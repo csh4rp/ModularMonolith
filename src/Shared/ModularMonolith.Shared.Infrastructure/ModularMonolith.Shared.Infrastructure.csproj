@@ -8,6 +8,17 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ModularMonolith.Shared.BusinessLogic\ModularMonolith.Shared.BusinessLogic.csproj" />
+      <ProjectReference Include="..\ModularMonolith.Shared.Core\ModularMonolith.Shared.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design"/>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Identity\" />
+    </ItemGroup>
+  
 </Project>

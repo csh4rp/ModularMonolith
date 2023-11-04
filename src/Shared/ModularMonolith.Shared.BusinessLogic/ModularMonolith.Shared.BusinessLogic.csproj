@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
+      <ProjectReference Include="..\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj" />
     </ItemGroup>
   
   <ItemGroup>

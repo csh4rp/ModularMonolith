@@ -2,7 +2,7 @@
 
 public class AuditLog
 {
-    public long Id { get; init; }
+    public Guid Id { get; init; }
     
     public required DateTimeOffset CreatedAt { get; init; }
     
@@ -13,4 +13,10 @@ public class AuditLog
     public required string EntityKeys { get; init; }
     
     public required string Changes { get; init; }
+    
+    public Guid? UserId { get; init; }
+    
+    public required string OperationName { get; init; }
+    
+    public required string TraceId { get; init; }
 }

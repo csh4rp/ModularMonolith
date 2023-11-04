@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+      <PackageReference Include="NSubstitute"/>
+      <PackageReference Include="NSubstitute.Analyzers.CSharp"/>
+      <PackageReference Include="Respawn" />
+      <PackageReference Include="Respawn.Postgres" />
+      <PackageReference Include="Testcontainers.PostgreSql" />
+    </ItemGroup>
+  
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj" />
+    </ItemGroup>
+  
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>

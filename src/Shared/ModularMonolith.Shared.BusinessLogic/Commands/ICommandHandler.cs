@@ -1,7 +1,7 @@
-﻿using ModularMonolith.Shared.Contracts;
-using MediatR;
+﻿using MediatR;
+using ModularMonolith.Shared.Contracts;
 
-namespace ModularMonolith.Shared.BusinessLogic;
+namespace ModularMonolith.Shared.BusinessLogic.Commands;
 
 public interface ICommandHandler<in TCommand> : IRequestHandler<TCommand> where TCommand : ICommand
 {

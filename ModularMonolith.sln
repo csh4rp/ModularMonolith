@@ -24,6 +24,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Busi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Infrastructure", "src\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj", "{94E65B55-B084-43F0-B439-24A8E338D1BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Domain", "src\Shared\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj", "{7054E47F-787F-4AE3-A0B1-850CDD04BBF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Core", "src\Shared\ModularMonolith.Shared.Core\ModularMonolith.Shared.Core.csproj", "{266D8B0D-BD23-4BCA-A207-747F8B981DAB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{282304E4-D50F-4AB3-8699-7CD18964EBF0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Infrastructure.Tests.Integration", "tests\Shared\ModularMonolith.Shared.Infrastructure.Tests.Integration\ModularMonolith.Shared.Infrastructure.Tests.Integration.csproj", "{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +47,10 @@ Global
 		{AE9B90FA-0F23-4F56-BBF5-6B02F3D07EC4} = {23D97AF7-96F3-49EC-BFE2-CCE1B738FCEE}
 		{A05144C4-127D-4697-9B9C-263E04C11E49} = {23D97AF7-96F3-49EC-BFE2-CCE1B738FCEE}
 		{94E65B55-B084-43F0-B439-24A8E338D1BE} = {23D97AF7-96F3-49EC-BFE2-CCE1B738FCEE}
+		{7054E47F-787F-4AE3-A0B1-850CDD04BBF7} = {23D97AF7-96F3-49EC-BFE2-CCE1B738FCEE}
+		{266D8B0D-BD23-4BCA-A207-747F8B981DAB} = {23D97AF7-96F3-49EC-BFE2-CCE1B738FCEE}
+		{282304E4-D50F-4AB3-8699-7CD18964EBF0} = {775CE607-1412-4AB7-AC27-6F5983ED2197}
+		{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B} = {282304E4-D50F-4AB3-8699-7CD18964EBF0}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BBAF6E32-FA5F-4916-9F22-AD58F95D2992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -61,5 +73,17 @@ Global
 		{94E65B55-B084-43F0-B439-24A8E338D1BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94E65B55-B084-43F0-B439-24A8E338D1BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94E65B55-B084-43F0-B439-24A8E338D1BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7054E47F-787F-4AE3-A0B1-850CDD04BBF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7054E47F-787F-4AE3-A0B1-850CDD04BBF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7054E47F-787F-4AE3-A0B1-850CDD04BBF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7054E47F-787F-4AE3-A0B1-850CDD04BBF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{266D8B0D-BD23-4BCA-A207-747F8B981DAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{266D8B0D-BD23-4BCA-A207-747F8B981DAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{266D8B0D-BD23-4BCA-A207-747F8B981DAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{266D8B0D-BD23-4BCA-A207-747F8B981DAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
