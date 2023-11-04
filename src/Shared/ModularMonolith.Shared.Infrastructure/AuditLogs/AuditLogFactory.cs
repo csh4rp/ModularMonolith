@@ -35,6 +35,11 @@ public class AuditLogFactory
         
         foreach (var propertyEntry in auditableProperties)
         {
+            if (propertyEntry.Metadata.IsPrimaryKey())
+            {
+                continue;
+            }
+            
             if (changeType == ChangeType.Modified && propertyEntry.IsModified)
             {
                 var change = new PropertyChange(propertyEntry.CurrentValue, propertyEntry.OriginalValue);

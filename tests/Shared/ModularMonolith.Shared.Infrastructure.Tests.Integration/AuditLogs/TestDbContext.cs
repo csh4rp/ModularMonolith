@@ -42,6 +42,6 @@ public class TestDbContext : DbContext
         modelBuilder.Entity<SecondTestEntity>()
             .AuditIgnore();
 
-        modelBuilder.ApplyConfiguration(new AuditLogEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new AuditLogEntityTypeConfiguration(table: "AuditLog"));
     }
 }

@@ -1,6 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   
+  <PropertyGroup>
+    <NoWarn>VSTHRD200</NoWarn>
+  </PropertyGroup>
+  
     <ItemGroup>
+      <PackageReference Include="FluentAssertions" />
       <PackageReference Include="Microsoft.EntityFrameworkCore"/>
       <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />

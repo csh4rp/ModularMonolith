@@ -30,11 +30,12 @@ public class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<AuditLog
             .HasMaxLength(8);
 
         builder.Property(b => b.Changes)
-            .IsRequired();
+            .IsRequired()
+            .HasColumnType("jsonb");
 
         builder.Property(b => b.EntityKeys)
             .IsRequired()
-            .HasMaxLength(256);
+            .HasColumnType("jsonb");
 
         builder.Property(b => b.TraceId)
             .IsRequired()
