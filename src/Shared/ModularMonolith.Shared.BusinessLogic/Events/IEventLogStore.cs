@@ -2,5 +2,5 @@
 
 public interface IEventLogStore
 {
-    Task<TEvent?> GetLastOccurenceAsync<TEvent>(string userId, CancellationToken cancellationToken);
+    Task<TEvent?> GetLastOccurenceAsync<TEvent>(Guid userId, CancellationToken cancellationToken);
 }

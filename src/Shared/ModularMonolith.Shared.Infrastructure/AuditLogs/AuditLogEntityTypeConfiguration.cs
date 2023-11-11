@@ -9,10 +9,10 @@ public class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<AuditLog
     private readonly string? _schema;
     private readonly string _table;
     
-    public AuditLogEntityTypeConfiguration(string? schema = null, string table = nameof(AuditLog))
+    public AuditLogEntityTypeConfiguration(string table = nameof(AuditLog), string? schema = null)
     {
-        _schema = schema;
         _table = table;
+        _schema = schema;
     }
     
     public void Configure(EntityTypeBuilder<AuditLog> builder)
@@ -39,6 +39,7 @@ public class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<AuditLog
 
         builder.Property(b => b.TraceId)
             .IsRequired()
+            .IsUnicode(false)
             .HasMaxLength(32);
     }
 }

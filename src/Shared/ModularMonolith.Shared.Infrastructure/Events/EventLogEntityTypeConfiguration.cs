@@ -6,9 +6,18 @@ namespace ModularMonolith.Shared.Infrastructure.Events;
 
 internal sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<EventLog>
 {
+    private readonly string _table;
+    private readonly string? _schema;
+
+    public EventLogEntityTypeConfiguration(string table = nameof(EventLog), string? schema = null)
+    {
+        _table = table;
+        _schema = schema;
+    }
+
     public void Configure(EntityTypeBuilder<EventLog> builder)
     {
-        builder.ToTable(nameof(EventLog), "Shared");
+        builder.ToTable(_table, _schema);
 
         builder.HasKey(b => b.Id);
 
@@ -27,11 +36,11 @@ internal sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration
             .HasMaxLength(128);
 
         builder.Property(b => b.Stream)
-            .IsRequired()
             .HasMaxLength(128);
         
         builder.Property(b => b.TraceId)
             .IsRequired()
+            .IsUnicode(false)
             .HasMaxLength(32);
     }
 }
