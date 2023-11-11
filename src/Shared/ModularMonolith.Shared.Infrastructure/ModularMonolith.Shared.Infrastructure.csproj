@@ -16,9 +16,5 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design"/>
       <PackageReference Include="Microsoft.EntityFrameworkCore.Relational"/>
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Identity\" />
-    </ItemGroup>
   
 </Project>

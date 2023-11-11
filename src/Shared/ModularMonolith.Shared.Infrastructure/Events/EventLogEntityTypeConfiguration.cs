@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace ModularMonolith.Shared.Infrastructure.Events;
 
-internal sealed class EventBusEntityTypeConfiguration : IEntityTypeConfiguration<EventLog>
+internal sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<EventLog>
 {
     public void Configure(EntityTypeBuilder<EventLog> builder)
     {
