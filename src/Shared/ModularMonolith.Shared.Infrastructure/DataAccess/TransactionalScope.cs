@@ -5,26 +5,31 @@ namespace ModularMonolith.Shared.Infrastructure.DataAccess;
 
 internal sealed class TransactionalScope : ITransactionalScope
 {
-    private static readonly AsyncLocal<IDbContextTransaction> Transaction = new();
+    private static readonly AsyncLocal<IDbContextTransaction> CurrentTransaction = new();
     
-    public ValueTask CompleteAsync(CancellationToken cancellationToken) => Transaction.Value is null 
+    public ValueTask CompleteAsync(CancellationToken cancellationToken) => CurrentTransaction.Value is null 
         ? new ValueTask() 
-        : new ValueTask(Transaction.Value.CommitAsync(cancellationToken));
+        : new ValueTask(CurrentTransaction.Value.CommitAsync(cancellationToken));
 
-    public void Dispose()
+    public void Dispose() => CurrentTransaction.Value?.Dispose();
+
+    public async ValueTask DisposeAsync()
     {
-        Transaction.Value?.Dispose();
+        if (CurrentTransaction.Value is null)
+        {
+            return;
+        }
+
+        await CurrentTransaction.Value.DisposeAsync();
     }
-    
-    public ValueTask DisposeAsync() => Transaction.Value?.DisposeAsync() ?? new ValueTask();
 
     public static void EnlistTransaction(IDbContextTransaction transaction)
     {
-        if (Transaction.Value is not null)
+        if (CurrentTransaction.Value is not null)
         {
             throw new InvalidOperationException("Transaction was already enlisted");
         }
 
-        Transaction.Value = transaction;
+        CurrentTransaction.Value = transaction;
     }
 }

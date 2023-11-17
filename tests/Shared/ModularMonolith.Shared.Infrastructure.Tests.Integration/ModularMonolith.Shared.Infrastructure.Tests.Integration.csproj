@@ -7,13 +7,14 @@
     <ItemGroup>
       <PackageReference Include="FluentAssertions" />
       <PackageReference Include="Microsoft.EntityFrameworkCore"/>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
       <PackageReference Include="NSubstitute"/>
       <PackageReference Include="NSubstitute.Analyzers.CSharp"/>
       <PackageReference Include="Respawn" />
       <PackageReference Include="Respawn.Postgres" />
       <PackageReference Include="Testcontainers.PostgreSql" />
+      <PackageReference Include="xunit" />
+      <PackageReference Include="xunit.runner.visualstudio" />
     </ItemGroup>
   
     <ItemGroup>
@@ -22,6 +23,13 @@
   
     <ItemGroup>
       <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj" />
+    </ItemGroup>
+  
+    <ItemGroup>
+      <PackageVersion Update="NSubstitute.Analyzers.CSharp" Version="1.0.16">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageVersion>
     </ItemGroup>
 
 </Project>

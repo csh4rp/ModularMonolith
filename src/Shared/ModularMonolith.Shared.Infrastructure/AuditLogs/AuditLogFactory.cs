@@ -1,25 +1,13 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ModularMonolith.Shared.BusinessLogic.Identity;
-using ModularMonolith.Shared.Core;
 
 namespace ModularMonolith.Shared.Infrastructure.AuditLogs;
 
-public class AuditLogFactory
+public sealed class AuditLogFactory(IIdentityContextAccessor identityContextAccessor, TimeProvider timeProvider)
 {
-    private readonly IIdentityContextAccessor _identityContextAccessor;
-    private readonly IDateTimeProvider _dateTimeProvider;
-
-    public AuditLogFactory(IIdentityContextAccessor identityContextAccessor, IDateTimeProvider dateTimeProvider)
-    {
-        _identityContextAccessor = identityContextAccessor;
-        _dateTimeProvider = dateTimeProvider;
-    }
-
     public AuditLog Create(EntityEntry entry)
     {
         Debug.Assert(Activity.Current is not null);
@@ -66,10 +54,10 @@ public class AuditLogFactory
         
         return new AuditLog
         {
-            CreatedAt = _dateTimeProvider.GetUtcNow(),
+            CreatedAt = timeProvider.GetUtcNow(),
             ChangeType = GetChangeType(entry),
             TraceId = Activity.Current.TraceId.ToString(),
-            UserId = _identityContextAccessor.Context?.UserId,
+            UserId = identityContextAccessor.Context?.UserId,
             OperationName = Activity.Current.OperationName,
             EntityType = entityType.FullName!,
             Changes = JsonSerializer.Serialize(changes),

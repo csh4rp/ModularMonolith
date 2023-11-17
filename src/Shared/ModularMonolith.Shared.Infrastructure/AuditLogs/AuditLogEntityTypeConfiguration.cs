@@ -4,20 +4,12 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace ModularMonolith.Shared.Infrastructure.AuditLogs;
 
-public class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<AuditLog>
+public class AuditLogEntityTypeConfiguration(string table = nameof(AuditLog), string? schema = null)
+    : IEntityTypeConfiguration<AuditLog>
 {
-    private readonly string? _schema;
-    private readonly string _table;
-    
-    public AuditLogEntityTypeConfiguration(string table = nameof(AuditLog), string? schema = null)
-    {
-        _table = table;
-        _schema = schema;
-    }
-    
     public void Configure(EntityTypeBuilder<AuditLog> builder)
     {
-        builder.ToTable(_table, _schema);
+        builder.ToTable(table, schema);
 
         builder.HasKey(b => b.Id);
 

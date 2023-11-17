@@ -3,7 +3,6 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.BusinessLogic.Identity;
-using ModularMonolith.Shared.Core;
 using ModularMonolith.Shared.Infrastructure.AuditLogs;
 using ModularMonolith.Shared.Infrastructure.Tests.Integration.AuditLogs.Entities;
 using ModularMonolith.Shared.Infrastructure.Tests.Integration.AuditLogs.Fixtures;
@@ -25,7 +24,7 @@ public class AuditLogInterceptorTests : IAsyncDisposable
     };
     
     private readonly IIdentityContextAccessor _identityContextAccessor = Substitute.For<IIdentityContextAccessor>();
-    private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
+    private readonly TimeProvider _dateTimeProvider = Substitute.For<TimeProvider>();
 
     private readonly PostgresFixture _postgresFixture;
 
@@ -84,7 +83,7 @@ public class AuditLogInterceptorTests : IAsyncDisposable
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddTransient<AuditLogFactory>();
         serviceCollection.AddTransient<IIdentityContextAccessor>(_ => _identityContextAccessor);
-        serviceCollection.AddTransient<IDateTimeProvider>(_ => _dateTimeProvider);
+        serviceCollection.AddTransient<TimeProvider>(_ => _dateTimeProvider);
         
         var builder = new DbContextOptionsBuilder<TestDbContext>();
         builder.UseApplicationServiceProvider(serviceCollection.BuildServiceProvider());

@@ -4,20 +4,12 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace ModularMonolith.Shared.Infrastructure.Events;
 
-internal sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<EventLog>
+internal sealed class EventLogEntityTypeConfiguration(string table = nameof(EventLog), string? schema = null) 
+    : IEntityTypeConfiguration<EventLog>
 {
-    private readonly string _table;
-    private readonly string? _schema;
-
-    public EventLogEntityTypeConfiguration(string table = nameof(EventLog), string? schema = null)
-    {
-        _table = table;
-        _schema = schema;
-    }
-
     public void Configure(EntityTypeBuilder<EventLog> builder)
     {
-        builder.ToTable(_table, _schema);
+        builder.ToTable(table, schema);
 
         builder.HasKey(b => b.Id);
 

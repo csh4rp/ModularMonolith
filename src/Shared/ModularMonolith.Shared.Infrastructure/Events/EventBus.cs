@@ -4,26 +4,16 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.BusinessLogic.Events;
 using ModularMonolith.Shared.BusinessLogic.Identity;
-using ModularMonolith.Shared.Core;
 using ModularMonolith.Shared.Domain.Abstractions;
 using ModularMonolith.Shared.Domain.Attributes;
 
 namespace ModularMonolith.Shared.Infrastructure.Events;
 
-internal sealed class EventBus : IEventBus
+internal sealed class EventBus(DbContext dbContext,
+        IIdentityContextAccessor identityContextAccessor,
+        TimeProvider timeProvider) : IEventBus
 {
     private static readonly EventPublishOptions DefaultOptions = new();
-    
-    private readonly DbContext _dbContext;
-    private readonly IIdentityContextAccessor _identityContextAccessor;
-    private readonly IDateTimeProvider _dateTimeProvider;
-
-    public EventBus(DbContext dbContext, IIdentityContextAccessor identityContextAccessor, IDateTimeProvider dateTimeProvider)
-    {
-        _dbContext = dbContext;
-        _identityContextAccessor = identityContextAccessor;
-        _dateTimeProvider = dateTimeProvider;
-    }
 
     public Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : IEvent
         => PublishAsync(@event, DefaultOptions, cancellationToken);
@@ -39,19 +29,19 @@ internal sealed class EventBus : IEventBus
 
         var eventLog = new EventLog
         {
-            CreatedAt = _dateTimeProvider.GetUtcNow(),
+            CreatedAt = timeProvider.GetUtcNow(),
             Name = attribute?.Name ?? eventType.Name,
             Type = eventType.FullName!,
             Topic = attribute?.Topic,
             Stream = options.Stream,
             Payload = payload,
-            UserId = _identityContextAccessor.Context?.UserId,
+            UserId = identityContextAccessor.Context?.UserId,
             OperationName = Activity.Current.OperationName,
             TraceId = Activity.Current.TraceId.ToString()
         };
 
-        _dbContext.Set<EventLog>().Add(eventLog);
-        return _dbContext.SaveChangesAsync(cancellationToken);
+        dbContext.Set<EventLog>().Add(eventLog);
+        return dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken)
@@ -61,7 +51,7 @@ internal sealed class EventBus : IEventBus
     {
         Debug.Assert(Activity.Current is not null);
 
-        var now = _dateTimeProvider.GetUtcNow();
+        var now = timeProvider.GetUtcNow();
 
         var logs = events.Select(e =>
         {
@@ -78,13 +68,13 @@ internal sealed class EventBus : IEventBus
                 Topic = attribute?.Topic,
                 Stream = options.Stream,
                 Payload = payload,
-                UserId = _identityContextAccessor.Context?.UserId,
+                UserId = identityContextAccessor.Context?.UserId,
                 OperationName = Activity.Current.OperationName,
                 TraceId = Activity.Current.TraceId.ToString()
             };
         });
 
-        _dbContext.Set<EventLog>().AddRange(logs);
-        return _dbContext.SaveChangesAsync(cancellationToken);
+        dbContext.Set<EventLog>().AddRange(logs);
+        return dbContext.SaveChangesAsync(cancellationToken);
     }
 }
