@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.BusinessLogic.Events;
 using ModularMonolith.Shared.BusinessLogic.Identity;
 using ModularMonolith.Shared.Domain.Abstractions;
@@ -11,6 +9,7 @@ using ModularMonolith.Shared.Infrastructure.DataAccess;
 namespace ModularMonolith.Shared.Infrastructure.Events;
 
 internal sealed class EventBus(IEventLogContext dbContext,
+        EventSerializer eventSerializer,
         IIdentityContextAccessor identityContextAccessor,
         TimeProvider timeProvider) : IEventBus
 {
@@ -25,17 +24,14 @@ internal sealed class EventBus(IEventLogContext dbContext,
         
         var eventType = typeof(TEvent);
         var attribute = eventType.GetCustomAttribute<EventAttribute>();
-
-        var payload = JsonSerializer.Serialize(@event);
-
+        
         var eventLog = new EventLog
         {
             CreatedAt = timeProvider.GetUtcNow(),
             Name = attribute?.Name ?? eventType.Name,
             Type = eventType.FullName!,
-            Topic = attribute?.Topic,
-            Stream = options.Stream,
-            Payload = payload,
+            CorrelationId = options.CorrelationId,
+            Payload = eventSerializer.Serialize(@event),
             UserId = identityContextAccessor.Context?.UserId,
             OperationName = Activity.Current.OperationName,
             TraceId = Activity.Current.Id!
@@ -54,28 +50,25 @@ internal sealed class EventBus(IEventLogContext dbContext,
 
         var now = timeProvider.GetUtcNow();
 
-        var logs = events.Select(e =>
+        var eventLogs = events.Select(e =>
         {
             var eventType = e.GetType();
             var attribute = eventType.GetCustomAttribute<EventAttribute>();
-
-            var payload = JsonSerializer.Serialize(e, eventType);
-
+            
             return new EventLog
             {
                 CreatedAt = now,
                 Name = attribute?.Name ?? eventType.Name,
                 Type = eventType.FullName!,
-                Topic = attribute?.Topic,
-                Stream = options.Stream,
-                Payload = payload,
+                CorrelationId = options.CorrelationId,
+                Payload = eventSerializer.Serialize(e, eventType),
                 UserId = identityContextAccessor.Context?.UserId,
                 OperationName = Activity.Current.OperationName,
-                TraceId = Activity.Current.TraceId.ToString()
+                TraceId = Activity.Current.Id!
             };
         });
 
-        dbContext.EventLogs.AddRange(logs);
+        dbContext.EventLogs.AddRange(eventLogs);
         return dbContext.SaveChangesAsync(cancellationToken);
     }
 }

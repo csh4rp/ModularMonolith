@@ -1,11 +1,15 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
 
 namespace ModularMonolith.Shared.Infrastructure.Events;
 
-public sealed class EventReader(IEventLogContext eventLogContext, TimeProvider timeProvider, IOptionsMonitor<EventOptions> options)
+public sealed class EventReader(IEventLogContext eventLogContext,
+    TimeProvider timeProvider,
+    IOptionsMonitor<EventOptions> options,
+    ILogger<EventReader> logger)
 {
     public async IAsyncEnumerable<EventLog> GetUnpublishedEventsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
     {
@@ -41,10 +45,14 @@ public sealed class EventReader(IEventLogContext eventLogContext, TimeProvider t
 
             if (eventLogs.Count == 0)
             {
+                logger.NoNewEvents();
+                
                 await transaction.DisposeAsync();
                 await Task.Delay(options.CurrentValue.PollInterval, cancellationToken);
                 continue;
             }
+            
+            logger.FetchedNewEvents(eventLogs.Count);
             
             foreach (var eventLog in eventLogs)
             {
@@ -59,6 +67,8 @@ public sealed class EventReader(IEventLogContext eventLogContext, TimeProvider t
                 .ExecuteUpdateAsync(e => e.SetProperty(p => p.PublishedAt, now), cancellationToken);
             
             await transaction.CommitAsync(cancellationToken);
+            
+            logger.EventsMarkedAsPublished(ids);
         }
     } 
 }

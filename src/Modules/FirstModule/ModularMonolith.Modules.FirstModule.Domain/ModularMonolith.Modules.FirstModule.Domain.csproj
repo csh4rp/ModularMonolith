@@ -1,3 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj" />
+  </ItemGroup>
 </Project>

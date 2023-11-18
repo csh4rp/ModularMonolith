@@ -10,9 +10,7 @@ public class EventLog
     
     public Guid? UserId { get; init; }
     
-    public required string? Topic { get; init; }
-    
-    public required string? Stream { get; init; }
+    public required Guid? CorrelationId { get; init; }
     
     public required string Type { get; init; }
     

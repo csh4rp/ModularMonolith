@@ -22,13 +22,6 @@ internal sealed class EventLogEntityTypeConfiguration(string table = nameof(Even
         builder.Property(b => b.Type)
             .IsRequired()
             .HasMaxLength(256);
-
-        builder.Property(b => b.Topic)
-            .IsRequired()
-            .HasMaxLength(128);
-
-        builder.Property(b => b.Stream)
-            .HasMaxLength(128);
         
         builder.Property(b => b.TraceId)
             .IsRequired()

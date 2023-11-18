@@ -3,6 +3,7 @@ using MassTransit;
 using MassTransit.RabbitMqTransport.Topology;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Domain.Abstractions;
+using ModularMonolith.Shared.Infrastructure.Events;
 using RabbitMQ.Client;
 
 namespace ModularMonolith.Shared.Infrastructure.Messaging;
@@ -43,6 +44,8 @@ public static class Extensions
                 cfg.ReceiveEndpoint("", end =>
                 {
                     end.Consumer<MyClass>();
+                    
+                    end.UseConsumeFilter(typeof(TransactionEnlistingEventFilter<>), cnx);
                     
                     end.Bind("", a =>
                     {

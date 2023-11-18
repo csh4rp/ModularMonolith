@@ -1,3 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
+  <ItemGroup>
+    <Reference Include="MassTransit.Abstractions">
+      <HintPath>..\..\..\..\..\..\..\.nuget\packages\masstransit.abstractions\8.1.2\lib\net7.0\MassTransit.Abstractions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Domain\ModularMonolith.Modules.FirstModule.Domain.csproj" />
+  </ItemGroup>
 </Project>

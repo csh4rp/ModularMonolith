@@ -2,5 +2,5 @@
 
 public class EventPublishOptions
 {
-    public string? Stream { get; init; }
+    public Guid? CorrelationId { get; init; }
 }
