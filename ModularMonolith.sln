@@ -32,6 +32,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{282304
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Infrastructure.Tests.Integration", "tests\Shared\ModularMonolith.Shared.Infrastructure.Tests.Integration\ModularMonolith.Shared.Infrastructure.Tests.Integration.csproj", "{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Api", "src\Shared\ModularMonolith.Shared.Api\ModularMonolith.Shared.Api.csproj", "{298E5F9B-3D46-4A00-8D54-2FBD5B0B2E97}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Bootstrapper", "src\Bootstrapper\ModularMonolith.Bootstrapper\ModularMonolith.Bootstrapper.csproj", "{385F96E4-6FA3-49F4-97B5-CF2B47DF4BD8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,8 @@ Global
 		{266D8B0D-BD23-4BCA-A207-747F8B981DAB} = {23D97AF7-96F3-49EC-BFE2-CCE1B738FCEE}
 		{282304E4-D50F-4AB3-8699-7CD18964EBF0} = {775CE607-1412-4AB7-AC27-6F5983ED2197}
 		{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B} = {282304E4-D50F-4AB3-8699-7CD18964EBF0}
+		{298E5F9B-3D46-4A00-8D54-2FBD5B0B2E97} = {23D97AF7-96F3-49EC-BFE2-CCE1B738FCEE}
+		{385F96E4-6FA3-49F4-97B5-CF2B47DF4BD8} = {495200F9-2EF9-404F-9220-7DBEA311F038}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BBAF6E32-FA5F-4916-9F22-AD58F95D2992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -85,5 +91,13 @@ Global
 		{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{298E5F9B-3D46-4A00-8D54-2FBD5B0B2E97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{298E5F9B-3D46-4A00-8D54-2FBD5B0B2E97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{298E5F9B-3D46-4A00-8D54-2FBD5B0B2E97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{298E5F9B-3D46-4A00-8D54-2FBD5B0B2E97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{385F96E4-6FA3-49F4-97B5-CF2B47DF4BD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{385F96E4-6FA3-49F4-97B5-CF2B47DF4BD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{385F96E4-6FA3-49F4-97B5-CF2B47DF4BD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{385F96E4-6FA3-49F4-97B5-CF2B47DF4BD8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

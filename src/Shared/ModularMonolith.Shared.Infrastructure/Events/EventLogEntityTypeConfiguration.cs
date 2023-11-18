@@ -34,5 +34,7 @@ internal sealed class EventLogEntityTypeConfiguration(string table = nameof(Even
             .IsRequired()
             .IsUnicode(false)
             .HasMaxLength(32);
+        
+        builder.HasIndex(b => b.PublishedAt);
     }
 }

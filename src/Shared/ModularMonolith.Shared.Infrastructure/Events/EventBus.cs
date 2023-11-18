@@ -6,10 +6,11 @@ using ModularMonolith.Shared.BusinessLogic.Events;
 using ModularMonolith.Shared.BusinessLogic.Identity;
 using ModularMonolith.Shared.Domain.Abstractions;
 using ModularMonolith.Shared.Domain.Attributes;
+using ModularMonolith.Shared.Infrastructure.DataAccess;
 
 namespace ModularMonolith.Shared.Infrastructure.Events;
 
-internal sealed class EventBus(DbContext dbContext,
+internal sealed class EventBus(IEventLogContext dbContext,
         IIdentityContextAccessor identityContextAccessor,
         TimeProvider timeProvider) : IEventBus
 {
@@ -37,10 +38,10 @@ internal sealed class EventBus(DbContext dbContext,
             Payload = payload,
             UserId = identityContextAccessor.Context?.UserId,
             OperationName = Activity.Current.OperationName,
-            TraceId = Activity.Current.TraceId.ToString()
+            TraceId = Activity.Current.Id!
         };
 
-        dbContext.Set<EventLog>().Add(eventLog);
+        dbContext.EventLogs.Add(eventLog);
         return dbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -74,7 +75,7 @@ internal sealed class EventBus(DbContext dbContext,
             };
         });
 
-        dbContext.Set<EventLog>().AddRange(logs);
+        dbContext.EventLogs.AddRange(logs);
         return dbContext.SaveChangesAsync(cancellationToken);
     }
 }
