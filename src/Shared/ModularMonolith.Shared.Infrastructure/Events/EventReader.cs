@@ -1,17 +1,15 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
 
 namespace ModularMonolith.Shared.Infrastructure.Events;
 
-public class EventReader
+public sealed class EventReader(IEventLogContext eventLogContext, TimeProvider timeProvider, IOptionsMonitor<EventOptions> options)
 {
-    private readonly BaseDbContext _eventLogContext;
-    private readonly TimeProvider _timeProvider;
-
     public async IAsyncEnumerable<EventLog> GetUnpublishedEventsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var eventLogEntityType = _eventLogContext.Model.FindEntityType(typeof(EventLog))!;
+        var eventLogEntityType = eventLogContext.Model.FindEntityType(typeof(EventLog))!;
 
         var tableName = eventLogEntityType.GetTableName();
         var schemeName = eventLogEntityType.GetSchema();
@@ -25,35 +23,42 @@ public class EventReader
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            var transaction = await _eventLogContext.Database.BeginTransactionAsync(cancellationToken);
+            var limit = options.CurrentValue.BatchSize;
             
-            var eventLogs = await _eventLogContext.EventLogs.FromSql(
+            await using var transaction = await eventLogContext.Database.BeginTransactionAsync(cancellationToken);
+            
+            var eventLogs = await eventLogContext.EventLogs.FromSql(
                     $"""
                      SELECT *
                      FROM {fullTableName}
                      WHERE {publishedAtProperty.GetColumnName()} IS NULL
                      ORDER BY {idProperty.GetColumnName()}
-                     LIMIT 10
+                     LIMIT {limit}
                      FOR UPDATE SKIP LOCKED
                      """)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
+            if (eventLogs.Count == 0)
+            {
+                await transaction.DisposeAsync();
+                await Task.Delay(options.CurrentValue.PollInterval, cancellationToken);
+                continue;
+            }
+            
             foreach (var eventLog in eventLogs)
             {
                 yield return eventLog;
             }
 
-            var now = _timeProvider.GetUtcNow();
+            var now = timeProvider.GetUtcNow();
             var ids = eventLogs.Select(e => e.Id).ToList();
 
-            _ = await _eventLogContext.EventLogs
+            _ = await eventLogContext.EventLogs
                 .Where(e => ids.Contains(e.Id))
                 .ExecuteUpdateAsync(e => e.SetProperty(p => p.PublishedAt, now), cancellationToken);
             
             await transaction.CommitAsync(cancellationToken);
         }
-        
-
     } 
 }
