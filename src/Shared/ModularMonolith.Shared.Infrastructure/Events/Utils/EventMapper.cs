@@ -2,17 +2,20 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.Extensions.Options;
+using ModularMonolith.Shared.BusinessLogic.Abstract;
 using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Domain.Abstractions;
+using ModularMonolith.Shared.Infrastructure.Events.Options;
 
-namespace ModularMonolith.Shared.Infrastructure.Events;
+namespace ModularMonolith.Shared.Infrastructure.Events.Utils;
 
 public sealed class EventMapper
 {
     private readonly FrozenDictionary<Type, Func<object, IIntegrationEvent>> _eventMappings;
 
-    public EventMapper(Assembly[] assemblies) =>
-        _eventMappings = assemblies.SelectMany(a => a.GetTypes())
+    public EventMapper(IOptionsMonitor<EventOptions> optionsMonitor) =>
+        _eventMappings = optionsMonitor.CurrentValue.Assemblies.SelectMany(a => a.GetTypes())
             .Where(t => t.IsGenericType && t.GetGenericTypeDefinition().IsAssignableTo(typeof(IEventMapping<>)))
             .ToFrozenDictionary(t => t, t =>
             {

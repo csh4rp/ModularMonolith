@@ -4,11 +4,12 @@ using ModularMonolith.Shared.BusinessLogic.Events;
 using ModularMonolith.Shared.BusinessLogic.Identity;
 using ModularMonolith.Shared.Domain.Abstractions;
 using ModularMonolith.Shared.Domain.Attributes;
-using ModularMonolith.Shared.Infrastructure.DataAccess;
+using ModularMonolith.Shared.Domain.Entities;
+using ModularMonolith.Shared.Infrastructure.Events.Utils;
 
-namespace ModularMonolith.Shared.Infrastructure.Events;
+namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 
-internal sealed class EventBus(IEventLogContext dbContext,
+internal sealed class OutboxEventBus(IEventLogContext dbContext,
         EventSerializer eventSerializer,
         IIdentityContextAccessor identityContextAccessor,
         TimeProvider timeProvider) : IEventBus

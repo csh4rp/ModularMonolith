@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using ModularMonolith.Shared.Infrastructure.Events;
+using ModularMonolith.Shared.Domain.Entities;
 
-namespace ModularMonolith.Shared.Infrastructure.DataAccess;
+namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 
 public interface IEventLogContext
 {

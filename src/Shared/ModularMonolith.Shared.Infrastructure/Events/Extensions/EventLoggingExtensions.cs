@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace ModularMonolith.Shared.Infrastructure.Events;
+namespace ModularMonolith.Shared.Infrastructure.Events.Extensions;
 
 internal static partial class EventLoggingExtensions
 {

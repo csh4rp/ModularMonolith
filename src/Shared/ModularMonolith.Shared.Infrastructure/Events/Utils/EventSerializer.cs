@@ -1,16 +1,18 @@
 ﻿using System.Collections.Frozen;
 using System.Reflection;
 using System.Text.Json;
+using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.Domain.Abstractions;
+using ModularMonolith.Shared.Infrastructure.Events.Options;
 
-namespace ModularMonolith.Shared.Infrastructure.Events;
+namespace ModularMonolith.Shared.Infrastructure.Events.Utils;
 
-public sealed class EventSerializer
+internal sealed class EventSerializer
 {
     private readonly FrozenDictionary<string, Type> _typesDictionary;
 
-    public EventSerializer(Assembly[] assemblies) =>
-        _typesDictionary = assemblies.SelectMany(a => a.GetTypes())
+    public EventSerializer(IOptionsMonitor<EventOptions> optionsMonitor) =>
+        _typesDictionary = optionsMonitor.CurrentValue.Assemblies.SelectMany(a => a.GetTypes())
             .Where(t => t.IsAssignableTo(typeof(IEvent)))
             .ToFrozenDictionary(k => k.FullName!);
 

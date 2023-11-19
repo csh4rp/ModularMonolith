@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
+using ModularMonolith.Shared.Domain.Entities;
 
-namespace ModularMonolith.Shared.Infrastructure.Events;
+namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 
 internal sealed class EventLogEntityTypeConfiguration(string table = nameof(EventLog), string? schema = null) 
     : IEntityTypeConfiguration<EventLog>

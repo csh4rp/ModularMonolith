@@ -1,4 +1,4 @@
-﻿namespace ModularMonolith.Shared.Infrastructure.Events;
+﻿namespace ModularMonolith.Shared.Domain.Entities;
 
 public class EventLog
 {

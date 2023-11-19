@@ -1,10 +1,13 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ModularMonolith.Shared.Domain.Entities;
+using ModularMonolith.Shared.Infrastructure.Events.DataAccess;
+using ModularMonolith.Shared.Infrastructure.Events.Utils;
 
-namespace ModularMonolith.Shared.Infrastructure.Events;
+namespace ModularMonolith.Shared.Infrastructure.Events.BackgroundServices;
 
-public class EventPublisherBackgroundService(EventReader eventReader, 
+internal sealed class EventPublisherBackgroundService(EventReader eventReader, 
         EventSerializer eventSerializer,
         EventMapper eventMapper,
         IBus bus,
@@ -42,7 +45,7 @@ public class EventPublisherBackgroundService(EventReader eventReader,
             cnx.CorrelationId = eventLog.CorrelationId;
         }, cancellationToken);
         
-        logger.EventPublished(eventLog.Id);
+        Extensions.EventLoggingExtensions.EventPublished(logger, eventLog.Id);
 
         if (eventMapper.TryMap(@event, out var integrationEvent))
         {
@@ -52,7 +55,7 @@ public class EventPublisherBackgroundService(EventReader eventReader,
                 cnx.CorrelationId = eventLog.CorrelationId;
             }, cancellationToken);
             
-            logger.IntegrationEventPublished(eventLog.Id);
+            Extensions.EventLoggingExtensions.IntegrationEventPublished(logger, eventLog.Id);
         }
     }
 }

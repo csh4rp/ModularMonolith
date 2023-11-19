@@ -1,7 +1,7 @@
 ﻿using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Domain.Abstractions;
 
-namespace ModularMonolith.Shared.Infrastructure.Events;
+namespace ModularMonolith.Shared.BusinessLogic.Abstract;
 
 public interface IEventMapping<in TEvent> where TEvent : IEvent
 {

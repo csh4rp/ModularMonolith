@@ -13,6 +13,8 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design"/>
       <PackageReference Include="Microsoft.EntityFrameworkCore.Relational"/>
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+      <PackageReference Include="Microsoft.Extensions.Options" />
+      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
       <PackageReference Include="Npgsql" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     </ItemGroup>

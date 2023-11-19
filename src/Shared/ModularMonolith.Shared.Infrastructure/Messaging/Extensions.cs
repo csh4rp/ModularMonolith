@@ -1,37 +1,40 @@
 ﻿using System.Reflection;
 using MassTransit;
-using MassTransit.RabbitMqTransport.Topology;
 using Microsoft.Extensions.DependencyInjection;
+using ModularMonolith.Shared.BusinessLogic.Abstract;
+using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Domain.Abstractions;
-using ModularMonolith.Shared.Infrastructure.Events;
+using ModularMonolith.Shared.Domain.Attributes;
 using RabbitMQ.Client;
 
 namespace ModularMonolith.Shared.Infrastructure.Messaging;
 
 public static class Extensions
 {
-    public static IServiceCollection AddMessaging(this IServiceCollection serviceCollection,
-        Assembly[] consumerAssemblies,
-        Assembly[] messageAssemblies)
+    public static IServiceCollection AddMessaging(this IServiceCollection serviceCollection, Action<MessagingOptions> configurationAction)
     {
-        serviceCollection.AddMassTransit(c =>
+        serviceCollection.AddOptions<MessagingOptions>()
+            .Configure(configurationAction);
+
+        var options = new MessagingOptions();
+        configurationAction.Invoke(options);
+        
+        serviceCollection.AddMassTransit(configurator =>
         {
-            var consumerTypes = consumerAssemblies.SelectMany(a => a.GetTypes())
-                .Where(t => t.IsAssignableTo(typeof(IConsumer)))
-                .ToList();
-
-            foreach (var consumerType in consumerTypes)
-            {
-                c.AddConsumer(consumerType);
-            }
+            configurator.AddConsumers(_ => true, options.Assemblies.ToArray());
             
-            c.UsingRabbitMq((cnx, cfg) =>
+            configurator.UsingRabbitMq((cnx, cfg) =>
             {
-                var messageTypes = messageAssemblies.SelectMany(a => a.GetTypes())
-                    .Where(t => t.IsAssignableTo(typeof(IEvent)))
-                    .ToList();
-
-                foreach (var messageType in messageTypes)
+                cfg.Host(options.Uri);
+                
+                cfg.MessageTopology.SetEntityNameFormatter(new AttributeEntityNameFormatter());
+                
+                var consumerMessages = options.Assemblies.SelectMany(a => a.GetTypes())
+                    .Where(t => t.IsAssignableTo(typeof(IConsumer)))
+                    .GroupBy(t => t.GenericTypeArguments[0])
+                    .ToDictionary(t => t.Key, t => t.ToList());
+                
+                foreach (var messageType in consumerMessages.Keys)
                 {
                     cfg.Publish(messageType, msg =>
                     {
@@ -39,19 +42,31 @@ public static class Extensions
                         msg.Durable = true;
                     });
                 }
-                
-                
-                cfg.ReceiveEndpoint("", end =>
+
+                foreach (var (messageType, _) in consumerMessages)
                 {
-                    end.Consumer<MyClass>();
-                    
-                    end.UseConsumeFilter(typeof(TransactionEnlistingEventFilter<>), cnx);
-                    
-                    end.Bind("", a =>
+                    var eventAttribute = messageType.GetCustomAttribute<EventAttribute>()!;
+                    var topic = eventAttribute.Topic ?? messageType.Name;
+
+                    var groupedConsumers = consumerMessages.Values.SelectMany(s => s)
+                        .GroupBy(t => t.GetCustomAttribute<EventConsumerAttribute>()?.Queue ?? topic)
+                        .ToDictionary(t => t.Key, t => t.ToList());
+
+                    foreach (var (queue, consumerTypes) in groupedConsumers)
                     {
-                        
-                    });
-                });
+                        cfg.ReceiveEndpoint(queue,c =>
+                        {
+                            foreach (var consumerType in consumerTypes)
+                            {
+                                c.ConfigureConsumer(cnx, consumerType);
+                            }
+                            
+                           c.Bind(topic);
+                        });
+                    }
+                }
+                
+
             });
         });
         
