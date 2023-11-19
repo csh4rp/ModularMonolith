@@ -2,7 +2,7 @@
 using MassTransit;
 using ModularMonolith.Shared.Domain.Attributes;
 
-namespace ModularMonolith.Shared.Infrastructure.Messaging;
+namespace ModularMonolith.Shared.Infrastructure.Messaging.Utils;
 
 internal sealed class AttributeEntityNameFormatter : IEntityNameFormatter
 {
