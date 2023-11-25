@@ -22,6 +22,7 @@
     <PackageVersion Include="NSubstitute" Version="5.1.0" />
     <PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="10.0.16" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageVersion Include="Polly" Version="8.2.0" />
     <PackageVersion Include="Respawn" Version="6.1.0" />
     <PackageVersion Include="Respawn.Postgres" Version="1.0.15" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="3.6.0" />

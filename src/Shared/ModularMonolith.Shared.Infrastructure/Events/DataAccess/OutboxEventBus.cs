@@ -9,12 +9,24 @@ using ModularMonolith.Shared.Infrastructure.Events.Utils;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 
-internal sealed class OutboxEventBus(IEventLogContext dbContext,
-        EventSerializer eventSerializer,
-        IIdentityContextAccessor identityContextAccessor,
-        TimeProvider timeProvider) : IEventBus
+internal sealed class OutboxEventBus : IEventBus
 {
     private static readonly EventPublishOptions DefaultOptions = new();
+    private readonly IEventLogContext _dbContext;
+    private readonly EventSerializer _eventSerializer;
+    private readonly IIdentityContextAccessor _identityContextAccessor;
+    private readonly TimeProvider _timeProvider;
+
+    public OutboxEventBus(IEventLogContext dbContext,
+        EventSerializer eventSerializer,
+        IIdentityContextAccessor identityContextAccessor,
+        TimeProvider timeProvider)
+    {
+        _dbContext = dbContext;
+        _eventSerializer = eventSerializer;
+        _identityContextAccessor = identityContextAccessor;
+        _timeProvider = timeProvider;
+    }
 
     public Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : IEvent
         => PublishAsync(@event, DefaultOptions, cancellationToken);
@@ -28,18 +40,18 @@ internal sealed class OutboxEventBus(IEventLogContext dbContext,
         
         var eventLog = new EventLog
         {
-            CreatedAt = timeProvider.GetUtcNow(),
+            CreatedAt = _timeProvider.GetUtcNow(),
             Name = attribute?.Name ?? eventType.Name,
             Type = eventType.FullName!,
             CorrelationId = options.CorrelationId,
-            Payload = eventSerializer.Serialize(@event),
-            UserId = identityContextAccessor.Context?.UserId,
+            Payload = _eventSerializer.Serialize(@event),
+            UserId = _identityContextAccessor.Context?.UserId,
             OperationName = Activity.Current.OperationName,
-            TraceId = Activity.Current.Id!
+            ActivityId = Activity.Current.Id!
         };
 
-        dbContext.EventLogs.Add(eventLog);
-        return dbContext.SaveChangesAsync(cancellationToken);
+        _dbContext.EventLogs.Add(eventLog);
+        return _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken)
@@ -49,7 +61,7 @@ internal sealed class OutboxEventBus(IEventLogContext dbContext,
     {
         Debug.Assert(Activity.Current is not null);
 
-        var now = timeProvider.GetUtcNow();
+        var now = _timeProvider.GetUtcNow();
 
         var eventLogs = events.Select(e =>
         {
@@ -62,14 +74,14 @@ internal sealed class OutboxEventBus(IEventLogContext dbContext,
                 Name = attribute?.Name ?? eventType.Name,
                 Type = eventType.FullName!,
                 CorrelationId = options.CorrelationId,
-                Payload = eventSerializer.Serialize(e, eventType),
-                UserId = identityContextAccessor.Context?.UserId,
+                Payload = _eventSerializer.Serialize(e, eventType),
+                UserId = _identityContextAccessor.Context?.UserId,
                 OperationName = Activity.Current.OperationName,
-                TraceId = Activity.Current.Id!
+                ActivityId = Activity.Current.Id!
             };
         });
 
-        dbContext.EventLogs.AddRange(eventLogs);
-        return dbContext.SaveChangesAsync(cancellationToken);
+        _dbContext.EventLogs.AddRange(eventLogs);
+        return _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

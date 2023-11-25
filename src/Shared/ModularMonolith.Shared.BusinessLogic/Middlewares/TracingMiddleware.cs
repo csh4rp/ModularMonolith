@@ -5,9 +5,12 @@ using ModularMonolith.Shared.Contracts;
 
 namespace ModularMonolith.Shared.BusinessLogic.Middlewares;
 
-internal sealed class TracingMiddleware<TRequest, TResponse>(ILogger<TracingMiddleware<TRequest, TResponse>> logger)
-    : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
+internal sealed class TracingMiddleware<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
 {
+    private readonly ILogger<TracingMiddleware<TRequest, TResponse>> _logger;
+
+    public TracingMiddleware(ILogger<TracingMiddleware<TRequest, TResponse>> logger) => _logger = logger;
+
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
@@ -20,7 +23,7 @@ internal sealed class TracingMiddleware<TRequest, TResponse>(ILogger<TracingMidd
             _ => "Event"
         };
 
-        logger.OperationStarted(requestType.Name);
+        _logger.OperationStarted(requestType.Name);
         
         using var activity = TracingSources.Default.CreateActivity(requestType.Name, ActivityKind.Internal);
         activity?.SetTag("OperationType", operationType);
@@ -31,7 +34,7 @@ internal sealed class TracingMiddleware<TRequest, TResponse>(ILogger<TracingMidd
         
         activity?.Dispose();
 
-        logger.OperationFinished(requestType.Name);
+        _logger.OperationFinished(requestType.Name);
 
         return result;
     }

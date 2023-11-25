@@ -2,6 +2,4 @@
 
 namespace ModularMonolith.Shared.Contracts;
 
-public interface IQuery<out T> : IRequest<T>
-{
-}
+public interface IQuery<out T> : IRequest<T>;

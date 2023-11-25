@@ -1,76 +1,77 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.Domain.Entities;
-using ModularMonolith.Shared.Infrastructure.Events.Options;
+using ModularMonolith.Shared.Infrastructure.Events.Extensions;
+using ModularMonolith.Shared.Infrastructure.Events.Utils;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 
-internal sealed class EventReader(IEventLogContext eventLogContext,
-    TimeProvider timeProvider,
-    IOptionsMonitor<EventOptions> options,
-    ILogger<EventReader> logger)
+internal sealed class EventReader
 {
+    private readonly TimeProvider _timeProvider;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly EventChannel _eventChannel;
+    private readonly ILogger<EventReader> _logger;
+
+    public EventReader(TimeProvider timeProvider,
+        IServiceScopeFactory serviceScopeFactory,
+        EventChannel eventChannel,
+        ILogger<EventReader> logger)
+    {
+        _timeProvider = timeProvider;
+        _serviceScopeFactory = serviceScopeFactory;
+        _eventChannel = eventChannel;
+        _logger = logger;
+    }
+
     public async IAsyncEnumerable<EventLog> GetUnpublishedEventsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        using var timer = new PeriodicTimer(options.CurrentValue.PollInterval);
+        await EnsureInitializedAsync(cancellationToken);
         
-        while (!cancellationToken.IsCancellationRequested)
+        await foreach (var eventId in _eventChannel.ReadAllAsync(cancellationToken))
         {
+            await using var scope = _serviceScopeFactory.CreateAsyncScope();
+            await using var eventLogContext = scope.ServiceProvider.GetRequiredService<IEventLogContext>();
+            
             await using var transaction = await eventLogContext.Database.BeginTransactionAsync(cancellationToken);
             
-            var eventLogs = await GetLogsAsync(cancellationToken);
+            var eventLog = await GetEventLogAsync(eventLogContext, eventId, cancellationToken);
 
-            if (eventLogs.Count == 0)
+            if (eventLog is null)
             {
-                Extensions.EventLoggingExtensions.NoNewEvents(logger);
+                _logger.EventAlreadyTaken(eventId);
                 
                 await transaction.DisposeAsync();
-                await timer.WaitForNextTickAsync(cancellationToken);
                 continue;
             }
-            
-            Extensions.EventLoggingExtensions.FetchedNewEvents(logger, eventLogs.Count);
-            
-            foreach (var eventLog in eventLogs)
-            {
-                yield return eventLog;
-            }
 
-            var now = timeProvider.GetUtcNow();
-            var ids = eventLogs.Select(e => e.Id).ToList();
+            yield return eventLog;
+            
+            eventLog.MarkAsPublished(_timeProvider.GetUtcNow());
 
-            _ = await eventLogContext.EventLogs
-                .Where(e => ids.Contains(e.Id))
-                .ExecuteUpdateAsync(e => e.SetProperty(p => p.PublishedAt, now), cancellationToken);
+            await eventLogContext.SaveChangesAsync(cancellationToken);
             
             await transaction.CommitAsync(cancellationToken);
-            
-            Extensions.EventLoggingExtensions.EventsMarkedAsPublished(logger, ids);
         }
     }
 
-    private async Task<List<EventLog>> GetLogsAsync(CancellationToken cancellationToken)
+    private Task<EventLog?> GetEventLogAsync(IEventLogContext eventLogContext, Guid eventId, CancellationToken cancellationToken)
     {
-        var limit = options.CurrentValue.BatchSize;
-        var (tableName, idColumnName, publishedAtColumnName) = GetMetaData();
-        
-        var eventLogs = await eventLogContext.EventLogs.FromSql(
+        var (tableName, idColumnName) = GetMetaData(eventLogContext);
+        return eventLogContext.EventLogs.FromSql(
                 $"""
                  SELECT *
                  FROM {tableName}
-                 WHERE {publishedAtColumnName} IS NULL
-                 ORDER BY {idColumnName} ASC
-                 LIMIT {limit}
-                 FOR UPDATE SKIP LOCKED
+                 WHERE {idColumnName} = {eventId}
+                 FOR UPDATE
+                 SKIP LOCKED
                  """)
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-        return eventLogs;
+            .FirstOrDefaultAsync(cancellationToken);
     }
-
-    private (string TableName, string IdColumnetName, string PublishedAtColumnName) GetMetaData()
+    
+    private (string TableName, string IdColumnName) GetMetaData(IEventLogContext eventLogContext)
     {
         var eventLogEntityType = eventLogContext.Model.FindEntityType(typeof(EventLog))!;
 
@@ -80,10 +81,36 @@ internal sealed class EventReader(IEventLogContext eventLogContext,
         var fullTableName = string.IsNullOrEmpty(schemeName)
             ? tableName
             : $"{schemeName}.{tableName}";
-
-        var publishedAtProperty = eventLogEntityType.FindProperty(nameof(EventLog.PublishedAt))!;
+        
         var idProperty = eventLogEntityType.FindProperty(nameof(EventLog.Id))!;
 
-        return (fullTableName!, idProperty.GetColumnName(), publishedAtProperty.GetColumnName());
+        return (fullTableName!, idProperty.GetColumnName());
+    }
+
+    private async Task EnsureInitializedAsync(CancellationToken cancellationToken)
+    {
+        await using var scope = _serviceScopeFactory.CreateAsyncScope();
+        await using var eventLogContext = scope.ServiceProvider.GetRequiredService<IEventLogContext>();
+        
+        var (tableName, idColumnName) = GetMetaData(eventLogContext);
+        
+        await eventLogContext.Database.ExecuteSqlAsync(
+            $"""
+            CREATE OR REPLACE FUNCTION notify_event_log_inserted() 
+               RETURNS TRIGGER 
+               LANGUAGE PLPGSQL
+            AS
+            $$
+            BEGIN
+               NOTIFY new_events, NEW.{idColumnName}::text
+               RETURN NEW;
+            END;
+            $$
+
+            CREATE OR REPLACE TRIGGER event_inserted
+                AFTER INSERT ON {tableName}
+                FOR EACH ROW
+                EXECUTE FUNCTION notify_event_log_inserted()
+            """, cancellationToken);
     }
 }

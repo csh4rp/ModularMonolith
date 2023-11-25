@@ -17,6 +17,7 @@
       <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
       <PackageReference Include="Npgsql" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+      <PackageReference Include="Polly" />
     </ItemGroup>
   
 </Project>

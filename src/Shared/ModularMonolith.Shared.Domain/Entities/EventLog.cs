@@ -6,7 +6,7 @@ public class EventLog
     
     public required DateTimeOffset CreatedAt { get; init; }
     
-    public DateTimeOffset? PublishedAt { get; init; }
+    public DateTimeOffset? PublishedAt { get; private set; }
     
     public Guid? UserId { get; init; }
     
@@ -20,5 +20,7 @@ public class EventLog
     
     public required string OperationName { get; init; }
     
-    public required string TraceId { get; init; }
+    public required string ActivityId { get; init; }
+
+    public void MarkAsPublished(DateTimeOffset now) => PublishedAt = now;
 }

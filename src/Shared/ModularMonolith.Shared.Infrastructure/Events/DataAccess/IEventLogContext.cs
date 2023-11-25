@@ -5,7 +5,7 @@ using ModularMonolith.Shared.Domain.Entities;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 
-public interface IEventLogContext
+public interface IEventLogContext : IAsyncDisposable
 {
     DbSet<EventLog> EventLogs { get; }
     
