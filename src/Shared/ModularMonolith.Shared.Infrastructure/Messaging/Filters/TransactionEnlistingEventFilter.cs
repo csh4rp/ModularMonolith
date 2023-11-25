@@ -1,7 +1,7 @@
 using MassTransit;
 using ModularMonolith.Shared.BusinessLogic.Abstract;
 
-namespace ModularMonolith.Shared.Infrastructure.Messaging;
+namespace ModularMonolith.Shared.Infrastructure.Messaging.Filters;
 
 public class TransactionEnlistingEventFilter<T>(ITransactionalScopeFactory transactionalScopeFactory) 
     : IFilter<ConsumeContext<T>> where T : class
