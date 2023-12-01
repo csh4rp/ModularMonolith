@@ -56,7 +56,7 @@ public sealed class AuditLogFactory(IIdentityContextAccessor identityContextAcce
         {
             CreatedAt = timeProvider.GetUtcNow(),
             ChangeType = GetChangeType(entry),
-            TraceId = Activity.Current.TraceId.ToString(),
+            ActivityId = Activity.Current.TraceId.ToString(),
             UserId = identityContextAccessor.Context?.UserId,
             OperationName = Activity.Current.OperationName,
             EntityType = entityType.FullName!,

@@ -67,7 +67,7 @@ public class AuditLogInterceptorTests : IAsyncDisposable
         auditLog!.CreatedAt.Should().Be(Now);
         auditLog.UserId.Should().Be(UserId);
         auditLog.OperationName.Should().Be(activity.OperationName);
-        auditLog.TraceId.Should().Be(activity.TraceId.ToString());
+        auditLog.ActivityId.Should().Be(activity.TraceId.ToString());
         auditLog.EntityKeys.Should().Be(
             """
             {"Id": "4d4d085b-5266-4945-924a-e4177d79c65d"}

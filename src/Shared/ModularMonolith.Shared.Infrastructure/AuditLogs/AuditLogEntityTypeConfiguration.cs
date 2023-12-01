@@ -29,7 +29,7 @@ public class AuditLogEntityTypeConfiguration(string table = nameof(AuditLog), st
             .IsRequired()
             .HasColumnType("jsonb");
 
-        builder.Property(b => b.TraceId)
+        builder.Property(b => b.ActivityId)
             .IsRequired()
             .IsUnicode(false)
             .HasMaxLength(32);

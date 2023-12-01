@@ -3,8 +3,16 @@
     <Reference Include="MassTransit.Abstractions">
       <HintPath>..\..\..\..\..\..\..\.nuget\packages\masstransit.abstractions\8.1.2\lib\net7.0\MassTransit.Abstractions.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.EntityFrameworkCore">
+      <HintPath>..\..\..\..\..\..\..\.nuget\packages\microsoft.entityframeworkcore\8.0.0\lib\net8.0\Microsoft.EntityFrameworkCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.BusinessLogic\ModularMonolith.Shared.BusinessLogic.csproj" />
+    <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Contracts\ModularMonolith.Modules.FirstModule.Contracts.csproj" />
     <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Domain\ModularMonolith.Modules.FirstModule.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="EventHandlers\" />
   </ItemGroup>
 </Project>

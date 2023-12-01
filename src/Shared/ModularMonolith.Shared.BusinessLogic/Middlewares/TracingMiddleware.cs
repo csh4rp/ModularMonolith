@@ -24,7 +24,7 @@ internal sealed class TracingMiddleware<TRequest, TResponse> : IPipelineBehavior
         };
 
         _logger.OperationStarted(requestType.Name);
-        
+
         using var activity = TracingSources.Default.CreateActivity(requestType.Name, ActivityKind.Internal);
         activity?.SetTag("OperationType", operationType);
         activity?.SetTag("RequestType", requestType.FullName);

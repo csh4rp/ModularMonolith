@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
+    </ItemGroup>
+
 </Project>
