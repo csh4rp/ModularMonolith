@@ -12,4 +12,8 @@
       <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Contracts\ModularMonolith.Modules.FirstModule.Contracts.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Z.EntityFramework.Plus.EFCore" />
+    </ItemGroup>
+
 </Project>

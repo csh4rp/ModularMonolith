@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Shared.Api.Models.Errors;
 

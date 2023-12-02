@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http.Extensions;
 using ModularMonolith.Shared.Api.Models.Errors;
+using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Shared.Api.Filters;
 

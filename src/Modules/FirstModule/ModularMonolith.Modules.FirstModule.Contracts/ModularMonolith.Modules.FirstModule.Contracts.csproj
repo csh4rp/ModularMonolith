@@ -10,4 +10,8 @@
       <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Categories\" />
+    </ItemGroup>
+
 </Project>

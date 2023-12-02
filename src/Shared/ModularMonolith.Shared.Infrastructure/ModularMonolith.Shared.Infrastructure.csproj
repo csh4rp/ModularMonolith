@@ -18,6 +18,7 @@
       <PackageReference Include="Npgsql" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
       <PackageReference Include="Polly" />
+      <PackageReference Include="Z.EntityFramework.Plus.EFCore" />
     </ItemGroup>
   
 </Project>

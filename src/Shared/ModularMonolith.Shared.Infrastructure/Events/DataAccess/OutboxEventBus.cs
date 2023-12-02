@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Reflection;
+﻿using System.Reflection;
 using ModularMonolith.Shared.BusinessLogic.Events;
 using ModularMonolith.Shared.BusinessLogic.Identity;
 using ModularMonolith.Shared.Domain.Abstractions;
@@ -33,7 +32,8 @@ internal sealed class OutboxEventBus : IEventBus
     
     public Task PublishAsync<TEvent>(TEvent @event, EventPublishOptions options, CancellationToken cancellationToken) where TEvent : IEvent
     {
-        Debug.Assert(Activity.Current is not null);
+        var currentActivity = System.Diagnostics.Activity.Current;
+        System.Diagnostics.Debug.Assert(currentActivity is not null);
         
         var eventType = typeof(TEvent);
         var attribute = eventType.GetCustomAttribute<EventAttribute>();
@@ -46,8 +46,8 @@ internal sealed class OutboxEventBus : IEventBus
             CorrelationId = options.CorrelationId,
             Payload = _eventSerializer.Serialize(@event),
             UserId = _identityContextAccessor.Context?.UserId,
-            OperationName = Activity.Current.OperationName,
-            ActivityId = Activity.Current.Id!
+            OperationName = currentActivity.OperationName,
+            ActivityId = currentActivity.Id!
         };
 
         _dbContext.EventLogs.Add(eventLog);
@@ -59,7 +59,8 @@ internal sealed class OutboxEventBus : IEventBus
     
     public Task PublishAsync(IEnumerable<IEvent> events, EventPublishOptions options, CancellationToken cancellationToken)
     {
-        Debug.Assert(Activity.Current is not null);
+        var currentActivity = System.Diagnostics.Activity.Current;
+        System.Diagnostics.Debug.Assert(currentActivity is not null);
 
         var now = _timeProvider.GetUtcNow();
 
@@ -76,8 +77,8 @@ internal sealed class OutboxEventBus : IEventBus
                 CorrelationId = options.CorrelationId,
                 Payload = _eventSerializer.Serialize(e, eventType),
                 UserId = _identityContextAccessor.Context?.UserId,
-                OperationName = Activity.Current.OperationName,
-                ActivityId = Activity.Current.Id!
+                OperationName = currentActivity.OperationName,
+                ActivityId = currentActivity.Id!
             };
         });
 
