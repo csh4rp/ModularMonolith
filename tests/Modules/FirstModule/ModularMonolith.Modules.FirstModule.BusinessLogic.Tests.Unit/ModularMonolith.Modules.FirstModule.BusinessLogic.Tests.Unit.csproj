@@ -27,10 +27,6 @@
       <ProjectReference Include="..\..\..\..\src\Modules\FirstModule\ModularMonolith.Modules.FirstModule.Infrastructure\ModularMonolith.Modules.FirstModule.Infrastructure.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Utils\" />
-    </ItemGroup>
-
 
 
 </Project>

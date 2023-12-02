@@ -5,6 +5,7 @@ using ModularMonolith.Modules.FirstModule.Contracts.Categories.Commands;
 using ModularMonolith.Modules.FirstModule.Domain.Entities;
 using ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess.Categories;
 using ModularMonolith.Shared.BusinessLogic.Exceptions;
+using ModularMonolith.Shared.Contracts.Errors;
 using Xunit;
 
 namespace ModularMonolith.Modules.FirstModule.BusinessLogic.Tests.Unit.Categories;
@@ -46,20 +47,23 @@ public class CreateCategoryCommandHandlerTests
         var handler = new CreateCategoryCommandHandler(dbContext);
         
         // Act
-        Func<Task> act = () => handler.Handle(cmd, default);
+        var act = () => handler.Handle(cmd, default);
 
         // Assert
+        var expectedErrors = new[] { PropertyError.NotUnique(nameof(cmd.Name), cmd.Name) };
+        
         var exceptionAssertion = await act.Should().ThrowAsync<ValidationException>();
-        exceptionAssertion.And.Errors.Should().HaveCount(1);
-        exceptionAssertion.And.Errors[0].PropertyName.Should().Be(nameof(cmd.Name));
-        exceptionAssertion.And.Errors[0].Parameter.Should().Be(cmd.Name);
+        exceptionAssertion.And.Errors.Should().BeEquivalentTo(expectedErrors);
     }
 
     private static CategoryDbContext CreateDatabase()
     {
         var optionsBuilder = new DbContextOptionsBuilder<CategoryDbContext>();
 
-        optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString());
+        optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString(), opt =>
+        {
+            opt.EnableNullChecks();
+        });
 
         return new CategoryDbContext(optionsBuilder.Options);
     }
