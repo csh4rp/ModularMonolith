@@ -9,7 +9,7 @@ using ModularMonolith.Shared.Api.Filters;
 
 namespace ModularMonolith.Modules.FirstModule.Api.Categories;
 
-public static class CategoryEndpointExtensions
+internal static class CategoryEndpointExtensions
 {
     private const string Prefix = "categories";
 
@@ -29,7 +29,7 @@ public static class CategoryEndpointExtensions
             .AddValidation<CreateCategoryCommand>()
             .Produces<Guid>();
 
-        app.MapPut("{id}", async (
+        app.MapPut("{id:guid}", async (
                 [FromServices] IMediator mediator,
                 [FromBody] UpdateCategoryCommand command,
                 [FromRoute] Guid id,
@@ -45,7 +45,7 @@ public static class CategoryEndpointExtensions
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound);
 
-        app.MapDelete("{id}", async (
+        app.MapDelete("{id:guid}", async (
                 [FromServices] IMediator mediator,
                 [FromRoute] Guid id,
                 CancellationToken cancellationToken) =>
@@ -59,7 +59,7 @@ public static class CategoryEndpointExtensions
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound);
 
-        app.MapGet("{id}", async (
+        app.MapGet("{id:guid}", async (
                 [FromServices] IMediator mediator,
                 [FromRoute] Guid id,
                 CancellationToken cancellationToken) =>
@@ -75,7 +75,7 @@ public static class CategoryEndpointExtensions
 
         app.MapGet(string.Empty, async (
                 [FromServices] IMediator mediator,
-                [FromQuery] FindCategoriesQuery query,
+                [AsParameters] FindCategoriesQuery query,
                 CancellationToken cancellationToken) =>
             {
                 var response = await mediator.Send(query, cancellationToken);
