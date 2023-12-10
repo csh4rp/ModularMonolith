@@ -4,13 +4,13 @@ namespace ModularMonolith.Shared.Infrastructure.Events.Utils;
 
 internal sealed class EventChannel
 {
-    private readonly Channel<Guid> _channel = Channel.CreateBounded<Guid>(1000);
+    private readonly Channel<EventInfo> _channel = Channel.CreateBounded<EventInfo>(100);
 
-    public IAsyncEnumerable<Guid> ReadAllAsync(CancellationToken cancellationToken) => 
+    public IAsyncEnumerable<EventInfo> ReadAllAsync(CancellationToken cancellationToken) => 
         _channel.Reader.ReadAllAsync(cancellationToken);
 
-    public ValueTask WriteAsync(Guid id, CancellationToken cancellationToken) =>
-        _channel.Writer.WriteAsync(id, cancellationToken);
+    public ValueTask WriteAsync(EventInfo eventInfo, CancellationToken cancellationToken) =>
+        _channel.Writer.WriteAsync(eventInfo, cancellationToken);
 
-    public bool TryWrite(Guid id) => _channel.Writer.TryWrite(id);
+    public bool TryWrite(EventInfo eventInfo) => _channel.Writer.TryWrite(eventInfo);
 }

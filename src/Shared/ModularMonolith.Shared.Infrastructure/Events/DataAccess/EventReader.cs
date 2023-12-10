@@ -30,14 +30,14 @@ internal sealed class EventReader
     {
         await EnsureInitializedAsync(cancellationToken);
         
-        await foreach (var eventId in _eventChannel.ReadAllAsync(cancellationToken))
+        await foreach (var eventInfo in _eventChannel.ReadAllAsync(cancellationToken))
         {
             await using var scope = _serviceScopeFactory.CreateAsyncScope();
             await using var eventLogContext = scope.ServiceProvider.GetRequiredService<IEventLogContext>();
             
             await using var transaction = await eventLogContext.Database.BeginTransactionAsync(cancellationToken);
             
-            var eventLog = await GetEventLogAsync(eventLogContext, eventId, cancellationToken);
+            var eventLog = await GetEventLogAsync(eventLogContext, eventInfo, cancellationToken);
 
             if (eventLog is null)
             {
@@ -57,21 +57,37 @@ internal sealed class EventReader
         }
     }
 
-    private Task<EventLog?> GetEventLogAsync(IEventLogContext eventLogContext, Guid eventId, CancellationToken cancellationToken)
+    private Task<EventLog?> GetEventLogAsync(IEventLogContext eventLogContext, EventInfo eventInfo, CancellationToken cancellationToken)
     {
-        var (tableName, idColumnName) = GetMetaData(eventLogContext);
+        var (tableName, idColumnName, correlationIdColumnName) = GetMetaData(eventLogContext);
+
+        if (eventInfo.CorrelationId.HasValue)
+        {
+            return eventLogContext.EventLogs.FromSql(
+                $"""
+                 SELECT *
+                 FROM {tableName}
+                 WHERE {idColumnName} = {eventInfo.EventLogId}
+                 AND {correlationIdColumnName} IS NULL
+                 FOR UPDATE
+                 SKIP LOCKED
+                 """)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+        
         return eventLogContext.EventLogs.FromSql(
                 $"""
                  SELECT *
                  FROM {tableName}
-                 WHERE {idColumnName} = {eventId}
+                 WHERE {idColumnName} = {eventInfo.EventLogId}
+                 AND {correlationIdColumnName} IS NULL
                  FOR UPDATE
                  SKIP LOCKED
                  """)
             .FirstOrDefaultAsync(cancellationToken);
     }
     
-    private (string TableName, string IdColumnName) GetMetaData(IEventLogContext eventLogContext)
+    private (string TableName, string IdColumnName, string CorrelationIdColumnName) GetMetaData(IEventLogContext eventLogContext)
     {
         var eventLogEntityType = eventLogContext.Model.FindEntityType(typeof(EventLog))!;
 
@@ -84,7 +100,9 @@ internal sealed class EventReader
         
         var idProperty = eventLogEntityType.FindProperty(nameof(EventLog.Id))!;
 
-        return (fullTableName!, idProperty.GetColumnName());
+        var correlationIdProperty = eventLogEntityType.FindProperty(nameof(EventLog.CorrelationId));
+        
+        return (fullTableName!, idProperty.GetColumnName(), correlationIdProperty!.GetColumnName());
     }
 
     private async Task EnsureInitializedAsync(CancellationToken cancellationToken)
@@ -92,7 +110,7 @@ internal sealed class EventReader
         await using var scope = _serviceScopeFactory.CreateAsyncScope();
         await using var eventLogContext = scope.ServiceProvider.GetRequiredService<IEventLogContext>();
         
-        var (tableName, idColumnName) = GetMetaData(eventLogContext);
+        var (tableName, idColumnName, correlationIdColumnName) = GetMetaData(eventLogContext);
         
         await eventLogContext.Database.ExecuteSqlAsync(
             $"""
@@ -102,7 +120,7 @@ internal sealed class EventReader
             AS
             $$
             BEGIN
-               NOTIFY new_events, NEW.{idColumnName}::text
+               NOTIFY new_events, CONCAT(COALESCE(NEW.{correlationIdColumnName}::text, ''), '/', NEW.{idColumnName}::text)
                RETURN NEW;
             END;
             $$

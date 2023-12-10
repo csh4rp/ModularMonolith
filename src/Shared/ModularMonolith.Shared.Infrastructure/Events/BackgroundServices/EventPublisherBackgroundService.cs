@@ -1,34 +1,28 @@
-﻿using MassTransit;
+﻿using System.Diagnostics;
+using MassTransit;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ModularMonolith.Shared.Domain.Entities;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess;
+using ModularMonolith.Shared.Infrastructure.Events.Extensions;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;
 using Polly;
 using Polly.Retry;
+using EventLog = ModularMonolith.Shared.Domain.Entities.EventLog;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.BackgroundServices;
 
 internal sealed class EventPublisherBackgroundService : BackgroundService
 {
+    private static readonly ActivitySource EventPublisherActivitySource = new ActivitySource("");
+    
     private readonly EventReader _eventReader;
     private readonly EventSerializer _eventSerializer;
     private readonly EventMapper _eventMapper;
-    private readonly IBus _bus;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<EventPublisherBackgroundService> _logger;
 
-    public EventPublisherBackgroundService(EventReader eventReader, 
-        EventSerializer eventSerializer,
-        EventMapper eventMapper,
-        IBus bus,
-        ILogger<EventPublisherBackgroundService> logger)
-    {
-        _eventReader = eventReader;
-        _eventSerializer = eventSerializer;
-        _eventMapper = eventMapper;
-        _bus = bus;
-        _logger = logger;
-    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -72,24 +66,38 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
     {
         var @event = _eventSerializer.Deserialize(eventLog.Type, eventLog.Payload);
 
-        await _bus.Publish(@event, cnx =>
+        await using (var scope = _serviceScopeFactory.CreateAsyncScope())
         {
-            cnx.MessageId = eventLog.Id;
-            cnx.CorrelationId = eventLog.CorrelationId;
-        }, cancellationToken);
+            using var activity =
+                EventPublisherActivitySource.CreateActivity(eventLog.Name, ActivityKind.Internal);
+
+            activity?.SetParentId(eventLog.ActivityId);
+            activity?.Start();
+            
+            var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+            await mediator.Publish(@event, cancellationToken);
+        }
         
-        Extensions.EventLoggingExtensions.EventPublished(_logger, eventLog.Id);
+        _logger.EventPublished(eventLog.Id);
 
         if (_eventMapper.TryMap(@event, out var integrationEvent))
         {
-            await _bus.Publish(integrationEvent, cnx =>
+            await using (var scope = _serviceScopeFactory.CreateAsyncScope())
             {
-                cnx.MessageId = eventLog.Id;
-                cnx.CorrelationId = eventLog.CorrelationId;
-                cnx.Headers.Set("TraceId", eventLog.ActivityId);
-            }, cancellationToken);
+                using var activity =
+                    EventPublisherActivitySource.CreateActivity(eventLog.Name, ActivityKind.Internal);
+
+                activity?.SetParentId(eventLog.ActivityId);
+                activity?.Start();
             
-            Extensions.EventLoggingExtensions.IntegrationEventPublished(_logger, eventLog.Id);
+                var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+                await mediator.Publish(integrationEvent, cancellationToken);
+            }
+            
+
+            _logger.IntegrationEventPublished(eventLog.Id);
         }
     }
 }

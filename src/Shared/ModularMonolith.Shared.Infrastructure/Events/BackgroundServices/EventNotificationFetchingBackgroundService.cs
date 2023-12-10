@@ -66,11 +66,22 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
     
     private void OnNotificationEventHandler(object obj, NpgsqlNotificationEventArgs args)
     {
-        var id = Guid.Parse(args.Payload);
+        var index = args.Payload.IndexOf('/');
+        var payload = args.Payload.AsSpan();
+
+        Guid? correlationId = index != 0
+            ? Guid.Parse(payload[..index])
+            : null;
         
-        if (!_channel.TryWrite(id))
+        var id = Guid.Parse(payload[index..]);
+
+        var eventInfo = new EventInfo(id, correlationId);
+
+        var spin = new SpinWait();
+
+        while (!_channel.TryWrite(eventInfo))
         {
-            Thread.Sleep(0);
+            spin.SpinOnce();
         }
     }
 }
