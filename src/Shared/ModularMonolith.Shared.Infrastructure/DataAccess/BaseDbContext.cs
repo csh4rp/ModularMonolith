@@ -4,9 +4,8 @@ namespace ModularMonolith.Shared.Infrastructure.DataAccess;
 
 public abstract class BaseDbContext : DbContext
 {
-    public BaseDbContext(DbContextOptions options) : base(options)
+    protected BaseDbContext(DbContextOptions options) : base(options)
     {
-        
     }
     
     public sealed override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = new())

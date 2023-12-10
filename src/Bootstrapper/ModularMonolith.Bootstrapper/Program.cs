@@ -8,8 +8,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-Extensions.AddMediator(builder.Services);
-
 var app = builder.Build();
 
 app.UseFirstModule();

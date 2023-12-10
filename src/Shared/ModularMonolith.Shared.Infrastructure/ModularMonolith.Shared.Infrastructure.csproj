@@ -6,6 +6,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="EFCore.NamingConventions" />
       <PackageReference Include="MassTransit" />
       <PackageReference Include="MassTransit.Abstractions" />
       <PackageReference Include="MassTransit.RabbitMQ" />

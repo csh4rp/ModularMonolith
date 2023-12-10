@@ -4,57 +4,23 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModularMonolith.Shared.Domain.Entities;
 using ModularMonolith.Shared.Infrastructure.Events.Extensions;
+using ModularMonolith.Shared.Infrastructure.Events.MetaData;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 
 internal sealed class EventReader
 {
-    private readonly TimeProvider _timeProvider;
-    private readonly IServiceScopeFactory _serviceScopeFactory;
-    private readonly EventChannel _eventChannel;
-    private readonly ILogger<EventReader> _logger;
+    private readonly SemaphoreSlim _semaphoreSlim;
+    
 
-    public EventReader(TimeProvider timeProvider,
-        IServiceScopeFactory serviceScopeFactory,
-        EventChannel eventChannel,
-        ILogger<EventReader> logger)
-    {
-        _timeProvider = timeProvider;
-        _serviceScopeFactory = serviceScopeFactory;
-        _eventChannel = eventChannel;
-        _logger = logger;
-    }
+    
 
     public async IAsyncEnumerable<EventLog> GetUnpublishedEventsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
     {
         await EnsureInitializedAsync(cancellationToken);
         
-        await foreach (var eventInfo in _eventChannel.ReadAllAsync(cancellationToken))
-        {
-            await using var scope = _serviceScopeFactory.CreateAsyncScope();
-            await using var eventLogContext = scope.ServiceProvider.GetRequiredService<IEventLogContext>();
-            
-            await using var transaction = await eventLogContext.Database.BeginTransactionAsync(cancellationToken);
-            
-            var eventLog = await GetEventLogAsync(eventLogContext, eventInfo, cancellationToken);
 
-            if (eventLog is null)
-            {
-                _logger.EventAlreadyTaken(eventId);
-                
-                await transaction.DisposeAsync();
-                continue;
-            }
-
-            yield return eventLog;
-            
-            eventLog.MarkAsPublished(_timeProvider.GetUtcNow());
-
-            await eventLogContext.SaveChangesAsync(cancellationToken);
-            
-            await transaction.CommitAsync(cancellationToken);
-        }
     }
 
     private Task<EventLog?> GetEventLogAsync(IEventLogContext eventLogContext, EventInfo eventInfo, CancellationToken cancellationToken)

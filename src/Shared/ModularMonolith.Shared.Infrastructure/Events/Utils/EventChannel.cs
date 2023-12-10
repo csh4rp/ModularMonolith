@@ -1,4 +1,5 @@
 ﻿using System.Threading.Channels;
+using ModularMonolith.Shared.Infrastructure.Events.MetaData;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.Utils;
 
