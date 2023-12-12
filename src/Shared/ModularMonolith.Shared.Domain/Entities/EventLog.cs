@@ -8,6 +8,10 @@ public class EventLog
     
     public DateTimeOffset? PublishedAt { get; private set; }
     
+    public DateTimeOffset? NextAttemptAt { get; private set; }
+    
+    public int AttemptNumber { get; private set; }
+    
     public Guid? UserId { get; init; }
     
     public required Guid? CorrelationId { get; init; }
@@ -21,6 +25,5 @@ public class EventLog
     public required string OperationName { get; init; }
     
     public required string ActivityId { get; init; }
-
-    public void MarkAsPublished(DateTimeOffset now) => PublishedAt = now;
+    
 }

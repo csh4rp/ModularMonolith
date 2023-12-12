@@ -1,8 +1,8 @@
 ﻿namespace ModularMonolith.Shared.Domain.Entities;
 
-public class EventLogLock
+public class EventCorrelationLock
 {
-    public Guid EventLogId { get; init; }
+    public Guid CorrelationId { get; init; }
     
     public DateTimeOffset AcquiredAt { get; init; }
 }

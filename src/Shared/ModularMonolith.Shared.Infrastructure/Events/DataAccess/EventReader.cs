@@ -1,100 +1,337 @@
-﻿using System.Runtime.CompilerServices;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using System.Data;
+using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.Domain.Entities;
-using ModularMonolith.Shared.Infrastructure.Events.Extensions;
+using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Events.MetaData;
-using ModularMonolith.Shared.Infrastructure.Events.Utils;
+using ModularMonolith.Shared.Infrastructure.Events.Options;
+using Npgsql;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 
 internal sealed class EventReader
 {
-    private readonly SemaphoreSlim _semaphoreSlim;
-    
+    private readonly EventMetaDataProvider _eventMetaDataProvider;
+    private readonly DbConnectionFactory _dbConnectionFactory;
+    private readonly IOptionsMonitor<EventOptions> _optionsMonitor;
 
-    
-
-    public async IAsyncEnumerable<EventLog> GetUnpublishedEventsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
+    public EventReader(DbConnectionFactory dbConnectionFactory, EventMetaDataProvider eventMetaDataProvider, IOptionsMonitor<EventOptions> optionsMonitor)
     {
-        await EnsureInitializedAsync(cancellationToken);
-        
-
+        _dbConnectionFactory = dbConnectionFactory;
+        _eventMetaDataProvider = eventMetaDataProvider;
+        _optionsMonitor = optionsMonitor;
     }
 
-    private Task<EventLog?> GetEventLogAsync(IEventLogContext eventLogContext, EventInfo eventInfo, CancellationToken cancellationToken)
+    public async Task<EventLog?> TryAcquireLockAsync(EventInfo eventInfo, CancellationToken cancellationToken)
     {
-        var (tableName, idColumnName, correlationIdColumnName) = GetMetaData(eventLogContext);
+        var retryAttempts = _optionsMonitor.CurrentValue.MaxRetryAttempts;
+        var (id, correlationId) = eventInfo;
+        
+        await using var connection = _dbConnectionFactory.Create();
+        await connection.OpenAsync(cancellationToken);
+        
+        var eventLogMetaData = _eventMetaDataProvider.GetEventLogMetaData();
+        var eventLockMetaData = _eventMetaDataProvider.GetEventLockMetaData();
+        var eventCorrelationLockMetaData = _eventMetaDataProvider.GetEventCorrelationLockMetaData();
+
+        await using var batch = connection.CreateBatch();
+        
+        if (correlationId.HasValue)
+        {
+            var insertCommand = batch.CreateBatchCommand();
+            insertCommand.Parameters.AddWithValue("@correlation_id", correlationId.Value);
+            insertCommand.CommandText = 
+                $"""
+                 INSERT INTO {eventCorrelationLockMetaData.TableName}
+                 ({eventCorrelationLockMetaData.CorrelationIdColumnName}, {eventCorrelationLockMetaData.AcquiredAtColumnName})
+                 VALUES (@correlation_id, CURRENT_TIMESTAMP)
+                 ON CONFLICT DO NOTHING
+                 RETURNING 1;
+                 """;
+
+            var selectCommand = batch.CreateBatchCommand();
+            selectCommand.Parameters.AddWithValue("@correlation_id", correlationId.Value);
+            selectCommand.Parameters.AddWithValue("@max_retry_attempts", retryAttempts);
+            selectCommand.CommandText =
+                $"""
+                SELECT *
+                FROM {eventLogMetaData.TableName} AS el
+                WHERE {eventLogMetaData.PublishedAtColumnName} IS NULL
+                AND NOT EXISTS
+                (
+                    SELECT 1
+                    FROM {eventCorrelationLockMetaData.TableName}
+                    WHERE {eventCorrelationLockMetaData.CorrelationIdColumnName} = @correlation_id
+                )
+                AND NOT EXISTS
+                (
+                    SELECT 1
+                    FROM {eventLogMetaData.TableName}
+                    WHERE {eventLogMetaData.CorrelationIdColumnName} = el.{eventLogMetaData.CorrelationIdColumnName}
+                    AND {eventLogMetaData.CreatedAtColumnName} < el.{eventLogMetaData.CreatedAtColumnName}
+                    AND {eventLogMetaData.PublishedAtColumnName} IS NULL
+                    AND {eventLogMetaData.AttemptNumberColumnName} < @max_retry_attempts
+                )
+                AND ({eventLogMetaData.NextAttemptAtColumnName} IS NULL OR {eventLogMetaData.NextAttemptAtColumnName} < CURRENT_TIMESTAMP)
+                AND {eventLogMetaData.AttemptNumberColumnName} < @max_retry_attempts
+                ORDER BY {eventLogMetaData.CreatedAtColumnName}
+                LIMIT 1 OFFSET 0 
+                """;
+        }
+        else
+        {
+            var insertCommand = batch.CreateBatchCommand();
+            insertCommand.Parameters.AddWithValue("@id", id);
+            insertCommand.Parameters.AddWithValue("@max_retry_attempts", retryAttempts);
+            insertCommand.CommandText = 
+                $"""
+                 INSERT INTO {eventLockMetaData.TableName}
+                 ({eventLockMetaData.IdColumnName}, {eventLockMetaData.AcquiredAtColumnName})
+                 VALUES (@id, CURRENT_TIMESTAMP)
+                 ON CONFLICT DO NOTHING
+                 RETURNING 1;
+                 """;
+            
+            var selectCommand = batch.CreateBatchCommand();
+            selectCommand.Parameters.AddWithValue("@id", id);
+            selectCommand.CommandText =
+                $"""
+                 SELECT *
+                 FROM {eventLogMetaData.TableName}
+                 WHERE {eventLogMetaData.PublishedAtColumnName} IS NULL
+                 AND {eventLogMetaData.IdColumnName} = @id
+                 AND NOT EXISTS
+                 (
+                     SELECT 1
+                     FROM {eventLockMetaData.TableName}
+                     WHERE {eventLockMetaData.IdColumnName} = @id
+                 )
+                 AND ({eventLogMetaData.NextAttemptAtColumnName} IS NULL OR {eventLogMetaData.NextAttemptAtColumnName} < CURRENT_TIMESTAMP)
+                 AND {eventLogMetaData.AttemptNumberColumnName} < @max_retry_attempts
+                 ORDER BY {eventLogMetaData.CreatedAtColumnName}
+                 LIMIT 1 OFFSET 0
+                 """;
+        }
+        
+        await using var reader = await batch.ExecuteReaderAsync(cancellationToken);
+
+        if (!reader.HasRows || !await reader.ReadAsync(cancellationToken))
+        {
+            return null;
+        }
+
+        _ = await reader.NextResultAsync(cancellationToken);
+        
+        if (!reader.HasRows || !await reader.ReadAsync(cancellationToken))
+        {
+            return null;
+        }
+        
+        return ReadEventLog(reader, eventLogMetaData);
+    }
+    
+    private static EventLog ReadEventLog(NpgsqlDataReader reader, EventLogMetaData eventLogMetaData) =>
+        new()
+        {
+            Id = reader.GetGuid(eventLogMetaData.IdColumnName),
+            Name = reader.GetString(eventLogMetaData.NameColumnName),
+            Payload = reader.GetString(eventLogMetaData.PayloadColumnName),
+            Type = reader.GetString(eventLogMetaData.TypeColumnName),
+            ActivityId = reader.GetString(eventLogMetaData.ActivityIdColumnName),
+            CorrelationId = reader.IsDBNull(eventLogMetaData.CorrelationIdColumnName)
+                ? null
+                : reader.GetGuid(eventLogMetaData.CorrelationIdColumnName),
+            CreatedAt = reader.GetDateTime(eventLogMetaData.CreatedAtColumnName),
+            OperationName = reader.GetString(eventLogMetaData.OperationNameColumnName),
+            UserId = reader.IsDBNull(eventLogMetaData.UserIdColumnName)
+                ? null
+                : reader.GetGuid(eventLogMetaData.UserIdColumnName)
+        };
+
+    public async Task MarkAsPublishedAsync(EventInfo eventInfo, CancellationToken cancellationToken)
+    {
+        var eventLogMetaData = _eventMetaDataProvider.GetEventLogMetaData();
+        var eventLockMetaData = _eventMetaDataProvider.GetEventLockMetaData();
+        var eventCorrelationLockMetaData = _eventMetaDataProvider.GetEventCorrelationLockMetaData();
+        
+        await using var connection = _dbConnectionFactory.Create();
+        await connection.OpenAsync(cancellationToken);
+
+        await using var batch = connection.CreateBatch();
 
         if (eventInfo.CorrelationId.HasValue)
         {
-            return eventLogContext.EventLogs.FromSql(
+            var releaseLockCommand = batch.CreateBatchCommand();
+            releaseLockCommand.Parameters.AddWithValue("@correlation_id", eventInfo.CorrelationId.Value);
+            releaseLockCommand.CommandText = 
                 $"""
-                 SELECT *
-                 FROM {tableName}
-                 WHERE {idColumnName} = {eventInfo.EventLogId}
-                 AND {correlationIdColumnName} IS NULL
-                 FOR UPDATE
-                 SKIP LOCKED
-                 """)
-                .FirstOrDefaultAsync(cancellationToken);
+                 DELETE FROM {eventCorrelationLockMetaData.TableName}
+                 WHERE {eventCorrelationLockMetaData.CorrelationIdColumnName} = @correlation_id;
+                 """;
+        }
+        else
+        {
+            var releaseLockCommand = batch.CreateBatchCommand();
+            releaseLockCommand.Parameters.AddWithValue("@id", eventInfo.EventLogId);
+            releaseLockCommand.CommandText = 
+                $"""
+                 DELETE FROM {eventLockMetaData.TableName}
+                 WHERE {eventLockMetaData.IdColumnName} = @id;
+                 """;
         }
         
-        return eventLogContext.EventLogs.FromSql(
-                $"""
-                 SELECT *
-                 FROM {tableName}
-                 WHERE {idColumnName} = {eventInfo.EventLogId}
-                 AND {correlationIdColumnName} IS NULL
-                 FOR UPDATE
-                 SKIP LOCKED
-                 """)
-            .FirstOrDefaultAsync(cancellationToken);
+        var markAsPublishedCommand = batch.CreateBatchCommand();
+        markAsPublishedCommand.Parameters.AddWithValue("@id", eventInfo.EventLogId);
+        markAsPublishedCommand.CommandText =
+            $"""
+             UPDATE {eventLogMetaData.TableName}
+             SET {eventLogMetaData.PublishedAtColumnName} = CURRENT_TIMESTAMP
+             WHERE {eventLogMetaData.IdColumnName} = @id
+             """;
+
+        _ = await batch.ExecuteNonQueryAsync(cancellationToken);
     }
     
-    private (string TableName, string IdColumnName, string CorrelationIdColumnName) GetMetaData(IEventLogContext eventLogContext)
+    public async Task IncrementFailedAttemptNumberAsync(EventInfo eventInfo, CancellationToken cancellationToken)
     {
-        var eventLogEntityType = eventLogContext.Model.FindEntityType(typeof(EventLog))!;
-
-        var tableName = eventLogEntityType.GetTableName();
-        var schemeName = eventLogEntityType.GetSchema();
-
-        var fullTableName = string.IsNullOrEmpty(schemeName)
-            ? tableName
-            : $"{schemeName}.{tableName}";
+        var eventLogMetaData = _eventMetaDataProvider.GetEventLogMetaData();
+        var eventLockMetaData = _eventMetaDataProvider.GetEventLockMetaData();
+        var eventCorrelationLockMetaData = _eventMetaDataProvider.GetEventCorrelationLockMetaData();
         
-        var idProperty = eventLogEntityType.FindProperty(nameof(EventLog.Id))!;
+        await using var connection = _dbConnectionFactory.Create();
+        await connection.OpenAsync(cancellationToken);
 
-        var correlationIdProperty = eventLogEntityType.FindProperty(nameof(EventLog.CorrelationId));
+        await using var batch = connection.CreateBatch();
+
+        if (eventInfo.CorrelationId.HasValue)
+        {
+            var releaseLockCommand = batch.CreateBatchCommand();
+            releaseLockCommand.Parameters.AddWithValue("@correlation_id", eventInfo.CorrelationId.Value);
+            releaseLockCommand.CommandText = 
+                $"""
+                 DELETE FROM {eventCorrelationLockMetaData.TableName}
+                 WHERE {eventCorrelationLockMetaData.CorrelationIdColumnName} = @correlation_id;
+                 """;
+        }
+        else
+        {
+            var releaseLockCommand = batch.CreateBatchCommand();
+            releaseLockCommand.Parameters.AddWithValue("@id", eventInfo.EventLogId);
+            releaseLockCommand.CommandText = 
+                $"""
+                 DELETE FROM {eventLockMetaData.TableName}
+                 WHERE {eventLockMetaData.IdColumnName} = @id;
+                 """;
+        }
         
-        return (fullTableName!, idProperty.GetColumnName(), correlationIdProperty!.GetColumnName());
+        var increaseFailedAttemptCommand = batch.CreateBatchCommand();
+        increaseFailedAttemptCommand.Parameters.AddWithValue("@id", eventInfo.EventLogId);
+        increaseFailedAttemptCommand.CommandText =
+            $"""
+             UPDATE {eventLogMetaData.TableName}
+             SET {eventLogMetaData.AttemptNumberColumnName} = {eventLogMetaData.AttemptNumberColumnName} + 1,
+                 {eventLogMetaData.NextAttemptAtColumnName} =
+                     COALESCE({eventLogMetaData.NextAttemptAtColumnName}, {eventLogMetaData.CreatedAtColumnName})
+                     + INTERVAL '5 minutes' * {eventLogMetaData.AttemptNumberColumnName}
+             WHERE {eventLogMetaData.IdColumnName} = @id
+             """;
+
+        _ = await batch.ExecuteNonQueryAsync(cancellationToken);
+    }
+    
+    public async Task EnsureInitializedAsync(CancellationToken cancellationToken)
+    {
+        var eventLogMetaData = _eventMetaDataProvider.GetEventLogMetaData();
+        
+        await using var connection = _dbConnectionFactory.Create();
+        await connection.OpenAsync(cancellationToken);
+
+        await using var command = connection.CreateCommand();
+
+        command.CommandText =
+            $"""
+             CREATE OR REPLACE FUNCTION notify_event_log_inserted()
+                RETURNS TRIGGER
+                LANGUAGE PLPGSQL
+             AS
+             $$
+             BEGIN
+                NOTIFY new_events, CONCAT(COALESCE(NEW.{eventLogMetaData.CorrelationIdColumnName}::text, ''), '/', NEW.{eventLogMetaData.IdColumnName}::text)
+                RETURN NEW;
+             END;
+             $$
+
+             CREATE OR REPLACE TRIGGER event_inserted
+                 AFTER INSERT ON {eventLogMetaData.TableName}
+                 FOR EACH ROW
+                 EXECUTE FUNCTION notify_event_log_inserted()
+             """;
+
+        await command.ExecuteNonQueryAsync(cancellationToken);
     }
 
-    private async Task EnsureInitializedAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<EventInfo>> GetUnpublishedEventsAsync(CancellationToken cancellationToken)
     {
-        await using var scope = _serviceScopeFactory.CreateAsyncScope();
-        await using var eventLogContext = scope.ServiceProvider.GetRequiredService<IEventLogContext>();
-        
-        var (tableName, idColumnName, correlationIdColumnName) = GetMetaData(eventLogContext);
-        
-        await eventLogContext.Database.ExecuteSqlAsync(
-            $"""
-            CREATE OR REPLACE FUNCTION notify_event_log_inserted() 
-               RETURNS TRIGGER 
-               LANGUAGE PLPGSQL
-            AS
-            $$
-            BEGIN
-               NOTIFY new_events, CONCAT(COALESCE(NEW.{correlationIdColumnName}::text, ''), '/', NEW.{idColumnName}::text)
-               RETURN NEW;
-            END;
-            $$
+        var eventLogMetaData = _eventMetaDataProvider.GetEventLogMetaData();
+        var eventLockMetaData = _eventMetaDataProvider.GetEventLockMetaData();
+        var eventCorrelationLockMetaData = _eventMetaDataProvider.GetEventCorrelationLockMetaData();
 
-            CREATE OR REPLACE TRIGGER event_inserted
-                AFTER INSERT ON {tableName}
-                FOR EACH ROW
-                EXECUTE FUNCTION notify_event_log_inserted()
-            """, cancellationToken);
+        await using var connection = _dbConnectionFactory.Create();
+        await connection.OpenAsync(cancellationToken);
+        
+        await using var selectCommand = connection.CreateCommand();
+        selectCommand.Parameters.AddWithValue("@max_retry_attempts", _optionsMonitor.CurrentValue.MaxRetryAttempts);
+        selectCommand.CommandText =
+            $"""
+             SELECT
+             {eventLogMetaData.IdColumnName}
+             {eventLogMetaData.CorrelationIdColumnName}
+             FROM {eventLogMetaData.TableName} AS el
+             WHERE {eventLogMetaData.PublishedAtColumnName} IS NULL
+             AND 
+             NOT EXISTS
+             (
+                SELECT 1
+                FROM {eventCorrelationLockMetaData.TableName}
+                WHERE {eventCorrelationLockMetaData.CorrelationIdColumnName} = el.{eventLogMetaData.CorrelationIdColumnName}
+             )
+             AND NOT EXISTS
+             (
+                 SELECT 1
+                 FROM {eventLogMetaData.TableName}
+                 WHERE {eventLogMetaData.CorrelationIdColumnName} = el.{eventLogMetaData.CorrelationIdColumnName}
+                 AND {eventLogMetaData.CreatedAtColumnName} < el.{eventLogMetaData.CreatedAtColumnName}
+                 AND {eventLogMetaData.PublishedAtColumnName} IS NULL
+                 AND {eventLogMetaData.AttemptNumberColumnName} < @max_retry_attempts
+             )
+             AND NOT EXISTS
+             (
+                SELECT 1
+                FROM {eventLockMetaData.TableName}
+                AND {eventLogMetaData.IdColumnName} = el.{eventLogMetaData.IdColumnName}
+             )
+             AND ({eventLogMetaData.NextAttemptAtColumnName} IS NULL OR {eventLogMetaData.NextAttemptAtColumnName} < CURRENT_TIMESTAMP)
+             AND {eventLogMetaData.AttemptNumberColumnName} < @max_retry_attempts
+             ORDER BY {eventLogMetaData.CreatedAtColumnName}
+             LIMIT 10 OFFSET 0
+             """;
+
+        await using var reader = await selectCommand.ExecuteReaderAsync(cancellationToken);
+
+        if (!reader.HasRows)
+        {
+            return Array.Empty<EventInfo>();
+        }
+
+        var events = new List<EventInfo>(10);
+        
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            var eventLogId = reader.GetGuid(0);
+            var correlationId = reader.IsDBNull(1) ? (Guid?)null : reader.GetGuid(1);
+
+            events.Add(new EventInfo(eventLogId, correlationId));
+        }
+
+        return events;
     }
 }

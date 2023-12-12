@@ -2,23 +2,20 @@
 using EFCore.NamingConventions.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 using ModularMonolith.Shared.Domain.Entities;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.MetaData;
 
-public class EventMetaDataProvider
+public sealed class EventMetaDataProvider
 {
     private static readonly EventLogMetaData EventLogMetaData = Initialize();
     
     private static EventLogMetaData Initialize()
     {
-        new NamingConventionsOptionsExtension().WithSnakeCaseNamingConvention(CultureInfo.InvariantCulture);
-        
         var conventionSet = new ConventionSet();
         
-        NameRewritingConvention rewritingConvention = new NameRewritingConvention(new SnakeCaseNameRewriter(CultureInfo.InvariantCulture));
+        var rewritingConvention = new NameRewritingConvention(new SnakeCaseNameRewriter(CultureInfo.InvariantCulture));
         conventionSet.EntityTypeAddedConventions.Add(rewritingConvention);
         conventionSet.EntityTypeAnnotationChangedConventions.Add(rewritingConvention);
         conventionSet.PropertyAddedConventions.Add(rewritingConvention);
@@ -33,16 +30,25 @@ public class EventMetaDataProvider
 
         var entity = model.FindEntityType(typeof(EventLog))!;
 
-        var idProperty = entity.FindProperty(nameof(EventLog.Id))!;
-        
         return new EventLogMetaData
         {
             TableName = entity.GetTableName()!, 
-            IdColumnName = idProperty.GetColumnName(),
+            IdColumnName = entity.FindProperty(nameof(EventLog.Id))!.GetColumnName(),
+            NameColumnName = entity.FindProperty(nameof(EventLog.Name))!.GetColumnName(),
+            OperationNameColumnName = entity.FindProperty(nameof(EventLog.OperationName))!.GetColumnName(),
+            PayloadColumnName = entity.FindProperty(nameof(EventLog.Payload))!.GetColumnName(),
+            PublishedAtColumnName = entity.FindProperty(nameof(EventLog.PublishedAt))!.GetColumnName(),
+            TypeColumnName = entity.FindProperty(nameof(EventLog.Type))!.GetColumnName(),
+            ActivityIdColumnName = entity.FindProperty(nameof(EventLog.ActivityId))!.GetColumnName(),
+            CorrelationIdColumnName = entity.FindProperty(nameof(EventLog.CorrelationId))!.GetColumnName(),
+            CreatedAtColumnName = entity.FindProperty(nameof(EventLog.CreatedAt))!.GetColumnName(),
+            UserIdColumnName = entity.FindProperty(nameof(EventLog.UserId))!.GetColumnName(),
         };
     }
     
     public EventLogMetaData GetEventLogMetaData() => EventLogMetaData;
     
     public EventLockMetaData GetEventLockMetaData() => null!;
+
+    public EventCorrelationLockMetaData GetEventCorrelationLockMetaData() => null!;
 }
