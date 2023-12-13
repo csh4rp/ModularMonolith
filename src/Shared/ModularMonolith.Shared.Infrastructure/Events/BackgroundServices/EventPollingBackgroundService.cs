@@ -14,11 +14,11 @@ internal sealed class EventPollingBackgroundService : BackgroundService
 {
     private readonly IOptionsMonitor<EventOptions> _optionsMonitor;
     private readonly ILogger<EventPollingBackgroundService> _logger;
-    private readonly EventReader _eventReader;
+    private readonly IEventReader _eventReader;
     private readonly EventChannel _eventChannel;
 
     public EventPollingBackgroundService(IOptionsMonitor<EventOptions> optionsMonitor,
-        ILogger<EventPollingBackgroundService> logger, EventReader eventReader, EventChannel eventChannel)
+        ILogger<EventPollingBackgroundService> logger, IEventReader eventReader, EventChannel eventChannel)
     {
         _optionsMonitor = optionsMonitor;
         _logger = logger;
@@ -42,6 +42,8 @@ internal sealed class EventPollingBackgroundService : BackgroundService
 
     private async ValueTask RunAsync(CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Starting event polling");
+        
         try
         {
             using var timer = new PeriodicTimer(_optionsMonitor.CurrentValue.PollInterval);

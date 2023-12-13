@@ -6,6 +6,8 @@ public class EventOptions
 {
     public TimeSpan PollInterval { get; set; } = TimeSpan.FromSeconds(5);
 
+    public TimeSpan MaxLockTime { get; set; } = TimeSpan.FromHours(1);
+    
     public List<Assembly> Assemblies { get; set; } = new();
 
     public int MaxParallelWorkers { get; set; } = Environment.ProcessorCount * 2;

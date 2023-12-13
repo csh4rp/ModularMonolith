@@ -1,33 +1,30 @@
-﻿using System.Globalization;
-using EFCore.NamingConventions.Internal;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Domain.Entities;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.MetaData;
 
-public sealed class EventMetaDataProvider
+internal sealed class EventMetaDataProvider
 {
-    private static readonly EventLogMetaData EventLogMetaData = Initialize();
-    
-    private static EventLogMetaData Initialize()
+    public EventMetaDataProvider(IServiceProvider serviceProvider)
     {
-        var conventionSet = new ConventionSet();
-        
-        var rewritingConvention = new NameRewritingConvention(new SnakeCaseNameRewriter(CultureInfo.InvariantCulture));
-        conventionSet.EntityTypeAddedConventions.Add(rewritingConvention);
-        conventionSet.EntityTypeAnnotationChangedConventions.Add(rewritingConvention);
-        conventionSet.PropertyAddedConventions.Add(rewritingConvention);
-        conventionSet.ForeignKeyOwnershipChangedConventions.Add(rewritingConvention);
-        conventionSet.KeyAddedConventions.Add(rewritingConvention);
-        conventionSet.ForeignKeyAddedConventions.Add(rewritingConvention);
-        conventionSet.IndexAddedConventions.Add(rewritingConvention);
-        conventionSet.EntityTypeBaseTypeChangedConventions.Add(rewritingConvention);
-        conventionSet.ModelFinalizingConventions.Add(rewritingConvention);
-        
-        var model = new ModelBuilder(conventionSet).ApplyConfiguration(new EventLogEntityTypeConfiguration()).FinalizeModel();
+        EventLogMetaData = CreateEventLogMetaData(serviceProvider);
+        EventLogLockMetaData = CreateEventLockMetaData(serviceProvider);
+        EventLogCorrelationLockMetaData = CreateEventCorrelationLockMetaData(serviceProvider);
+    }
+    
+    public EventLogMetaData EventLogMetaData { get; }
 
+    public EventLogLockMetaData EventLogLockMetaData { get; }
+
+    public EventLogCorrelationLockMetaData EventLogCorrelationLockMetaData { get; }
+    
+    private static EventLogMetaData CreateEventLogMetaData(IServiceProvider serviceProvider)
+    {
+        using var dbContext = serviceProvider.GetRequiredService<IEventLogContext>();
+        var model = dbContext.Model;
+        
         var entity = model.FindEntityType(typeof(EventLog))!;
 
         return new EventLogMetaData
@@ -43,12 +40,38 @@ public sealed class EventMetaDataProvider
             CorrelationIdColumnName = entity.FindProperty(nameof(EventLog.CorrelationId))!.GetColumnName(),
             CreatedAtColumnName = entity.FindProperty(nameof(EventLog.CreatedAt))!.GetColumnName(),
             UserIdColumnName = entity.FindProperty(nameof(EventLog.UserId))!.GetColumnName(),
+            AttemptNumberColumnName = entity.FindProperty(nameof(EventLog.AttemptNumber))!.GetColumnName(),
+            NextAttemptAtColumnName = entity.FindProperty(nameof(EventLog.NextAttemptAt))!.GetColumnName()
         };
     }
     
-    public EventLogMetaData GetEventLogMetaData() => EventLogMetaData;
-    
-    public EventLockMetaData GetEventLockMetaData() => null!;
+    private static EventLogLockMetaData CreateEventLockMetaData(IServiceProvider serviceProvider)
+    {
+        using var dbContext = serviceProvider.GetRequiredService<IEventLogContext>();
+        var model = dbContext.Model;
+        
+        var entity = model.FindEntityType(typeof(EventLogLock))!;
 
-    public EventCorrelationLockMetaData GetEventCorrelationLockMetaData() => null!;
+        return new EventLogLockMetaData
+        {
+            TableName = entity.GetTableName()!, 
+            IdColumnName = entity.FindProperty(nameof(EventLogLock.EventLogId))!.GetColumnName(),
+            AcquiredAtColumnName = entity.FindProperty(nameof(EventLogLock.AcquiredAt))!.GetColumnName()
+        };
+    }
+
+    private static EventLogCorrelationLockMetaData CreateEventCorrelationLockMetaData(IServiceProvider serviceProvider)
+    {
+        using var dbContext = serviceProvider.GetRequiredService<IEventLogContext>();
+        var model = dbContext.Model;
+        
+        var entity = model.FindEntityType(typeof(EventCorrelationLock))!;
+
+        return new EventLogCorrelationLockMetaData()
+        {
+            TableName = entity.GetTableName()!, 
+            CorrelationIdColumnName = entity.FindProperty(nameof(EventCorrelationLock.CorrelationId))!.GetColumnName(),
+            AcquiredAtColumnName = entity.FindProperty(nameof(EventCorrelationLock.AcquiredAt))!.GetColumnName()
+        };
+    }
 }

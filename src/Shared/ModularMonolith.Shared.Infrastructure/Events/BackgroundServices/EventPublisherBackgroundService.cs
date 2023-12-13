@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess;
+using ModularMonolith.Shared.Infrastructure.Events.Extensions;
+using ModularMonolith.Shared.Infrastructure.Events.Options;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;
 using Polly;
 using Polly.Retry;
@@ -9,7 +12,10 @@ namespace ModularMonolith.Shared.Infrastructure.Events.BackgroundServices;
 
 internal sealed class EventPublisherBackgroundService : BackgroundService
 {
-    private readonly Task[] _tasks = new Task[Environment.ProcessorCount * 2];
+    private static readonly ResiliencePipeline EventReceiverPipeline = CreateReceiverPipeline();
+    private static readonly ResiliencePipeline EventLockReleasePipeline = CreateLockReleasePipeline();
+    private static readonly ResiliencePipeline EventPublicationPipeline = CreatePublicationPipeline();
+    private readonly Task[] _tasks;
     private readonly EventReader _eventReader;
     private readonly EventChannel _eventChannel;
     private readonly EventPublisher _eventPublisher;
@@ -18,12 +24,14 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
     public EventPublisherBackgroundService(EventReader eventReader,
         EventChannel eventChannel,
         EventPublisher eventPublisher,
-        ILogger<EventPublisherBackgroundService> logger)
+        ILogger<EventPublisherBackgroundService> logger,
+        IOptions<EventOptions> options)
     {
         _eventReader = eventReader;
         _eventChannel = eventChannel;
         _eventPublisher = eventPublisher;
         _logger = logger;
+        _tasks = new Task[options.Value.MaxParallelWorkers];
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -34,67 +42,72 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
         {
             _tasks[i] = Task.Factory.StartNew(async () =>
             {
-                var pipeline = new ResiliencePipelineBuilder()
-                    .AddRetry(new RetryStrategyOptions
-                    {
-                        Delay = TimeSpan.FromSeconds(5),
-                        BackoffType = DelayBackoffType.Constant,
-                        MaxRetryAttempts = int.MaxValue
-                    })
-                    .Build();
-
-                await pipeline.ExecuteAsync(RunAsync, stoppingToken);
+                await EventReceiverPipeline.ExecuteAsync(RunAsync, stoppingToken);
                 
             }, stoppingToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
         }
 
         await Task.WhenAll(_tasks);
     }
-
     
-    private async ValueTask RunAsync(CancellationToken cancellationToken)
-    {
-        var publishPipeline = new ResiliencePipelineBuilder()
+    private static ResiliencePipeline CreateReceiverPipeline() =>
+        new ResiliencePipelineBuilder()
+            .AddRetry(new RetryStrategyOptions
+            {
+                Delay = TimeSpan.FromSeconds(5),
+                BackoffType = DelayBackoffType.Constant,
+                MaxRetryAttempts = int.MaxValue
+            })
+            .Build();
+    
+    private static ResiliencePipeline CreateLockReleasePipeline() =>
+        new ResiliencePipelineBuilder()
+            .AddRetry(new RetryStrategyOptions
+            {
+                Delay = TimeSpan.FromMinutes(1),
+                BackoffType = DelayBackoffType.Exponential,
+                MaxRetryAttempts = 10
+            })
+            .Build();
+
+    private static ResiliencePipeline CreatePublicationPipeline() =>
+        new ResiliencePipelineBuilder()
             .AddRetry(new RetryStrategyOptions
             {
                 Delay = TimeSpan.FromSeconds(10),
                 BackoffType = DelayBackoffType.Exponential,
                 MaxRetryAttempts = 3
             })
-            .Build(); 
-        
-        var markAsPublishedPipeline = new ResiliencePipelineBuilder()
-            .AddRetry(new RetryStrategyOptions
-            {
-                Delay = TimeSpan.FromMinutes(2),
-                BackoffType = DelayBackoffType.Exponential,
-                MaxRetryAttempts = 10
-            })
-            .Build(); 
-        
+            .Build();
+    
+    private async ValueTask RunAsync(CancellationToken cancellationToken)
+    {
         await foreach (var eventInfo in _eventChannel.ReadAllAsync(cancellationToken))
         {
             try
             {
-                var eventLog = await _eventReader.TryAcquireLockAsync(eventInfo, cancellationToken);
-                if (eventLog is null)
+                var (wasAcquired, eventLog) = await _eventReader.TryAcquireLockAsync(eventInfo, cancellationToken);
+                if (!wasAcquired)
                 {
+                    _logger.EventAlreadyTaken(eventInfo.EventLogId);
                     continue;
                 }
 
                 // Try to publish up to three times before releasing the lock
-                await publishPipeline.ExecuteAsync(async (el, cts) => 
-                    await _eventPublisher.PublishAsync(el, cts), eventLog, cancellationToken);
+                await EventPublicationPipeline.ExecuteAsync(async (el, cts) => 
+                    await _eventPublisher.PublishAsync(el, cts), eventLog!, cancellationToken);
                 
                 // Try to mark as published up to ten times before going for re-publish
-                await markAsPublishedPipeline.ExecuteAsync(async (ev, cts) => 
+                await EventLockReleasePipeline.ExecuteAsync(async (ev, cts) => 
                     await _eventReader.MarkAsPublishedAsync(ev, cts), eventInfo, cancellationToken);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occured while publishing events events");
                 
-                await _eventReader.IncrementFailedAttemptNumberAsync(eventInfo, cancellationToken);
+                // Make sure to release the lock
+                await EventLockReleasePipeline.ExecuteAsync(async (ev, cts) => await _eventReader.IncrementFailedAttemptNumberAsync(ev, cts),
+                    eventInfo, cancellationToken);
             }
         }
     }

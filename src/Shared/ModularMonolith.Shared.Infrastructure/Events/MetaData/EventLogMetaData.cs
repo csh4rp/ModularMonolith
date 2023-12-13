@@ -1,6 +1,6 @@
 ﻿namespace ModularMonolith.Shared.Infrastructure.Events.MetaData;
 
-public sealed class EventLogMetaData
+internal sealed class EventLogMetaData
 {
     public required string TableName { get; init; }
     

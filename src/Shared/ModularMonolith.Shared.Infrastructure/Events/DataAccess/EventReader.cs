@@ -8,20 +8,22 @@ using Npgsql;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 
-internal sealed class EventReader
+internal sealed class EventReader : IEventReader
 {
     private readonly EventMetaDataProvider _eventMetaDataProvider;
     private readonly DbConnectionFactory _dbConnectionFactory;
     private readonly IOptionsMonitor<EventOptions> _optionsMonitor;
 
-    public EventReader(DbConnectionFactory dbConnectionFactory, EventMetaDataProvider eventMetaDataProvider, IOptionsMonitor<EventOptions> optionsMonitor)
+    public EventReader(DbConnectionFactory dbConnectionFactory, 
+        EventMetaDataProvider eventMetaDataProvider,
+        IOptionsMonitor<EventOptions> optionsMonitor)
     {
         _dbConnectionFactory = dbConnectionFactory;
         _eventMetaDataProvider = eventMetaDataProvider;
         _optionsMonitor = optionsMonitor;
     }
 
-    public async Task<EventLog?> TryAcquireLockAsync(EventInfo eventInfo, CancellationToken cancellationToken)
+    public async Task<(bool WasAcquired, EventLog? EventLog)> TryAcquireLockAsync(EventInfo eventInfo, CancellationToken cancellationToken)
     {
         var retryAttempts = _optionsMonitor.CurrentValue.MaxRetryAttempts;
         var (id, correlationId) = eventInfo;
@@ -29,9 +31,9 @@ internal sealed class EventReader
         await using var connection = _dbConnectionFactory.Create();
         await connection.OpenAsync(cancellationToken);
         
-        var eventLogMetaData = _eventMetaDataProvider.GetEventLogMetaData();
-        var eventLockMetaData = _eventMetaDataProvider.GetEventLockMetaData();
-        var eventCorrelationLockMetaData = _eventMetaDataProvider.GetEventCorrelationLockMetaData();
+        var eventLogMetaData = _eventMetaDataProvider.EventLogMetaData;
+        var eventLockMetaData = _eventMetaDataProvider.EventLogLockMetaData;
+        var eventCorrelationLockMetaData = _eventMetaDataProvider.EventLogCorrelationLockMetaData;
 
         await using var batch = connection.CreateBatch();
         
@@ -116,17 +118,17 @@ internal sealed class EventReader
 
         if (!reader.HasRows || !await reader.ReadAsync(cancellationToken))
         {
-            return null;
+            return (false, null);
         }
 
         _ = await reader.NextResultAsync(cancellationToken);
         
         if (!reader.HasRows || !await reader.ReadAsync(cancellationToken))
         {
-            return null;
+            return (false, null);
         }
         
-        return ReadEventLog(reader, eventLogMetaData);
+        return (true, ReadEventLog(reader, eventLogMetaData));
     }
     
     private static EventLog ReadEventLog(NpgsqlDataReader reader, EventLogMetaData eventLogMetaData) =>
@@ -149,9 +151,9 @@ internal sealed class EventReader
 
     public async Task MarkAsPublishedAsync(EventInfo eventInfo, CancellationToken cancellationToken)
     {
-        var eventLogMetaData = _eventMetaDataProvider.GetEventLogMetaData();
-        var eventLockMetaData = _eventMetaDataProvider.GetEventLockMetaData();
-        var eventCorrelationLockMetaData = _eventMetaDataProvider.GetEventCorrelationLockMetaData();
+        var eventLogMetaData = _eventMetaDataProvider.EventLogMetaData;
+        var eventLockMetaData = _eventMetaDataProvider.EventLogLockMetaData;
+        var eventCorrelationLockMetaData = _eventMetaDataProvider.EventLogCorrelationLockMetaData;
         
         await using var connection = _dbConnectionFactory.Create();
         await connection.OpenAsync(cancellationToken);
@@ -193,9 +195,9 @@ internal sealed class EventReader
     
     public async Task IncrementFailedAttemptNumberAsync(EventInfo eventInfo, CancellationToken cancellationToken)
     {
-        var eventLogMetaData = _eventMetaDataProvider.GetEventLogMetaData();
-        var eventLockMetaData = _eventMetaDataProvider.GetEventLockMetaData();
-        var eventCorrelationLockMetaData = _eventMetaDataProvider.GetEventCorrelationLockMetaData();
+        var eventLogMetaData = _eventMetaDataProvider.EventLogMetaData;
+        var eventLockMetaData = _eventMetaDataProvider.EventLogLockMetaData;
+        var eventCorrelationLockMetaData = _eventMetaDataProvider.EventLogCorrelationLockMetaData;
         
         await using var connection = _dbConnectionFactory.Create();
         await connection.OpenAsync(cancellationToken);
@@ -240,7 +242,7 @@ internal sealed class EventReader
     
     public async Task EnsureInitializedAsync(CancellationToken cancellationToken)
     {
-        var eventLogMetaData = _eventMetaDataProvider.GetEventLogMetaData();
+        var eventLogMetaData = _eventMetaDataProvider.EventLogMetaData;
         
         await using var connection = _dbConnectionFactory.Create();
         await connection.OpenAsync(cancellationToken);
@@ -271,14 +273,36 @@ internal sealed class EventReader
 
     public async Task<IReadOnlyList<EventInfo>> GetUnpublishedEventsAsync(CancellationToken cancellationToken)
     {
-        var eventLogMetaData = _eventMetaDataProvider.GetEventLogMetaData();
-        var eventLockMetaData = _eventMetaDataProvider.GetEventLockMetaData();
-        var eventCorrelationLockMetaData = _eventMetaDataProvider.GetEventCorrelationLockMetaData();
+        var eventLogMetaData = _eventMetaDataProvider.EventLogMetaData;
+        var eventLogLockMetaData = _eventMetaDataProvider.EventLogLockMetaData;
+        var eventLogCorrelationLockMetaData = _eventMetaDataProvider.EventLogCorrelationLockMetaData;
 
         await using var connection = _dbConnectionFactory.Create();
         await connection.OpenAsync(cancellationToken);
+
+        await using var batch = connection.CreateBatch();
+
+        var releaseEventLocksCommand = batch.CreateBatchCommand();
+        releaseEventLocksCommand.Parameters.AddWithValue("@max_lock_time_in_seconds",
+            _optionsMonitor.CurrentValue.MaxLockTime.TotalSeconds);
+
+        releaseEventLocksCommand.CommandText =
+            $"""
+            DELETE FROM {eventLogLockMetaData.TableName}
+            WHERE ({eventLogLockMetaData.AcquiredAtColumnName} + INTERVAL '1 second' * @max_lock_time_in_seconds) < CURRENT_TIMESTAMP
+            """;
+
+        var releaseCorrelationLocksCommand = batch.CreateBatchCommand();
+        releaseEventLocksCommand.Parameters.AddWithValue("@max_lock_time_in_seconds",
+            _optionsMonitor.CurrentValue.MaxLockTime.TotalSeconds);
+
+        releaseEventLocksCommand.CommandText =
+            $"""
+             DELETE FROM {eventLogCorrelationLockMetaData.TableName}
+             WHERE ({eventLogCorrelationLockMetaData.AcquiredAtColumnName} + INTERVAL '1 second' * @max_lock_time_in_seconds) < CURRENT_TIMESTAMP
+             """;
         
-        await using var selectCommand = connection.CreateCommand();
+        var selectCommand = batch.CreateBatchCommand();
         selectCommand.Parameters.AddWithValue("@max_retry_attempts", _optionsMonitor.CurrentValue.MaxRetryAttempts);
         selectCommand.CommandText =
             $"""
@@ -291,8 +315,8 @@ internal sealed class EventReader
              NOT EXISTS
              (
                 SELECT 1
-                FROM {eventCorrelationLockMetaData.TableName}
-                WHERE {eventCorrelationLockMetaData.CorrelationIdColumnName} = el.{eventLogMetaData.CorrelationIdColumnName}
+                FROM {eventLogCorrelationLockMetaData.TableName}
+                WHERE {eventLogCorrelationLockMetaData.CorrelationIdColumnName} = el.{eventLogMetaData.CorrelationIdColumnName}
              )
              AND NOT EXISTS
              (
@@ -306,7 +330,7 @@ internal sealed class EventReader
              AND NOT EXISTS
              (
                 SELECT 1
-                FROM {eventLockMetaData.TableName}
+                FROM {eventLogLockMetaData.TableName}
                 AND {eventLogMetaData.IdColumnName} = el.{eventLogMetaData.IdColumnName}
              )
              AND ({eventLogMetaData.NextAttemptAtColumnName} IS NULL OR {eventLogMetaData.NextAttemptAtColumnName} < CURRENT_TIMESTAMP)
@@ -314,9 +338,13 @@ internal sealed class EventReader
              ORDER BY {eventLogMetaData.CreatedAtColumnName}
              LIMIT 10 OFFSET 0
              """;
+        
+        await using var reader = await batch.ExecuteReaderAsync(cancellationToken);
 
-        await using var reader = await selectCommand.ExecuteReaderAsync(cancellationToken);
-
+        // Move to the SELECT query result
+        _ = await reader.NextResultAsync(cancellationToken);
+        _ = await reader.NextResultAsync(cancellationToken);
+        
         if (!reader.HasRows)
         {
             return Array.Empty<EventInfo>();

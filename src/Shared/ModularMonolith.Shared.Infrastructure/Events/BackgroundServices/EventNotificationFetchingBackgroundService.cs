@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
+using ModularMonolith.Shared.Infrastructure.Events.Extensions;
 using ModularMonolith.Shared.Infrastructure.Events.MetaData;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;
 using Npgsql;
@@ -11,6 +12,8 @@ namespace ModularMonolith.Shared.Infrastructure.Events.BackgroundServices;
 
 internal sealed class EventNotificationFetchingBackgroundService : BackgroundService
 {
+    private static readonly ResiliencePipeline RetryPipeline = CreatePipeline();
+    
     private readonly DbConnectionFactory _dbConnectionFactory;
     private readonly EventChannel _channel;
     private readonly ILogger<EventNotificationFetchingBackgroundService> _logger;
@@ -24,9 +27,8 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
         _logger = logger;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        var pipeline = new ResiliencePipelineBuilder()
+    private static ResiliencePipeline CreatePipeline() =>
+        new ResiliencePipelineBuilder()
             .AddRetry(new RetryStrategyOptions
             {
                 Delay = TimeSpan.FromSeconds(5),
@@ -35,11 +37,15 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
             })
             .Build();
 
-        await pipeline.ExecuteAsync(RunAsync, stoppingToken);
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        await RetryPipeline.ExecuteAsync(RunAsync, stoppingToken);
     }
 
     private async ValueTask RunAsync(CancellationToken stoppingToken)
     {
+        _logger.LogInformation("Started listening for the notifications");
+        
         try
         {
             await using var connection = _dbConnectionFactory.Create();
@@ -57,6 +63,8 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
             {
                 await connection.WaitAsync(stoppingToken);
             }
+
+            connection.Notification -= OnNotificationEventHandler;
         }
         catch (Exception ex)
         {
@@ -65,7 +73,33 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
         }
     }
     
-    private void OnNotificationEventHandler(object obj, NpgsqlNotificationEventArgs args)
+    private async void OnNotificationEventHandler(object obj, NpgsqlNotificationEventArgs args)
+    {
+        try
+        {
+            var (id, correlationId) = GetIds(args);
+
+            var eventInfo = new EventInfo(id, correlationId);
+
+            _logger.NotificationReceived(id, correlationId);
+
+            if (_channel.TryWrite(eventInfo))
+            {
+                return;
+            }
+
+            _logger.NotificationBlocked(id, correlationId);
+
+            await _channel.WriteAsync(eventInfo, default);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while writing event with notification payload: {NotificationPayload} to channel",
+                args.Payload);
+        }
+    }
+
+    private static (Guid Id, Guid? CorrelationId) GetIds(NpgsqlNotificationEventArgs args)
     {
         var index = args.Payload.IndexOf('/');
         var payload = args.Payload.AsSpan();
@@ -75,14 +109,6 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
             : null;
         
         var id = Guid.Parse(payload[index..]);
-
-        var eventInfo = new EventInfo(id, correlationId);
-
-        var spin = new SpinWait();
-
-        while (!_channel.TryWrite(eventInfo))
-        {
-            spin.SpinOnce();
-        }
+        return (id, correlationId);
     }
 }
