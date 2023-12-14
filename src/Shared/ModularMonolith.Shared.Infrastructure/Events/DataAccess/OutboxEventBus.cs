@@ -61,9 +61,7 @@ internal sealed class OutboxEventBus : IEventBus
     {
         var currentActivity = System.Diagnostics.Activity.Current;
         System.Diagnostics.Debug.Assert(currentActivity is not null);
-
-        var now = _timeProvider.GetUtcNow();
-
+        
         var eventLogs = events.Select(e =>
         {
             var eventType = e.GetType();
@@ -71,7 +69,7 @@ internal sealed class OutboxEventBus : IEventBus
             
             return new EventLog
             {
-                CreatedAt = now,
+                CreatedAt = _timeProvider.GetUtcNow(),
                 Name = attribute?.Name ?? eventType.Name,
                 Type = eventType.FullName!,
                 CorrelationId = options.CorrelationId,

@@ -13,8 +13,6 @@
       <PackageReference Include="Respawn" />
       <PackageReference Include="Respawn.Postgres" />
       <PackageReference Include="Testcontainers.PostgreSql" />
-      <PackageReference Include="xunit" />
-      <PackageReference Include="xunit.runner.visualstudio" />
     </ItemGroup>
   
     <ItemGroup>

@@ -20,7 +20,7 @@ public class PaginatedResult<T> : IResult
 
     public async Task ExecuteAsync(HttpContext httpContext)
     {
-        httpContext.Response.Headers.Add("X-Total-Length", _totalLength.ToString());
+        httpContext.Response.Headers.Append("X-Total-Length", _totalLength.ToString());
         await httpContext.Response.WriteAsJsonAsync(_items);
     }
 }

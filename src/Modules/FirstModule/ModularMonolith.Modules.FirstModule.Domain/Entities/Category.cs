@@ -6,5 +6,5 @@ public class Category
     
     public Guid? ParentId { get; set; }
     
-    public string Name { get; set; }
+    public required string Name { get; set; }
 }

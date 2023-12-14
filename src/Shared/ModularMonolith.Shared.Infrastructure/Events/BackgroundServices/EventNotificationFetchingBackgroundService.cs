@@ -58,7 +58,7 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
             }
 
             connection.Notification += OnNotificationEventHandler;
-
+            
             while (!stoppingToken.IsCancellationRequested)
             {
                 await connection.WaitAsync(stoppingToken);
@@ -73,7 +73,7 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
         }
     }
     
-    private async void OnNotificationEventHandler(object obj, NpgsqlNotificationEventArgs args)
+    private void OnNotificationEventHandler(object obj, NpgsqlNotificationEventArgs args)
     {
         try
         {
@@ -90,7 +90,17 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
 
             _logger.NotificationBlocked(id, correlationId);
 
-            await _channel.WriteAsync(eventInfo, default);
+            var spinWait = new SpinWait();
+
+            while (!_channel.TryWrite(eventInfo))
+            {
+                if (spinWait.NextSpinWillYield)
+                {
+                    _logger.NotificationBlocked(id, correlationId);
+                }
+                
+                spinWait.SpinOnce();
+            }
         }
         catch (Exception ex)
         {

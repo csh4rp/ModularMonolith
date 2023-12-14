@@ -355,7 +355,7 @@ internal sealed class EventReader : IEventReader
         while (await reader.ReadAsync(cancellationToken))
         {
             var eventLogId = reader.GetGuid(0);
-            var correlationId = reader.IsDBNull(1) ? (Guid?)null : reader.GetGuid(1);
+            var correlationId = await reader.IsDBNullAsync(1, cancellationToken) ? (Guid?)null : reader.GetGuid(1);
 
             events.Add(new EventInfo(eventLogId, correlationId));
         }
