@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.Domain.Entities;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
+using ModularMonolith.Shared.Infrastructure.DataAccess.Factories;
 using ModularMonolith.Shared.Infrastructure.Events.MetaData;
 using ModularMonolith.Shared.Infrastructure.Events.Options;
 using Npgsql;

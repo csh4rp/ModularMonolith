@@ -3,8 +3,9 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ModularMonolith.Shared.BusinessLogic.Identity;
+using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
 
-namespace ModularMonolith.Shared.Infrastructure.AuditLogs;
+namespace ModularMonolith.Shared.Infrastructure.AuditLogs.Factories;
 
 public sealed class AuditLogFactory(IIdentityContextAccessor identityContextAccessor, TimeProvider timeProvider)
 {

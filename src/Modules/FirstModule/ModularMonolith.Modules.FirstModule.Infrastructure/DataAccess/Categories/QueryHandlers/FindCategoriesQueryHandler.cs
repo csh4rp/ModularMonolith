@@ -2,6 +2,7 @@
 using ModularMonolith.Modules.FirstModule.Contracts.Categories.Queries;
 using ModularMonolith.Modules.FirstModule.Contracts.Categories.Responses;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
+using ModularMonolith.Shared.Infrastructure.DataAccess.Extensions;
 using ModularMonolith.Shared.Infrastructure.Queries;
 using Z.EntityFramework.Plus;
 

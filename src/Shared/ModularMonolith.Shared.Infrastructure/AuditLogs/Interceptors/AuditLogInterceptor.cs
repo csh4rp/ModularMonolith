@@ -2,8 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
+using ModularMonolith.Shared.Infrastructure.AuditLogs.Factories;
 
-namespace ModularMonolith.Shared.Infrastructure.AuditLogs;
+namespace ModularMonolith.Shared.Infrastructure.AuditLogs.Interceptors;
 
 public class AuditLogInterceptor : SaveChangesInterceptor
 {

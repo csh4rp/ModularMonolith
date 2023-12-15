@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.Infrastructure.AuditLogs;
+using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
 using ModularMonolith.Shared.Infrastructure.Tests.Integration.AuditLogs.Entities;
 
 namespace ModularMonolith.Shared.Infrastructure.Tests.Integration.AuditLogs;

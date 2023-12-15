@@ -1,5 +1,4 @@
 ﻿using System.Collections.Frozen;
-using System.Reflection;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.Domain.Abstractions;
@@ -26,4 +25,6 @@ internal sealed class EventSerializer
         
         return JsonSerializer.Deserialize(eventPayload, type)!;
     }
+    
+    public TEvent Deserialize<TEvent>(string eventPayload) => JsonSerializer.Deserialize<TEvent>(eventPayload)!;
 }

@@ -2,14 +2,10 @@
 
 namespace ModularMonolith.Shared.Infrastructure.Events.BackgroundServices;
 
-internal static class EventBackgroundServicesExtensions
+internal static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddEventBackgroundServices(this IServiceCollection serviceCollection)
-    {
+    public static IServiceCollection AddEventBackgroundServices(this IServiceCollection serviceCollection) =>
         serviceCollection.AddSingleton<EventNotificationFetchingBackgroundService>()
             .AddSingleton<EventPollingBackgroundService>()
             .AddSingleton<EventPublisherBackgroundService>();
-
-        return serviceCollection;
-    }
 }

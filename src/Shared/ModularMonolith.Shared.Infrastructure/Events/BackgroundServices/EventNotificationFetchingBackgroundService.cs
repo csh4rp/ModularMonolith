@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
+using ModularMonolith.Shared.Infrastructure.DataAccess.Factories;
 using ModularMonolith.Shared.Infrastructure.Events.Extensions;
 using ModularMonolith.Shared.Infrastructure.Events.MetaData;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;

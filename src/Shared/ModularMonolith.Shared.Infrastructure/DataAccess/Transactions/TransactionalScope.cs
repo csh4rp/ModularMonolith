@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using ModularMonolith.Shared.BusinessLogic.Abstract;
 
-namespace ModularMonolith.Shared.Infrastructure.DataAccess;
+namespace ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
 
 internal sealed class TransactionalScope : ITransactionalScope
 {

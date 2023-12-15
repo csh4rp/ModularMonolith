@@ -2,9 +2,9 @@
 using MassTransit.Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModularMonolith.Shared.BusinessLogic.Identity;
 using ModularMonolith.Shared.Infrastructure.Events.Extensions;
 using EventLog = ModularMonolith.Shared.Domain.Entities.EventLog;
-
 
 namespace ModularMonolith.Shared.Infrastructure.Events.Utils;
 
@@ -17,7 +17,10 @@ internal sealed class EventPublisher
     private readonly EventMapper _eventMapper;
     private readonly ILogger<EventPublisher> _logger;
 
-    public EventPublisher(EventSerializer eventSerializer, IServiceScopeFactory serviceScopeFactory, EventMapper eventMapper, ILogger<EventPublisher> logger)
+    public EventPublisher(EventSerializer eventSerializer,
+        IServiceScopeFactory serviceScopeFactory,
+        EventMapper eventMapper,
+        ILogger<EventPublisher> logger)
     {
         _eventSerializer = eventSerializer;
         _serviceScopeFactory = serviceScopeFactory;
@@ -31,9 +34,13 @@ internal sealed class EventPublisher
 
         await using (var scope = _serviceScopeFactory.CreateAsyncScope())
         {
-            using var activity =
-                EventPublisherActivitySource.CreateActivity(eventLog.Name, ActivityKind.Internal);
+            if (eventLog.UserId.HasValue)
+            {
+                var identitySetter = scope.ServiceProvider.GetRequiredService<IIdentityContextSetter>();
+                identitySetter.Set(new IdentityContext(eventLog.UserId.Value));
+            }
 
+            using var activity = EventPublisherActivitySource.CreateActivity(eventLog.Name, ActivityKind.Internal);
             activity?.SetParentId(eventLog.ActivityId);
             activity?.Start();
             
@@ -48,9 +55,13 @@ internal sealed class EventPublisher
         {
             await using (var scope = _serviceScopeFactory.CreateAsyncScope())
             {
-                using var activity =
-                    EventPublisherActivitySource.CreateActivity(eventLog.Name, ActivityKind.Internal);
-
+                if (eventLog.UserId.HasValue)
+                {
+                    var identitySetter = scope.ServiceProvider.GetRequiredService<IIdentityContextSetter>();
+                    identitySetter.Set(new IdentityContext(eventLog.UserId.Value));
+                }
+                
+                using var activity = EventPublisherActivitySource.CreateActivity(eventLog.Name, ActivityKind.Internal);
                 activity?.SetParentId(eventLog.ActivityId);
                 activity?.Start();
             

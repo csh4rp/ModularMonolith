@@ -2,7 +2,7 @@
 
 namespace ModularMonolith.Shared.Infrastructure.Events.Extensions;
 
-internal static partial class EventLoggingExtensions
+internal static partial class LoggingExtensions
 {
     [LoggerMessage(
         EventId = 2000,
@@ -29,7 +29,7 @@ internal static partial class EventLoggingExtensions
     public static partial void EventPublished(this ILogger logger, Guid eventId);
     
     [LoggerMessage(
-        EventId = 2030,
+        EventId = 2021,
         Level = LogLevel.Debug,
         Message = "IntegrationEvent with id: {EventId} was published")]
     public static partial void IntegrationEventPublished(this ILogger logger, Guid eventId);

@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.BusinessLogic.Identity;
 using ModularMonolith.Shared.Infrastructure.AuditLogs;
+using ModularMonolith.Shared.Infrastructure.AuditLogs.Factories;
+using ModularMonolith.Shared.Infrastructure.AuditLogs.Interceptors;
 using ModularMonolith.Shared.Infrastructure.Tests.Integration.AuditLogs.Entities;
 using ModularMonolith.Shared.Infrastructure.Tests.Integration.AuditLogs.Fixtures;
 using NSubstitute;

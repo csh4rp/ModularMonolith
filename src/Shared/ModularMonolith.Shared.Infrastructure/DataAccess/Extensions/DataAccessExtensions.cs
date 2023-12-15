@@ -2,7 +2,7 @@
 using System.Reflection;
 using ModularMonolith.Shared.Contracts;
 
-namespace ModularMonolith.Shared.Infrastructure.DataAccess;
+namespace ModularMonolith.Shared.Infrastructure.DataAccess.Extensions;
 
 public static class DataAccessExtensions
 {

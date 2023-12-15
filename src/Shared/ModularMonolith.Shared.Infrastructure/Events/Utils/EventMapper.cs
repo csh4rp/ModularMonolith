@@ -10,7 +10,7 @@ using ModularMonolith.Shared.Infrastructure.Events.Options;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.Utils;
 
-public sealed class EventMapper
+internal sealed class EventMapper
 {
     private readonly FrozenDictionary<Type, Func<object, IIntegrationEvent>> _eventMappings;
 
