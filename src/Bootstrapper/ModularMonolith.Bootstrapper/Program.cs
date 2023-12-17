@@ -1,12 +1,19 @@
-using ModularMonolith.Modules.FirstModule.Api;
-using ModularMonolith.Modules.FirstModule.Api.Categories;
-using ModularMonolith.Shared.BusinessLogic;
-using Extensions = ModularMonolith.Shared.BusinessLogic.Extensions;
+﻿using ModularMonolith.Modules.FirstModule.Api;
+using ModularMonolith.Shared.Infrastructure.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.addev
+builder.Services.AddDataAccess(c =>
+{
+    c.ConnectionString = builder.Configuration.GetConnectionString("Database")!;
+});
+
+builder.Services.AddFirstModule();
+
 
 var app = builder.Build();
 

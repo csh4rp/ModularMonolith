@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Modules.FirstModule.BusinessLogic.Categories.CommandHandlers;
 using ModularMonolith.Modules.FirstModule.Contracts.Categories.Commands;
@@ -12,10 +12,6 @@ namespace ModularMonolith.Modules.FirstModule.BusinessLogic.Tests.Unit.Categorie
 
 public class CreateCategoryCommandHandlerTests
 {
-    /// <summary>
-    /// Test method to verify the functionality of creating a category.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task ShouldCreateCategory()
     {

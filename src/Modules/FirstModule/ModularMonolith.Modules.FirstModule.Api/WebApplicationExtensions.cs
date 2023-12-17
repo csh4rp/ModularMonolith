@@ -2,7 +2,7 @@
 
 namespace ModularMonolith.Modules.FirstModule.Api;
 
-public static class Extensions
+public static class WebApplicationExtensions
 {
     public static WebApplication UseFirstModule(this WebApplication app)
     {

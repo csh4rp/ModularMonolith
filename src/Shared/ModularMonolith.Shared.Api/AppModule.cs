@@ -8,7 +8,7 @@ public abstract class AppModule
 
     public abstract IServiceCollection RegisterServices(IServiceCollection serviceCollection);
 
-    public abstract Assembly GetHandlersAssembly();
+    public abstract Assembly[] GetHandlersAssemblies();
     
-    public abstract Assembly GetValidatorsAssembly();
+    public abstract Assembly[] GetValidatorsAssemblies();
 }

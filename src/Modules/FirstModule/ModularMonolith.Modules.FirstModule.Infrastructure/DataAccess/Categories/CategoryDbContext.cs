@@ -5,7 +5,7 @@ using ModularMonolith.Shared.Infrastructure.DataAccess;
 
 namespace ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess.Categories;
 
-public sealed class CategoryDbContext : BaseDbContext, ICategoryDatabase
+internal sealed class CategoryDbContext : BaseDbContext, ICategoryDatabase
 {
     public CategoryDbContext(DbContextOptions<CategoryDbContext> options) : base(options)
     {
