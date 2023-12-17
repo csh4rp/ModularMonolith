@@ -7,8 +7,17 @@ using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
 
 namespace ModularMonolith.Shared.Infrastructure.AuditLogs.Factories;
 
-public sealed class AuditLogFactory(IIdentityContextAccessor identityContextAccessor, TimeProvider timeProvider)
+public sealed class AuditLogFactory
 {
+    private readonly IIdentityContextAccessor _identityContextAccessor;
+    private readonly TimeProvider _timeProvider;
+
+    public AuditLogFactory(IIdentityContextAccessor identityContextAccessor, TimeProvider timeProvider)
+    {
+        _identityContextAccessor = identityContextAccessor;
+        _timeProvider = timeProvider;
+    }
+
     public AuditLog Create(EntityEntry entry)
     {
         Debug.Assert(Activity.Current is not null);
@@ -55,10 +64,10 @@ public sealed class AuditLogFactory(IIdentityContextAccessor identityContextAcce
         
         return new AuditLog
         {
-            CreatedAt = timeProvider.GetUtcNow(),
+            CreatedAt = _timeProvider.GetUtcNow(),
             ChangeType = GetChangeType(entry),
             ActivityId = Activity.Current.TraceId.ToString(),
-            UserId = identityContextAccessor.Context?.UserId,
+            UserId = _identityContextAccessor.Context?.UserId,
             OperationName = Activity.Current.OperationName,
             EntityType = entityType.FullName!,
             Changes = JsonSerializer.Serialize(changes),

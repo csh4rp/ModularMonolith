@@ -1,23 +1,43 @@
-﻿using ModularMonolith.Modules.FirstModule.Api;
+﻿using ModularMonolith.Bootstrapper;
+using ModularMonolith.Modules.FirstModule.Api;
+using ModularMonolith.Shared.BusinessLogic;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
+using ModularMonolith.Shared.Infrastructure.Events;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+var modules = builder.Configuration.GetEnabledModules().ToList();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.addev
+var assemblies = modules.SelectMany(m => m.Assemblies).ToArray();
+
+builder.Services.AddMediator(assemblies);
+
+builder.Services.AddEvents(e =>
+{
+    e.Assemblies = [.. assemblies];
+});
+
+
 builder.Services.AddDataAccess(c =>
 {
     c.ConnectionString = builder.Configuration.GetConnectionString("Database")!;
 });
 
-builder.Services.AddFirstModule();
-
+foreach (var appModule in modules)
+{
+    appModule.RegisterServices(builder.Services);
+}
 
 var app = builder.Build();
 
-app.UseFirstModule();
+foreach (var appModule in modules)
+{
+    appModule.UseEndpoints(app);
+}
 
 if (app.Environment.IsDevelopment())
 {

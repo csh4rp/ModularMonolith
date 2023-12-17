@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Frozen;
+using System.Reflection;
 
 namespace ModularMonolith.Shared.Api;
 
@@ -8,7 +9,7 @@ public abstract class AppModule
 
     public abstract IServiceCollection RegisterServices(IServiceCollection serviceCollection);
 
-    public abstract Assembly[] GetHandlersAssemblies();
+    public abstract WebApplication UseEndpoints(WebApplication app);
     
-    public abstract Assembly[] GetValidatorsAssemblies();
+    public abstract FrozenSet<Assembly> Assemblies { get; }
 }

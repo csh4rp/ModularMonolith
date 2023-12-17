@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace ModularMonolith.Shared.Infrastructure.AuditLogs;
 
-public class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<AuditLog>
+public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<AuditLog>
 {
     private readonly bool _excludeFromMigrations;
     private readonly string _table;

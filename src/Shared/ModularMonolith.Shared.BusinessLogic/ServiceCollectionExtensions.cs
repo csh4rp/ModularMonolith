@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ModularMonolith.Shared.BusinessLogic;
 
-public static class Extensions
+public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddMediator(this IServiceCollection serviceCollection, Assembly[] assemblies)
     {
