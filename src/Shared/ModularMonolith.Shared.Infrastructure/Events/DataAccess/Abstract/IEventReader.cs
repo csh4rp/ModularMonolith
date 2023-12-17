@@ -1,7 +1,7 @@
 ﻿using ModularMonolith.Shared.Domain.Entities;
 using ModularMonolith.Shared.Infrastructure.Events.MetaData;
 
-namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess;
+namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 
 internal interface IEventReader
 {

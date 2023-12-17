@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Infrastructure.Events.BackgroundServices;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Events.MetaData;
@@ -10,11 +9,11 @@ namespace ModularMonolith.Shared.Infrastructure.Events;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddEvents<TDbContext>(this IServiceCollection serviceCollection, 
-        Action<EventOptions> action) where TDbContext : DbContext, IEventLogContext
+    public static IServiceCollection AddEvents(this IServiceCollection serviceCollection, 
+        Action<EventOptions> action)
     {
         serviceCollection.AddEventBackgroundServices()
-            .AddEventDataAccessServices<TDbContext>()
+            .AddEventDataAccessServices()
             .AddEventMetaDataProvider()
             .AddEventUtils();
 

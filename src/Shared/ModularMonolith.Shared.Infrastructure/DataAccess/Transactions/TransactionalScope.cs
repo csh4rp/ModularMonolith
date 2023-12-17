@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.BusinessLogic.Abstract;
 
 namespace ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
@@ -6,32 +6,31 @@ namespace ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
 internal sealed class TransactionalScope : ITransactionalScope
 {
     public static readonly AsyncLocal<TransactionalScope> Current = new();
-
-    private IDbContextTransaction? _transaction;
+    
+    public DbContext? DbContext { get; private set; }
 
     public TransactionalScope() => Current.Value = this;
 
-    public ValueTask CompleteAsync(CancellationToken cancellationToken) => _transaction is null 
-        ? new ValueTask() 
-        : new ValueTask(_transaction.CommitAsync(cancellationToken));
-    
-    public async ValueTask DisposeAsync()
+    public async Task CompleteAsync(CancellationToken cancellationToken)
     {
-        if (Current.Value is null)
+        if (DbContext?.Database.CurrentTransaction is null)
         {
             return;
         }
 
-        await Current.Value.DisposeAsync();
+        await DbContext.Database.CurrentTransaction.CommitAsync(cancellationToken);
+        DbContext = null;
     }
+    
+    public ValueTask DisposeAsync() => Current.Value is null ? ValueTask.CompletedTask : Current.Value.DisposeAsync();
 
-    public void EnlistTransaction(IDbContextTransaction transaction)
+    public void EnlistTransaction(DbContext dbContext)
     {
-        if (_transaction is not null)
+        if (DbContext is not null)
         {
             throw new InvalidOperationException("Transaction was already enlisted");
         }
-
-        _transaction = transaction;
+        
+        DbContext = dbContext;
     }
 }

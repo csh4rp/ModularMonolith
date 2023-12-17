@@ -2,18 +2,19 @@
 using ModularMonolith.Shared.BusinessLogic.Events;
 using ModularMonolith.Shared.Domain.Abstractions;
 using ModularMonolith.Shared.Domain.Entities;
+using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;
 
-namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess;
+namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
 
 internal sealed class EventLogStore : IEventLogStore
 {
-    private readonly IEventLogContext _eventLogContext;
+    private readonly IEventLogDbContext _eventLogDbContext;
     private readonly EventSerializer _eventSerializer;
 
-    public EventLogStore(IEventLogContext eventLogContext, EventSerializer eventSerializer)
+    public EventLogStore(IEventLogDbContext eventLogDbContext, EventSerializer eventSerializer)
     {
-        _eventLogContext = eventLogContext;
+        _eventLogDbContext = eventLogDbContext;
         _eventSerializer = eventSerializer;
     }
 
@@ -22,7 +23,7 @@ internal sealed class EventLogStore : IEventLogStore
     {
         var eventType = typeof(TEvent);
 
-        var eventLog = await _eventLogContext.EventLogs.Where(e => e.UserId == userId
+        var eventLog = await _eventLogDbContext.EventLogs.Where(e => e.UserId == userId
                                                                    && e.Type == eventType.FullName)
             .OrderBy(b => b.CreatedAt)
             .FirstOrDefaultAsync(cancellationToken);
@@ -31,7 +32,7 @@ internal sealed class EventLogStore : IEventLogStore
     }
 
     public Task<EventLog?> GetFirstOccurenceAsync(Guid userId, Type eventType, CancellationToken cancellationToken) =>
-        _eventLogContext.EventLogs
+        _eventLogDbContext.EventLogs
             .AsNoTracking()
             .Where(e => e.UserId == userId
                         && e.Type == eventType.FullName)
@@ -43,7 +44,7 @@ internal sealed class EventLogStore : IEventLogStore
     {
         var eventType = typeof(TEvent);
 
-        var eventLog = await _eventLogContext.EventLogs.Where(e => e.UserId == userId
+        var eventLog = await _eventLogDbContext.EventLogs.Where(e => e.UserId == userId
                                                                    && e.Type == eventType.FullName)
             .OrderByDescending(b => b.CreatedAt)
             .FirstOrDefaultAsync(cancellationToken);
@@ -52,7 +53,7 @@ internal sealed class EventLogStore : IEventLogStore
     }
 
     public Task<EventLog?> GetLastOccurenceAsync(Guid userId, Type eventType, CancellationToken cancellationToken) =>
-        _eventLogContext.EventLogs
+        _eventLogDbContext.EventLogs
             .AsNoTracking()
             .Where(e => e.UserId == userId
                         && e.Type == eventType.FullName)

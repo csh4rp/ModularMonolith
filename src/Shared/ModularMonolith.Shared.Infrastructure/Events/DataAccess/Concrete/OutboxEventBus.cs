@@ -4,19 +4,21 @@ using ModularMonolith.Shared.BusinessLogic.Identity;
 using ModularMonolith.Shared.Domain.Abstractions;
 using ModularMonolith.Shared.Domain.Attributes;
 using ModularMonolith.Shared.Domain.Entities;
+using ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
+using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;
 
-namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess;
+namespace ModularMonolith.Shared.Infrast1ructure.Events.DataAccess.Concrete;
 
 internal sealed class OutboxEventBus : IEventBus
 {
     private static readonly EventPublishOptions DefaultOptions = new();
-    private readonly IEventLogContext _dbContext;
+    private readonly IEventLogDbContext _dbContext;
     private readonly EventSerializer _eventSerializer;
     private readonly IIdentityContextAccessor _identityContextAccessor;
     private readonly TimeProvider _timeProvider;
 
-    public OutboxEventBus(IEventLogContext dbContext,
+    public OutboxEventBus(IEventLogDbContext dbContext,
         EventSerializer eventSerializer,
         IIdentityContextAccessor identityContextAccessor,
         TimeProvider timeProvider)
@@ -50,6 +52,13 @@ internal sealed class OutboxEventBus : IEventBus
             ActivityId = currentActivity.Id!
         };
 
+        var scope = TransactionalScope.Current.Value;
+        if (scope?.DbContext is not null)
+        {
+            scope.DbContext.Set<EventLog>().Add(eventLog);
+            return scope.DbContext.SaveChangesAsync(cancellationToken);
+        }
+
         _dbContext.EventLogs.Add(eventLog);
         return _dbContext.SaveChangesAsync(cancellationToken);
     }
@@ -79,6 +88,13 @@ internal sealed class OutboxEventBus : IEventBus
                 ActivityId = currentActivity.Id!
             };
         });
+
+        var scope = TransactionalScope.Current.Value;
+        if (scope?.DbContext is not null)
+        {
+            scope.DbContext.Set<EventLog>().AddRange(eventLogs);
+            return scope.DbContext.SaveChangesAsync(cancellationToken);
+        }
 
         _dbContext.EventLogs.AddRange(eventLogs);
         return _dbContext.SaveChangesAsync(cancellationToken);

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Domain.Entities;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess;
+using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.MetaData;
 
@@ -22,7 +23,7 @@ internal sealed class EventMetaDataProvider
     
     private static EventLogMetaData CreateEventLogMetaData(IServiceProvider serviceProvider)
     {
-        using var dbContext = serviceProvider.GetRequiredService<IEventLogContext>();
+        using var dbContext = serviceProvider.GetRequiredService<IEventLogDbContext>();
         var model = dbContext.Model;
         
         var entity = model.FindEntityType(typeof(EventLog))!;
@@ -47,7 +48,7 @@ internal sealed class EventMetaDataProvider
     
     private static EventLogLockMetaData CreateEventLockMetaData(IServiceProvider serviceProvider)
     {
-        using var dbContext = serviceProvider.GetRequiredService<IEventLogContext>();
+        using var dbContext = serviceProvider.GetRequiredService<IEventLogDbContext>();
         var model = dbContext.Model;
         
         var entity = model.FindEntityType(typeof(EventLogLock))!;
@@ -62,7 +63,7 @@ internal sealed class EventMetaDataProvider
 
     private static EventLogCorrelationLockMetaData CreateEventCorrelationLockMetaData(IServiceProvider serviceProvider)
     {
-        using var dbContext = serviceProvider.GetRequiredService<IEventLogContext>();
+        using var dbContext = serviceProvider.GetRequiredService<IEventLogDbContext>();
         var model = dbContext.Model;
         
         var entity = model.FindEntityType(typeof(EventCorrelationLock))!;

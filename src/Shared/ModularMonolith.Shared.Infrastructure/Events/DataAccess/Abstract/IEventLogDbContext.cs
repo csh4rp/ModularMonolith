@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using ModularMonolith.Shared.Domain.Entities;
 
-namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess;
+namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 
-public interface IEventLogContext : IDisposable, IAsyncDisposable
+public interface IEventLogDbContext : IDisposable, IAsyncDisposable
 {
     DbSet<EventLog> EventLogs { get; }
     

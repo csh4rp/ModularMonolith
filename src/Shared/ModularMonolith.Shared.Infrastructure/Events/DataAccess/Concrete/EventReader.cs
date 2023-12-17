@@ -1,13 +1,13 @@
 ﻿using System.Data;
 using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.Domain.Entities;
-using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Factories;
+using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 using ModularMonolith.Shared.Infrastructure.Events.MetaData;
 using ModularMonolith.Shared.Infrastructure.Events.Options;
 using Npgsql;
 
-namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess;
+namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
 
 internal sealed class EventReader : IEventReader
 {

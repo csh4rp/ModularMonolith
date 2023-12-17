@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ModularMonolith.Shared.Infrastructure.AuditLogs;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
+using ModularMonolith.Shared.Infrastructure.Events.DataAccess.EntityConfigurations;
 
 namespace ModularMonolith.Shared.Infrastructure.DataAccess;
 
@@ -13,8 +15,8 @@ public abstract class BaseDbContext : DbContext
     {
         if (Database.CurrentTransaction is null && TransactionalScope.Current.Value is not null)
         {
-            var transaction = await Database.BeginTransactionAsync(cancellationToken);
-            TransactionalScope.Current.Value!.EnlistTransaction(transaction);
+            _ = await Database.BeginTransactionAsync(cancellationToken);
+            TransactionalScope.Current.Value!.EnlistTransaction(this);
         }
 
         return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
@@ -24,10 +26,18 @@ public abstract class BaseDbContext : DbContext
     {
         if (Database.CurrentTransaction is null && TransactionalScope.Current.Value is not null)
         {
-            var transaction = Database.BeginTransaction();
-            TransactionalScope.Current.Value!.EnlistTransaction(transaction);
+            _ = Database.BeginTransaction();
+            TransactionalScope.Current.Value!.EnlistTransaction(this);
         }
 
         return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfiguration(new EventCorrelationLockEntityTypeConfiguration(false))
+            .ApplyConfiguration(new EventLogLockEntityTypeConfiguration(false))
+            .ApplyConfiguration(new EventLogEntityTypeConfiguration(false))
+            .ApplyConfiguration(new AuditLogEntityTypeConfiguration(false));
     }
 }

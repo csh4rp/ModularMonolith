@@ -2,5 +2,5 @@
 
 public interface ITransactionalScope : IAsyncDisposable
 {
-    ValueTask CompleteAsync(CancellationToken cancellationToken);
+    Task CompleteAsync(CancellationToken cancellationToken);
 }

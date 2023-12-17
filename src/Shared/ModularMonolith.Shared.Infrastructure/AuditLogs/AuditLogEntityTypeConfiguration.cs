@@ -4,12 +4,29 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace ModularMonolith.Shared.Infrastructure.AuditLogs;
 
-public class AuditLogEntityTypeConfiguration(string table = nameof(AuditLog), string? schema = null)
-    : IEntityTypeConfiguration<AuditLog>
+public class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<AuditLog>
 {
+    private readonly bool _excludeFromMigrations;
+    private readonly string _table;
+    private readonly string? _schema;
+
+    public AuditLogEntityTypeConfiguration(bool excludeFromMigrations, string table = nameof(AuditLog), string? schema = null)
+    {
+        _excludeFromMigrations = excludeFromMigrations;
+        _table = table;
+        _schema = schema;
+    }
+
     public void Configure(EntityTypeBuilder<AuditLog> builder)
     {
-        builder.ToTable(table, schema);
+        if (_excludeFromMigrations)
+        {
+            builder.ToTable(_table, _schema,t => t.ExcludeFromMigrations());
+        }
+        else
+        {
+            builder.ToTable(_table, _schema);
+        }
 
         builder.HasKey(b => b.Id);
 
