@@ -1,9 +1,7 @@
 ﻿using ModularMonolith.Bootstrapper;
-using ModularMonolith.Modules.FirstModule.Api;
 using ModularMonolith.Shared.BusinessLogic;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Events;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +34,7 @@ var app = builder.Build();
 
 foreach (var appModule in modules)
 {
-    appModule.UseEndpoints(app);
+    appModule.RegisterEndpoints(app);
 }
 
 if (app.Environment.IsDevelopment())

@@ -1,4 +1,7 @@
-﻿namespace ModularMonolith.Shared.Infrastructure.AuditLogs;
+﻿using ModularMonolith.Shared.Domain.Enums;
+using ModularMonolith.Shared.Domain.ValueObjects;
+
+namespace ModularMonolith.Shared.Domain.Entities;
 
 public class AuditLog
 {
@@ -8,11 +11,11 @@ public class AuditLog
     
     public required string EntityType { get; init; }
     
-    public required string EntityKeys { get; init; }
+    public required EntityState EntityState { get; init; }
     
-    public required ChangeType ChangeType { get; init; }
+    public required List<PropertyChange> EntityPropertyChanges { get; init; }
     
-    public required string Changes { get; init; }
+    public required List<EntityKey> EntityKeys { get; init; }
     
     public Guid? UserId { get; init; }
     

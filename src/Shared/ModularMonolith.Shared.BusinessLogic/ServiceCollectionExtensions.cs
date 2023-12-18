@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
+using MediatR.NotificationPublishers;
 using Microsoft.Extensions.DependencyInjection;
+using ModularMonolith.Shared.BusinessLogic.Middlewares;
 
 namespace ModularMonolith.Shared.BusinessLogic;
 
@@ -9,6 +11,9 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.AddMediatR(c =>
         {
+            c.NotificationPublisher = new TaskWhenAllPublisher();
+            c.AddOpenBehavior(typeof(TracingMiddleware<,>));
+            c.AddOpenBehavior(typeof(TransactionalMiddleware<,>));
             c.RegisterServicesFromAssemblies(assemblies);
         });
         

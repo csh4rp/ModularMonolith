@@ -3,11 +3,15 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ModularMonolith.Shared.BusinessLogic.Identity;
+using ModularMonolith.Shared.Domain.Entities;
+using ModularMonolith.Shared.Domain.Enums;
+using ModularMonolith.Shared.Domain.ValueObjects;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
+using EntityState = ModularMonolith.Shared.Domain.Enums.EntityState;
 
 namespace ModularMonolith.Shared.Infrastructure.AuditLogs.Factories;
 
-public sealed class AuditLogFactory
+internal sealed class AuditLogFactory
 {
     private readonly IIdentityContextAccessor _identityContextAccessor;
     private readonly TimeProvider _timeProvider;
@@ -27,7 +31,7 @@ public sealed class AuditLogFactory
         var auditableProperties = entry.Properties.Where(p => p.IsAuditable())
             .ToList();
 
-        var changes = new Dictionary<string, PropertyChange>();
+        var changes = new List<PropertyChange>();
 
         var changeType = GetChangeType(entry);
         
@@ -38,19 +42,19 @@ public sealed class AuditLogFactory
                 continue;
             }
             
-            if (changeType == ChangeType.Modified && propertyEntry.IsModified)
+            if (changeType == EntityState.Modified && propertyEntry.IsModified)
             {
-                var change = new PropertyChange(propertyEntry.CurrentValue, propertyEntry.OriginalValue);
-                changes.Add(propertyEntry.Metadata.Name, change);
+                var change = new PropertyChange(propertyEntry.Metadata.Name, propertyEntry.CurrentValue, propertyEntry.OriginalValue);
+                changes.Add(change);
             }
             else
             {
-                var change = new PropertyChange(propertyEntry.CurrentValue, null);
-                changes.Add(propertyEntry.Metadata.Name, change);
+                var change = new PropertyChange(propertyEntry.Metadata.Name, propertyEntry.CurrentValue, null);
+                changes.Add(change);
             }
         }
-        
-        var keys = new Dictionary<string, object>();
+
+        var keys = new List<EntityKey>();
 
         var primaryKey = entry.Metadata.GetKeys().Single(k => k.IsPrimaryKey());
 
@@ -59,27 +63,28 @@ public sealed class AuditLogFactory
             var propertyEntry = auditableProperties.Single(p => p.Metadata.Name == primaryKeyProperty.Name);
          
             Debug.Assert(propertyEntry.CurrentValue is not null);
-            keys.Add(propertyEntry.Metadata.Name, propertyEntry.CurrentValue);
+            
+            keys.Add(new EntityKey(propertyEntry.Metadata.Name, propertyEntry.CurrentValue));
         }
         
         return new AuditLog
         {
             CreatedAt = _timeProvider.GetUtcNow(),
-            ChangeType = GetChangeType(entry),
+            EntityState = GetChangeType(entry),
             ActivityId = Activity.Current.TraceId.ToString(),
             UserId = _identityContextAccessor.Context?.UserId,
             OperationName = Activity.Current.OperationName,
             EntityType = entityType.FullName!,
-            Changes = JsonSerializer.Serialize(changes),
-            EntityKeys = JsonSerializer.Serialize(keys)
+            EntityPropertyChanges = [.. changes],
+            EntityKeys = keys,
         };
     }
 
-    private static ChangeType GetChangeType(EntityEntry entry) => entry.State switch
+    private static EntityState GetChangeType(EntityEntry entry) => entry.State switch
     {
-        EntityState.Added => ChangeType.Added,
-        EntityState.Modified => ChangeType.Modified,
-        EntityState.Deleted => ChangeType.Deleted,
+        Microsoft.EntityFrameworkCore.EntityState.Added => EntityState.Added,
+        Microsoft.EntityFrameworkCore.EntityState.Modified => EntityState.Modified,
+        Microsoft.EntityFrameworkCore.EntityState.Deleted => EntityState.Deleted,
         _ => throw new ArgumentOutOfRangeException()
     };
 }

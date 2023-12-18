@@ -1,8 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
+using ModularMonolith.Shared.Domain.Entities;
+using ModularMonolith.Shared.Domain.Enums;
+using EntityState = ModularMonolith.Shared.Domain.Enums.EntityState;
 
-namespace ModularMonolith.Shared.Infrastructure.AuditLogs;
+namespace ModularMonolith.Shared.Infrastructure.AuditLogs.EntityConfigurations;
 
 public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<AuditLog>
 {
@@ -33,18 +36,23 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
         builder.Property(b => b.Id)
             .HasValueGenerator(typeof(SequentialGuidValueGenerator));
         
-        builder.Property(b => b.ChangeType)
-            .HasConversion(b => b.ToString(), b => Enum.Parse<ChangeType>(b))
+        builder.Property(b => b.EntityState)
+            .HasConversion(b => b.ToString(), b => Enum.Parse<EntityState>(b))
             .IsRequired()
             .HasMaxLength(8);
 
-        builder.Property(b => b.Changes)
-            .IsRequired()
-            .HasColumnType("jsonb");
-
+        builder.OwnsMany(b => b.EntityPropertyChanges, c =>
+        {
+            c.ToJson();
+        });
+        
         builder.Property(b => b.EntityKeys)
             .IsRequired()
             .HasColumnType("jsonb");
+
+        builder.Property(b => b.OperationName)
+            .IsRequired()
+            .HasMaxLength(128);
 
         builder.Property(b => b.ActivityId)
             .IsRequired()

@@ -2,12 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using ModularMonolith.Shared.Domain.Entities;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.Factories;
 
 namespace ModularMonolith.Shared.Infrastructure.AuditLogs.Interceptors;
 
-public class AuditLogInterceptor : SaveChangesInterceptor
+public sealed class AuditLogInterceptor : SaveChangesInterceptor
 {
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData,
         InterceptionResult<int> result,

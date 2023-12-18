@@ -15,7 +15,7 @@ public sealed class FirstModule : AppModule
     private static readonly Assembly DomainAssembly = Assembly.Load($"{RootNamespace}.Domain");
     private static readonly Assembly InfrastructureAssembly = Assembly.Load($"{RootNamespace}.Infrastructure");
     
-    public override WebApplication UseEndpoints(WebApplication app)
+    public override WebApplication RegisterEndpoints(WebApplication app)
     {
         app.UseCategoryEndpoints();
 

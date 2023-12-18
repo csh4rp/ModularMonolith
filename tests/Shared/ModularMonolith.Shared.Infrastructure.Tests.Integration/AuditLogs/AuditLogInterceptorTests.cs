@@ -3,12 +3,16 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.BusinessLogic.Identity;
+using ModularMonolith.Shared.Domain.Entities;
+using ModularMonolith.Shared.Domain.Enums;
+using ModularMonolith.Shared.Domain.ValueObjects;
 using ModularMonolith.Shared.Infrastructure.AuditLogs;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.Factories;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.Interceptors;
 using ModularMonolith.Shared.Infrastructure.Tests.Integration.AuditLogs.Entities;
 using ModularMonolith.Shared.Infrastructure.Tests.Integration.AuditLogs.Fixtures;
 using NSubstitute;
+using EntityState = ModularMonolith.Shared.Domain.Enums.EntityState;
 
 namespace ModularMonolith.Shared.Infrastructure.Tests.Integration.AuditLogs;
 
@@ -63,21 +67,22 @@ public class AuditLogInterceptorTests : IAsyncDisposable
         await using var searchCnx = CreateDbContext();
 
         var auditLog = searchCnx.Set<AuditLog>().SingleOrDefault(a =>
-            a.ChangeType == ChangeType.Added && a.EntityType == typeof(FirstTestEntity).FullName);
+            a.EntityState == EntityState.Added && a.EntityType == typeof(FirstTestEntity).FullName);
 
         auditLog.Should().NotBeNull();
         auditLog!.CreatedAt.Should().Be(Now);
         auditLog.UserId.Should().Be(UserId);
         auditLog.OperationName.Should().Be(activity.OperationName);
         auditLog.ActivityId.Should().Be(activity.TraceId.ToString());
-        auditLog.EntityKeys.Should().Be(
-            """
-            {"Id": "4d4d085b-5266-4945-924a-e4177d79c65d"}
-            """);
-        auditLog.Changes.Should().Be(
-            """
-            {"Name": {"CurrentValue": "Name", "OriginalValue": null}, "OwnedEntity": {"CurrentValue": {"Name": "Entity-Name"}, "OriginalValue": null}}
-            """);
+        auditLog.EntityKeys.Should().BeEquivalentTo(new List<EntityKey>
+        {
+            new("Id", Guid.Parse("4d4d085b-5266-4945-924a-e4177d79c65d"))
+        });
+        auditLog.EntityPropertyChanges.Should().BeEquivalentTo(new List<PropertyChange>
+        {
+            new("Name", "Name", null),
+            new("OwnedEntity", new OwnedEntity{Name = "Entity-Name"}, null),
+        });
     }
 
     private TestDbContext CreateDbContext()

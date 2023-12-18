@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.Infrastructure.AuditLogs;
+using ModularMonolith.Shared.Infrastructure.AuditLogs.EntityConfigurations;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.EntityConfigurations;
 

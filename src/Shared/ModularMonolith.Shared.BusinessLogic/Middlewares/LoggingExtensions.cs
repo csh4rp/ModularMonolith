@@ -2,7 +2,7 @@
 
 namespace ModularMonolith.Shared.BusinessLogic.Middlewares;
 
-internal static partial class LoggingHelpers
+internal static partial class LoggingExtensions
 {
     [LoggerMessage(EventId = 3000, Level = LogLevel.Information, Message = "Operation: '{OperationType}' has started")]
     public static partial void OperationStarted(this ILogger logger, string operationType);

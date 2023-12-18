@@ -31,8 +31,6 @@ internal sealed class TracingMiddleware<TRequest, TResponse> : IPipelineBehavior
         activity?.Start();
         
         var result = await next();
-        
-        activity?.Dispose();
 
         _logger.OperationFinished(requestType.Name);
 
