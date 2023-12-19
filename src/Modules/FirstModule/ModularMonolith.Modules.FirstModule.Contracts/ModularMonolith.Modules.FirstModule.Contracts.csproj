@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
+      <PackageReference Include="FluentValidation" />
     </ItemGroup>
-
+  
     <ItemGroup>
-      <Folder Include="Categories\" />
+      <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
     </ItemGroup>
 
 </Project>

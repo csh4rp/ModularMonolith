@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddOptions<DatabaseOptions>()
             .PostConfigure(action);
         
-        serviceCollection.AddScoped<DbConnectionFactory>()
+        serviceCollection.AddSingleton<DbConnectionFactory>()
             .AddSingleton<ITransactionalScopeFactory, TransactionalScopeFactory>()
             .AddDbContext<InternalDbContext>(c =>
         {

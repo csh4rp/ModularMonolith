@@ -8,7 +8,7 @@ using ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;
 
-namespace ModularMonolith.Shared.Infrast1ructure.Events.DataAccess.Concrete;
+namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
 
 internal sealed class OutboxEventBus : IEventBus
 {

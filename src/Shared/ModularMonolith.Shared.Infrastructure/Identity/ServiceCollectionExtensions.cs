@@ -3,7 +3,7 @@ using ModularMonolith.Shared.BusinessLogic.Identity;
 
 namespace ModularMonolith.Shared.Infrastructure.Identity;
 
-public static class IdentityExtensions
+public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddIdentity(this IServiceCollection serviceCollection)
     {

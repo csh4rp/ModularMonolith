@@ -1,7 +1,9 @@
-﻿using ModularMonolith.Bootstrapper;
+﻿using FluentValidation;
+using ModularMonolith.Bootstrapper;
 using ModularMonolith.Shared.BusinessLogic;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Events;
+using ModularMonolith.Shared.Infrastructure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,10 +16,15 @@ var assemblies = modules.SelectMany(m => m.Assemblies).ToArray();
 
 builder.Services.AddMediator(assemblies);
 
+builder.Services.AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true);
+
 builder.Services.AddEvents(e =>
 {
     e.Assemblies = [.. assemblies];
 });
+
+builder.Services.AddIdentity()
+    .AddSingleton(TimeProvider.System);
 
 
 builder.Services.AddDataAccess(c =>

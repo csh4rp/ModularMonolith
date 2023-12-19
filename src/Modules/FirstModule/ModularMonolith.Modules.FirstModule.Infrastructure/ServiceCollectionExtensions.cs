@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using ModularMonolith.Modules.FirstModule.BusinessLogic.Categories.Abstract;
 using ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess.Categories;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Options;
 
@@ -21,6 +22,8 @@ public static class ServiceCollectionExtensions
             opt.UseSnakeCaseNamingConvention();
         });
 
+        serviceCollection.AddScoped<ICategoryDatabase>(sp => sp.GetRequiredService<CategoryDbContext>());
+        
         return serviceCollection;
     }
 }

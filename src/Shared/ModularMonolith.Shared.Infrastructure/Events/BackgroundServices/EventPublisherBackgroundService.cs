@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess;
+using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
 using ModularMonolith.Shared.Infrastructure.Events.Extensions;
 using ModularMonolith.Shared.Infrastructure.Events.Options;
@@ -17,12 +18,12 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
     private static readonly ResiliencePipeline EventLockReleasePipeline = CreateLockReleasePipeline();
     private static readonly ResiliencePipeline EventPublicationPipeline = CreatePublicationPipeline();
     private readonly Task[] _tasks;
-    private readonly EventReader _eventReader;
+    private readonly IEventReader _eventReader;
     private readonly EventChannel _eventChannel;
     private readonly EventPublisher _eventPublisher;
     private readonly ILogger<EventPublisherBackgroundService> _logger;
 
-    public EventPublisherBackgroundService(EventReader eventReader,
+    public EventPublisherBackgroundService(IEventReader eventReader,
         EventChannel eventChannel,
         EventPublisher eventPublisher,
         ILogger<EventPublisherBackgroundService> logger,

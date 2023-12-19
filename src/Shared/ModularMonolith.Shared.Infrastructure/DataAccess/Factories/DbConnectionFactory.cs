@@ -8,7 +8,7 @@ public sealed class DbConnectionFactory
 {
     private readonly DatabaseOptions _options;
 
-    public DbConnectionFactory(IOptionsSnapshot<DatabaseOptions> options) => _options = options.Value;
+    public DbConnectionFactory(IOptionsMonitor<DatabaseOptions> options) => _options = options.CurrentValue;
 
     public NpgsqlConnection Create() => new(_options.ConnectionString);
 }
