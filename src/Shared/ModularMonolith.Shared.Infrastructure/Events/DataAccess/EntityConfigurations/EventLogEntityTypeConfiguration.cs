@@ -11,7 +11,8 @@ internal sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration
     private readonly string _table;
     private readonly string? _schema;
 
-    public EventLogEntityTypeConfiguration(bool excludeFromMigrations, string table = nameof(EventLog), string? schema = null)
+    public EventLogEntityTypeConfiguration(bool excludeFromMigrations, string table = nameof(EventLog),
+        string? schema = null)
     {
         _excludeFromMigrations = excludeFromMigrations;
         _table = table;
@@ -41,7 +42,7 @@ internal sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration
         builder.Property(b => b.Type)
             .IsRequired()
             .HasMaxLength(256);
-        
+
         builder.Property(b => b.ActivityId)
             .IsRequired()
             .IsUnicode(false)
@@ -50,7 +51,11 @@ internal sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration
         builder.Property(b => b.OperationName)
             .IsRequired()
             .HasMaxLength(256);
+
+        builder.HasIndex(b => b.PublishedAt).HasFilter("published_at IS NULL");
         
-        builder.HasIndex(b => b.PublishedAt);
+        builder.HasIndex(b => new { b.UserId, b.Type, b.CreatedAt });
+
+        builder.HasIndex(b => b.CorrelationId);
     }
 }

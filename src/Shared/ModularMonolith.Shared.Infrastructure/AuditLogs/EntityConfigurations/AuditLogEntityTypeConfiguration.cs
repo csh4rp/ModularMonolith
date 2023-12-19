@@ -41,10 +41,9 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
             .IsRequired()
             .HasMaxLength(8);
 
-        builder.OwnsMany(b => b.EntityPropertyChanges, c =>
-        {
-            c.ToJson();
-        });
+        builder.Property(b => b.EntityPropertyChanges)
+            .IsRequired()
+            .HasColumnType("jsonb");
         
         builder.Property(b => b.EntityKeys)
             .IsRequired()
@@ -58,5 +57,9 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
             .IsRequired()
             .IsUnicode(false)
             .HasMaxLength(32);
+        
+        builder.HasIndex(b => b.UserId);
+
+        // TODO: Add index for EntityKey, EntityType [{"PropertyName": "id", "Value": "GUID"}]
     }
 }
