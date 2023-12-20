@@ -1,14 +1,12 @@
 #!/bin/bash
 
-connection_strings=("User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=ModularMonolithDb;")
-
 contexts=("InternalDbContext")
+
+connection_strings=("User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;")
 
 projects=("../../src/Shared/ModularMonolith.Shared.Migrations")
 
-startup_projects=("../../src/Shared/ModularMonolith.Shared.Migrations")
-
-index=NONE
+index=-1
 
 length=${#contexts[@]}
 
@@ -21,7 +19,7 @@ do
   fi
 done
 
-if [[ $index == "NONE" ]]; then
+if [[ $index == -1 ]]; then
   echo Context: "$1" was not found
 else
 
@@ -30,7 +28,7 @@ else
   dotnet ef migrations add \
     --context "$1" \
     --project "${projects[$index]}" \
-    --startup-project "${startup_projects[$index]}" \
+    --startup-project "${projects[$index]}" \
     "$2" \
     -- "${connection_strings[$index]}"
 fi

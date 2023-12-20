@@ -56,6 +56,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{1655472A-29C3-48F2-B5CA-228591A3D3FA}"
 	ProjectSection(SolutionItems) = preProject
 		tools\Scripts\add-migration.sh = tools\Scripts\add-migration.sh
+		tools\Scripts\create-database.sql = tools\Scripts\create-database.sql
+		tools\Scripts\update-databases.sh = tools\Scripts\update-databases.sh
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Migrations", "src\Shared\ModularMonolith.Shared.Migrations\ModularMonolith.Shared.Migrations.csproj", "{98F0EF2A-4399-417C-B624-743D407D1885}"
