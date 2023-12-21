@@ -4,7 +4,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddExceptionHandlers(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddExceptionHandler<ValidationExceptionHandler>();
+        serviceCollection.AddExceptionHandler<ValidationExceptionHandler>()
+            .AddExceptionHandler<CatchAllExceptionHandler>();
         
         return serviceCollection;
     }

@@ -7,9 +7,9 @@ namespace ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess.Categori
 
 internal sealed class GetCategoryDetailsByIdQueryHandler : IQueryHandler<GetCategoryDetailsByIdQuery, CategoryDetailsResponse?>
 {
-    private readonly CategoryDbContext _dbContext;
+    private readonly FirstModuleDbContext _dbContext;
 
-    public GetCategoryDetailsByIdQueryHandler(CategoryDbContext dbContext)
+    public GetCategoryDetailsByIdQueryHandler(FirstModuleDbContext dbContext)
     {
         _dbContext = dbContext;
     }

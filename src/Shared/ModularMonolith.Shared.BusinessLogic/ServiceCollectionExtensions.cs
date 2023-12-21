@@ -11,7 +11,7 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.AddMediatR(c =>
         {
-            c.NotificationPublisher = new TaskWhenAllPublisher();
+            c.NotificationPublisher = new ForeachAwaitPublisher();
             c.AddOpenBehavior(typeof(TracingMiddleware<,>));
             c.AddOpenBehavior(typeof(TransactionalMiddleware<,>));
             c.RegisterServicesFromAssemblies(assemblies);

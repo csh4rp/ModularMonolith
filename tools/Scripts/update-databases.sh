@@ -1,15 +1,19 @@
 #!/bin/bash
 
-contexts=("InternalDbContext")
+contexts=("InternalDbContext" "FirstModuleDbContext")
 
-connection_strings=("User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;")
+connection_strings=("User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;" \
+  "User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;")
 
-projects=("../../src/Shared/ModularMonolith.Shared.Migrations")
+projects=("../../src/Shared/ModularMonolith.Shared.Migrations" \
+  "../../src/Modules/FirstModule/ModularMonolith.Modules.FirstModule.Migrations")
 
 for (( i=0; i < "${#contexts[@]}"; i++ ));
 do
   
   cnx="${contexts[$i]}"
+
+  echo Running migrations for context: "$cnx"
 
   dotnet ef database update \
     --context "$cnx" \

@@ -9,9 +9,9 @@ namespace ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess.Categori
 
 internal sealed class FindCategoriesQueryHandler : IQueryHandler<FindCategoriesQuery, CategoriesResponse>
 {
-    private readonly CategoryDbContext _dbContext;
+    private readonly FirstModuleDbContext _dbContext;
 
-    public FindCategoriesQueryHandler(CategoryDbContext dbContext)
+    public FindCategoriesQueryHandler(FirstModuleDbContext dbContext)
     {
         _dbContext = dbContext;
     }

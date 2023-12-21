@@ -11,7 +11,7 @@ internal sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration
     private readonly string _table;
     private readonly string? _schema;
 
-    public EventLogEntityTypeConfiguration(bool excludeFromMigrations, string table = nameof(EventLog),
+    public EventLogEntityTypeConfiguration(bool excludeFromMigrations, string table = "event_log",
         string? schema = null)
     {
         _excludeFromMigrations = excludeFromMigrations;

@@ -3,11 +3,11 @@ using ModularMonolith.Modules.FirstModule.BusinessLogic.Categories.Abstract;
 using ModularMonolith.Modules.FirstModule.Domain.Entities;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
 
-namespace ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess.Categories;
+namespace ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess;
 
-internal sealed class CategoryDbContext : BaseDbContext, ICategoryDatabase
+internal sealed class FirstModuleDbContext : BaseDbContext, ICategoryDatabase
 {
-    public CategoryDbContext(DbContextOptions<CategoryDbContext> options) : base(options)
+    public FirstModuleDbContext(DbContextOptions<FirstModuleDbContext> options) : base(options)
     {
     }
     
@@ -15,6 +15,7 @@ internal sealed class CategoryDbContext : BaseDbContext, ICategoryDatabase
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(CategoryDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(FirstModuleDbContext).Assembly);
+        modelBuilder.HasDefaultSchema("first_module");
     }
 }

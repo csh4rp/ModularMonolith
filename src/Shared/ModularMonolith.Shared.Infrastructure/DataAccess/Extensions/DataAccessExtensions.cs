@@ -8,6 +8,11 @@ public static class DataAccessExtensions
 {
     public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> queryable, IPaginatedQuery paginator)
     {
+        if (!paginator.Skip.HasValue && !paginator.Take.HasValue && string.IsNullOrEmpty(paginator.OrderBy))
+        {
+            return queryable;
+        }
+        
         IOrderedQueryable<T> query;
 
         var objType = typeof(T);

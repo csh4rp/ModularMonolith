@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Modules.FirstModule.BusinessLogic.Categories.CommandHandlers;
 using ModularMonolith.Modules.FirstModule.Contracts.Categories.Commands;
 using ModularMonolith.Modules.FirstModule.Domain.Entities;
+using ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess;
 using ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess.Categories;
 using ModularMonolith.Shared.BusinessLogic.Exceptions;
 using Xunit;
@@ -52,15 +53,15 @@ public class DeleteCategoryCommandHandlerTests
         await act.Should().ThrowAsync<EntityNotFoundException>();
     }
 
-    private static CategoryDbContext CreateDatabase()
+    private static FirstModuleDbContext CreateDatabase()
     {
-        var optionsBuilder = new DbContextOptionsBuilder<CategoryDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<FirstModuleDbContext>();
 
         optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString(), opt =>
         {
             opt.EnableNullChecks();
         });
 
-        return new CategoryDbContext(optionsBuilder.Options);
+        return new FirstModuleDbContext(optionsBuilder.Options);
     }
 }

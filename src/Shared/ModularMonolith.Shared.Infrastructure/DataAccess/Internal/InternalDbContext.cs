@@ -11,8 +11,14 @@ internal sealed class InternalDbContext : BaseDbContext, IEventLogDbContext
     public InternalDbContext(DbContextOptions options) : base(options)
     {
     }
-
+    
     public DbSet<EventLog> EventLogs { get; set; } = default!;
+    
+    public DbSet<EventLogLock> EventLogLocks { get; set; } = default!;
+    
+    public DbSet<EventCorrelationLock> EventCorrelationLocks { get; set; } = default!;
+    
+    public DbSet<AuditLog> AuditLogs { get; set; } = default!;
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -20,5 +26,7 @@ internal sealed class InternalDbContext : BaseDbContext, IEventLogDbContext
             .ApplyConfiguration(new EventLogLockEntityTypeConfiguration(false))
             .ApplyConfiguration(new EventLogEntityTypeConfiguration(false))
             .ApplyConfiguration(new AuditLogEntityTypeConfiguration(false));
+
+        modelBuilder.HasDefaultSchema("shared");
     }
 }

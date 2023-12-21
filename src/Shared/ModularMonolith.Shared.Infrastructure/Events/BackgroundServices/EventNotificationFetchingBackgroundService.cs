@@ -54,7 +54,7 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
 
             await using (var cmd = connection.CreateCommand())
             {
-                cmd.CommandText = "LISTEN new_events";
+                cmd.CommandText = "LISTEN event_log_queue;";
                 await cmd.ExecuteNonQueryAsync(stoppingToken);
             }
 

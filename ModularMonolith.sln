@@ -62,6 +62,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{1655
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Migrations", "src\Shared\ModularMonolith.Shared.Migrations\ModularMonolith.Shared.Migrations.csproj", "{98F0EF2A-4399-417C-B624-743D407D1885}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.FirstModule.Migrations", "src\Modules\FirstModule\ModularMonolith.Modules.FirstModule.Migrations\ModularMonolith.Modules.FirstModule.Migrations.csproj", "{E16F9EF7-00FE-47CD-BA0A-F1C4B46D7565}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -92,6 +94,7 @@ Global
 		{E61AF8E6-1321-4DF1-8245-B0AD6D93EB7F} = {B93D64D5-80C4-48EB-B938-10E66BA5A7E0}
 		{1655472A-29C3-48F2-B5CA-228591A3D3FA} = {B93D64D5-80C4-48EB-B938-10E66BA5A7E0}
 		{98F0EF2A-4399-417C-B624-743D407D1885} = {23D97AF7-96F3-49EC-BFE2-CCE1B738FCEE}
+		{E16F9EF7-00FE-47CD-BA0A-F1C4B46D7565} = {2E2598B1-7339-4E03-B452-7B9AF9937631}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BBAF6E32-FA5F-4916-9F22-AD58F95D2992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -154,5 +157,9 @@ Global
 		{98F0EF2A-4399-417C-B624-743D407D1885}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98F0EF2A-4399-417C-B624-743D407D1885}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98F0EF2A-4399-417C-B624-743D407D1885}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E16F9EF7-00FE-47CD-BA0A-F1C4B46D7565}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E16F9EF7-00FE-47CD-BA0A-F1C4B46D7565}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E16F9EF7-00FE-47CD-BA0A-F1C4B46D7565}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E16F9EF7-00FE-47CD-BA0A-F1C4B46D7565}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

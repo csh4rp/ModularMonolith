@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using ModularMonolith.Shared.BusinessLogic.Abstract;
+using ModularMonolith.Shared.Contracts;
 
 namespace ModularMonolith.Shared.BusinessLogic.Middlewares;
 
@@ -15,6 +16,11 @@ internal sealed class TransactionalMiddleware<TRequest, TResponse>
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
+        if (request is IQuery<TResponse>)
+        {
+            return await next();
+        }
+        
         await using var scope =  _transactionalScopeFactory.Create();
         
         var result = await next();

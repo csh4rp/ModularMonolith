@@ -4,11 +4,12 @@ using ModularMonolith.Modules.FirstModule.Contracts.Categories.Commands;
 using ModularMonolith.Modules.FirstModule.Domain.Entities;
 using ModularMonolith.Shared.BusinessLogic.Commands;
 using ModularMonolith.Shared.BusinessLogic.Exceptions;
+using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Modules.FirstModule.BusinessLogic.Categories.CommandHandlers;
 
-internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryCommand, Guid>
+internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryCommand, CreatedResponse>
 {
     private readonly ICategoryDatabase _categoryDatabase;
 
@@ -17,7 +18,7 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
         _categoryDatabase = categoryDatabase;
     }
 
-    public async Task<Guid> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<CreatedResponse> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
         var categoryWithNameExists = await _categoryDatabase.Categories
             .AnyAsync(c => c.Name == request.Name, cancellationToken);
@@ -33,6 +34,6 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
 
         await _categoryDatabase.SaveChangesAsync(cancellationToken);
 
-        return category.Id;
+        return new CreatedResponse(category.Id);
     }
 }

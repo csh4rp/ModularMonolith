@@ -4,4 +4,8 @@
     <PackageReference Include="MediatR.Contracts"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FluentValidation"/>
+  </ItemGroup>
+  
 </Project>

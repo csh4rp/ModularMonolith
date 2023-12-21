@@ -10,7 +10,7 @@ internal sealed class EventCorrelationLockEntityTypeConfiguration : IEntityTypeC
     private readonly string _table;
     private readonly string? _schema;
 
-    public EventCorrelationLockEntityTypeConfiguration(bool excludeFromMigrations, string table = nameof(EventCorrelationLock), string? schema = null)
+    public EventCorrelationLockEntityTypeConfiguration(bool excludeFromMigrations, string table = "event_correlation_lock", string? schema = null)
     {
         _excludeFromMigrations = excludeFromMigrations;
         _table = table;

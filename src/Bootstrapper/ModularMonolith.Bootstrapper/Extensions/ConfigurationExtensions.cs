@@ -1,8 +1,7 @@
 ﻿using System.Reflection;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using ModularMonolith.Shared.Api;
 
-namespace ModularMonolith.Bootstrapper;
+namespace ModularMonolith.Bootstrapper.Extensions ;
 
 public static class ConfigurationExtensions
 {

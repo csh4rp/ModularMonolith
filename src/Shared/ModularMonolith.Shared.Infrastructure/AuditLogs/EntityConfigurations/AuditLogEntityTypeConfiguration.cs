@@ -13,7 +13,7 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
     private readonly string _table;
     private readonly string? _schema;
 
-    public AuditLogEntityTypeConfiguration(bool excludeFromMigrations, string table = nameof(AuditLog), string? schema = null)
+    public AuditLogEntityTypeConfiguration(bool excludeFromMigrations, string table = "audit_log", string? schema = null)
     {
         _excludeFromMigrations = excludeFromMigrations;
         _table = table;

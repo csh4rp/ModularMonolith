@@ -2,7 +2,7 @@
 
 namespace ModularMonolith.Modules.FirstModule.Contracts.Categories.Commands;
 
-public class CreateCategoryCommand : ICommand<Guid>
+public class CreateCategoryCommand : ICommand<CreatedResponse>
 {
     public required Guid? ParentId { get; init; }
     

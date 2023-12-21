@@ -6,6 +6,7 @@ using ModularMonolith.Modules.FirstModule.Contracts.Categories.Queries;
 using ModularMonolith.Modules.FirstModule.Contracts.Categories.Responses;
 using ModularMonolith.Shared.Api.CustomResults;
 using ModularMonolith.Shared.Api.Filters;
+using ModularMonolith.Shared.Contracts;
 
 namespace ModularMonolith.Modules.FirstModule.Api.Categories;
 
@@ -27,9 +28,9 @@ internal static class CategoryEndpointExtensions
                 return TypedResults.Created($"{Prefix}/{result}", result);
             })
             .AddValidation<CreateCategoryCommand>()
-            .Produces<Guid>();
+            .Produces<CreatedResponse>();
 
-        app.MapPut("{id:guid}", async (
+        group.MapPut("{id:guid}", async (
                 [FromServices] IMediator mediator,
                 [FromBody] UpdateCategoryCommand command,
                 [FromRoute] Guid id,
@@ -45,7 +46,7 @@ internal static class CategoryEndpointExtensions
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound);
 
-        app.MapDelete("{id:guid}", async (
+        group.MapDelete("{id:guid}", async (
                 [FromServices] IMediator mediator,
                 [FromRoute] Guid id,
                 CancellationToken cancellationToken) =>
@@ -59,7 +60,7 @@ internal static class CategoryEndpointExtensions
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound);
 
-        app.MapGet("{id:guid}", async (
+        group.MapGet("{id:guid}", async (
                 [FromServices] IMediator mediator,
                 [FromRoute] Guid id,
                 CancellationToken cancellationToken) =>
@@ -73,7 +74,7 @@ internal static class CategoryEndpointExtensions
             .Produces<CategoryDetailsResponse>()
             .Produces(StatusCodes.Status404NotFound);
 
-        app.MapGet(string.Empty, async (
+        group.MapGet(string.Empty, async (
                 [FromServices] IMediator mediator,
                 [AsParameters] FindCategoriesQuery query,
                 CancellationToken cancellationToken) =>
