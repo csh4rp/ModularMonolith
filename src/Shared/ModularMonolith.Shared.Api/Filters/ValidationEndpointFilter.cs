@@ -1,12 +1,22 @@
 ﻿using System.Diagnostics;
 using FluentValidation;
 using ModularMonolith.Shared.Api.Models.Errors;
+using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Shared.Api.Filters;
 
-internal sealed class ValidationEndpointFilter<TModel>(IValidator<TModel> validator) : IEndpointFilter
+internal sealed class ValidationEndpointFilter<TModel> : IEndpointFilter
 {
+    private readonly IValidator<TModel> _validator;
+    private readonly ILogger<ValidationEndpointFilter<TModel>> _logger;
+
+    public ValidationEndpointFilter(IValidator<TModel> validator, ILogger<ValidationEndpointFilter<TModel>> logger)
+    {
+        _validator = validator;
+        _logger = logger;
+    }
+
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
         var index = GetArgumentIndex(context.Arguments);
@@ -18,19 +28,28 @@ internal sealed class ValidationEndpointFilter<TModel>(IValidator<TModel> valida
 
         var argument = context.GetArgument<TModel>(index);
 
-        var validationResult = await validator.ValidateAsync(argument, context.HttpContext.RequestAborted);
+        var validationResult = await _validator.ValidateAsync(argument, context.HttpContext.RequestAborted);
 
         if (validationResult.IsValid)
         {
             return await next(context);
         }
+        
+        _logger.LogTrace("Validation failed for: '{Path}' for model: '{Model}'", 
+            context.HttpContext.Request.Path,
+            typeof(TModel).FullName);
 
-        var errors = validationResult.Errors.Select(e => new PropertyError
+        var errors = validationResult.Errors.Select(e =>
         {
-            PropertyName = e.PropertyName,
-            Message = e.ErrorMessage,
-            ErrorCode = e.ErrorCode,
-            Parameter = e.AttemptedValue
+            var codeMapped = ErrorCodeMapper.TryMap(e.ErrorCode, out var errorCode);
+            
+            return new PropertyError
+            {
+                PropertyName = char.ToLower(e.PropertyName[0]) + e.PropertyName[1..],
+                Message = e.ErrorMessage,
+                ErrorCode = codeMapped ? errorCode! : e.ErrorCode,
+                Parameter = e.AttemptedValue
+            };
         }).ToArray();
 
         var currentActivity = Activity.Current;
