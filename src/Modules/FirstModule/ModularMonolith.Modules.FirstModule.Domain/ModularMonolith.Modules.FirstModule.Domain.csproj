@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Events\" />
+    <Folder Include="Events\"/>
   </ItemGroup>
 </Project>

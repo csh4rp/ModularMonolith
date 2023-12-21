@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using FluentValidation;
-using Microsoft.AspNetCore.Http.Extensions;
 using ModularMonolith.Shared.Api.Models.Errors;
 using ModularMonolith.Shared.Contracts.Errors;
 
@@ -29,7 +28,7 @@ internal sealed class ValidationEndpointFilter<TModel>(IValidator<TModel> valida
         var errors = validationResult.Errors.Select(e => new PropertyError
         {
             PropertyName = e.PropertyName,
-            Message = e.ErrorMessage, 
+            Message = e.ErrorMessage,
             ErrorCode = e.ErrorCode,
             Parameter = e.AttemptedValue
         }).ToArray();
@@ -40,7 +39,7 @@ internal sealed class ValidationEndpointFilter<TModel>(IValidator<TModel> valida
             : $"One or more validation errors occurred while handling: {currentActivity.OperationName}";
         var traceId = currentActivity?.TraceId.ToString() ?? context.HttpContext.TraceIdentifier;
         var response = new ValidationErrorResponse(context.HttpContext.Request.Path, detail, traceId, errors);
-        
+
         return Results.BadRequest(response);
     }
 

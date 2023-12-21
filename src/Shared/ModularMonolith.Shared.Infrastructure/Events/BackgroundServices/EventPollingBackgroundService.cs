@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 using ModularMonolith.Shared.Infrastructure.Events.Options;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;
@@ -44,7 +42,7 @@ internal sealed class EventPollingBackgroundService : BackgroundService
     private async ValueTask RunAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Starting event polling");
-        
+
         try
         {
             using var timer = new PeriodicTimer(_optionsMonitor.CurrentValue.PollInterval);
@@ -57,7 +55,7 @@ internal sealed class EventPollingBackgroundService : BackgroundService
                 {
                     await _eventChannel.WriteAsync(eventInfo, cancellationToken);
                 }
-                
+
                 await timer.WaitForNextTickAsync(cancellationToken);
             }
         }

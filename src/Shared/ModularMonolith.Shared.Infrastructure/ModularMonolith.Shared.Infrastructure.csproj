@@ -1,27 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <ItemGroup>
-      <ProjectReference Include="..\ModularMonolith.Shared.BusinessLogic\ModularMonolith.Shared.BusinessLogic.csproj" />
-      <ProjectReference Include="..\ModularMonolith.Shared.Core\ModularMonolith.Shared.Core.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ModularMonolith.Shared.BusinessLogic\ModularMonolith.Shared.BusinessLogic.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Shared.Core\ModularMonolith.Shared.Core.csproj"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="EFCore.NamingConventions" />
-      <PackageReference Include="MassTransit" />
-      <PackageReference Include="MassTransit.Abstractions" />
-      <PackageReference Include="MassTransit.RabbitMQ" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
-      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
-      <PackageReference Include="Microsoft.Extensions.Options" />
-      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
-      <PackageReference Include="Npgsql" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
-      <PackageReference Include="Polly" />
-      <PackageReference Include="Serilog" />
-      <PackageReference Include="Serilog.Extensions.Logging" />
-      <PackageReference Include="Z.EntityFramework.Plus.EFCore" />
-    </ItemGroup>
-  
+  <ItemGroup>
+    <PackageReference Include="EFCore.NamingConventions"/>
+    <PackageReference Include="MassTransit"/>
+    <PackageReference Include="MassTransit.Abstractions"/>
+    <PackageReference Include="MassTransit.RabbitMQ"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational"/>
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions"/>
+    <PackageReference Include="Microsoft.Extensions.Options"/>
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions"/>
+    <PackageReference Include="Npgsql"/>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
+    <PackageReference Include="Polly"/>
+    <PackageReference Include="Serilog"/>
+    <PackageReference Include="Serilog.Extensions.Logging"/>
+    <PackageReference Include="Z.EntityFramework.Plus.EFCore"/>
+  </ItemGroup>
+
 </Project>

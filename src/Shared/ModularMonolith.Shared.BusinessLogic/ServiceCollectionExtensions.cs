@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
             c.AddOpenBehavior(typeof(TransactionalMiddleware<,>));
             c.RegisterServicesFromAssemblies(assemblies);
         });
-        
+
         return serviceCollection;
     }
 }

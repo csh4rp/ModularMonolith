@@ -16,15 +16,15 @@ internal sealed class EventSerializer
             .ToFrozenDictionary(k => k.FullName!);
 
     public string Serialize<T>(T @event) where T : IEvent => JsonSerializer.Serialize(@event);
-    
+
     public string Serialize(object @event, Type eventType) => JsonSerializer.Serialize(@event, eventType);
 
     public object Deserialize(string eventTypeName, string eventPayload)
     {
         var type = _typesDictionary[eventTypeName];
-        
+
         return JsonSerializer.Deserialize(eventPayload, type)!;
     }
-    
+
     public TEvent Deserialize<TEvent>(string eventPayload) => JsonSerializer.Deserialize<TEvent>(eventPayload)!;
 }

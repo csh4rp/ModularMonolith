@@ -4,7 +4,7 @@ public class Paginator<T>
 {
     private readonly string? _fieldName;
     private readonly bool? _isAscending;
-    
+
     public Paginator(int? skip, int? take, string? orderBy)
     {
         Skip = skip;
@@ -13,20 +13,20 @@ public class Paginator<T>
 
         (_fieldName, _isAscending) = GetOrderInfo(orderBy);
     }
-    
+
     public int? Skip { get; }
-    
+
     public int? Take { get; }
-    
+
     public string? OrderBy { get; }
 
     public bool HasOrderByExpression => !string.IsNullOrEmpty(OrderBy);
 
-    public string FieldName => _fieldName 
+    public string FieldName => _fieldName
                                ?? throw new InvalidOperationException("Paginator does not contain OrderBy expression");
 
-    public bool IsAscending => _isAscending 
-                                ?? throw new InvalidOperationException("Paginator does not contain OrderBy expression");
+    public bool IsAscending => _isAscending
+                               ?? throw new InvalidOperationException("Paginator does not contain OrderBy expression");
 
     private static (string? FieldName, bool? IsDescending) GetOrderInfo(string? orderBy)
     {
@@ -43,7 +43,7 @@ public class Paginator<T>
         }
 
         var span = orderBy.AsSpan();
-        
+
         var fieldName = span[..index];
         var direction = span[index..];
 
@@ -51,5 +51,4 @@ public class Paginator<T>
 
         return (fieldName.ToString(), isDescending);
     }
-
 }

@@ -5,5 +5,4 @@ namespace ModularMonolith.Modules.FirstModule.Contracts.Categories.Validators;
 
 internal sealed class DeleteCategoryCommandValidator : AbstractValidator<DeleteCategoryCommand>
 {
-    
 }

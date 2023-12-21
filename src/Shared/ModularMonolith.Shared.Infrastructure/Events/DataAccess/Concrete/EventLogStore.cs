@@ -24,7 +24,7 @@ internal sealed class EventLogStore : IEventLogStore
         var eventType = typeof(TEvent);
 
         var eventLog = await _eventLogDbContext.EventLogs.Where(e => e.UserId == userId
-                                                                   && e.Type == eventType.FullName)
+                                                                     && e.Type == eventType.FullName)
             .OrderBy(b => b.CreatedAt)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -45,7 +45,7 @@ internal sealed class EventLogStore : IEventLogStore
         var eventType = typeof(TEvent);
 
         var eventLog = await _eventLogDbContext.EventLogs.Where(e => e.UserId == userId
-                                                                   && e.Type == eventType.FullName)
+                                                                     && e.Type == eventType.FullName)
             .OrderByDescending(b => b.CreatedAt)
             .FirstOrDefaultAsync(cancellationToken);
 

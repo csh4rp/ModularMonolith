@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Shared.Infrastructure.AuditLogs;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.EntityConfigurations;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
 using ModularMonolith.Shared.Infrastructure.Tests.Integration.AuditLogs.Entities;
@@ -15,7 +14,7 @@ public class TestDbContext : DbContext
     public DbSet<FirstTestEntity> FirstTestEntities { get; set; } = default!;
 
     public DbSet<SecondTestEntity> SecondTestEntities { get; set; } = default!;
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<FirstTestEntity>()
@@ -32,11 +31,11 @@ public class TestDbContext : DbContext
             .UsingEntity<Dictionary<object, object>>(
                 l => l.HasOne<SecondTestEntity>().WithMany().HasForeignKey("SecondTestEntityId"),
                 r => r.HasOne<FirstTestEntity>().WithMany().HasForeignKey("FirstTestEntityId"),
-                j => {});
+                j => { });
 
         modelBuilder.Entity<FirstTestEntity>()
             .Property(b => b.OwnedEntity).HasColumnType("jsonb");
-        
+
         modelBuilder.Entity<SecondTestEntity>()
             .ToTable("SecondTestEntity")
             .HasKey(b => b.Id);
@@ -44,6 +43,6 @@ public class TestDbContext : DbContext
         modelBuilder.Entity<SecondTestEntity>()
             .AuditIgnore();
 
-        modelBuilder.ApplyConfiguration(new AuditLogEntityTypeConfiguration(false, table: "AuditLog"));
+        modelBuilder.ApplyConfiguration(new AuditLogEntityTypeConfiguration(false, "AuditLog"));
     }
 }

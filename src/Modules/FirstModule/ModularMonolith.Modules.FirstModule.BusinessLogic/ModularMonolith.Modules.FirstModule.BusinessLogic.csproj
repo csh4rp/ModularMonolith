@@ -8,11 +8,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.BusinessLogic\ModularMonolith.Shared.BusinessLogic.csproj" />
-    <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Contracts\ModularMonolith.Modules.FirstModule.Contracts.csproj" />
-    <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Domain\ModularMonolith.Modules.FirstModule.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.BusinessLogic\ModularMonolith.Shared.BusinessLogic.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Contracts\ModularMonolith.Modules.FirstModule.Contracts.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Domain\ModularMonolith.Modules.FirstModule.Domain.csproj"/>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Categories\" />
+    <Folder Include="Categories\"/>
   </ItemGroup>
 </Project>

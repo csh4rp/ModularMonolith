@@ -10,6 +10,6 @@ public abstract class AppModule
     public abstract IServiceCollection RegisterServices(IServiceCollection serviceCollection);
 
     public abstract WebApplication RegisterEndpoints(WebApplication app);
-    
+
     public abstract FrozenSet<Assembly> Assemblies { get; }
 }

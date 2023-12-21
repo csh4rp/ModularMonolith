@@ -13,6 +13,4 @@ public class EventOptions
     public int MaxParallelWorkers { get; set; }
 
     public int MaxRetryAttempts { get; set; }
-    
-    
 }

@@ -6,5 +6,4 @@ namespace ModularMonolith.Modules.FirstModule.BusinessLogic;
 
 public static class Extensions
 {
-    
 }

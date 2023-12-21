@@ -1,32 +1,32 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <OutputType>library</OutputType>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>library</OutputType>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <None Remove="Properties\launchSettings.json" />
-    </ItemGroup>
+  <ItemGroup>
+    <None Remove="Properties\launchSettings.json"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="MediatR">
-      </Reference>
-    </ItemGroup>
+  <ItemGroup>
+    <Reference Include="MediatR">
+    </Reference>
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\..\tests\Modules\FirstModule\ModularMonolith.Modules.FirstModule.BusinessLogic.Tests.Unit\ModularMonolith.Modules.FirstModule.BusinessLogic.Tests.Unit.csproj" />
-      <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Api\ModularMonolith.Shared.Api.csproj" />
-      <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.BusinessLogic\ModularMonolith.Modules.FirstModule.BusinessLogic.csproj" />
-      <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Contracts\ModularMonolith.Modules.FirstModule.Contracts.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\tests\Modules\FirstModule\ModularMonolith.Modules.FirstModule.BusinessLogic.Tests.Unit\ModularMonolith.Modules.FirstModule.BusinessLogic.Tests.Unit.csproj"/>
+    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Api\ModularMonolith.Shared.Api.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.BusinessLogic\ModularMonolith.Modules.FirstModule.BusinessLogic.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Contracts\ModularMonolith.Modules.FirstModule.Contracts.csproj"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Contracts\ModularMonolith.Modules.FirstModule.Contracts.csproj" />
-      <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Domain\ModularMonolith.Modules.FirstModule.Domain.csproj" />
-      <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Infrastructure\ModularMonolith.Modules.FirstModule.Infrastructure.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Contracts\ModularMonolith.Modules.FirstModule.Contracts.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Domain\ModularMonolith.Modules.FirstModule.Domain.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Infrastructure\ModularMonolith.Modules.FirstModule.Infrastructure.csproj"/>
+  </ItemGroup>
 
 </Project>

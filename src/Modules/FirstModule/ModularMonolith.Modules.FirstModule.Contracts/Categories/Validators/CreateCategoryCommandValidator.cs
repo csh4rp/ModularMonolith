@@ -5,9 +5,7 @@ namespace ModularMonolith.Modules.FirstModule.Contracts.Categories.Validators;
 
 internal sealed class CreateCategoryCommandValidator : AbstractValidator<CreateCategoryCommand>
 {
-    public CreateCategoryCommandValidator()
-    {
+    public CreateCategoryCommandValidator() =>
         RuleFor(x => x.Name)
             .NotEmpty();
-    }
 }

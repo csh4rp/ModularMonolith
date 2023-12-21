@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EFCore.NamingConventions" />
+    <PackageReference Include="EFCore.NamingConventions"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Infrastructure\ModularMonolith.Modules.FirstModule.Infrastructure.csproj" />
+    <ProjectReference Include="..\ModularMonolith.Modules.FirstModule.Infrastructure\ModularMonolith.Modules.FirstModule.Infrastructure.csproj"/>
   </ItemGroup>
-  
+
 </Project>

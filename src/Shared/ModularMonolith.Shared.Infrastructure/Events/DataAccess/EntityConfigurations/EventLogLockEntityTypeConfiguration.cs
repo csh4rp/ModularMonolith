@@ -10,7 +10,8 @@ internal sealed class EventLogLockEntityTypeConfiguration : IEntityTypeConfigura
     private readonly string _table;
     private readonly string? _schema;
 
-    public EventLogLockEntityTypeConfiguration(bool excludeFromMigrations, string table = "event_log_lock", string? schema = null)
+    public EventLogLockEntityTypeConfiguration(bool excludeFromMigrations, string table = "event_log_lock",
+        string? schema = null)
     {
         _excludeFromMigrations = excludeFromMigrations;
         _table = table;

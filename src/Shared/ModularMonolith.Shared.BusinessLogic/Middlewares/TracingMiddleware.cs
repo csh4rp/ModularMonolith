@@ -5,7 +5,8 @@ using ModularMonolith.Shared.Contracts;
 
 namespace ModularMonolith.Shared.BusinessLogic.Middlewares;
 
-internal sealed class TracingMiddleware<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
+internal sealed class TracingMiddleware<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull
 {
     private readonly ILogger<TracingMiddleware<TRequest, TResponse>> _logger;
 
@@ -29,7 +30,7 @@ internal sealed class TracingMiddleware<TRequest, TResponse> : IPipelineBehavior
         activity?.SetTag("OperationType", operationType);
         activity?.SetTag("RequestType", requestType.FullName);
         activity?.Start();
-        
+
         var result = await next();
 
         _logger.OperationFinished(requestType.Name);

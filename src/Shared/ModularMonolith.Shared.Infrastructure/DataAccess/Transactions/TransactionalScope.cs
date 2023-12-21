@@ -6,7 +6,7 @@ namespace ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
 internal sealed class TransactionalScope : ITransactionalScope
 {
     public static readonly AsyncLocal<TransactionalScope?> Current = new();
-    
+
     public DbContext? DbContext { get; private set; }
 
     public TransactionalScope() => Current.Value = this;
@@ -22,8 +22,8 @@ internal sealed class TransactionalScope : ITransactionalScope
         DbContext = null;
     }
 
-    public ValueTask DisposeAsync() => Current.Value?.DbContext?.Database.CurrentTransaction is null 
-        ? ValueTask.CompletedTask 
+    public ValueTask DisposeAsync() => Current.Value?.DbContext?.Database.CurrentTransaction is null
+        ? ValueTask.CompletedTask
         : Current.Value.DbContext.Database.CurrentTransaction.DisposeAsync();
 
     public void EnlistTransaction(DbContext dbContext)
@@ -32,7 +32,7 @@ internal sealed class TransactionalScope : ITransactionalScope
         {
             throw new InvalidOperationException("Transaction was already enlisted");
         }
-        
+
         DbContext = dbContext;
     }
 }

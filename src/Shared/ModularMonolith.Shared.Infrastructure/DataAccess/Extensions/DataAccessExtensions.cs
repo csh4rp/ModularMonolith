@@ -12,20 +12,21 @@ public static class DataAccessExtensions
         {
             return queryable;
         }
-        
+
         IOrderedQueryable<T> query;
 
         var objType = typeof(T);
 
         var (fieldName, isAscending) = GetOrderInfo(paginator.OrderBy);
-        
+
         if (!string.IsNullOrEmpty(fieldName) && isAscending.HasValue)
         {
             var property = objType.GetProperty(fieldName)!;
             var method = typeof(DataAccessExtensions).GetMethod(nameof(ApplyOrdering))!;
             var genericMethod = method.MakeGenericMethod(objType, property.PropertyType);
 
-            query = (IOrderedQueryable<T>) genericMethod.Invoke(null, new object[] { queryable, property, isAscending.Value })!;
+            query = (IOrderedQueryable<T>)genericMethod.Invoke(null,
+                new object[] { queryable, property, isAscending.Value })!;
         }
         else
         {
@@ -33,9 +34,9 @@ public static class DataAccessExtensions
             var method = typeof(DataAccessExtensions).GetMethod(nameof(ApplyOrdering))!;
             var genericMethod = method.MakeGenericMethod(objType, property.PropertyType);
 
-            query = (IOrderedQueryable<T>) genericMethod.Invoke(null, new object[] { queryable, property, true })!;
+            query = (IOrderedQueryable<T>)genericMethod.Invoke(null, new object[] { queryable, property, true })!;
         }
-        
+
         if (paginator.Skip.HasValue)
         {
             queryable = query.Skip(paginator.Skip.Value);
@@ -64,7 +65,7 @@ public static class DataAccessExtensions
         }
 
         var span = orderBy.AsSpan();
-        
+
         var fieldName = span[..index];
         var direction = span[index..];
 
@@ -72,15 +73,16 @@ public static class DataAccessExtensions
 
         return (fieldName.ToString(), isDescending);
     }
-    
-    private static IOrderedQueryable<T> ApplyOrdering<T, TK>(IQueryable<T> queryable, PropertyInfo propertyInfo, bool isAscending)
+
+    private static IOrderedQueryable<T> ApplyOrdering<T, TK>(IQueryable<T> queryable, PropertyInfo propertyInfo,
+        bool isAscending)
     {
         var objType = propertyInfo.DeclaringType;
-        
+
         var parameterExpression = Expression.Parameter(objType!, "x");
 
         var propertyExpression = Expression.Property(parameterExpression, propertyInfo);
-        
+
         var expression = Expression.Lambda<Func<T, TK>>(propertyExpression, parameterExpression);
 
         return isAscending

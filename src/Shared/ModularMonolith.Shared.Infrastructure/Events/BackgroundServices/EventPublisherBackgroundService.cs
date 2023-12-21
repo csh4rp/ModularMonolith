@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
-using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
 using ModularMonolith.Shared.Infrastructure.Events.Extensions;
 using ModularMonolith.Shared.Infrastructure.Events.Options;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;
@@ -39,19 +37,18 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await _eventReader.EnsureInitializedAsync(stoppingToken);
-        
+
         for (var i = 0; i < Environment.ProcessorCount; i++)
         {
             _tasks[i] = Task.Factory.StartNew(async () =>
             {
                 await EventReceiverPipeline.ExecuteAsync(RunAsync, stoppingToken);
-                
             }, stoppingToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
         }
 
         await Task.WhenAll(_tasks);
     }
-    
+
     private static ResiliencePipeline CreateReceiverPipeline() =>
         new ResiliencePipelineBuilder()
             .AddRetry(new RetryStrategyOptions
@@ -61,14 +58,12 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
                 MaxRetryAttempts = int.MaxValue
             })
             .Build();
-    
+
     private static ResiliencePipeline CreateLockReleasePipeline() =>
         new ResiliencePipelineBuilder()
             .AddRetry(new RetryStrategyOptions
             {
-                Delay = TimeSpan.FromMinutes(1),
-                BackoffType = DelayBackoffType.Exponential,
-                MaxRetryAttempts = 10
+                Delay = TimeSpan.FromMinutes(1), BackoffType = DelayBackoffType.Exponential, MaxRetryAttempts = 10
             })
             .Build();
 
@@ -76,12 +71,10 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
         new ResiliencePipelineBuilder()
             .AddRetry(new RetryStrategyOptions
             {
-                Delay = TimeSpan.FromSeconds(10),
-                BackoffType = DelayBackoffType.Exponential,
-                MaxRetryAttempts = 3
+                Delay = TimeSpan.FromSeconds(10), BackoffType = DelayBackoffType.Exponential, MaxRetryAttempts = 3
             })
             .Build();
-    
+
     private async ValueTask RunAsync(CancellationToken cancellationToken)
     {
         await foreach (var eventInfo in _eventChannel.ReadAllAsync(cancellationToken))
@@ -96,23 +89,22 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
                 }
 
                 // Try to publish up to three times before releasing the lock
-                await EventPublicationPipeline.ExecuteAsync(async (el, cts) => 
+                await EventPublicationPipeline.ExecuteAsync(async (el, cts) =>
                     await _eventPublisher.PublishAsync(el, cts), eventLog!, cancellationToken);
-                
+
                 // Try to mark as published up to ten times before going for re-publish
-                await EventLockReleasePipeline.ExecuteAsync(async (ev, cts) => 
+                await EventLockReleasePipeline.ExecuteAsync(async (ev, cts) =>
                     await _eventReader.MarkAsPublishedAsync(ev, cts), eventInfo, cancellationToken);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occured while publishing events events");
-                
+
                 // Make sure to release the lock
-                await EventLockReleasePipeline.ExecuteAsync(async (ev, cts) => await _eventReader.IncrementFailedAttemptNumberAsync(ev, cts),
+                await EventLockReleasePipeline.ExecuteAsync(
+                    async (ev, cts) => await _eventReader.IncrementFailedAttemptNumberAsync(ev, cts),
                     eventInfo, cancellationToken);
             }
         }
     }
-
-
 }

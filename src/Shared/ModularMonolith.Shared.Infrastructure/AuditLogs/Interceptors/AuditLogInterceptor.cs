@@ -15,7 +15,7 @@ public sealed class AuditLogInterceptor : SaveChangesInterceptor
         CancellationToken cancellationToken = new())
     {
         Debug.Assert(eventData.Context is not null);
-        
+
         AddAuditLogs(eventData.Context);
 
         return new ValueTask<InterceptionResult<int>>(result);
@@ -24,7 +24,7 @@ public sealed class AuditLogInterceptor : SaveChangesInterceptor
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
         Debug.Assert(eventData.Context is not null);
-        
+
         AddAuditLogs(eventData.Context);
 
         return result;

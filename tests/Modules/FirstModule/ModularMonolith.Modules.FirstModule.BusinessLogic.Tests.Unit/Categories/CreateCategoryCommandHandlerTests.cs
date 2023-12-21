@@ -4,7 +4,6 @@ using ModularMonolith.Modules.FirstModule.BusinessLogic.Categories.CommandHandle
 using ModularMonolith.Modules.FirstModule.Contracts.Categories.Commands;
 using ModularMonolith.Modules.FirstModule.Domain.Entities;
 using ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess;
-using ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess.Categories;
 using ModularMonolith.Shared.BusinessLogic.Exceptions;
 using ModularMonolith.Shared.Contracts.Errors;
 using Xunit;
@@ -21,7 +20,7 @@ public class CreateCategoryCommandHandlerTests
         var cmd = new CreateCategoryCommand { ParentId = Guid.NewGuid(), Name = "Category 1" };
 
         var handler = new CreateCategoryCommandHandler(dbContext);
-        
+
         // Act
         var result = await handler.Handle(cmd, default);
 
@@ -35,7 +34,7 @@ public class CreateCategoryCommandHandlerTests
         item!.Name.Should().Be(cmd.Name);
         item.ParentId.Should().Be(cmd.ParentId);
     }
-    
+
     [Fact]
     public async Task ShouldThrowException_WhenCategoryNameIsNotUnique()
     {
@@ -43,17 +42,17 @@ public class CreateCategoryCommandHandlerTests
         await using var dbContext = CreateDatabase();
         dbContext.Categories.Add(new Category { Id = Guid.NewGuid(), Name = "Category 1" });
         await dbContext.SaveChangesAsync();
-        
+
         var cmd = new CreateCategoryCommand { ParentId = Guid.NewGuid(), Name = "Category 1" };
 
         var handler = new CreateCategoryCommandHandler(dbContext);
-        
+
         // Act
         var act = () => handler.Handle(cmd, default);
 
         // Assert
         var expectedErrors = new[] { PropertyError.NotUnique(nameof(cmd.Name), cmd.Name) };
-        
+
         var exceptionAssertion = await act.Should().ThrowAsync<ValidationException>();
         exceptionAssertion.And.Errors.Should().BeEquivalentTo(expectedErrors);
     }

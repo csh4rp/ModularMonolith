@@ -10,7 +10,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IdentityContextAccessor>()
             .AddScoped<IIdentityContextSetter>(sp => sp.GetRequiredService<IdentityContextAccessor>())
             .AddScoped<IIdentityContextAccessor>(sp => sp.GetRequiredService<IdentityContextAccessor>());
-        
+
         return serviceCollection;
-    } 
+    }
 }

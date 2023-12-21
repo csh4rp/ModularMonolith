@@ -1,12 +1,13 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using ModularMonolith.Shared.BusinessLogic.Events;
 using ModularMonolith.Shared.BusinessLogic.Identity;
 using ModularMonolith.Shared.Domain.Abstractions;
 using ModularMonolith.Shared.Domain.Attributes;
-using ModularMonolith.Shared.Domain.Entities;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;
+using EventLog = ModularMonolith.Shared.Domain.Entities.EventLog;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
 
@@ -31,15 +32,16 @@ internal sealed class OutboxEventBus : IEventBus
 
     public Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : IEvent
         => PublishAsync(@event, DefaultOptions, cancellationToken);
-    
-    public Task PublishAsync<TEvent>(TEvent @event, EventPublishOptions options, CancellationToken cancellationToken) where TEvent : IEvent
+
+    public Task PublishAsync<TEvent>(TEvent @event, EventPublishOptions options, CancellationToken cancellationToken)
+        where TEvent : IEvent
     {
-        var currentActivity = System.Diagnostics.Activity.Current;
-        System.Diagnostics.Debug.Assert(currentActivity is not null);
-        
+        var currentActivity = Activity.Current;
+        Debug.Assert(currentActivity is not null);
+
         var eventType = typeof(TEvent);
         var attribute = eventType.GetCustomAttribute<EventAttribute>();
-        
+
         var eventLog = new EventLog
         {
             CreatedAt = _timeProvider.GetUtcNow(),
@@ -65,17 +67,18 @@ internal sealed class OutboxEventBus : IEventBus
 
     public Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken)
         => PublishAsync(events, DefaultOptions, cancellationToken);
-    
-    public Task PublishAsync(IEnumerable<IEvent> events, EventPublishOptions options, CancellationToken cancellationToken)
+
+    public Task PublishAsync(IEnumerable<IEvent> events, EventPublishOptions options,
+        CancellationToken cancellationToken)
     {
-        var currentActivity = System.Diagnostics.Activity.Current;
-        System.Diagnostics.Debug.Assert(currentActivity is not null);
-        
+        var currentActivity = Activity.Current;
+        Debug.Assert(currentActivity is not null);
+
         var eventLogs = events.Select(e =>
         {
             var eventType = e.GetType();
             var attribute = eventType.GetCustomAttribute<EventAttribute>();
-            
+
             return new EventLog
             {
                 CreatedAt = _timeProvider.GetUtcNow(),

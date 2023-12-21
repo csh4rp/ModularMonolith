@@ -5,17 +5,16 @@ using ModularMonolith.Shared.Infrastructure.Queries;
 
 namespace ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess.Categories.QueryHandlers;
 
-internal sealed class GetCategoryDetailsByIdQueryHandler : IQueryHandler<GetCategoryDetailsByIdQuery, CategoryDetailsResponse?>
+internal sealed class
+    GetCategoryDetailsByIdQueryHandler : IQueryHandler<GetCategoryDetailsByIdQuery, CategoryDetailsResponse?>
 {
     private readonly FirstModuleDbContext _dbContext;
 
-    public GetCategoryDetailsByIdQueryHandler(FirstModuleDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    public GetCategoryDetailsByIdQueryHandler(FirstModuleDbContext dbContext) => _dbContext = dbContext;
 
-    public Task<CategoryDetailsResponse?> Handle(GetCategoryDetailsByIdQuery request, CancellationToken cancellationToken) =>
+    public Task<CategoryDetailsResponse?> Handle(GetCategoryDetailsByIdQuery request,
+        CancellationToken cancellationToken) =>
         _dbContext.Categories.Where(c => c.Id == request.Id)
-            .Select(c => new CategoryDetailsResponse { Id = c.Id, ParentId = c.ParentId, Name = c.Name, })
+            .Select(c => new CategoryDetailsResponse { Id = c.Id, ParentId = c.ParentId, Name = c.Name })
             .FirstOrDefaultAsync(cancellationToken);
 }

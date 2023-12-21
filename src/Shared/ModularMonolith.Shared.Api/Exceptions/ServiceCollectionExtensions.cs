@@ -6,7 +6,7 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.AddExceptionHandler<ValidationExceptionHandler>()
             .AddExceptionHandler<CatchAllExceptionHandler>();
-        
+
         return serviceCollection;
     }
 }

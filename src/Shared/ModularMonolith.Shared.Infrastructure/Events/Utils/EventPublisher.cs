@@ -11,7 +11,7 @@ namespace ModularMonolith.Shared.Infrastructure.Events.Utils;
 internal sealed class EventPublisher
 {
     private static readonly ActivitySource EventPublisherActivitySource = new(nameof(EventPublisher));
-    
+
     private readonly EventSerializer _eventSerializer;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly EventMapper _eventMapper;
@@ -43,12 +43,12 @@ internal sealed class EventPublisher
             using var activity = EventPublisherActivitySource.CreateActivity(eventLog.Name, ActivityKind.Internal);
             activity?.SetParentId(eventLog.ActivityId);
             activity?.Start();
-            
+
             var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
             await mediator.Publish(@event, cancellationToken);
         }
-        
+
         _logger.EventPublished(eventLog.Id);
 
         if (_eventMapper.TryMap(@event, out var integrationEvent))
@@ -60,16 +60,16 @@ internal sealed class EventPublisher
                     var identitySetter = scope.ServiceProvider.GetRequiredService<IIdentityContextSetter>();
                     identitySetter.Set(new IdentityContext(eventLog.UserId.Value));
                 }
-                
+
                 using var activity = EventPublisherActivitySource.CreateActivity(eventLog.Name, ActivityKind.Internal);
                 activity?.SetParentId(eventLog.ActivityId);
                 activity?.Start();
-            
+
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
                 await mediator.Publish(integrationEvent, cancellationToken);
             }
-            
+
             _logger.IntegrationEventPublished(eventLog.Id);
         }
     }

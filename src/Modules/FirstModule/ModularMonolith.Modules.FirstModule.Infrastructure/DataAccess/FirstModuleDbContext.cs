@@ -10,7 +10,7 @@ internal sealed class FirstModuleDbContext : BaseDbContext, ICategoryDatabase
     public FirstModuleDbContext(DbContextOptions<FirstModuleDbContext> options) : base(options)
     {
     }
-    
+
     public DbSet<Category> Categories { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

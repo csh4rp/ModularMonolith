@@ -11,10 +11,7 @@ internal sealed class FindCategoriesQueryHandler : IQueryHandler<FindCategoriesQ
 {
     private readonly FirstModuleDbContext _dbContext;
 
-    public FindCategoriesQueryHandler(FirstModuleDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    public FindCategoriesQueryHandler(FirstModuleDbContext dbContext) => _dbContext = dbContext;
 
     public async Task<CategoriesResponse> Handle(FindCategoriesQuery request, CancellationToken cancellationToken)
     {
@@ -33,7 +30,7 @@ internal sealed class FindCategoriesQueryHandler : IQueryHandler<FindCategoriesQ
             .Future();
 
         var items = await itemsFuture.ToListAsync(cancellationToken);
-        
+
         return new CategoriesResponse { Items = items, TotalLength = countFuture };
     }
 }

@@ -15,8 +15,8 @@ public class ValidationErrorResponse : ProblemDetails
         TraceId = traceId;
         Errors = errors as IReadOnlyList<PropertyError> ?? errors.ToList();
     }
-    
+
     public string TraceId { get; }
-    
+
     public IReadOnlyList<PropertyError> Errors { get; }
 }

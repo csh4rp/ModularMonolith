@@ -9,7 +9,7 @@ namespace ModularMonolith.Shared.Infrastructure.Events;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddEvents(this IServiceCollection serviceCollection, 
+    public static IServiceCollection AddEvents(this IServiceCollection serviceCollection,
         Action<EventOptions> action)
     {
         serviceCollection.AddEventBackgroundServices()
@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
                 o.MaxLockTime = TimeSpan.FromSeconds(30);
             })
             .PostConfigure(action);
-        
+
         return serviceCollection;
     }
 }

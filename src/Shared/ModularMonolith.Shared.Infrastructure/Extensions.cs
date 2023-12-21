@@ -7,5 +7,4 @@ namespace ModularMonolith.Shared.Infrastructure;
 
 public class Extensions
 {
-    
 }

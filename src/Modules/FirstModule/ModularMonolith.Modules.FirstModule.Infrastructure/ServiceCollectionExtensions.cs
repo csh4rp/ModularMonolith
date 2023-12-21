@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using ModularMonolith.Modules.FirstModule.BusinessLogic.Categories.Abstract;
 using ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess;
-using ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess.Categories;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Options;
 
 [assembly: InternalsVisibleTo("ModularMonolith.Modules.FirstModule.BusinessLogic.Tests.Unit")]
@@ -25,7 +24,7 @@ public static class ServiceCollectionExtensions
         });
 
         serviceCollection.AddScoped<ICategoryDatabase>(sp => sp.GetRequiredService<FirstModuleDbContext>());
-        
+
         return serviceCollection;
     }
 }

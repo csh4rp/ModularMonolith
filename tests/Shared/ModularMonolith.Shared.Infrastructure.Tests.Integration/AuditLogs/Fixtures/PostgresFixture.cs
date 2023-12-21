@@ -7,7 +7,8 @@ namespace ModularMonolith.Shared.Infrastructure.Tests.Integration.AuditLogs.Fixt
 
 public class PostgresFixture : IAsyncLifetime
 {
-    public const string ConnectionString = "Server=localhost; Port=5434; UserName=testuser; Password=testuser123; Database=test_db;";
+    public const string ConnectionString =
+        "Server=localhost; Port=5434; UserName=testuser; Password=testuser123; Database=test_db;";
 
     private NpgsqlConnection? _connection;
     private PostgreSqlContainer? _container;
@@ -26,9 +27,9 @@ public class PostgresFixture : IAsyncLifetime
 
         _connection = new NpgsqlConnection(ConnectionString);
         await _connection.OpenAsync();
-        
+
         await using var cmd = _connection.CreateCommand();
-        cmd.CommandText = 
+        cmd.CommandText =
             """
             CREATE TABLE "FirstTestEntity"
             (
@@ -64,13 +65,10 @@ public class PostgresFixture : IAsyncLifetime
                 "TraceId" VARCHAR(32)
             );
             """;
-        
+
         await cmd.ExecuteNonQueryAsync();
-        
-        _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions
-        {
-            DbAdapter = DbAdapter.Postgres,
-        });
+
+        _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
     }
 
     public async Task DisposeAsync()
@@ -92,7 +90,7 @@ public class PostgresFixture : IAsyncLifetime
     {
         Debug.Assert(_connection is not null);
         Debug.Assert(_respawner is not null);
-        
+
         return _respawner.ResetAsync(_connection);
     }
 }

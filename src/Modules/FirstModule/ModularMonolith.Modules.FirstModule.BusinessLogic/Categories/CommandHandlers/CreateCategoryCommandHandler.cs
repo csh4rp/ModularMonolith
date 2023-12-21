@@ -13,10 +13,7 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
 {
     private readonly ICategoryDatabase _categoryDatabase;
 
-    public CreateCategoryCommandHandler(ICategoryDatabase categoryDatabase)
-    {
-        _categoryDatabase = categoryDatabase;
-    }
+    public CreateCategoryCommandHandler(ICategoryDatabase categoryDatabase) => _categoryDatabase = categoryDatabase;
 
     public async Task<CreatedResponse> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
@@ -27,7 +24,7 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
         {
             throw new ValidationException(PropertyError.NotUnique(nameof(request.Name), request.Name));
         }
-        
+
         var category = new Category { ParentId = request.ParentId, Name = request.Name };
 
         _categoryDatabase.Categories.Add(category);

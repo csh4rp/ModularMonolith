@@ -4,7 +4,6 @@ using ModularMonolith.Modules.FirstModule.BusinessLogic.Categories.CommandHandle
 using ModularMonolith.Modules.FirstModule.Contracts.Categories.Commands;
 using ModularMonolith.Modules.FirstModule.Domain.Entities;
 using ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess;
-using ModularMonolith.Modules.FirstModule.Infrastructure.DataAccess.Categories;
 using ModularMonolith.Shared.BusinessLogic.Exceptions;
 using Xunit;
 
@@ -17,19 +16,19 @@ public class DeleteCategoryCommandHandlerTests
     {
         // Arrange
         await using var cnx = CreateDatabase();
-        
+
         var existingCategory = new Category { Id = Guid.NewGuid(), Name = "Category 1" };
 
         cnx.Categories.Add(existingCategory);
         await cnx.SaveChangesAsync();
 
         var cmd = new DeleteCategoryCommand(existingCategory.Id);
-        
+
         var handler = new DeleteCategoryCommandHandler(cnx);
 
         // Act
         await handler.Handle(cmd, default);
-        
+
         // Assert
         var category = await cnx.Categories.FindAsync(existingCategory.Id);
 
@@ -47,7 +46,7 @@ public class DeleteCategoryCommandHandlerTests
         var handler = new DeleteCategoryCommandHandler(cnx);
 
         // Act
-        var act = () =>  handler.Handle(cmd, default);
+        var act = () => handler.Handle(cmd, default);
 
         // Assert
         await act.Should().ThrowAsync<EntityNotFoundException>();

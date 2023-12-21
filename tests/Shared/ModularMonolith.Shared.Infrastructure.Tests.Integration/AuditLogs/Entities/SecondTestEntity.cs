@@ -3,6 +3,6 @@
 public class SecondTestEntity
 {
     public Guid Id { get; init; }
-    
+
     public string? Name { get; set; }
 }

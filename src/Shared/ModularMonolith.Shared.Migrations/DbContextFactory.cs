@@ -14,8 +14,8 @@ internal sealed class DbContextFactory : IDesignTimeDbContextFactory<InternalDbC
             {
                 b.MigrationsAssembly(GetType().Assembly.FullName);
             })
-        .UseSnakeCaseNamingConvention();
-        
+            .UseSnakeCaseNamingConvention();
+
         var options = optionsBuilder.Options;
 
         return new InternalDbContext(options);

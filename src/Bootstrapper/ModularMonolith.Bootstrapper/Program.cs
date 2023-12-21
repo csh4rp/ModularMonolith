@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using ModularMonolith.Bootstrapper;
 using ModularMonolith.Bootstrapper.Extensions;
 using ModularMonolith.Shared.BusinessLogic;
 using ModularMonolith.Shared.Infrastructure.DataAccess;

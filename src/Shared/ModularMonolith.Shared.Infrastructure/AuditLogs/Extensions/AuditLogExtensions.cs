@@ -6,11 +6,12 @@ namespace ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
 public static class AuditLogExtensions
 {
     private const string AuditIgnoreAnnotation = nameof(AuditIgnoreAnnotation);
-    
-    public static EntityTypeBuilder<TEntity> AuditIgnore<TEntity>(this EntityTypeBuilder<TEntity> entityTypeBuilder) where TEntity : class
+
+    public static EntityTypeBuilder<TEntity> AuditIgnore<TEntity>(this EntityTypeBuilder<TEntity> entityTypeBuilder)
+        where TEntity : class
     {
         entityTypeBuilder.Metadata.AddAnnotation(AuditIgnoreAnnotation, true);
-        
+
         return entityTypeBuilder;
     }
 
@@ -24,7 +25,7 @@ public static class AuditLogExtensions
     public static PropertyBuilder<TProperty> AuditIgnore<TProperty>(this PropertyBuilder<TProperty> propertyBuilder)
     {
         propertyBuilder.Metadata.AddAnnotation(AuditIgnoreAnnotation, true);
-        
+
         return propertyBuilder;
     }
 

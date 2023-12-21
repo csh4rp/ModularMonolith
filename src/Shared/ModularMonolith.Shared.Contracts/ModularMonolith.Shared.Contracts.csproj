@@ -7,5 +7,5 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation"/>
   </ItemGroup>
-  
+
 </Project>

@@ -1,10 +1,7 @@
 ﻿using System.Diagnostics;
-using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ModularMonolith.Shared.BusinessLogic.Identity;
 using ModularMonolith.Shared.Domain.Entities;
-using ModularMonolith.Shared.Domain.Enums;
 using ModularMonolith.Shared.Domain.ValueObjects;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
 using EntityState = ModularMonolith.Shared.Domain.Enums.EntityState;
@@ -25,7 +22,7 @@ internal sealed class AuditLogFactory
     public AuditLog Create(EntityEntry entry)
     {
         Debug.Assert(Activity.Current is not null);
-        
+
         var entityType = entry.Entity.GetType();
 
         var auditableProperties = entry.Properties.Where(p => p.IsAuditable())
@@ -34,17 +31,18 @@ internal sealed class AuditLogFactory
         var changes = new List<PropertyChange>();
 
         var changeType = GetChangeType(entry);
-        
+
         foreach (var propertyEntry in auditableProperties)
         {
             if (propertyEntry.Metadata.IsPrimaryKey())
             {
                 continue;
             }
-            
+
             if (changeType == EntityState.Modified && propertyEntry.IsModified)
             {
-                var change = new PropertyChange(propertyEntry.Metadata.Name, propertyEntry.CurrentValue, propertyEntry.OriginalValue);
+                var change = new PropertyChange(propertyEntry.Metadata.Name, propertyEntry.CurrentValue,
+                    propertyEntry.OriginalValue);
                 changes.Add(change);
             }
             else
@@ -61,12 +59,12 @@ internal sealed class AuditLogFactory
         foreach (var primaryKeyProperty in primaryKey.Properties)
         {
             var propertyEntry = auditableProperties.Single(p => p.Metadata.Name == primaryKeyProperty.Name);
-         
+
             Debug.Assert(propertyEntry.CurrentValue is not null);
-            
+
             keys.Add(new EntityKey(propertyEntry.Metadata.Name, propertyEntry.CurrentValue));
         }
-        
+
         return new AuditLog
         {
             CreatedAt = _timeProvider.GetUtcNow(),
@@ -76,7 +74,7 @@ internal sealed class AuditLogFactory
             OperationName = Activity.Current.OperationName,
             EntityType = entityType.FullName!,
             EntityPropertyChanges = [.. changes],
-            EntityKeys = keys,
+            EntityKeys = keys
         };
     }
 

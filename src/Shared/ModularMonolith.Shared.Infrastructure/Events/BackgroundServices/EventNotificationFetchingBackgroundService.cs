@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Factories;
 using ModularMonolith.Shared.Infrastructure.Events.Extensions;
 using ModularMonolith.Shared.Infrastructure.Events.MetaData;
@@ -14,7 +13,7 @@ namespace ModularMonolith.Shared.Infrastructure.Events.BackgroundServices;
 internal sealed class EventNotificationFetchingBackgroundService : BackgroundService
 {
     private static readonly ResiliencePipeline RetryPipeline = CreatePipeline();
-    
+
     private readonly DbConnectionFactory _dbConnectionFactory;
     private readonly EventChannel _channel;
     private readonly ILogger<EventNotificationFetchingBackgroundService> _logger;
@@ -38,15 +37,13 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
             })
             .Build();
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken) =>
         await RetryPipeline.ExecuteAsync(RunAsync, stoppingToken);
-    }
 
     private async ValueTask RunAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Started listening for the notifications");
-        
+
         try
         {
             await using var connection = _dbConnectionFactory.Create();
@@ -59,7 +56,7 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
             }
 
             connection.Notification += OnNotificationEventHandler;
-            
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 await connection.WaitAsync(stoppingToken);
@@ -73,7 +70,7 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
             throw;
         }
     }
-    
+
     private void OnNotificationEventHandler(object obj, NpgsqlNotificationEventArgs args)
     {
         try
@@ -99,13 +96,14 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
                 {
                     _logger.NotificationBlocked(id, correlationId);
                 }
-                
+
                 spinWait.SpinOnce();
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred while writing event with notification payload: {NotificationPayload} to channel",
+            _logger.LogError(ex,
+                "An error occurred while writing event with notification payload: {NotificationPayload} to channel",
                 args.Payload);
         }
     }
@@ -118,7 +116,7 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
         Guid? correlationId = index != 0
             ? Guid.Parse(payload[..index])
             : null;
-        
+
         var id = Guid.Parse(payload[index..]);
         return (id, correlationId);
     }

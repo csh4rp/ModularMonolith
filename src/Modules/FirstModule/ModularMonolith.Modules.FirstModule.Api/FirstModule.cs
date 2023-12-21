@@ -14,7 +14,7 @@ public sealed class FirstModule : AppModule
     private static readonly Assembly ContractsAssembly = Assembly.Load($"{RootNamespace}.Contracts");
     private static readonly Assembly DomainAssembly = Assembly.Load($"{RootNamespace}.Domain");
     private static readonly Assembly InfrastructureAssembly = Assembly.Load($"{RootNamespace}.Infrastructure");
-    
+
     public override WebApplication RegisterEndpoints(WebApplication app)
     {
         app.UseCategoryEndpoints();
@@ -24,13 +24,10 @@ public sealed class FirstModule : AppModule
 
     public override FrozenSet<Assembly> Assemblies { get; } = new[]
     {
-        BusinessLogicAssembly,
-        ContractsAssembly,
-        DomainAssembly,
-        InfrastructureAssembly
+        BusinessLogicAssembly, ContractsAssembly, DomainAssembly, InfrastructureAssembly
     }.ToFrozenSet();
-    
-    public override IServiceCollection RegisterServices(IServiceCollection serviceCollection) 
+
+    public override IServiceCollection RegisterServices(IServiceCollection serviceCollection)
     {
         serviceCollection.AddInfrastructure();
 

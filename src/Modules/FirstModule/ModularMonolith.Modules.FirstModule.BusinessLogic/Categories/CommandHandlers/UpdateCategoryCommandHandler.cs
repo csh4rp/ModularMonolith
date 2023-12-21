@@ -12,16 +12,14 @@ internal sealed class UpdateCategoryCommandHandler : ICommandHandler<UpdateCateg
 {
     private readonly ICategoryDatabase _categoryDatabase;
 
-    public UpdateCategoryCommandHandler(ICategoryDatabase categoryDatabase)
-    {
-        _categoryDatabase = categoryDatabase;
-    }
+    public UpdateCategoryCommandHandler(ICategoryDatabase categoryDatabase) => _categoryDatabase = categoryDatabase;
 
     public async Task Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
     {
-        var category = await _categoryDatabase.Categories.FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken)
+        var category =
+            await _categoryDatabase.Categories.FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken)
             ?? throw new EntityNotFoundException(typeof(Category), request.Id);
-        
+
         var categoryWithNameExists = await _categoryDatabase.Categories
             .AnyAsync(c => c.Id != request.Id && c.Name == request.Name, cancellationToken);
 
@@ -32,7 +30,7 @@ internal sealed class UpdateCategoryCommandHandler : ICommandHandler<UpdateCateg
 
         category.ParentId = request.ParentId;
         category.Name = request.Name;
-        
+
         await _categoryDatabase.SaveChangesAsync(cancellationToken);
     }
 }

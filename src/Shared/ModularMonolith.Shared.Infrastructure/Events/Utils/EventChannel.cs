@@ -7,7 +7,7 @@ internal sealed class EventChannel
 {
     private readonly Channel<EventInfo> _channel = Channel.CreateBounded<EventInfo>(100);
 
-    public IAsyncEnumerable<EventInfo> ReadAllAsync(CancellationToken cancellationToken) => 
+    public IAsyncEnumerable<EventInfo> ReadAllAsync(CancellationToken cancellationToken) =>
         _channel.Reader.ReadAllAsync(cancellationToken);
 
     public ValueTask WriteAsync(EventInfo eventInfo, CancellationToken cancellationToken) =>

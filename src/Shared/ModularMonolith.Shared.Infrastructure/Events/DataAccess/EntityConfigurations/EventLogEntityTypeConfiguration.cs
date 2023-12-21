@@ -53,7 +53,7 @@ internal sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration
             .HasMaxLength(256);
 
         builder.HasIndex(b => b.PublishedAt).HasFilter("published_at IS NULL");
-        
+
         builder.HasIndex(b => new { b.UserId, b.Type, b.CreatedAt });
 
         builder.HasIndex(b => b.CorrelationId);

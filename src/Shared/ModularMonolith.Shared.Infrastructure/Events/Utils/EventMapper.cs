@@ -22,18 +22,19 @@ internal sealed class EventMapper
                 var mappingCtor = t.GetConstructors(BindingFlags.Default | BindingFlags.Public)[0];
                 var eventType = t.GenericTypeArguments[0];
                 var method = t.GetMethod(nameof(IEventMapping<IEvent>.Map))!;
-                
+
                 var eventParameter = Expression.Parameter(typeof(object), "ev");
 
                 var convertExpression = Expression.Convert(eventParameter, eventType);
                 var creationExpression = Expression.New(mappingCtor);
 
-                var invocationExpression = Expression.Call(method, creationExpression,convertExpression);
+                var invocationExpression = Expression.Call(method, creationExpression, convertExpression);
 
-                return Expression.Lambda<Func<object, IIntegrationEvent>>(invocationExpression,  eventParameter).Compile();
+                return Expression.Lambda<Func<object, IIntegrationEvent>>(invocationExpression, eventParameter)
+                    .Compile();
             });
 
-    public bool TryMap(object @event, [NotNullWhen(true)] out IIntegrationEvent? integrationEvent) 
+    public bool TryMap(object @event, [NotNullWhen(true)] out IIntegrationEvent? integrationEvent)
     {
         if (_eventMappings.TryGetValue(@event.GetType(), out var mapping))
         {

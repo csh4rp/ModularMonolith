@@ -4,7 +4,8 @@ namespace ModularMonolith.Shared.Api.CustomResults;
 
 public abstract class PaginatedResult
 {
-    public static PaginatedResult<T> From<T>(IPaginatedResponse<T> response) => new(response.Items, response.TotalLength);
+    public static PaginatedResult<T> From<T>(IPaginatedResponse<T> response) =>
+        new(response.Items, response.TotalLength);
 }
 
 public class PaginatedResult<T> : IResult
