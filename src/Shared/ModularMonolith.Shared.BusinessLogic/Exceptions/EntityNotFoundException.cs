@@ -1,6 +1,6 @@
 ﻿namespace ModularMonolith.Shared.BusinessLogic.Exceptions;
 
-public class EntityNotFoundException : ApplicationException
+public class EntityNotFoundException : AppException
 {
     public EntityNotFoundException(Type entityType, Guid entityId)
         : base($"Entity of type: '{entityType}' with id: '{entityId}' was not found")
