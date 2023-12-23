@@ -9,12 +9,19 @@
     <ItemGroup>
       <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.BusinessLogic\ModularMonolith.Shared.BusinessLogic.csproj" />
       <ProjectReference Include="..\ModularMonolith.Modules.Identity.Contracts\ModularMonolith.Modules.Identity.Contracts.csproj" />
+      <ProjectReference Include="..\ModularMonolith.Modules.Identity.Core\ModularMonolith.Modules.Identity.Core.csproj" />
       <ProjectReference Include="..\ModularMonolith.Modules.Identity.Domain\ModularMonolith.Modules.Identity.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <Reference Include="Microsoft.Extensions.Identity.Core">
         <HintPath>..\..\..\..\..\..\..\.nuget\packages\microsoft.extensions.identity.core\8.0.0\lib\net8.0\Microsoft.Extensions.Identity.Core.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.IdentityModel.Tokens">
+        <HintPath>..\..\..\..\..\..\..\.nuget\packages\microsoft.identitymodel.tokens\6.8.0\lib\netstandard2.0\Microsoft.IdentityModel.Tokens.dll</HintPath>
+      </Reference>
+      <Reference Include="System.IdentityModel.Tokens.Jwt">
+        <HintPath>..\..\..\..\..\..\..\.nuget\packages\system.identitymodel.tokens.jwt\6.8.0\lib\netstandard2.0\System.IdentityModel.Tokens.Jwt.dll</HintPath>
       </Reference>
     </ItemGroup>
 

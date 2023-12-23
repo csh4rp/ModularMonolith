@@ -1,6 +1,3 @@
 ﻿namespace ModularMonolith.Modules.Identity.Contracts.Account.Responses;
 
-public class SignInResponse
-{
-    
-}
+public sealed record SignInResponse(string Token);
