@@ -1,5 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\ModularMonolith.Shared.BusinessLogic\ModularMonolith.Shared.BusinessLogic.csproj"/>
     <ProjectReference Include="..\ModularMonolith.Shared.Core\ModularMonolith.Shared.Core.csproj"/>

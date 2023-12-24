@@ -1,17 +1,13 @@
 ﻿namespace ModularMonolith.Shared.Domain.Entities;
 
-public class EventLog
+public sealed class EventLog
 {
     public Guid Id { get; init; }
 
     public required DateTimeOffset CreatedAt { get; init; }
 
-    public DateTimeOffset? PublishedAt { get; }
-
-    public DateTimeOffset? NextAttemptAt { get; }
-
-    public int AttemptNumber { get; }
-
+    public DateTimeOffset? PublishedAt { get; init; }
+    
     public Guid? UserId { get; init; }
 
     public required Guid? CorrelationId { get; init; }
@@ -25,4 +21,8 @@ public class EventLog
     public required string OperationName { get; init; }
 
     public required string ActivityId { get; init; }
+    
+    public required string? IpAddress { get; init; }
+    
+    public required string? UserAgent { get; init; }
 }

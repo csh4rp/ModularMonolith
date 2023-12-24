@@ -2,5 +2,5 @@
 
 namespace ModularMonolith.Modules.Identity.Domain.Users.Events;
 
-public record UserCreated(Guid UserId, string Email) : IEvent;
+public record UserRegistered(Guid UserId, string Email) : IEvent;
 

@@ -36,8 +36,6 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _eventReader.EnsureInitializedAsync(stoppingToken);
-
         for (var i = 0; i < Environment.ProcessorCount; i++)
         {
             _tasks[i] = Task.Factory.StartNew(async () =>

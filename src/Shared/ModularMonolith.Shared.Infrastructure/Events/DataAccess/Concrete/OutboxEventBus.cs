@@ -18,16 +18,18 @@ internal sealed class OutboxEventBus : IEventBus
     private readonly EventSerializer _eventSerializer;
     private readonly IIdentityContextAccessor _identityContextAccessor;
     private readonly TimeProvider _timeProvider;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public OutboxEventBus(IEventLogDbContext dbContext,
         EventSerializer eventSerializer,
         IIdentityContextAccessor identityContextAccessor,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider, IHttpContextAccessor httpContextAccessor)
     {
         _dbContext = dbContext;
         _eventSerializer = eventSerializer;
         _identityContextAccessor = identityContextAccessor;
         _timeProvider = timeProvider;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : IEvent
@@ -42,6 +44,9 @@ internal sealed class OutboxEventBus : IEventBus
         var eventType = typeof(TEvent);
         var attribute = eventType.GetCustomAttribute<EventAttribute>();
 
+        var remoteIpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
+        var userAgent = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent;
+        
         var eventLog = new EventLog
         {
             CreatedAt = _timeProvider.GetUtcNow(),
@@ -51,7 +56,9 @@ internal sealed class OutboxEventBus : IEventBus
             Payload = _eventSerializer.Serialize(@event),
             UserId = _identityContextAccessor.Context?.UserId,
             OperationName = currentActivity.OperationName,
-            ActivityId = currentActivity.Id!
+            ActivityId = currentActivity.Id!,
+            IpAddress = remoteIpAddress?.ToString(),
+            UserAgent = userAgent
         };
 
         var scope = TransactionalScope.Current.Value;
@@ -73,6 +80,9 @@ internal sealed class OutboxEventBus : IEventBus
     {
         var currentActivity = Activity.Current;
         Debug.Assert(currentActivity is not null);
+        
+        var remoteIpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
+        var userAgent = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent;
 
         var eventLogs = events.Select(e =>
         {
@@ -88,7 +98,9 @@ internal sealed class OutboxEventBus : IEventBus
                 Payload = _eventSerializer.Serialize(e, eventType),
                 UserId = _identityContextAccessor.Context?.UserId,
                 OperationName = currentActivity.OperationName,
-                ActivityId = currentActivity.Id!
+                ActivityId = currentActivity.Id!,
+                IpAddress = remoteIpAddress?.ToString(),
+                UserAgent = userAgent
             };
         });
 

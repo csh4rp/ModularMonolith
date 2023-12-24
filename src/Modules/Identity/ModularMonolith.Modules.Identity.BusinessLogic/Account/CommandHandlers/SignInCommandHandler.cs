@@ -4,38 +4,45 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using ModularMonolith.Modules.Identity.BusinessLogic.Account.Exceptions;
 using ModularMonolith.Modules.Identity.Contracts.Account.Commands;
 using ModularMonolith.Modules.Identity.Contracts.Account.Responses;
 using ModularMonolith.Modules.Identity.Core.Options;
 using ModularMonolith.Modules.Identity.Domain.Users.Entities;
+using ModularMonolith.Modules.Identity.Domain.Users.Events;
 using ModularMonolith.Shared.BusinessLogic.Commands;
+using ModularMonolith.Shared.BusinessLogic.Events;
 
 namespace ModularMonolith.Modules.Identity.BusinessLogic.Account.CommandHandlers;
 
 internal sealed class SignInCommandHandler : ICommandHandler<SignInCommand, SignInResponse>
 {
     private readonly UserManager<User> _userManager;
+    private readonly IEventBus _eventBus;
     private readonly IOptions<AuthOptions> _options;
     private readonly TimeProvider _timeProvider;
 
-    public SignInCommandHandler(UserManager<User> userManager, IOptions<AuthOptions> options, TimeProvider timeProvider)
+    public SignInCommandHandler(UserManager<User> userManager, IEventBus eventBus, IOptions<AuthOptions> options, TimeProvider timeProvider)
     {
         _userManager = userManager;
+        _eventBus = eventBus;
         _options = options;
         _timeProvider = timeProvider;
     }
 
     public async Task<SignInResponse> Handle(SignInCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email)
-                   ?? throw new InvalidCredentialsException();
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user is null)
+        {
+            return SignInResponse.InvalidCredentials();
+        }
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
-
         if (!isPasswordValid)
         {
-            throw new InvalidCredentialsException();
+            await _eventBus.PublishAsync(new SignInFailed(user.Id), cancellationToken);
+            
+            return SignInResponse.InvalidCredentials();
         }
 
         var options = _options.Value;
@@ -57,6 +64,8 @@ internal sealed class SignInCommandHandler : ICommandHandler<SignInCommand, Sign
         
         var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
 
-        return new SignInResponse(tokenValue);
+        await _eventBus.PublishAsync(new SignInSucceeded(user.Id), cancellationToken);
+
+        return SignInResponse.Succeeded(tokenValue);
     }
 }

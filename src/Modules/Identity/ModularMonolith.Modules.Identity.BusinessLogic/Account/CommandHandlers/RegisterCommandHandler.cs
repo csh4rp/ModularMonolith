@@ -41,6 +41,6 @@ internal sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand>
             throw new UserRegistrationException(result.Errors);
         }
 
-        await _eventBus.PublishAsync(new UserCreated(user.Id, user.Email), cancellationToken);
+        await _eventBus.PublishAsync(new UserRegistered(user.Id, user.Email), cancellationToken);
     }
 }

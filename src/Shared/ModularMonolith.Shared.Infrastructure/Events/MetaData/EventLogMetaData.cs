@@ -24,7 +24,7 @@ internal sealed class EventLogMetaData
 
     public required string PublishedAtColumnName { get; init; }
 
-    public required string AttemptNumberColumnName { get; init; }
+    public required string IpAddressColumnName { get; init; }
 
-    public required string NextAttemptAtColumnName { get; init; }
+    public required string UserAgentColumnName { get; init; }
 }

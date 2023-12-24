@@ -14,14 +14,16 @@ internal sealed class EventReader : IEventReader
     private readonly EventMetaDataProvider _eventMetaDataProvider;
     private readonly DbConnectionFactory _dbConnectionFactory;
     private readonly IOptionsMonitor<EventOptions> _optionsMonitor;
+    private readonly TimeProvider _timeProvider;
 
     public EventReader(DbConnectionFactory dbConnectionFactory,
         EventMetaDataProvider eventMetaDataProvider,
-        IOptionsMonitor<EventOptions> optionsMonitor)
+        IOptionsMonitor<EventOptions> optionsMonitor, TimeProvider timeProvider)
     {
         _dbConnectionFactory = dbConnectionFactory;
         _eventMetaDataProvider = eventMetaDataProvider;
         _optionsMonitor = optionsMonitor;
+        _timeProvider = timeProvider;
     }
 
     public async Task<(bool WasAcquired, EventLog? EventLog)> TryAcquireLockAsync(EventInfo eventInfo,
@@ -73,10 +75,10 @@ internal sealed class EventReader : IEventReader
                      WHERE {eventLogMetaData.CorrelationIdColumnName} = el.{eventLogMetaData.CorrelationIdColumnName}
                      AND {eventLogMetaData.CreatedAtColumnName} < el.{eventLogMetaData.CreatedAtColumnName}
                      AND {eventLogMetaData.PublishedAtColumnName} IS NULL
-                     AND {eventLogMetaData.AttemptNumberColumnName} < @max_retry_attempts
+                     AND {eventLogMetaData.IpAddressColumnName} < @max_retry_attempts
                  )
-                 AND ({eventLogMetaData.NextAttemptAtColumnName} IS NULL OR {eventLogMetaData.NextAttemptAtColumnName} < CURRENT_TIMESTAMP)
-                 AND {eventLogMetaData.AttemptNumberColumnName} < @max_retry_attempts
+                 AND ({eventLogMetaData.UserAgentColumnName} IS NULL OR {eventLogMetaData.UserAgentColumnName} < CURRENT_TIMESTAMP)
+                 AND {eventLogMetaData.IpAddressColumnName} < @max_retry_attempts
                  ORDER BY {eventLogMetaData.CreatedAtColumnName}
                  LIMIT 1 OFFSET 0
                  """;
@@ -109,8 +111,8 @@ internal sealed class EventReader : IEventReader
                      FROM {eventLockMetaData.TableName}
                      WHERE {eventLockMetaData.IdColumnName} = @id
                  )
-                 AND ({eventLogMetaData.NextAttemptAtColumnName} IS NULL OR {eventLogMetaData.NextAttemptAtColumnName} < CURRENT_TIMESTAMP)
-                 AND {eventLogMetaData.AttemptNumberColumnName} < @max_retry_attempts
+                 AND ({eventLogMetaData.UserAgentColumnName} IS NULL OR {eventLogMetaData.UserAgentColumnName} < CURRENT_TIMESTAMP)
+                 AND {eventLogMetaData.IpAddressColumnName} < @max_retry_attempts
                  ORDER BY {eventLogMetaData.CreatedAtColumnName}
                  LIMIT 1 OFFSET 0
                  """;
@@ -148,7 +150,13 @@ internal sealed class EventReader : IEventReader
             OperationName = reader.GetString(eventLogMetaData.OperationNameColumnName),
             UserId = reader.IsDBNull(eventLogMetaData.UserIdColumnName)
                 ? null
-                : reader.GetGuid(eventLogMetaData.UserIdColumnName)
+                : reader.GetGuid(eventLogMetaData.UserIdColumnName),
+            IpAddress = reader.IsDBNull(eventLogMetaData.IpAddressColumnName)
+                ? null
+                : reader.GetString(eventLogMetaData.IpAddressColumnName),
+            UserAgent = reader.IsDBNull(eventLogMetaData.UserAgentColumnName)
+                ? null
+                : reader.GetString(eventLogMetaData.UserAgentColumnName)
         };
 
     public async Task MarkAsPublishedAsync(EventInfo eventInfo, CancellationToken cancellationToken)
@@ -156,6 +164,7 @@ internal sealed class EventReader : IEventReader
         var eventLogMetaData = _eventMetaDataProvider.EventLogMetaData;
         var eventLockMetaData = _eventMetaDataProvider.EventLogLockMetaData;
         var eventCorrelationLockMetaData = _eventMetaDataProvider.EventLogCorrelationLockMetaData;
+        var eventLogPublishAttemptMetaData = _eventMetaDataProvider.EventLogPublishAttemptMetaData;
 
         await using var connection = _dbConnectionFactory.Create();
         await connection.OpenAsync(cancellationToken);
@@ -183,6 +192,14 @@ internal sealed class EventReader : IEventReader
                  """;
         }
 
+        var deleteAttemptsCommand = batch.CreateBatchCommand();
+        deleteAttemptsCommand.Parameters.AddWithValue("@event_log_id", eventInfo.EventLogId);
+        deleteAttemptsCommand.CommandText =
+            $"""
+            DELETE FROM {eventLogPublishAttemptMetaData.TableName}
+            WHERE {eventLogPublishAttemptMetaData.EventLogIdColumnName} = @event_log_id;
+            """;
+
         var markAsPublishedCommand = batch.CreateBatchCommand();
         markAsPublishedCommand.Parameters.AddWithValue("@id", eventInfo.EventLogId);
         markAsPublishedCommand.CommandText =
@@ -197,7 +214,7 @@ internal sealed class EventReader : IEventReader
 
     public async Task IncrementFailedAttemptNumberAsync(EventInfo eventInfo, CancellationToken cancellationToken)
     {
-        var eventLogMetaData = _eventMetaDataProvider.EventLogMetaData;
+        var eventLogPublishAttemptMetaData = _eventMetaDataProvider.EventLogPublishAttemptMetaData;
         var eventLockMetaData = _eventMetaDataProvider.EventLogLockMetaData;
         var eventCorrelationLockMetaData = _eventMetaDataProvider.EventLogCorrelationLockMetaData;
 
@@ -228,49 +245,24 @@ internal sealed class EventReader : IEventReader
         }
 
         var increaseFailedAttemptCommand = batch.CreateBatchCommand();
-        increaseFailedAttemptCommand.Parameters.AddWithValue("@id", eventInfo.EventLogId);
+        increaseFailedAttemptCommand.Parameters.AddWithValue("@event_log_id", eventInfo.EventLogId);
+        increaseFailedAttemptCommand.Parameters.AddWithValue("@next_attempt_at", eventInfo.EventLogId);
         increaseFailedAttemptCommand.CommandText =
             $"""
-             UPDATE {eventLogMetaData.TableName}
-             SET {eventLogMetaData.AttemptNumberColumnName} = {eventLogMetaData.AttemptNumberColumnName} + 1,
-                 {eventLogMetaData.NextAttemptAtColumnName} =
-                     COALESCE({eventLogMetaData.NextAttemptAtColumnName}, {eventLogMetaData.CreatedAtColumnName})
-                     + INTERVAL '5 minutes' * {eventLogMetaData.AttemptNumberColumnName}
-             WHERE {eventLogMetaData.IdColumnName} = @id
+             INSERT INTO {eventLogPublishAttemptMetaData.TableName}
+             ({eventLogPublishAttemptMetaData.EventLogIdColumnName},
+              {eventLogPublishAttemptMetaData.NextAttemptAtColumnName},
+              {eventLogPublishAttemptMetaData.AttemptNumberColumnName})
+              VALUES(@event_lod_id, @next_attempt_at,
+                     COALESCE
+                     (
+                         SELECT MAX({eventLogPublishAttemptMetaData.NextAttemptAtColumnName}) + 1
+                         FROM {eventLogPublishAttemptMetaData.TableName} AS epa
+                         WHERE epa.{eventLogPublishAttemptMetaData.EventLogIdColumnName} = @event_log_id,
+                     1))
              """;
 
         _ = await batch.ExecuteNonQueryAsync(cancellationToken);
-    }
-
-    public async Task EnsureInitializedAsync(CancellationToken cancellationToken)
-    {
-        var eventLogMetaData = _eventMetaDataProvider.EventLogMetaData;
-
-        await using var connection = _dbConnectionFactory.Create();
-        await connection.OpenAsync(cancellationToken);
-
-        await using var command = connection.CreateCommand();
-
-        command.CommandText =
-            $"""
-             CREATE OR REPLACE FUNCTION notify_event_log_inserted()
-                RETURNS TRIGGER
-                LANGUAGE PLPGSQL
-             AS
-             $$
-             BEGIN
-                NOTIFY new_events, CONCAT(COALESCE(NEW.{eventLogMetaData.CorrelationIdColumnName}::text, ''), '/', NEW.{eventLogMetaData.IdColumnName}::text)
-                RETURN NEW;
-             END;
-             $$
-
-             CREATE OR REPLACE TRIGGER event_inserted
-                 AFTER INSERT ON {eventLogMetaData.TableName}
-                 FOR EACH ROW
-                 EXECUTE FUNCTION notify_event_log_inserted()
-             """;
-
-        await command.ExecuteNonQueryAsync(cancellationToken);
     }
 
     public async Task<IReadOnlyList<EventInfo>> GetUnpublishedEventsAsync(CancellationToken cancellationToken)
@@ -327,7 +319,7 @@ internal sealed class EventReader : IEventReader
                  WHERE {eventLogMetaData.CorrelationIdColumnName} = el.{eventLogMetaData.CorrelationIdColumnName}
                  AND {eventLogMetaData.CreatedAtColumnName} < el.{eventLogMetaData.CreatedAtColumnName}
                  AND {eventLogMetaData.PublishedAtColumnName} IS NULL
-                 AND {eventLogMetaData.AttemptNumberColumnName} < @max_retry_attempts
+                 AND {eventLogMetaData.IpAddressColumnName} < @max_retry_attempts
              )
              AND NOT EXISTS
              (
@@ -335,8 +327,8 @@ internal sealed class EventReader : IEventReader
                 FROM {eventLogLockMetaData.TableName}
                 AND {eventLogMetaData.IdColumnName} = el.{eventLogMetaData.IdColumnName}
              )
-             AND ({eventLogMetaData.NextAttemptAtColumnName} IS NULL OR {eventLogMetaData.NextAttemptAtColumnName} < CURRENT_TIMESTAMP)
-             AND {eventLogMetaData.AttemptNumberColumnName} < @max_retry_attempts
+             AND ({eventLogMetaData.UserAgentColumnName} IS NULL OR {eventLogMetaData.UserAgentColumnName} < CURRENT_TIMESTAMP)
+             AND {eventLogMetaData.IpAddressColumnName} < @max_retry_attempts
              ORDER BY {eventLogMetaData.CreatedAtColumnName}
              LIMIT 10 OFFSET 0
              """;

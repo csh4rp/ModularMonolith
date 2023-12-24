@@ -12,7 +12,5 @@ internal interface IEventReader
 
     Task IncrementFailedAttemptNumberAsync(EventInfo eventInfo, CancellationToken cancellationToken);
 
-    Task EnsureInitializedAsync(CancellationToken cancellationToken);
-
     Task<IReadOnlyList<EventInfo>> GetUnpublishedEventsAsync(CancellationToken cancellationToken);
 }
