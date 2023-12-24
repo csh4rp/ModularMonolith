@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Modules\FirstModule\ModularMonolith.Modules.FirstModule.BusinessLogic\ModularMonolith.Modules.FirstModule.BusinessLogic.csproj"/>
+    <ProjectReference Include="..\..\Modules\FirstModule\ModularMonolith.FirstModule.Application\ModularMonolith.FirstModule.Application.csproj" />
     <ProjectReference Include="..\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
   </ItemGroup>
 

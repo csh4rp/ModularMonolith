@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using ModularMonolith.Shared.BusinessLogic.Identity;
+using ModularMonolith.Shared.Application.Identity;
 using ModularMonolith.Shared.Domain.Entities;
 using ModularMonolith.Shared.Domain.ValueObjects;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;

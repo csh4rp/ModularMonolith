@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using ModularMonolith.Shared.BusinessLogic.Events;
-using ModularMonolith.Shared.BusinessLogic.Identity;
+using ModularMonolith.Shared.Application.Events;
+using ModularMonolith.Shared.Application.Identity;
 using ModularMonolith.Shared.Domain.Abstractions;
 using ModularMonolith.Shared.Domain.Attributes;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;

@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Extensions.Options;
-using ModularMonolith.Shared.BusinessLogic.Abstract;
+using ModularMonolith.Shared.Application.Abstract;
 using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Domain.Abstractions;
 using ModularMonolith.Shared.Infrastructure.Events.Options;

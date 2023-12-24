@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics;
 using ModularMonolith.Shared.Api.Models.Errors;
-using ModularMonolith.Shared.BusinessLogic.Exceptions;
+using ModularMonolith.Shared.Application.Exceptions;
 
 namespace ModularMonolith.Shared.Api.Exceptions;
 

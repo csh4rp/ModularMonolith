@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using ModularMonolith.Shared.BusinessLogic.Abstract;
+using ModularMonolith.Shared.Application.Abstract;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Factories;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Internal;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Options;

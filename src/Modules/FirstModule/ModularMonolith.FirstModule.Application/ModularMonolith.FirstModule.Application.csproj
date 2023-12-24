@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  
+  <ItemGroup>
+    <Reference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj" />
+    <ProjectReference Include="..\ModularMonolith.FirstModule.Contracts\ModularMonolith.FirstModule.Contracts.csproj" />
+    <ProjectReference Include="..\ModularMonolith.FirstModule.Domain\ModularMonolith.FirstModule.Domain.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+
+</Project>

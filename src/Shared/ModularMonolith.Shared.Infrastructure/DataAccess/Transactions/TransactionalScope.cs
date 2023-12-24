@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Shared.BusinessLogic.Abstract;
+using ModularMonolith.Shared.Application.Abstract;
 
 namespace ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
 

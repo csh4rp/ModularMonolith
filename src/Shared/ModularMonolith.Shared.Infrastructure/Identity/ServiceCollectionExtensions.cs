@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using ModularMonolith.Shared.BusinessLogic.Identity;
+using ModularMonolith.Shared.Application.Identity;
 
 namespace ModularMonolith.Shared.Infrastructure.Identity;
 

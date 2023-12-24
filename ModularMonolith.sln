@@ -10,15 +10,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{23D97A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{775CE607-1412-4AB7-AC27-6F5983ED2197}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.FirstModule.Domain", "src\Modules\FirstModule\ModularMonolith.Modules.FirstModule.Domain\ModularMonolith.Modules.FirstModule.Domain.csproj", "{BBAF6E32-FA5F-4916-9F22-AD58F95D2992}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.FirstModule.Domain", "src\Modules\FirstModule\ModularMonolith.FirstModule.Domain\ModularMonolith.FirstModule.Domain.csproj", "{BBAF6E32-FA5F-4916-9F22-AD58F95D2992}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FirstModule", "FirstModule", "{2E2598B1-7339-4E03-B452-7B9AF9937631}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.FirstModule.BusinessLogic", "src\Modules\FirstModule\ModularMonolith.Modules.FirstModule.BusinessLogic\ModularMonolith.Modules.FirstModule.BusinessLogic.csproj", "{EF8EF229-E23A-43C3-BA6B-28C04E909485}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.FirstModule.Application", "src\Modules\FirstModule\ModularMonolith.FirstModule.Application\ModularMonolith.FirstModule.Application.csproj", "{EF8EF229-E23A-43C3-BA6B-28C04E909485}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Contracts", "src\Shared\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj", "{AE9B90FA-0F23-4F56-BBF5-6B02F3D07EC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.BusinessLogic", "src\Shared\ModularMonolith.Shared.BusinessLogic\ModularMonolith.Shared.BusinessLogic.csproj", "{A05144C4-127D-4697-9B9C-263E04C11E49}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Application", "src\Shared\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj", "{A05144C4-127D-4697-9B9C-263E04C11E49}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Infrastructure", "src\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj", "{94E65B55-B084-43F0-B439-24A8E338D1BE}"
 EndProject
@@ -28,23 +28,23 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Core
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{282304E4-D50F-4AB3-8699-7CD18964EBF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Infrastructure.Tests.Integration", "tests\Shared\ModularMonolith.Shared.Infrastructure.Tests.Integration\ModularMonolith.Shared.Infrastructure.Tests.Integration.csproj", "{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Infrastructure.IntegrationTests", "tests\Shared\ModularMonolith.Shared.Infrastructure.IntegrationTests\ModularMonolith.Shared.Infrastructure.IntegrationTests.csproj", "{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Api", "src\Shared\ModularMonolith.Shared.Api\ModularMonolith.Shared.Api.csproj", "{298E5F9B-3D46-4A00-8D54-2FBD5B0B2E97}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Bootstrapper", "src\Bootstrapper\ModularMonolith.Bootstrapper\ModularMonolith.Bootstrapper.csproj", "{385F96E4-6FA3-49F4-97B5-CF2B47DF4BD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.FirstModule.Contracts", "src\Modules\FirstModule\ModularMonolith.Modules.FirstModule.Contracts\ModularMonolith.Modules.FirstModule.Contracts.csproj", "{344DC25C-7360-4D11-B3BF-837446937076}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.FirstModule.Contracts", "src\Modules\FirstModule\ModularMonolith.FirstModule.Contracts\ModularMonolith.FirstModule.Contracts.csproj", "{344DC25C-7360-4D11-B3BF-837446937076}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.FirstModule.Infrastructure", "src\Modules\FirstModule\ModularMonolith.Modules.FirstModule.Infrastructure\ModularMonolith.Modules.FirstModule.Infrastructure.csproj", "{075AED8F-5FC1-423B-8BF1-29BE4B1CF52B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.FirstModule.Infrastructure", "src\Modules\FirstModule\ModularMonolith.FirstModule.Infrastructure\ModularMonolith.FirstModule.Infrastructure.csproj", "{075AED8F-5FC1-423B-8BF1-29BE4B1CF52B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.FirstModule.Api", "src\Modules\FirstModule\ModularMonolith.Modules.FirstModule.Api\ModularMonolith.Modules.FirstModule.Api.csproj", "{05CDDFB0-A40B-4CD0-BF60-B3F64F840377}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.FirstModule.Api", "src\Modules\FirstModule\ModularMonolith.FirstModule.Api\ModularMonolith.FirstModule.Api.csproj", "{05CDDFB0-A40B-4CD0-BF60-B3F64F840377}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{4A7E2C58-0F4B-4084-8C03-204B8F58EAE7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FirstModule", "FirstModule", "{AB6EC38A-288E-4BB3-AD7E-2E652B04A145}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.FirstModule.BusinessLogic.Tests.Unit", "tests\Modules\FirstModule\ModularMonolith.Modules.FirstModule.BusinessLogic.Tests.Unit\ModularMonolith.Modules.FirstModule.BusinessLogic.Tests.Unit.csproj", "{33DF7DDB-C87C-49EF-9DF4-EEF505E0986B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.FirstModule.Application.UnitTests", "tests\Modules\FirstModule\ModularMonolith.FirstModule.Application.UnitTests\ModularMonolith.FirstModule.Application.UnitTests.csproj", "{33DF7DDB-C87C-49EF-9DF4-EEF505E0986B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{B93D64D5-80C4-48EB-B938-10E66BA5A7E0}"
 EndProject
@@ -62,23 +62,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{1655
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Migrations", "src\Shared\ModularMonolith.Shared.Migrations\ModularMonolith.Shared.Migrations.csproj", "{98F0EF2A-4399-417C-B624-743D407D1885}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.FirstModule.Migrations", "src\Modules\FirstModule\ModularMonolith.Modules.FirstModule.Migrations\ModularMonolith.Modules.FirstModule.Migrations.csproj", "{E16F9EF7-00FE-47CD-BA0A-F1C4B46D7565}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.FirstModule.Migrations", "src\Modules\FirstModule\ModularMonolith.FirstModule.Migrations\ModularMonolith.FirstModule.Migrations.csproj", "{E16F9EF7-00FE-47CD-BA0A-F1C4B46D7565}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{FAC7DF74-47D5-4F61-8446-5940C54A2BBE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.Identity.Domain", "src\Modules\Identity\ModularMonolith.Modules.Identity.Domain\ModularMonolith.Modules.Identity.Domain.csproj", "{7EF4ACE0-3517-4C22-9E4E-2F9293400D4A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Identity.Domain", "src\Modules\Identity\ModularMonolith.Identity.Domain\ModularMonolith.Identity.Domain.csproj", "{7EF4ACE0-3517-4C22-9E4E-2F9293400D4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.Identity.Contracts", "src\Modules\Identity\ModularMonolith.Modules.Identity.Contracts\ModularMonolith.Modules.Identity.Contracts.csproj", "{DB02FA02-59B6-46DA-A291-935D43C3B381}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Identity.Contracts", "src\Modules\Identity\ModularMonolith.Identity.Contracts\ModularMonolith.Identity.Contracts.csproj", "{DB02FA02-59B6-46DA-A291-935D43C3B381}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.Identity.BusinessLogic", "src\Modules\Identity\ModularMonolith.Modules.Identity.BusinessLogic\ModularMonolith.Modules.Identity.BusinessLogic.csproj", "{2287D46C-3D1A-4948-BE63-14C0758200C1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Identity.Application", "src\Modules\Identity\ModularMonolith.Identity.Application\ModularMonolith.Identity.Application.csproj", "{2287D46C-3D1A-4948-BE63-14C0758200C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.Identity.Infrastructure", "src\Modules\Identity\ModularMonolith.Modules.Identity.Infrastructure\ModularMonolith.Modules.Identity.Infrastructure.csproj", "{23B3D575-B275-42EE-9B40-516FA02B7F95}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Identity.Infrastructure", "src\Modules\Identity\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj", "{23B3D575-B275-42EE-9B40-516FA02B7F95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.Identity.Migrations", "src\Modules\Identity\ModularMonolith.Modules.Identity.Migrations\ModularMonolith.Modules.Identity.Migrations.csproj", "{EF58FEB8-5C09-4A96-BE07-41F8B6049D1D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Identity.Migrations", "src\Modules\Identity\ModularMonolith.Identity.Migrations\ModularMonolith.Identity.Migrations.csproj", "{EF58FEB8-5C09-4A96-BE07-41F8B6049D1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.Identity.Api", "src\Modules\Identity\ModularMonolith.Modules.Identity.Api\ModularMonolith.Modules.Identity.Api.csproj", "{07B5331C-885A-45FD-A4FA-5C909B3994AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Identity.Api", "src\Modules\Identity\ModularMonolith.Identity.Api\ModularMonolith.Identity.Api.csproj", "{07B5331C-885A-45FD-A4FA-5C909B3994AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Modules.Identity.Core", "src\Modules\Identity\ModularMonolith.Modules.Identity.Core\ModularMonolith.Modules.Identity.Core.csproj", "{15293147-AB68-4047-8507-5C2988101967}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Identity.Core", "src\Modules\Identity\ModularMonolith.Identity.Core\ModularMonolith.Identity.Core.csproj", "{15293147-AB68-4047-8507-5C2988101967}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
