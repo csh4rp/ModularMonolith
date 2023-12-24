@@ -25,6 +25,7 @@ internal sealed class InternalDbContext : BaseDbContext, IEventLogDbContext
         modelBuilder.ApplyConfiguration(new EventCorrelationLockEntityTypeConfiguration(false))
             .ApplyConfiguration(new EventLogLockEntityTypeConfiguration(false))
             .ApplyConfiguration(new EventLogEntityTypeConfiguration(false))
+            .ApplyConfiguration(new EventLogPublishAttemptEntityTypeConfiguration(false))
             .ApplyConfiguration(new AuditLogEntityTypeConfiguration(false));
 
         modelBuilder.HasDefaultSchema("shared");

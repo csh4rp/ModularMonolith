@@ -10,8 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\Modules\FirstModule\ModularMonolith.FirstModule.Application\ModularMonolith.FirstModule.Application.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Modules\FirstModule\ModularMonolith.FirstModule.Infrastructure\ModularMonolith.FirstModule.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Modules\FirstModule\ModularMonolith.FirstModule.Application\ModularMonolith.FirstModule.Application.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Modules\FirstModule\ModularMonolith.FirstModule.Infrastructure\ModularMonolith.FirstModule.Infrastructure.csproj"/>
   </ItemGroup>
 
 

@@ -21,7 +21,8 @@ internal sealed class SignInCommandHandler : ICommandHandler<SignInCommand, Sign
     private readonly IOptions<AuthOptions> _options;
     private readonly TimeProvider _timeProvider;
 
-    public SignInCommandHandler(UserManager<User> userManager, IEventBus eventBus, IOptions<AuthOptions> options, TimeProvider timeProvider)
+    public SignInCommandHandler(UserManager<User> userManager, IEventBus eventBus, IOptions<AuthOptions> options,
+        TimeProvider timeProvider)
     {
         _userManager = userManager;
         _eventBus = eventBus;
@@ -41,27 +42,24 @@ internal sealed class SignInCommandHandler : ICommandHandler<SignInCommand, Sign
         if (!isPasswordValid)
         {
             await _eventBus.PublishAsync(new SignInFailed(user.Id), cancellationToken);
-            
+
             return SignInResponse.InvalidCredentials();
         }
 
         var options = _options.Value;
-        
+
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Key));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.NameIdentifier,user.UserName!),
-        };
+        var claims = new[] { new Claim(ClaimTypes.NameIdentifier, user.UserName!) };
 
         var expirationTime = _timeProvider.GetUtcNow().AddMinutes(options.ExpirationTimeInMinutes);
-        
+
         var token = new JwtSecurityToken(options.Issuer,
             options.Audience,
             claims,
             expires: expirationTime.UtcDateTime,
             signingCredentials: credentials);
-        
+
         var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
 
         await _eventBus.PublishAsync(new SignInSucceeded(user.Id), cancellationToken);

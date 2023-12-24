@@ -3,9 +3,9 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
   </PropertyGroup>
-  
+
   <ItemGroup>
-    <ProjectReference Include="..\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj" />
+    <ProjectReference Include="..\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
     <ProjectReference Include="..\ModularMonolith.Shared.Core\ModularMonolith.Shared.Core.csproj"/>
   </ItemGroup>
 

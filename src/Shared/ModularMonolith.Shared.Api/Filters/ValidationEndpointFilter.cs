@@ -34,15 +34,15 @@ internal sealed class ValidationEndpointFilter<TModel> : IEndpointFilter
         {
             return await next(context);
         }
-        
-        _logger.LogTrace("Validation failed for: '{Path}' for model: '{Model}'", 
+
+        _logger.LogTrace("Validation failed for: '{Path}' for model: '{Model}'",
             context.HttpContext.Request.Path,
             typeof(TModel).FullName);
 
         var errors = validationResult.Errors.Select(e =>
         {
             var codeMapped = ErrorCodeMapper.TryMap(e.ErrorCode, out var errorCode);
-            
+
             return new PropertyError
             {
                 PropertyName = char.ToLower(e.PropertyName[0]) + e.PropertyName[1..],

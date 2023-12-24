@@ -17,7 +17,7 @@ public class PropertyError
         Message = $"Item with {propertyName} equal to {parameter} already exists",
         Parameter = parameter
     };
-    
+
     public static PropertyError InvalidArgument(string propertyName, object? parameter) => new()
     {
         PropertyName = propertyName,
@@ -25,5 +25,4 @@ public class PropertyError
         Message = $"Value for  {propertyName} is invalid",
         Parameter = parameter
     };
-
 }

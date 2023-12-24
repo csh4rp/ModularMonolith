@@ -14,11 +14,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\tests\Modules\FirstModule\ModularMonolith.FirstModule.Application.UnitTests\ModularMonolith.FirstModule.Application.UnitTests.csproj" />
+    <ProjectReference Include="..\..\..\..\tests\Modules\FirstModule\ModularMonolith.FirstModule.Application.UnitTests\ModularMonolith.FirstModule.Application.UnitTests.csproj"/>
     <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Api\ModularMonolith.Shared.Api.csproj"/>
-    <ProjectReference Include="..\ModularMonolith.FirstModule.Application\ModularMonolith.FirstModule.Application.csproj" />
-    <ProjectReference Include="..\ModularMonolith.FirstModule.Domain\ModularMonolith.FirstModule.Domain.csproj" />
-    <ProjectReference Include="..\ModularMonolith.FirstModule.Infrastructure\ModularMonolith.FirstModule.Infrastructure.csproj" />
+    <ProjectReference Include="..\ModularMonolith.FirstModule.Application\ModularMonolith.FirstModule.Application.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.FirstModule.Domain\ModularMonolith.FirstModule.Domain.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.FirstModule.Infrastructure\ModularMonolith.FirstModule.Infrastructure.csproj"/>
   </ItemGroup>
 
 </Project>

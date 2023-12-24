@@ -10,7 +10,8 @@ internal sealed class EventLogPublishAttemptEntityTypeConfiguration : IEntityTyp
     private readonly string _table;
     private readonly string? _schema;
 
-    public EventLogPublishAttemptEntityTypeConfiguration(bool excludeFromMigrations, string table = "event_log_publish_attempt",
+    public EventLogPublishAttemptEntityTypeConfiguration(bool excludeFromMigrations,
+        string table = "event_log_publish_attempt",
         string? schema = null)
     {
         _excludeFromMigrations = excludeFromMigrations;
@@ -29,6 +30,6 @@ internal sealed class EventLogPublishAttemptEntityTypeConfiguration : IEntityTyp
             builder.ToTable(_table, _schema);
         }
 
-        builder.HasKey(b => new {b.EventLogId, b.AttemptNumber});
+        builder.HasKey(b => new { b.EventLogId, b.AttemptNumber });
     }
 }

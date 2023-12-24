@@ -7,7 +7,7 @@ public sealed class EventLog
     public required DateTimeOffset CreatedAt { get; init; }
 
     public DateTimeOffset? PublishedAt { get; init; }
-    
+
     public Guid? UserId { get; init; }
 
     public required Guid? CorrelationId { get; init; }
@@ -21,8 +21,8 @@ public sealed class EventLog
     public required string OperationName { get; init; }
 
     public required string ActivityId { get; init; }
-    
+
     public required string? IpAddress { get; init; }
-    
+
     public required string? UserAgent { get; init; }
 }

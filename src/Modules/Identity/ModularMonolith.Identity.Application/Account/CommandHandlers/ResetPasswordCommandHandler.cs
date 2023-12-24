@@ -15,8 +15,9 @@ internal sealed class ResetPasswordCommandHandler : ICommandHandler<ResetPasswor
     private readonly UserManager<User> _userManager;
     private readonly IEventBus _eventBus;
     private readonly ILogger<ResetPasswordCommandHandler> _logger;
-    
-    public ResetPasswordCommandHandler(UserManager<User> userManager, IEventBus eventBus, ILogger<ResetPasswordCommandHandler> logger)
+
+    public ResetPasswordCommandHandler(UserManager<User> userManager, IEventBus eventBus,
+        ILogger<ResetPasswordCommandHandler> logger)
     {
         _userManager = userManager;
         _eventBus = eventBus;
@@ -34,7 +35,7 @@ internal sealed class ResetPasswordCommandHandler : ICommandHandler<ResetPasswor
         {
             _logger.LogWarning("An attempt was made to reset password for user with ID: {UserId} using invalid token",
                 user.Id);
-            
+
             throw new ValidationException(PropertyError.InvalidArgument(
                 nameof(ResetPasswordCommand.Token), request.Token));
         }

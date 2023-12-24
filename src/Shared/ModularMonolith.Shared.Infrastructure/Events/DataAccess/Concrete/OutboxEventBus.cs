@@ -46,7 +46,7 @@ internal sealed class OutboxEventBus : IEventBus
 
         var remoteIpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
         var userAgent = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent;
-        
+
         var eventLog = new EventLog
         {
             CreatedAt = _timeProvider.GetUtcNow(),
@@ -80,7 +80,7 @@ internal sealed class OutboxEventBus : IEventBus
     {
         var currentActivity = Activity.Current;
         Debug.Assert(currentActivity is not null);
-        
+
         var remoteIpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
         var userAgent = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent;
 

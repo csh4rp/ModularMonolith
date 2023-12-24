@@ -196,9 +196,9 @@ internal sealed class EventReader : IEventReader
         deleteAttemptsCommand.Parameters.AddWithValue("@event_log_id", eventInfo.EventLogId);
         deleteAttemptsCommand.CommandText =
             $"""
-            DELETE FROM {eventLogPublishAttemptMetaData.TableName}
-            WHERE {eventLogPublishAttemptMetaData.EventLogIdColumnName} = @event_log_id;
-            """;
+             DELETE FROM {eventLogPublishAttemptMetaData.TableName}
+             WHERE {eventLogPublishAttemptMetaData.EventLogIdColumnName} = @event_log_id;
+             """;
 
         var markAsPublishedCommand = batch.CreateBatchCommand();
         markAsPublishedCommand.Parameters.AddWithValue("@id", eventInfo.EventLogId);

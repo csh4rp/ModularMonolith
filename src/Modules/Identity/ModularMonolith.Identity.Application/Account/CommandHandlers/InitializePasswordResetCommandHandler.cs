@@ -14,9 +14,9 @@ internal sealed class InitializePasswordResetCommandHandler : ICommandHandler<In
     private readonly UserManager<User> _userManager;
     private readonly IEventBus _eventBus;
     private readonly ILogger<InitializePasswordResetCommandHandler> _logger;
-    
+
     public InitializePasswordResetCommandHandler(UserManager<User> userManager,
-        IEventBus eventBus, 
+        IEventBus eventBus,
         ILogger<InitializePasswordResetCommandHandler> logger)
     {
         _userManager = userManager;
@@ -32,11 +32,11 @@ internal sealed class InitializePasswordResetCommandHandler : ICommandHandler<In
             .Where(u => u.NormalizedEmail == normalizedEmail)
             .Select(u => u.Id)
             .SingleOrDefaultAsync(cancellationToken);
-        
+
         if (userId == default)
         {
             _logger.LogWarning("Password reset initialized for not existing user");
-            
+
             return;
         }
 

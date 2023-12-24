@@ -2,5 +2,5 @@
 
 namespace ModularMonolith.Identity.Contracts.Account.Commands;
 
-public sealed record ChangePasswordCommand(string CurrentPassword, string NewPassword, string NewPasswordConfirmed) : ICommand;
-
+public sealed record ChangePasswordCommand(string CurrentPassword, string NewPassword, string NewPasswordConfirmed)
+    : ICommand;

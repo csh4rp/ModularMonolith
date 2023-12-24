@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj" />
-      <ProjectReference Include="..\ModularMonolith.Identity.Contracts\ModularMonolith.Identity.Contracts.csproj" />
-      <ProjectReference Include="..\ModularMonolith.Identity.Core\ModularMonolith.Identity.Core.csproj" />
-      <ProjectReference Include="..\ModularMonolith.Identity.Domain\ModularMonolith.Identity.Domain.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Identity.Contracts\ModularMonolith.Identity.Contracts.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Identity.Core\ModularMonolith.Identity.Core.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Identity.Domain\ModularMonolith.Identity.Domain.csproj"/>
+  </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.Extensions.Identity.Core" />
-    <Reference Include="Microsoft.IdentityModel.Tokens" />
-    <Reference Include="System.IdentityModel.Tokens.Jwt" />
+    <Reference Include="Microsoft.Extensions.Identity.Core"/>
+    <Reference Include="Microsoft.IdentityModel.Tokens"/>
+    <Reference Include="System.IdentityModel.Tokens.Jwt"/>
   </ItemGroup>
 
 </Project>

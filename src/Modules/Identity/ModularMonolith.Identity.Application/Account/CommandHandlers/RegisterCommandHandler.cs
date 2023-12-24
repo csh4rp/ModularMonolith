@@ -22,17 +22,18 @@ internal sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand>
         _userManager = userManager;
         _eventBus = eventBus;
     }
-    
+
     public async Task Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         var normalizedEmail = _userManager.NormalizeEmail(request.Email);
 
-        var emailExists = await _userManager.Users.AnyAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
+        var emailExists =
+            await _userManager.Users.AnyAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
         if (emailExists)
         {
             throw new ValidationException(PropertyError.NotUnique(nameof(RegisterCommand.Email), request.Email));
         }
-        
+
         var user = new User { UserName = request.Email, Email = request.Email };
 
         var result = await _userManager.CreateAsync(user, request.Password);

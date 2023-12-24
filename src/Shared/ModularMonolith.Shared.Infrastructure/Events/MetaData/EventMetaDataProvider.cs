@@ -21,7 +21,7 @@ internal sealed class EventMetaDataProvider
     public EventLogCorrelationLockMetaData EventLogCorrelationLockMetaData { get; }
 
     public EventLogPublishAttemptMetaData EventLogPublishAttemptMetaData { get; }
-    
+
     private static EventLogMetaData CreateEventLogMetaData(IServiceProvider serviceProvider)
     {
         using var dbContext = serviceProvider.GetRequiredService<IEventLogDbContext>();
@@ -77,7 +77,7 @@ internal sealed class EventMetaDataProvider
             AcquiredAtColumnName = entity.FindProperty(nameof(EventCorrelationLock.AcquiredAt))!.GetColumnName()
         };
     }
-    
+
     private static EventLogPublishAttemptMetaData CreateEventLogPublishAttemptMetaData(IServiceProvider serviceProvider)
     {
         using var dbContext = serviceProvider.GetRequiredService<IEventLogDbContext>();
@@ -89,8 +89,10 @@ internal sealed class EventMetaDataProvider
         {
             TableName = entity.GetTableName()!,
             EventLogIdColumnName = entity.FindProperty(nameof(EventLogPublishAttempt.EventLogId))!.GetColumnName(),
-            AttemptNumberColumnName = entity.FindProperty(nameof(EventLogPublishAttempt.AttemptNumber))!.GetColumnName(),
-            NextAttemptAtColumnName = entity.FindProperty(nameof(EventLogPublishAttempt.NextAttemptAt))!.GetColumnName()
+            AttemptNumberColumnName =
+                entity.FindProperty(nameof(EventLogPublishAttempt.AttemptNumber))!.GetColumnName(),
+            NextAttemptAtColumnName =
+                entity.FindProperty(nameof(EventLogPublishAttempt.NextAttemptAt))!.GetColumnName()
         };
     }
 }

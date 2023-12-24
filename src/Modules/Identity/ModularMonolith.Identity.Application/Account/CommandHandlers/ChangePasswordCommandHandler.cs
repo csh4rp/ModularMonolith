@@ -14,7 +14,8 @@ internal sealed class ChangePasswordCommandHandler : ICommandHandler<ChangePassw
     private readonly IIdentityContextAccessor _identityContextAccessor;
     private readonly IEventBus _eventBus;
 
-    public ChangePasswordCommandHandler(UserManager<User> userManager, IIdentityContextAccessor identityContextAccessor, IEventBus eventBus)
+    public ChangePasswordCommandHandler(UserManager<User> userManager, IIdentityContextAccessor identityContextAccessor,
+        IEventBus eventBus)
     {
         _userManager = userManager;
         _identityContextAccessor = identityContextAccessor;
