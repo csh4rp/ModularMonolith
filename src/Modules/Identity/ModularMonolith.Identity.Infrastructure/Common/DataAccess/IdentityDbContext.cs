@@ -1,13 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Identity.Domain.Users.Entities;
-using ModularMonolith.Identity.Infrastructure.Users.DataAccess.EntityConfigurations;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
 
-namespace ModularMonolith.Identity.Infrastructure.Users.DataAccess;
+namespace ModularMonolith.Identity.Infrastructure.Common.DataAccess;
 
-internal sealed class UserDbContext : BaseDbContext
+internal sealed class IdentityDbContext : BaseDbContext
 {
-    public UserDbContext(DbContextOptions options) : base(options)
+    public IdentityDbContext(DbContextOptions options) : base(options)
     {
     }
 
@@ -17,7 +16,7 @@ internal sealed class UserDbContext : BaseDbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyConfiguration(new UserEntityTypeConfiguration());
+        modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
 
         modelBuilder.HasDefaultSchema("identity");
     }

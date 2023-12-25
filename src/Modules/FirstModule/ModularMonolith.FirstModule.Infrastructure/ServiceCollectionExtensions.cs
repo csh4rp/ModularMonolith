@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using ModularMonolith.FirstModule.Application.Categories.Abstract;
 using ModularMonolith.FirstModule.Infrastructure.Categories.DataAccess;
+using ModularMonolith.FirstModule.Infrastructure.Common;
+using ModularMonolith.FirstModule.Infrastructure.Common.DataAccess;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Options;
 
 [assembly: InternalsVisibleTo("ModularMonolith.FirstModule.Application.UnitTests")]
@@ -15,7 +17,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddDbContextFactory<CategoryDbContext>((sp, opt) =>
+        serviceCollection.AddDbContextFactory<FirstModuleDbContext>((sp, opt) =>
         {
             var options = sp.GetRequiredService<IOptions<DatabaseOptions>>();
 
@@ -23,7 +25,7 @@ public static class ServiceCollectionExtensions
             opt.UseSnakeCaseNamingConvention();
         });
 
-        serviceCollection.AddScoped<ICategoryDatabase>(sp => sp.GetRequiredService<CategoryDbContext>());
+        serviceCollection.AddScoped<ICategoryDatabase>(sp => sp.GetRequiredService<FirstModuleDbContext>());
 
         return serviceCollection;
     }

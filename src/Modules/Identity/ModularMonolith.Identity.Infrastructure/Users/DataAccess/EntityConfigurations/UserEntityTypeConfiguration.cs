@@ -10,15 +10,7 @@ internal sealed class UserEntityTypeConfiguration : IEntityTypeConfiguration<Use
     {
         builder.ToTable("user");
 
-        builder.HasKey(x => x.Id);
-
-        builder.Property(b => b.Email)
-            .IsRequired()
-            .HasMaxLength(128);
-
-        builder.Property(b => b.NormalizedEmail)
-            .IsRequired()
-            .HasMaxLength(128);
+        builder.HasKey(b => b.Id);
 
         builder.Property(b => b.UserName)
             .IsRequired()
@@ -27,10 +19,28 @@ internal sealed class UserEntityTypeConfiguration : IEntityTypeConfiguration<Use
         builder.Property(b => b.NormalizedUserName)
             .IsRequired()
             .HasMaxLength(128);
+        
+        builder.Property(b => b.Email)
+            .IsRequired()
+            .HasMaxLength(128);
+        
+        builder.Property(b => b.NormalizedEmail)
+            .IsRequired()
+            .HasMaxLength(128);
+
+        builder.Property(b => b.ConcurrencyStamp)
+            .IsRequired()
+            .HasMaxLength(64)
+            .IsConcurrencyToken();
+
+        builder.Property(b => b.PhoneNumber)
+            .HasMaxLength(64);
 
         builder.Property(b => b.PasswordHash)
-            .HasMaxLength(512);
-
-        builder.HasIndex(b => b.NormalizedEmail);
+            .HasMaxLength(256);
+        
+        builder.HasIndex(b => b.NormalizedEmail).IsUnique();
+        
+        builder.HasIndex(b => b.NormalizedUserName).IsUnique();
     }
 }

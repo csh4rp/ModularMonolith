@@ -4,6 +4,8 @@ using ModularMonolith.FirstModule.Application.Categories.CommandHandlers;
 using ModularMonolith.FirstModule.Contracts.Categories.Commands;
 using ModularMonolith.FirstModule.Domain.Entities;
 using ModularMonolith.FirstModule.Infrastructure.Categories.DataAccess;
+using ModularMonolith.FirstModule.Infrastructure.Common;
+using ModularMonolith.FirstModule.Infrastructure.Common.DataAccess;
 using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts.Errors;
 using Xunit;
@@ -57,15 +59,15 @@ public class CreateCategoryCommandHandlerTests
         exceptionAssertion.And.Errors.Should().BeEquivalentTo(expectedErrors);
     }
 
-    private static CategoryDbContext CreateDatabase()
+    private static FirstModuleDbContext CreateDatabase()
     {
-        var optionsBuilder = new DbContextOptionsBuilder<CategoryDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<FirstModuleDbContext>();
 
         optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString(), opt =>
         {
             opt.EnableNullChecks();
         });
 
-        return new CategoryDbContext(optionsBuilder.Options);
+        return new FirstModuleDbContext(optionsBuilder.Options);
     }
 }

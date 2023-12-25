@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.FirstModule.Contracts.Categories.Queries;
 using ModularMonolith.FirstModule.Contracts.Categories.Responses;
+using ModularMonolith.FirstModule.Infrastructure.Common;
+using ModularMonolith.FirstModule.Infrastructure.Common.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Queries;
 
 namespace ModularMonolith.FirstModule.Infrastructure.Categories.DataAccess.QueryHandlers;
@@ -8,9 +10,9 @@ namespace ModularMonolith.FirstModule.Infrastructure.Categories.DataAccess.Query
 internal sealed class GetCategoryDetailsByIdQueryHandler
     : IQueryHandler<GetCategoryDetailsByIdQuery, CategoryDetailsResponse?>
 {
-    private readonly CategoryDbContext _dbContext;
+    private readonly FirstModuleDbContext _dbContext;
 
-    public GetCategoryDetailsByIdQueryHandler(CategoryDbContext dbContext) => _dbContext = dbContext;
+    public GetCategoryDetailsByIdQueryHandler(FirstModuleDbContext dbContext) => _dbContext = dbContext;
 
     public Task<CategoryDetailsResponse?> Handle(GetCategoryDetailsByIdQuery request,
         CancellationToken cancellationToken) =>

@@ -8,5 +8,5 @@ public sealed class InvalidCredentialsException : AppException
     {
     }
 
-    public override string Code => "INVLID_CREDENTIALS";
+    public override string Code => "INVALID_CREDENTIALS";
 }

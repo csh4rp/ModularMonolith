@@ -1,6 +1,8 @@
 ﻿using ModularMonolith.FirstModule.Contracts.Categories.Models;
 using ModularMonolith.FirstModule.Contracts.Categories.Queries;
 using ModularMonolith.FirstModule.Contracts.Categories.Responses;
+using ModularMonolith.FirstModule.Infrastructure.Common;
+using ModularMonolith.FirstModule.Infrastructure.Common.DataAccess;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Extensions;
 using ModularMonolith.Shared.Infrastructure.Queries;
 using Z.EntityFramework.Plus;
@@ -9,9 +11,9 @@ namespace ModularMonolith.FirstModule.Infrastructure.Categories.DataAccess.Query
 
 internal sealed class FindCategoriesQueryHandler : IQueryHandler<FindCategoriesQuery, CategoriesResponse>
 {
-    private readonly CategoryDbContext _dbContext;
+    private readonly FirstModuleDbContext _dbContext;
 
-    public FindCategoriesQueryHandler(CategoryDbContext dbContext) => _dbContext = dbContext;
+    public FindCategoriesQueryHandler(FirstModuleDbContext dbContext) => _dbContext = dbContext;
 
     public async Task<CategoriesResponse> Handle(FindCategoriesQuery request, CancellationToken cancellationToken)
     {

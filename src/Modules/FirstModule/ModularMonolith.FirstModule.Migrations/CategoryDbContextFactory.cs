@@ -1,14 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using ModularMonolith.FirstModule.Infrastructure.Categories.DataAccess;
+using ModularMonolith.FirstModule.Infrastructure.Common;
+using ModularMonolith.FirstModule.Infrastructure.Common.DataAccess;
 
 namespace ModularMonolith.FirstModule.Migrations;
 
-internal sealed class CategoryDbContextFactory : IDesignTimeDbContextFactory<CategoryDbContext>
+internal sealed class CategoryDbContextFactory : IDesignTimeDbContextFactory<FirstModuleDbContext>
 {
-    public CategoryDbContext CreateDbContext(string[] args)
+    public FirstModuleDbContext CreateDbContext(string[] args)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<CategoryDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<FirstModuleDbContext>();
 
         optionsBuilder.UseNpgsql(args[0], b =>
             {
@@ -18,6 +20,6 @@ internal sealed class CategoryDbContextFactory : IDesignTimeDbContextFactory<Cat
 
         var options = optionsBuilder.Options;
 
-        return new CategoryDbContext(options);
+        return new FirstModuleDbContext(options);
     }
 }
