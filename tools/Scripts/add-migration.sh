@@ -1,12 +1,12 @@
 #!/bin/bash
 
-contexts=("InternalDbContext" "FirstModuleDbContext")
+contexts=("SharedDbContext" "FirstModuleDbContext")
 
 connection_strings=("User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;" \
   "User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;")
 
 projects=("../../src/Shared/ModularMonolith.Shared.Migrations" \
-  "../../src/Modules/FirstModule/ModularMonolith.Modules.FirstModule.Migrations")
+  "../../src/Modules/FirstModule/ModularMonolith.FirstModule.Migrations")
 
 index=-1
 
@@ -16,8 +16,11 @@ for (( i=0; i < "$length"; i++ ));
 do
   cnx="${contexts[$i]}"
   
+  echo "$cnx"
+  
   if [[ $cnx -eq $1 ]]; then
     index=$i
+    break;
   fi
 done
 
@@ -25,7 +28,7 @@ if [[ $index == -1 ]]; then
   echo Context: "$1" was not found
 else
 
-  echo Addding migration: "$2" for context: "${contexts[$index]}"
+  echo Adding migration: "$2" for context: "${contexts[$index]}"
   
   dotnet ef migrations add \
     --context "$1" \

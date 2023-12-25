@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <OutputType>library</OutputType>
+    <OutputType>exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,6 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="FluentValidation.DependencyInjectionExtensions">
+      <HintPath>..\..\..\..\..\..\..\.nuget\packages\fluentvalidation.dependencyinjectionextensions\11.8.1\lib\netstandard2.1\FluentValidation.DependencyInjectionExtensions.dll</HintPath>
+    </Reference>
     <Reference Include="MediatR">
     </Reference>
   </ItemGroup>

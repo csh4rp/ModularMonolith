@@ -23,9 +23,8 @@ builder.Services.AddEvents(e =>
     e.Assemblies = [.. assemblies];
 });
 
-builder.Services.AddIdentity()
+builder.Services.AddIdentityServices()
     .AddSingleton(TimeProvider.System);
-
 
 builder.Services.AddDataAccess(c =>
 {

@@ -57,15 +57,15 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     published_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    next_attempt_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    attempt_number = table.Column<int>(type: "integer", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: true),
                     correlation_id = table.Column<Guid>(type: "uuid", nullable: true),
                     type = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
                     payload = table.Column<string>(type: "jsonb", nullable: false),
                     operation_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    activity_id = table.Column<string>(type: "character varying(32)", unicode: false, maxLength: 32, nullable: false)
+                    activity_id = table.Column<string>(type: "character varying(32)", unicode: false, maxLength: 32, nullable: false),
+                    ip_address = table.Column<string>(type: "text", nullable: true),
+                    user_agent = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -83,6 +83,20 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_event_log_lock", x => x.event_log_id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "event_log_publish_attempt",
+                schema: "shared",
+                columns: table => new
+                {
+                    event_log_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    attempt_number = table.Column<int>(type: "integer", nullable: false),
+                    next_attempt_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_event_log_publish_attempt", x => new { x.event_log_id, x.attempt_number });
                 });
 
             migrationBuilder.CreateIndex(
@@ -147,6 +161,10 @@ namespace ModularMonolith.Shared.Migrations.Migrations
 
             migrationBuilder.DropTable(
                 name: "event_log_lock",
+                schema: "shared");
+
+            migrationBuilder.DropTable(
+                name: "event_log_publish_attempt",
                 schema: "shared");
         }
     }

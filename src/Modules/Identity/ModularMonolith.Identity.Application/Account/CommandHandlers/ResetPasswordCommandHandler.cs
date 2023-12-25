@@ -30,14 +30,14 @@ internal sealed class ResetPasswordCommandHandler : ICommandHandler<ResetPasswor
                    ?? throw new ValidationException(PropertyError.InvalidArgument(
                        nameof(ResetPasswordCommand.UserId), request.UserId));
 
-        var result = await _userManager.ResetPasswordAsync(user, request.Token, request.Password);
+        var result = await _userManager.ResetPasswordAsync(user, request.ResetPasswordToken, request.Password);
         if (!result.Succeeded)
         {
             _logger.LogWarning("An attempt was made to reset password for user with ID: {UserId} using invalid token",
                 user.Id);
 
             throw new ValidationException(PropertyError.InvalidArgument(
-                nameof(ResetPasswordCommand.Token), request.Token));
+                nameof(ResetPasswordCommand.ResetPasswordToken), request.ResetPasswordToken));
         }
 
         await _eventBus.PublishAsync(new PasswordReset(user.Id), cancellationToken);

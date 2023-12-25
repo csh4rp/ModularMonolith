@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="EFCore.NamingConventions"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">

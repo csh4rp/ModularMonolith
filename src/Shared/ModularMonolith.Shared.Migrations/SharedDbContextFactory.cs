@@ -4,11 +4,11 @@ using ModularMonolith.Shared.Infrastructure.DataAccess.Internal;
 
 namespace ModularMonolith.Shared.Migrations;
 
-internal sealed class DbContextFactory : IDesignTimeDbContextFactory<InternalDbContext>
+public sealed class SharedDbContextFactory : IDesignTimeDbContextFactory<SharedDbContext>
 {
-    public InternalDbContext CreateDbContext(string[] args)
+    public SharedDbContext CreateDbContext(string[] args)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<InternalDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<SharedDbContext>();
 
         optionsBuilder.UseNpgsql(args[0], b =>
             {
@@ -18,6 +18,6 @@ internal sealed class DbContextFactory : IDesignTimeDbContextFactory<InternalDbC
 
         var options = optionsBuilder.Options;
 
-        return new InternalDbContext(options);
+        return new SharedDbContext(options);
     }
 }

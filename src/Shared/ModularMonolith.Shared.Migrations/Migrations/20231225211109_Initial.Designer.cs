@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ModularMonolith.Shared.Domain.ValueObjects;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Internal;
@@ -12,10 +13,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace ModularMonolith.Shared.Migrations.Migrations
 {
-    [DbContext(typeof(InternalDbContext))]
-    partial class InternalDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(SharedDbContext))]
+    [Migration("20231225211109_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,10 +117,6 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                         .HasColumnType("character varying(32)")
                         .HasColumnName("activity_id");
 
-                    b.Property<int>("AttemptNumber")
-                        .HasColumnType("integer")
-                        .HasColumnName("attempt_number");
-
                     b.Property<Guid?>("CorrelationId")
                         .HasColumnType("uuid")
                         .HasColumnName("correlation_id");
@@ -126,14 +125,14 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("text")
+                        .HasColumnName("ip_address");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
-
-                    b.Property<DateTimeOffset?>("NextAttemptAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("next_attempt_at");
 
                     b.Property<string>("OperationName")
                         .IsRequired()
@@ -155,6 +154,10 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)")
                         .HasColumnName("type");
+
+                    b.Property<string>("UserAgent")
+                        .HasColumnType("text")
+                        .HasColumnName("user_agent");
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uuid")
@@ -191,6 +194,26 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                         .HasName("pk_event_log_lock");
 
                     b.ToTable("event_log_lock", "shared");
+                });
+
+            modelBuilder.Entity("ModularMonolith.Shared.Domain.Entities.EventLogPublishAttempt", b =>
+                {
+                    b.Property<Guid>("EventLogId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("event_log_id");
+
+                    b.Property<int>("AttemptNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempt_number");
+
+                    b.Property<DateTimeOffset>("NextAttemptAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("next_attempt_at");
+
+                    b.HasKey("EventLogId", "AttemptNumber")
+                        .HasName("pk_event_log_publish_attempt");
+
+                    b.ToTable("event_log_publish_attempt", "shared");
                 });
 #pragma warning restore 612, 618
         }

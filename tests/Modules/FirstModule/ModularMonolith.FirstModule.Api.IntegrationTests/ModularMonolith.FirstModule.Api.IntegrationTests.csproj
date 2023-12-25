@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="EFCore.NamingConventions"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+        <PackageReference Include="Respawn"/>
+        <PackageReference Include="Respawn.Postgres"/>
+        <PackageReference Include="Testcontainers.PostgreSql"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\..\src\Modules\FirstModule\ModularMonolith.FirstModule.Api\ModularMonolith.FirstModule.Api.csproj" />
+      <ProjectReference Include="..\..\..\..\src\Modules\FirstModule\ModularMonolith.FirstModule.Migrations\ModularMonolith.FirstModule.Migrations.csproj" />
+      <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Migrations\ModularMonolith.Identity.Migrations.csproj" />
+      <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.Migrations\ModularMonolith.Shared.Migrations.csproj" />
+    </ItemGroup>
+  
+</Project>

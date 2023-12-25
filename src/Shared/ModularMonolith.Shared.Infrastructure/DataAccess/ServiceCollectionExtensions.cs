@@ -22,11 +22,11 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddSingleton<DbConnectionFactory>()
             .AddSingleton<ITransactionalScopeFactory, TransactionalScopeFactory>()
-            .AddDbContext<InternalDbContext>(c =>
+            .AddDbContext<SharedDbContext>(c =>
             {
                 c.UseNpgsql(options.ConnectionString);
                 c.UseSnakeCaseNamingConvention();
-            }).AddScoped<IEventLogDbContext>(sp => sp.GetRequiredService<InternalDbContext>());
+            }).AddScoped<IEventLogDbContext>(sp => sp.GetRequiredService<SharedDbContext>());
 
         return new DataAccessBuilder(serviceCollection, options);
     }

@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Api\ModularMonolith.Shared.Api.csproj" />
+    <ProjectReference Include="..\ModularMonolith.Identity.Contracts\ModularMonolith.Identity.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

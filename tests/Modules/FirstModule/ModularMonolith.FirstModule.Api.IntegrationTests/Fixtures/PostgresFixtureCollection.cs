@@ -1,4 +1,4 @@
-﻿namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs.Fixtures;
+﻿namespace ModularMonolith.FirstModule.Api.IntegrationTests.Fixtures;
 
 [CollectionDefinition("Postgres")]
 public class PostgresFixtureCollection : ICollectionFixture<PostgresFixture>;

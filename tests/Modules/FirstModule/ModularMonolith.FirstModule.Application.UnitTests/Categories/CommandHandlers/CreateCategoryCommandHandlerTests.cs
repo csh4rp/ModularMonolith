@@ -3,14 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using ModularMonolith.FirstModule.Application.Categories.CommandHandlers;
 using ModularMonolith.FirstModule.Contracts.Categories.Commands;
 using ModularMonolith.FirstModule.Domain.Entities;
-using ModularMonolith.FirstModule.Infrastructure.Categories.DataAccess;
-using ModularMonolith.FirstModule.Infrastructure.Common;
 using ModularMonolith.FirstModule.Infrastructure.Common.DataAccess;
 using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts.Errors;
 using Xunit;
 
-namespace ModularMonolith.FirstModule.Application.UnitTests.Categories;
+namespace ModularMonolith.FirstModule.Application.UnitTests.Categories.CommandHandlers;
 
 public class CreateCategoryCommandHandlerTests
 {
@@ -19,7 +17,7 @@ public class CreateCategoryCommandHandlerTests
     {
         // Arrange
         await using var dbContext = CreateDatabase();
-        var cmd = new CreateCategoryCommand { ParentId = Guid.NewGuid(), Name = "Category 1" };
+        var cmd = new CreateCategoryCommand(Guid.NewGuid(), "Category 1");
 
         var handler = new CreateCategoryCommandHandler(dbContext);
 
@@ -45,7 +43,7 @@ public class CreateCategoryCommandHandlerTests
         dbContext.Categories.Add(new Category { Id = Guid.NewGuid(), Name = "Category 1" });
         await dbContext.SaveChangesAsync();
 
-        var cmd = new CreateCategoryCommand { ParentId = Guid.NewGuid(), Name = "Category 1" };
+        var cmd = new CreateCategoryCommand(Guid.NewGuid(), "Category 1");
 
         var handler = new CreateCategoryCommandHandler(dbContext);
 

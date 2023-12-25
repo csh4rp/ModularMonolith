@@ -3,14 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using ModularMonolith.FirstModule.Application.Categories.CommandHandlers;
 using ModularMonolith.FirstModule.Contracts.Categories.Commands;
 using ModularMonolith.FirstModule.Domain.Entities;
-using ModularMonolith.FirstModule.Infrastructure.Categories.DataAccess;
-using ModularMonolith.FirstModule.Infrastructure.Common;
 using ModularMonolith.FirstModule.Infrastructure.Common.DataAccess;
 using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts.Errors;
 using Xunit;
 
-namespace ModularMonolith.FirstModule.Application.UnitTests.Categories;
+namespace ModularMonolith.FirstModule.Application.UnitTests.Categories.CommandHandlers;
 
 public class UpdateCategoryCommandHandlerTests
 {

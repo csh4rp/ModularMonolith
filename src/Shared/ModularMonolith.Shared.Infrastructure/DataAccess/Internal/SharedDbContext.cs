@@ -6,9 +6,9 @@ using ModularMonolith.Shared.Infrastructure.Events.DataAccess.EntityConfiguratio
 
 namespace ModularMonolith.Shared.Infrastructure.DataAccess.Internal;
 
-internal sealed class InternalDbContext : BaseDbContext, IEventLogDbContext
+public sealed class SharedDbContext : BaseDbContext, IEventLogDbContext
 {
-    public InternalDbContext(DbContextOptions options) : base(options)
+    public SharedDbContext(DbContextOptions options) : base(options)
     {
     }
 

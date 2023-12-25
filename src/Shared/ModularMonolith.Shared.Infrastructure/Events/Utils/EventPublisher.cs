@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
-using MassTransit.Mediator;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using MediatR;
 using ModularMonolith.Shared.Application.Identity;
 using ModularMonolith.Shared.Infrastructure.Events.Extensions;
 using EventLog = ModularMonolith.Shared.Domain.Entities.EventLog;

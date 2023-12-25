@@ -5,7 +5,7 @@ namespace ModularMonolith.Shared.Infrastructure.Identity;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddIdentity(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddIdentityServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<IdentityContextAccessor>()
             .AddScoped<IIdentityContextSetter>(sp => sp.GetRequiredService<IdentityContextAccessor>())
