@@ -139,10 +139,14 @@ internal sealed class EventReader : IEventReader
         new()
         {
             Id = reader.GetGuid(eventLogMetaData.IdColumnName),
-            Name = reader.GetString(eventLogMetaData.NameColumnName),
-            Payload = reader.GetString(eventLogMetaData.PayloadColumnName),
-            Type = reader.GetString(eventLogMetaData.TypeColumnName),
-            ActivityId = reader.GetString(eventLogMetaData.ActivityIdColumnName),
+            EventName = reader.GetString(eventLogMetaData.EventNameColumnName),
+            EventPayload = reader.GetString(eventLogMetaData.EventPayloadColumnName),
+            EventType = reader.GetString(eventLogMetaData.EventTypeColumnName),
+            TraceId = reader.GetString(eventLogMetaData.TraceIdColumnName),
+            SpanId = reader.GetString(eventLogMetaData.SpanIdColumnName),
+            ParentSpanId = reader.IsDBNull(eventLogMetaData.ParentSpanIdColumnName)
+                ? null
+                : reader.GetString(eventLogMetaData.ParentSpanIdColumnName),
             CorrelationId = reader.IsDBNull(eventLogMetaData.CorrelationIdColumnName)
                 ? null
                 : reader.GetGuid(eventLogMetaData.CorrelationIdColumnName),
@@ -151,6 +155,9 @@ internal sealed class EventReader : IEventReader
             UserId = reader.IsDBNull(eventLogMetaData.UserIdColumnName)
                 ? null
                 : reader.GetGuid(eventLogMetaData.UserIdColumnName),
+            UserName = reader.IsDBNull(eventLogMetaData.UserNameColumnName)
+                ? null
+                : reader.GetString(eventLogMetaData.UserNameColumnName),
             IpAddress = reader.IsDBNull(eventLogMetaData.IpAddressColumnName)
                 ? null
                 : reader.GetString(eventLogMetaData.IpAddressColumnName),

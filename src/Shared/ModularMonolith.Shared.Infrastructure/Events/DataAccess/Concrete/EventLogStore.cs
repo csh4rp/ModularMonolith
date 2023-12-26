@@ -24,18 +24,18 @@ internal sealed class EventLogStore : IEventLogStore
         var eventType = typeof(TEvent);
 
         var eventLog = await _eventLogDbContext.EventLogs.Where(e => e.UserId == userId
-                                                                     && e.Type == eventType.FullName)
+                                                                     && e.EventType == eventType.FullName)
             .OrderBy(b => b.CreatedAt)
             .FirstOrDefaultAsync(cancellationToken);
 
-        return eventLog is null ? default : _eventSerializer.Deserialize<TEvent>(eventLog.Payload);
+        return eventLog is null ? default : _eventSerializer.Deserialize<TEvent>(eventLog.EventPayload);
     }
 
     public Task<EventLog?> GetFirstOccurenceAsync(Guid userId, Type eventType, CancellationToken cancellationToken) =>
         _eventLogDbContext.EventLogs
             .AsNoTracking()
             .Where(e => e.UserId == userId
-                        && e.Type == eventType.FullName)
+                        && e.EventType == eventType.FullName)
             .OrderBy(b => b.CreatedAt)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -45,18 +45,18 @@ internal sealed class EventLogStore : IEventLogStore
         var eventType = typeof(TEvent);
 
         var eventLog = await _eventLogDbContext.EventLogs.Where(e => e.UserId == userId
-                                                                     && e.Type == eventType.FullName)
+                                                                     && e.EventType == eventType.FullName)
             .OrderByDescending(b => b.CreatedAt)
             .FirstOrDefaultAsync(cancellationToken);
 
-        return eventLog is null ? default : _eventSerializer.Deserialize<TEvent>(eventLog.Payload);
+        return eventLog is null ? default : _eventSerializer.Deserialize<TEvent>(eventLog.EventPayload);
     }
 
     public Task<EventLog?> GetLastOccurenceAsync(Guid userId, Type eventType, CancellationToken cancellationToken) =>
         _eventLogDbContext.EventLogs
             .AsNoTracking()
             .Where(e => e.UserId == userId
-                        && e.Type == eventType.FullName)
+                        && e.EventType == eventType.FullName)
             .OrderByDescending(b => b.CreatedAt)
             .FirstOrDefaultAsync(cancellationToken);
 }

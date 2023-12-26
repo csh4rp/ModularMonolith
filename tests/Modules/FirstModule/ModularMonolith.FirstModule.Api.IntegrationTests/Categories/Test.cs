@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using ModularMonolith.FirstModule.Api.IntegrationTests.Fixtures;
+using ModularMonolith.FirstModule.Domain.Entities;
 
 namespace ModularMonolith.FirstModule.Api.IntegrationTests.Categories;
 
 [Collection("Postgres")]
+[UsesVerify]
 public class Test
 {
     private readonly WebApplicationFactory<Program> _factory;
@@ -31,9 +33,14 @@ public class Test
     [Fact]
     public async Task ShouldRun()
     {
+        _fixture.FirstModuleDbContext.Categories.Add(new Category { Name = "Category-1" });
+        await _fixture.FirstModuleDbContext.SaveChangesAsync();
+        
         using var response = await _httpClient.GetAsync("categories");
 
         var x = response.EnsureSuccessStatusCode();
+
+        await Verify(x.Content);
     }
 }
 

@@ -53,13 +53,29 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
             .IsRequired()
             .HasMaxLength(128);
 
-        builder.Property(b => b.ActivityId)
+        builder.Property(b => b.TraceId)
             .IsRequired()
             .IsUnicode(false)
             .HasMaxLength(32);
+        
+        builder.Property(b => b.SpanId)
+            .IsRequired()
+            .IsUnicode(false)
+            .HasMaxLength(16);
+        
+        builder.Property(b => b.ParentSpanId)
+            .IsUnicode(false)
+            .HasMaxLength(16);
 
-        builder.HasIndex(b => b.UserId);
+        builder.Property(b => b.UserName)
+            .HasMaxLength(128);
+        
+        builder.Property(b => b.IpAddress)
+            .HasMaxLength(32);
 
+        builder.Property(b => b.UserAgent)
+            .HasMaxLength(256);
+        
         // TODO: Add index for EntityKey, EntityType [{"PropertyName": "id", "Value": "GUID"}]
     }
 }

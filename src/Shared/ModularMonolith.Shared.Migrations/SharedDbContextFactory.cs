@@ -13,6 +13,7 @@ public sealed class SharedDbContextFactory : IDesignTimeDbContextFactory<SharedD
         optionsBuilder.UseNpgsql(args[0], b =>
             {
                 b.MigrationsAssembly(GetType().Assembly.FullName);
+                b.MigrationsHistoryTable("migration_history", "shared");
             })
             .UseSnakeCaseNamingConvention();
 

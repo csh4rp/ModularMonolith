@@ -10,6 +10,9 @@
         <PackageReference Include="Respawn"/>
         <PackageReference Include="Respawn.Postgres"/>
         <PackageReference Include="Testcontainers.PostgreSql"/>
+        <PackageReference Include="Verify" />
+        <PackageReference Include="Verify.Http" />
+        <PackageReference Include="Verify.Xunit" />
     </ItemGroup>
 
     <ItemGroup>

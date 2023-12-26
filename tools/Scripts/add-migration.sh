@@ -18,7 +18,7 @@ do
   
   echo "$cnx"
   
-  if [[ $cnx -eq $1 ]]; then
+  if [[ "$1" == "$cnx" ]]; then
     index=$i
     break;
   fi

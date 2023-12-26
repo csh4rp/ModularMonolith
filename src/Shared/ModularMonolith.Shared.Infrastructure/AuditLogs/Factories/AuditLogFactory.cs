@@ -11,12 +11,14 @@ namespace ModularMonolith.Shared.Infrastructure.AuditLogs.Factories;
 internal sealed class AuditLogFactory
 {
     private readonly IIdentityContextAccessor _identityContextAccessor;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly TimeProvider _timeProvider;
 
-    public AuditLogFactory(IIdentityContextAccessor identityContextAccessor, TimeProvider timeProvider)
+    public AuditLogFactory(IIdentityContextAccessor identityContextAccessor, TimeProvider timeProvider, IHttpContextAccessor httpContextAccessor)
     {
         _identityContextAccessor = identityContextAccessor;
         _timeProvider = timeProvider;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public AuditLog Create(EntityEntry entry)
@@ -65,16 +67,30 @@ internal sealed class AuditLogFactory
             keys.Add(new EntityKey(propertyEntry.Metadata.Name, propertyEntry.CurrentValue));
         }
 
+        var activity = Activity.Current;
+        var httpContext = _httpContextAccessor.HttpContext;
+        var identityContext = _identityContextAccessor.Context;
+        
+        var ipAddress = httpContext?.Connection.RemoteIpAddress?.ToString();
+        var userAgent = httpContext?.Request.Headers.UserAgent;
+        
         return new AuditLog
         {
             CreatedAt = _timeProvider.GetUtcNow(),
+            UserId = identityContext?.UserId,
+            UserName = identityContext?.UserName,
             EntityState = GetChangeType(entry),
-            ActivityId = Activity.Current.TraceId.ToString(),
-            UserId = _identityContextAccessor.Context?.UserId,
-            OperationName = Activity.Current.OperationName,
+            EntityKeys = keys,
             EntityType = entityType.FullName!,
             EntityPropertyChanges = [.. changes],
-            EntityKeys = keys
+            OperationName = Activity.Current.OperationName,
+            TraceId = activity.TraceId.ToString(),
+            SpanId = activity.SpanId.ToString(),
+            ParentSpanId = activity.Parent is null
+                ? null
+                : activity.ParentSpanId.ToString(),
+            IpAddress = ipAddress,
+            UserAgent = userAgent
         };
     }
 

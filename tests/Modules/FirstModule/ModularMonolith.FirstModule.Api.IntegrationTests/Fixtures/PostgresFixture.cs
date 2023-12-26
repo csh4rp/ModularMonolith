@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.FirstModule.Infrastructure.Common.DataAccess;
 using ModularMonolith.FirstModule.Migrations;
+using ModularMonolith.Shared.Infrastructure.DataAccess.Internal;
 using ModularMonolith.Shared.Migrations;
 using Npgsql;
 using Respawn;
@@ -11,34 +12,39 @@ namespace ModularMonolith.FirstModule.Api.IntegrationTests.Fixtures;
 
 public class PostgresFixture : IAsyncLifetime
 {
-    public readonly string ConnectionString =
-        "Server=localhost; Port=5434; UserName=postgres; Password=Admin123!@#; Database=test_db2;";
-
     private NpgsqlConnection? _connection;
     private PostgreSqlContainer? _container;
     private Respawner? _respawner;
+    
+    public string ConnectionString => _container!.GetConnectionString();
+
+    public SharedDbContext SharedDbContext { get; private set; } = default!;
+    
+    public FirstModuleDbContext FirstModuleDbContext { get; private set; } = default!;
 
     public async Task InitializeAsync()
     {
         _container = new PostgreSqlBuilder()
-            .WithDatabase("test_db2")
+            .WithImage("postgres:16.1")
+            .WithName("postgres_automated_tests")
+            .WithDatabase("tests_database")
             .WithUsername("postgres")
             .WithPassword("Admin123!@#")
             .WithPortBinding("5434", "5432")
             .Build();
-
+        
         await _container.StartAsync();
 
         _connection = new NpgsqlConnection(ConnectionString);
         await _connection.OpenAsync();
         
-        await using var sharedDbContext = new SharedDbContextFactory().CreateDbContext([ConnectionString]);
-        await sharedDbContext.Database.EnsureCreatedAsync();
-        // await sharedDbContext.Database.MigrateAsync();
+        SharedDbContext = new SharedDbContextFactory().CreateDbContext([ConnectionString]);
+        // await SharedDbContext.Database.EnsureCreatedAsync();
+        await SharedDbContext.Database.MigrateAsync();
         
-        await using var firstModuleDbContext = new FirstModuleDbContextFactory().CreateDbContext([ConnectionString]);//new FirstModuleDbContext(firstModuleOptionsBuilder.Options);
-        await firstModuleDbContext.Database.EnsureCreatedAsync();
-        await firstModuleDbContext.Database.MigrateAsync();
+        FirstModuleDbContext = new FirstModuleDbContextFactory().CreateDbContext([ConnectionString]);
+        // await FirstModuleDbContext.Database.EnsureCreatedAsync();
+        await FirstModuleDbContext.Database.MigrateAsync();
         
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
     }
@@ -56,6 +62,10 @@ public class PostgresFixture : IAsyncLifetime
             await _container.StopAsync();
             await _container.DisposeAsync();
         }
+
+        await SharedDbContext.DisposeAsync();
+        await FirstModuleDbContext.DisposeAsync();
+        
     }
 
     public Task ResetAsync()

@@ -18,7 +18,8 @@ namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs;
 public class AuditLogInterceptorTests : IAsyncDisposable
 {
     private static readonly DateTimeOffset Now = new(2023, 11, 3, 15, 30, 0, TimeSpan.Zero);
-    private static readonly Guid UserId = Guid.Parse("48A12418-9B7E-471F-930A-CBC7EB390F07");
+    private static readonly Guid UserId = Guid.Parse("018C4AA8-3842-43D9-B0C5-236D442787D5");
+    private static readonly string UserName = "mail@mail.com";
 
     private readonly ActivityListener _activityListener = new()
     {
@@ -37,7 +38,7 @@ public class AuditLogInterceptorTests : IAsyncDisposable
     {
         _postgresFixture = postgresFixture;
         _dateTimeProvider.GetUtcNow().Returns(Now);
-        _identityContextAccessor.Context.Returns(new IdentityContext(UserId));
+        _identityContextAccessor.Context.Returns(new IdentityContext(UserId, UserName));
 
         ActivitySource.AddActivityListener(_activityListener);
     }
@@ -67,9 +68,9 @@ public class AuditLogInterceptorTests : IAsyncDisposable
 
         auditLog.Should().NotBeNull();
         auditLog!.CreatedAt.Should().Be(Now);
-        auditLog.UserId.Should().Be(UserId);
+        auditLog.UserName.Should().Be(UserName);
         auditLog.OperationName.Should().Be(activity.OperationName);
-        auditLog.ActivityId.Should().Be(activity.TraceId.ToString());
+        auditLog.TraceId.Should().Be(activity.TraceId.ToString());
         auditLog.EntityKeys.Should().BeEquivalentTo(new List<EntityKey>
         {
             new("Id", Guid.Parse("4d4d085b-5266-4945-924a-e4177d79c65d"))

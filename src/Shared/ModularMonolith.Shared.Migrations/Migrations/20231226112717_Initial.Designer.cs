@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ModularMonolith.Shared.Migrations.Migrations
 {
     [DbContext(typeof(SharedDbContext))]
-    [Migration("20231225211109_Initial")]
+    [Migration("20231226112717_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -34,13 +34,6 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    b.Property<string>("ActivityId")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .IsUnicode(false)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("activity_id");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -67,21 +60,53 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("entity_type");
 
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("ip_address");
+
                     b.Property<string>("OperationName")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)")
                         .HasColumnName("operation_name");
 
+                    b.Property<string>("ParentSpanId")
+                        .HasMaxLength(16)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("parent_span_id");
+
+                    b.Property<string>("SpanId")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("span_id");
+
+                    b.Property<string>("TraceId")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("trace_id");
+
+                    b.Property<string>("UserAgent")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("user_agent");
+
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
+                    b.Property<string>("UserName")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("user_name");
+
                     b.HasKey("Id")
                         .HasName("pk_audit_log");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_audit_log_user_id");
 
                     b.ToTable("audit_log", "shared");
                 });
@@ -110,13 +135,6 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<string>("ActivityId")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .IsUnicode(false)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("activity_id");
-
                     b.Property<Guid?>("CorrelationId")
                         .HasColumnType("uuid")
                         .HasColumnName("correlation_id");
@@ -125,14 +143,27 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("IpAddress")
-                        .HasColumnType("text")
-                        .HasColumnName("ip_address");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("EventName")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("event_name");
+
+                    b.Property<string>("EventPayload")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("event_payload");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("event_type");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("ip_address");
 
                     b.Property<string>("OperationName")
                         .IsRequired()
@@ -140,28 +171,43 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                         .HasColumnType("character varying(256)")
                         .HasColumnName("operation_name");
 
-                    b.Property<string>("Payload")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("payload");
+                    b.Property<string>("ParentSpanId")
+                        .HasMaxLength(16)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("parent_span_id");
 
                     b.Property<DateTimeOffset?>("PublishedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("published_at");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("SpanId")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
-                        .HasColumnName("type");
+                        .HasMaxLength(16)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("span_id");
+
+                    b.Property<string>("TraceId")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("trace_id");
 
                     b.Property<string>("UserAgent")
-                        .HasColumnType("text")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
                         .HasColumnName("user_agent");
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("user_name");
 
                     b.HasKey("Id")
                         .HasName("pk_event_log");
@@ -173,8 +219,8 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                         .HasDatabaseName("ix_event_log_published_at")
                         .HasFilter("published_at IS NULL");
 
-                    b.HasIndex("UserId", "Type", "CreatedAt")
-                        .HasDatabaseName("ix_event_log_user_id_type_created_at");
+                    b.HasIndex("UserId", "EventType", "CreatedAt")
+                        .HasDatabaseName("ix_event_log_user_id_event_type_created_at");
 
                     b.ToTable("event_log", "shared");
                 });

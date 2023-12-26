@@ -1,4 +1,5 @@
-﻿using ModularMonolith.FirstModule.Contracts.Categories.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using ModularMonolith.FirstModule.Contracts.Categories.Models;
 using ModularMonolith.FirstModule.Contracts.Categories.Queries;
 using ModularMonolith.FirstModule.Contracts.Categories.Responses;
 using ModularMonolith.FirstModule.Infrastructure.Common;
@@ -24,7 +25,7 @@ internal sealed class FindCategoriesQueryHandler : IQueryHandler<FindCategoriesQ
             query = query.Where(c => c.Name.StartsWith(request.Search));
         }
 
-        var countFuture = query.DeferredCount().FutureValue();
+        var countFuture = query.DeferredCount().FutureValue<int>();
 
         var itemsFuture = query
             .Select(c => new CategoryItemModel { Id = c.Id, Name = c.Name })
@@ -33,6 +34,6 @@ internal sealed class FindCategoriesQueryHandler : IQueryHandler<FindCategoriesQ
 
         var items = await itemsFuture.ToListAsync(cancellationToken);
 
-        return new CategoriesResponse { Items = items, TotalLength = countFuture };
+        return new CategoriesResponse { Items = items, TotalLength = countFuture.Value };
     }
 }

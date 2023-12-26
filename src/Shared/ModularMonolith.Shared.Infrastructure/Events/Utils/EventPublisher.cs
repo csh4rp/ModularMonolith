@@ -28,18 +28,18 @@ internal sealed class EventPublisher
 
     public async Task PublishAsync(EventLog eventLog, CancellationToken cancellationToken)
     {
-        var @event = _eventSerializer.Deserialize(eventLog.Type, eventLog.Payload);
+        var @event = _eventSerializer.Deserialize(eventLog.EventType, eventLog.EventPayload);
 
         await using (var scope = _serviceScopeFactory.CreateAsyncScope())
         {
             if (eventLog.UserId.HasValue)
             {
                 var identitySetter = scope.ServiceProvider.GetRequiredService<IIdentityContextSetter>();
-                identitySetter.Set(new IdentityContext(eventLog.UserId.Value));
+                identitySetter.Set(new IdentityContext(eventLog.UserId.Value, eventLog.UserName!));
             }
 
-            using var activity = EventPublisherActivitySource.CreateActivity(eventLog.Name, ActivityKind.Internal);
-            activity?.SetParentId(eventLog.ActivityId);
+            using var activity = EventPublisherActivitySource.CreateActivity(eventLog.EventName, ActivityKind.Internal);
+            activity?.SetParentId(eventLog.TraceId);
             activity?.Start();
 
             var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -56,11 +56,11 @@ internal sealed class EventPublisher
                 if (eventLog.UserId.HasValue)
                 {
                     var identitySetter = scope.ServiceProvider.GetRequiredService<IIdentityContextSetter>();
-                    identitySetter.Set(new IdentityContext(eventLog.UserId.Value));
+                    identitySetter.Set(new IdentityContext(eventLog.UserId.Value, eventLog.UserName!));
                 }
 
-                using var activity = EventPublisherActivitySource.CreateActivity(eventLog.Name, ActivityKind.Internal);
-                activity?.SetParentId(eventLog.ActivityId);
+                using var activity = EventPublisherActivitySource.CreateActivity(eventLog.EventName, ActivityKind.Internal);
+                activity?.SetParentId(eventLog.TraceId);
                 activity?.Start();
 
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();

@@ -28,8 +28,13 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                     entity_property_changes = table.Column<List<PropertyChange>>(type: "jsonb", nullable: false),
                     entity_keys = table.Column<List<EntityKey>>(type: "jsonb", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    user_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     operation_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    activity_id = table.Column<string>(type: "character varying(32)", unicode: false, maxLength: 32, nullable: false)
+                    trace_id = table.Column<string>(type: "character varying(32)", unicode: false, maxLength: 32, nullable: false),
+                    span_id = table.Column<string>(type: "character varying(16)", unicode: false, maxLength: 16, nullable: false),
+                    parent_span_id = table.Column<string>(type: "character varying(16)", unicode: false, maxLength: 16, nullable: true),
+                    ip_address = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
+                    user_agent = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -58,14 +63,17 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     published_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     user_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    user_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     correlation_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    type = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    name = table.Column<string>(type: "text", nullable: false),
-                    payload = table.Column<string>(type: "jsonb", nullable: false),
+                    event_type = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    event_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    event_payload = table.Column<string>(type: "jsonb", nullable: false),
                     operation_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    activity_id = table.Column<string>(type: "character varying(32)", unicode: false, maxLength: 32, nullable: false),
-                    ip_address = table.Column<string>(type: "text", nullable: true),
-                    user_agent = table.Column<string>(type: "text", nullable: true)
+                    trace_id = table.Column<string>(type: "character varying(32)", unicode: false, maxLength: 32, nullable: false),
+                    span_id = table.Column<string>(type: "character varying(16)", unicode: false, maxLength: 16, nullable: false),
+                    parent_span_id = table.Column<string>(type: "character varying(16)", unicode: false, maxLength: 16, nullable: true),
+                    ip_address = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
+                    user_agent = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -100,12 +108,6 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "ix_audit_log_user_id",
-                schema: "shared",
-                table: "audit_log",
-                column: "user_id");
-
-            migrationBuilder.CreateIndex(
                 name: "ix_event_log_correlation_id",
                 schema: "shared",
                 table: "event_log",
@@ -119,10 +121,10 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                 filter: "published_at IS NULL");
 
             migrationBuilder.CreateIndex(
-                name: "ix_event_log_user_id_type_created_at",
+                name: "ix_event_log_user_id_event_type_created_at",
                 schema: "shared",
                 table: "event_log",
-                columns: new[] { "user_id", "type", "created_at" });
+                columns: new[] { "user_id", "event_type", "created_at" });
             
             migrationBuilder.Sql(
                 """

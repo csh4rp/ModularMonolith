@@ -44,21 +44,25 @@ internal sealed class OutboxEventBus : IEventBus
         var eventType = typeof(TEvent);
         var attribute = eventType.GetCustomAttribute<EventAttribute>();
 
+        var identityContext = _identityContextAccessor.Context;
         var remoteIpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
         var userAgent = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent;
 
         var eventLog = new EventLog
         {
             CreatedAt = _timeProvider.GetUtcNow(),
-            Name = attribute?.Name ?? eventType.Name,
-            Type = eventType.FullName!,
+            EventName = attribute?.Name ?? eventType.Name,
+            EventType = eventType.FullName!,
+            EventPayload = _eventSerializer.Serialize(@event),
             CorrelationId = options.CorrelationId,
-            Payload = _eventSerializer.Serialize(@event),
-            UserId = _identityContextAccessor.Context?.UserId,
+            UserId = identityContext?.UserId,
+            UserName = identityContext?.UserName,
             OperationName = currentActivity.OperationName,
-            ActivityId = currentActivity.Id!,
+            TraceId = currentActivity.TraceId.ToString(),
+            SpanId = currentActivity.SpanId.ToString(),
+            ParentSpanId = currentActivity.Parent is null ? null : currentActivity.ParentSpanId.ToString(),
             IpAddress = remoteIpAddress?.ToString(),
-            UserAgent = userAgent
+            UserAgent = userAgent,
         };
 
         var scope = TransactionalScope.Current.Value;
@@ -81,6 +85,7 @@ internal sealed class OutboxEventBus : IEventBus
         var currentActivity = Activity.Current;
         Debug.Assert(currentActivity is not null);
 
+        var identityContext = _identityContextAccessor.Context;
         var remoteIpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
         var userAgent = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent;
 
@@ -92,15 +97,18 @@ internal sealed class OutboxEventBus : IEventBus
             return new EventLog
             {
                 CreatedAt = _timeProvider.GetUtcNow(),
-                Name = attribute?.Name ?? eventType.Name,
-                Type = eventType.FullName!,
+                EventName = attribute?.Name ?? eventType.Name,
+                EventType = eventType.FullName!,
+                EventPayload = _eventSerializer.Serialize(e),
                 CorrelationId = options.CorrelationId,
-                Payload = _eventSerializer.Serialize(e, eventType),
-                UserId = _identityContextAccessor.Context?.UserId,
+                UserId = identityContext?.UserId,
+                UserName = identityContext?.UserName,
                 OperationName = currentActivity.OperationName,
-                ActivityId = currentActivity.Id!,
+                TraceId = currentActivity.TraceId.ToString(),
+                SpanId = currentActivity.SpanId.ToString(),
+                ParentSpanId = currentActivity.Parent is null ? null : currentActivity.ParentSpanId.ToString(),
                 IpAddress = remoteIpAddress?.ToString(),
-                UserAgent = userAgent
+                UserAgent = userAgent,
             };
         });
 

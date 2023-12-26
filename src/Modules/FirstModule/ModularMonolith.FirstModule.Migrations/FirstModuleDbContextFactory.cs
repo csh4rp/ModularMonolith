@@ -13,6 +13,7 @@ public sealed class FirstModuleDbContextFactory : IDesignTimeDbContextFactory<Fi
         optionsBuilder.UseNpgsql(args[0], b =>
         {
             b.MigrationsAssembly(GetType().Assembly.FullName);
+            b.MigrationsHistoryTable("migration_history", "first_module");
         })
         .UseSnakeCaseNamingConvention();
 

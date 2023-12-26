@@ -33,15 +33,18 @@ internal sealed class EventMetaDataProvider
         {
             TableName = entity.GetTableName()!,
             IdColumnName = entity.FindProperty(nameof(EventLog.Id))!.GetColumnName(),
-            NameColumnName = entity.FindProperty(nameof(EventLog.Name))!.GetColumnName(),
+            EventNameColumnName = entity.FindProperty(nameof(EventLog.EventName))!.GetColumnName(),
             OperationNameColumnName = entity.FindProperty(nameof(EventLog.OperationName))!.GetColumnName(),
-            PayloadColumnName = entity.FindProperty(nameof(EventLog.Payload))!.GetColumnName(),
+            EventPayloadColumnName = entity.FindProperty(nameof(EventLog.EventPayload))!.GetColumnName(),
             PublishedAtColumnName = entity.FindProperty(nameof(EventLog.PublishedAt))!.GetColumnName(),
-            TypeColumnName = entity.FindProperty(nameof(EventLog.Type))!.GetColumnName(),
-            ActivityIdColumnName = entity.FindProperty(nameof(EventLog.ActivityId))!.GetColumnName(),
+            EventTypeColumnName = entity.FindProperty(nameof(EventLog.EventType))!.GetColumnName(),
+            TraceIdColumnName = entity.FindProperty(nameof(EventLog.TraceId))!.GetColumnName(),
+            SpanIdColumnName = entity.FindProperty(nameof(EventLog.SpanId))!.GetColumnName(),
+            ParentSpanIdColumnName = entity.FindProperty(nameof(EventLog.ParentSpanId))!.GetColumnName(),
             CorrelationIdColumnName = entity.FindProperty(nameof(EventLog.CorrelationId))!.GetColumnName(),
             CreatedAtColumnName = entity.FindProperty(nameof(EventLog.CreatedAt))!.GetColumnName(),
             UserIdColumnName = entity.FindProperty(nameof(EventLog.UserId))!.GetColumnName(),
+            UserNameColumnName = entity.FindProperty(nameof(EventLog.UserName))!.GetColumnName(),
             IpAddressColumnName = entity.FindProperty(nameof(EventLog.IpAddress))!.GetColumnName(),
             UserAgentColumnName = entity.FindProperty(nameof(EventLog.UserAgent))!.GetColumnName()
         };
