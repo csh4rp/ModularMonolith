@@ -2,7 +2,7 @@ using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Shared.Application.Exceptions;
 
-public class ValidationException : AppException
+public sealed class ValidationException : AppException
 {
     public ValidationException(params PropertyError[] propertyErrors) :
         base("One or more validation errors occurred.") => Errors = propertyErrors;

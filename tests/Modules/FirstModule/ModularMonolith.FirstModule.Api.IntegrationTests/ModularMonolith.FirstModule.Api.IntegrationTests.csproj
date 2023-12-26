@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Bogus" />
         <PackageReference Include="EFCore.NamingConventions"/>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
         <PackageReference Include="Respawn"/>
@@ -20,6 +21,14 @@
       <ProjectReference Include="..\..\..\..\src\Modules\FirstModule\ModularMonolith.FirstModule.Migrations\ModularMonolith.FirstModule.Migrations.csproj" />
       <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Migrations\ModularMonolith.Identity.Migrations.csproj" />
       <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.Migrations\ModularMonolith.Shared.Migrations.csproj" />
+      <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.IntegrationTests.Common\ModularMonolith.Shared.IntegrationTests.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Categories\Resources\CreateCategory.DuplicateName.json" />
+      <EmbeddedResource Include="Categories\Resources\CreateCategory.EmptyName.json" />
+      <None Remove="Categories\Resources\CreateCategory.Valid.json" />
+      <EmbeddedResource Include="Categories\Resources\CreateCategory.Valid.json" />
     </ItemGroup>
   
 </Project>

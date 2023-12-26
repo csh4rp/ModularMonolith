@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ModularMonolith.FirstModule.Infrastructure.Common.DataAccess;
 using ModularMonolith.FirstModule.Migrations;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Internal;
+using ModularMonolith.Shared.IntegrationTests.Common;
 using ModularMonolith.Shared.Migrations;
 using Npgsql;
 using Respawn;
@@ -10,7 +11,7 @@ using Testcontainers.PostgreSql;
 
 namespace ModularMonolith.FirstModule.Api.IntegrationTests.Fixtures;
 
-public class PostgresFixture : IAsyncLifetime
+public class PostgresFixture : IAsyncLifetime, IDatabaseFixture
 {
     private NpgsqlConnection? _connection;
     private PostgreSqlContainer? _container;

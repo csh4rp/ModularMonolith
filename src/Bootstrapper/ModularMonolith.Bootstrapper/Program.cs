@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using ModularMonolith.Bootstrapper.Extensions;
+using ModularMonolith.Shared.Api.Exceptions;
 using ModularMonolith.Shared.Application;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Events;
@@ -24,7 +25,8 @@ builder.Services.AddEvents(e =>
 });
 
 builder.Services.AddIdentityServices()
-    .AddSingleton(TimeProvider.System);
+    .AddSingleton(TimeProvider.System)
+    .AddExceptionHandlers();
 
 builder.Services.AddDataAccess(c =>
 {
@@ -37,6 +39,11 @@ foreach (var appModule in modules)
 }
 
 var app = builder.Build();
+
+app.UseExceptionHandler(o =>
+{
+
+});
 
 foreach (var appModule in modules)
 {

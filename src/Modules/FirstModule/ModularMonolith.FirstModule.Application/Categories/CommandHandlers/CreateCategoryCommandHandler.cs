@@ -22,7 +22,7 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
 
         if (categoryWithNameExists)
         {
-            throw new ValidationException(PropertyError.NotUnique(nameof(request.Name), request.Name));
+            throw new ConflictException(nameof(request.Name), ErrorCodes.NotUnique, "Category name must be unique.");
         }
 
         var category = new Category { ParentId = request.ParentId, Name = request.Name };

@@ -19,9 +19,9 @@ public class PaginatedResult<T> : IResult
         _totalLength = totalLength;
     }
 
-    public async Task ExecuteAsync(HttpContext httpContext)
+    public Task ExecuteAsync(HttpContext httpContext)
     {
         httpContext.Response.Headers.Append("X-Total-Length", _totalLength.ToString());
-        await httpContext.Response.WriteAsJsonAsync(_items);
+        return httpContext.Response.WriteAsJsonAsync(_items);
     }
 }

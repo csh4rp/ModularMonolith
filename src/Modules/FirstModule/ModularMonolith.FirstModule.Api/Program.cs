@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using ModularMonolith.Shared.Api.Exceptions;
 using ModularMonolith.Shared.Application;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Events;
@@ -28,7 +29,8 @@ public class Program
         builder.Services
             .AddSingleton(TimeProvider.System)
             .AddIdentityServices()
-            .AddHttpContextAccessor();
+            .AddHttpContextAccessor()
+            .AddExceptionHandlers();
 
         builder.Services.AddDataAccess(c =>
         {
@@ -39,9 +41,14 @@ public class Program
         module.RegisterServices(builder.Services);
         
         var app = builder.Build();
+
+        app.UseExceptionHandler(o =>
+        {
+
+        });
         
         module.RegisterEndpoints(app);
-        
+
 
         app.Run();
     }

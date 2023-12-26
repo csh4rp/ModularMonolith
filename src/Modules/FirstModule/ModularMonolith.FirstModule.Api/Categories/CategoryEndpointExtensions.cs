@@ -25,7 +25,7 @@ internal static class CategoryEndpointExtensions
             {
                 var result = await mediator.Send(command, cancellationToken);
 
-                return TypedResults.Created($"{Prefix}/{result}", result);
+                return TypedResults.Created($"{Prefix}/{result.Id}", result);
             })
             .AddValidation<CreateCategoryCommand>()
             .Produces<CreatedResponse>();
