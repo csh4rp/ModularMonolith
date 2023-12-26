@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Identity.Application.Account.Exceptions;
 using ModularMonolith.Identity.Contracts.Account.Commands;
-using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Identity.Domain.Users.Entities;
 using ModularMonolith.Identity.Domain.Users.Events;
 using ModularMonolith.Shared.Application.Commands;

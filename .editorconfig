@@ -127,6 +127,7 @@ csharp_preserve_single_line_blocks = true
 csharp_place_attribute_on_same_line = false
 csharp_wrap_property_pattern = chop_always
 wrap_property_pattern = chop_always
+dotnet_diagnostic.IDE0005.severity = warning
 ###############################
 # VB Coding Conventions       #
 ###############################

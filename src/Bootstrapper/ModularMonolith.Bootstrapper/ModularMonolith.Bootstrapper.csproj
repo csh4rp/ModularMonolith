@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Modules\FirstModule\ModularMonolith.FirstModule.Api\ModularMonolith.FirstModule.Api.csproj"/>
+    <ProjectReference Include="..\..\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Api\ModularMonolith.CategoryManagement.Api.csproj"/>
     <ProjectReference Include="..\..\Shared\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
   </ItemGroup>
 

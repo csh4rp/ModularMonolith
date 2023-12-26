@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "ModularMonolith.Modules.CategoryManagement.Api": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:50360;http://localhost:50362"
+    }
+  }
+}

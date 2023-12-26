@@ -4,7 +4,7 @@ using MediatR.NotificationPublishers;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Application.Middlewares;
 
-[assembly: InternalsVisibleTo("ModularMonolith.FirstModule.Application.UnitTests")]
+[assembly: InternalsVisibleTo("ModularMonolith.CategoryManagement.Application.UnitTests")]
 
 namespace ModularMonolith.Shared.Application;
 

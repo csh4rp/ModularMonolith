@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace ModularMonolith.Shared.Infrastructure.Events.Utils;
+﻿namespace ModularMonolith.Shared.Infrastructure.Events.Utils;
 
 internal static class ServiceCollectionExtensions
 {

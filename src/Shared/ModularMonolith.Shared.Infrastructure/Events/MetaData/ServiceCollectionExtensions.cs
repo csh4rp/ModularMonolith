@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace ModularMonolith.Shared.Infrastructure.Events.MetaData;
+﻿namespace ModularMonolith.Shared.Infrastructure.Events.MetaData;
 
 internal static class ServiceCollectionExtensions
 {
