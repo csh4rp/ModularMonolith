@@ -3,7 +3,7 @@
 public class EntityNotFoundException : AppException
 {
     public EntityNotFoundException(Type entityType, Guid entityId)
-        : base($"Entity of type: '{entityType}' with id: '{entityId}' was not found")
+        : base($"Entity of type: '{entityType.Name}' with id: '{entityId}' was not found")
     {
         EntityType = entityType;
         EntityId = entityId;

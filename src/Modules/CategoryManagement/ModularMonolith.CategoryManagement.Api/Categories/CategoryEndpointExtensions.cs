@@ -6,6 +6,7 @@ using ModularMonolith.CategoryManagement.Contracts.Categories.Queries;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Responses;
 using ModularMonolith.Shared.Api.CustomResults;
 using ModularMonolith.Shared.Api.Filters;
+using ModularMonolith.Shared.Api.Models.Errors;
 using ModularMonolith.Shared.Contracts;
 
 namespace ModularMonolith.CategoryManagement.Api.Categories;
@@ -28,6 +29,7 @@ internal static class CategoryEndpointExtensions
                 return TypedResults.Created($"{Prefix}/{result.Id}", result);
             })
             .AddValidation<CreateCategoryCommand>()
+            .Produces<ValidationErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces<CreatedResponse>();
 
         group.MapPut("{id:guid}", async (
@@ -44,7 +46,8 @@ internal static class CategoryEndpointExtensions
             })
             .AddValidation<UpdateCategoryCommand>()
             .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces<ValidationErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound);
 
         group.MapDelete("{id:guid}", async (
                 [FromServices] IMediator mediator,
@@ -58,7 +61,7 @@ internal static class CategoryEndpointExtensions
                 return TypedResults.NoContent();
             })
             .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound);
 
         group.MapGet("{id:guid}", async (
                 [FromServices] IMediator mediator,
@@ -69,10 +72,19 @@ internal static class CategoryEndpointExtensions
 
                 var response = await mediator.Send(query, cancellationToken);
 
-                return response is null ? Results.NotFound() : Results.Ok(response);
+                return response is null 
+                    ? Results.NotFound(new ProblemDetails
+                    {
+                        Title = "Entity not found",
+                        Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4",
+                        Instance = $"categories/{id}",
+                        Status = StatusCodes.Status404NotFound,
+                        Detail = $"Entity of type: 'Category' with id: '{id}' was not found"
+                    })
+                    : Results.Ok(response);
             })
             .Produces<CategoryDetailsResponse>()
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound);
 
         group.MapGet(string.Empty, async (
                 [FromServices] IMediator mediator,

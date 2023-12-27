@@ -6,6 +6,7 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.AddExceptionHandler<ValidationExceptionHandler>()
             .AddExceptionHandler<ConflictExceptionHandler>()
+            .AddExceptionHandler<EntityNotFoundExceptionHandler>()
             .AddExceptionHandler<CatchAllExceptionHandler>();
 
         return serviceCollection;

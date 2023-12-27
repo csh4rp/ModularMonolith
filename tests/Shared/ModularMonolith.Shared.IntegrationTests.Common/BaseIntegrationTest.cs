@@ -2,33 +2,12 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
 
 namespace ModularMonolith.Shared.IntegrationTests.Common;
 
 [UsesVerify]
-public abstract class BaseIntegrationTest<TClass, TProgram> where TProgram : class
+public abstract class BaseIntegrationTest<TClass>
 {
-    protected HttpClient HttpClient { get; }
-
-    protected BaseIntegrationTest(IDatabaseFixture databasePostgresFixture)
-    {
-        var factory = new WebApplicationFactory<TProgram>()
-            .WithWebHostBuilder(b =>
-            {
-                b.ConfigureAppConfiguration((c, s) =>
-                {
-                    s.AddInMemoryCollection(new []
-                    {
-                        new KeyValuePair<string, string?>("ConnectionStrings:Database", databasePostgresFixture.ConnectionString)
-                    });
-                });
-            });
-
-        HttpClient = factory.CreateClient();
-    }
-
     protected StringContent GetResource(string name)
     {
         var @namespace = $"{typeof(TClass).Namespace}.Resources.{name}";

@@ -4,7 +4,7 @@ using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
 using ModularMonolith.CategoryManagement.Domain.Entities;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Exceptions;
-using ModularMonolith.Shared.Contracts.Errors;
+using ModularMonolith.Shared.Contracts;
 
 namespace ModularMonolith.CategoryManagement.Application.Categories.CommandHandlers;
 
@@ -25,7 +25,7 @@ internal sealed class UpdateCategoryCommandHandler : ICommandHandler<UpdateCateg
 
         if (categoryWithNameExists)
         {
-            throw new ValidationException(PropertyError.NotUnique(nameof(request.Name), request.Name));
+            throw new ConflictException(nameof(request.Name), ErrorCodes.NotUnique, "A category with given name already exists.");
         }
 
         category.ParentId = request.ParentId;
