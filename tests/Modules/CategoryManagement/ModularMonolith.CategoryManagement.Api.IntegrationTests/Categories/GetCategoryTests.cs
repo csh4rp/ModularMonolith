@@ -23,7 +23,7 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
     }
 
     [Fact]
-    [HasFileName("Ok")]
+    [TestMethodName("Ok")]
     public async Task ShouldReturnOk()
     {
         // Arrange
@@ -43,7 +43,7 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
     }
     
     [Fact]
-    [HasFileName("NotFound")]
+    [TestMethodName("NotFound")]
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()
     {
         // Arrange & Act

@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 using ModularMonolith.Shared.Contracts;
+using ModularMonolith.Shared.Contracts.Attributes;
 
 namespace ModularMonolith.Shared.Infrastructure.DataAccess.Extensions;
 
@@ -8,11 +9,6 @@ public static class DataAccessExtensions
 {
     public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> queryable, IPaginatedQuery paginator)
     {
-        if (!paginator.Skip.HasValue && !paginator.Take.HasValue && string.IsNullOrEmpty(paginator.OrderBy))
-        {
-            return queryable;
-        }
-
         IOrderedQueryable<T> query;
 
         var objType = typeof(T);
@@ -21,30 +17,60 @@ public static class DataAccessExtensions
 
         if (!string.IsNullOrEmpty(fieldName) && isAscending.HasValue)
         {
-            var property = objType.GetProperty(fieldName)!;
-            var method = typeof(DataAccessExtensions).GetMethod(nameof(ApplyOrdering))!;
+            var property = objType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Single(p => fieldName.Equals(p.Name, StringComparison.InvariantCultureIgnoreCase));
+            
+            var method = typeof(DataAccessExtensions).GetMethod(nameof(ApplyOrdering), BindingFlags.Static | BindingFlags.NonPublic)!;
             var genericMethod = method.MakeGenericMethod(objType, property.PropertyType);
 
             query = (IOrderedQueryable<T>)genericMethod.Invoke(null,
-                new object[] { queryable, property, isAscending.Value })!;
+                [queryable, property, isAscending.Value])!;
         }
         else
         {
-            var property = objType.GetProperties(BindingFlags.Public | BindingFlags.Instance)[0];
-            var method = typeof(DataAccessExtensions).GetMethod(nameof(ApplyOrdering))!;
-            var genericMethod = method.MakeGenericMethod(objType, property.PropertyType);
+            var attribute = paginator.GetType()
+                .GetProperty(nameof(paginator.OrderBy))!
+                .GetCustomAttribute<DefaultOrderByAttribute>();
 
-            query = (IOrderedQueryable<T>)genericMethod.Invoke(null, new object[] { queryable, property, true })!;
+            var property = attribute is null
+                ? objType.GetProperties(BindingFlags.Public | BindingFlags.Instance)[0]
+                : objType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Single(p => p.Name.Equals(attribute.PropertyName, StringComparison.InvariantCultureIgnoreCase));
+
+            isAscending = attribute?.IsAscending ?? true;
+
+            if (attribute is null)
+            {
+                var method = typeof(DataAccessExtensions).GetMethod(nameof(ApplyOrdering), BindingFlags.Static | BindingFlags.NonPublic)!;
+                var genericMethod = method.MakeGenericMethod(objType, property.PropertyType);
+
+                query = (IOrderedQueryable<T>)genericMethod.Invoke(null, [queryable, property, isAscending])!;
+            }
+            else
+            {
+                var method = typeof(DataAccessExtensions).GetMethod(nameof(ApplyOrdering), BindingFlags.Static | BindingFlags.NonPublic)!;
+                var genericMethod = method.MakeGenericMethod(objType, property.PropertyType);
+
+                query = (IOrderedQueryable<T>)genericMethod.Invoke(null, [queryable, property, isAscending])!;
+            }
         }
 
-        if (paginator.Skip.HasValue)
-        {
-            queryable = query.Skip(paginator.Skip.Value);
-        }
+        queryable = paginator.Skip.HasValue ? query.Skip(paginator.Skip.Value) : query;
 
         if (paginator.Take.HasValue)
         {
             queryable = queryable.Take(paginator.Take.Value);
+        }
+        else
+        {
+            var attribute = paginator.GetType()
+                .GetProperty(nameof(paginator.Take))!
+                .GetCustomAttribute<DefaultTakeAttribute>();
+
+            if (attribute is not null)
+            {
+                queryable = queryable.Take(attribute.Take);
+            }
         }
 
         return queryable;
@@ -67,22 +93,20 @@ public static class DataAccessExtensions
         var span = orderBy.AsSpan();
 
         var fieldName = span[..index];
-        var direction = span[index..];
+        var direction = span[(index + 1)..].ToString();
 
-        var isDescending = direction is "desc";
+        var isAscending = !direction.Equals("desc", StringComparison.InvariantCultureIgnoreCase);
 
-        return (fieldName.ToString(), isDescending);
+        return (fieldName.ToString(), isAscending);
     }
 
-    private static IOrderedQueryable<T> ApplyOrdering<T, TK>(IQueryable<T> queryable, PropertyInfo propertyInfo,
+    private static IOrderedQueryable<T> ApplyOrdering<T, TK>(IQueryable<T> queryable,
+        PropertyInfo propertyInfo,
         bool isAscending)
     {
         var objType = propertyInfo.DeclaringType;
-
         var parameterExpression = Expression.Parameter(objType!, "x");
-
         var propertyExpression = Expression.Property(parameterExpression, propertyInfo);
-
         var expression = Expression.Lambda<Func<T, TK>>(propertyExpression, parameterExpression);
 
         return isAscending

@@ -23,7 +23,7 @@ internal sealed class FindCategoriesQueryHandler : IQueryHandler<FindCategoriesQ
             query = query.Where(c => c.Name.StartsWith(request.Search));
         }
 
-        var countFuture = query.DeferredCount().FutureValue<int>();
+        var countFuture = query.DeferredCount().FutureValue();
 
         var itemsFuture = query
             .Select(c => new CategoryItemModel { Id = c.Id, Name = c.Name })
@@ -32,6 +32,6 @@ internal sealed class FindCategoriesQueryHandler : IQueryHandler<FindCategoriesQ
 
         var items = await itemsFuture.ToListAsync(cancellationToken);
 
-        return new CategoriesResponse { Items = items, TotalLength = countFuture.Value };
+        return new CategoriesResponse(items, countFuture);
     }
 }

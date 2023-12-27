@@ -21,28 +21,35 @@ public abstract class BaseIntegrationTest<TClass>
     }
 
     protected async Task VerifyResponse(HttpResponseMessage httpResponseMessage,
+        object?[]? parameters = null,
         [CallerMemberName] string method = default!,
         [CallerFilePath] string filePath = default!)
     {
         var type = GetType();
-        var attribute = type.GetMethod(method)?.GetCustomAttribute<HasFileName>();
+        var attribute = type.GetMethod(method)?.GetCustomAttribute<TestMethodName>();
 
         string? fileName = null;
         if (attribute is not null)
         {
-            fileName = $"{type.Name}.{attribute.FileName}";
+            fileName = $"{attribute.Name}";
         }
         
         var directory = Path.Join(Path.GetDirectoryName(filePath), "Responses");
 
-        var task =  VerifyJson(httpResponseMessage.Content.ReadAsStreamAsync())
-            .UseDirectory(directory);
-
+        var settings = new VerifySettings();
+        
         if (!string.IsNullOrEmpty(fileName))
         {
-            task = task.UseFileName(fileName);
+            settings.UseMethodName(fileName);
+        }
+        
+        settings.UseDirectory(directory);
+
+        if (parameters is not null)
+        {
+            settings.UseParameters(parameters);
         }
 
-        await task;
+        await VerifyJson(httpResponseMessage.Content.ReadAsStreamAsync(), settings);
     }
 }

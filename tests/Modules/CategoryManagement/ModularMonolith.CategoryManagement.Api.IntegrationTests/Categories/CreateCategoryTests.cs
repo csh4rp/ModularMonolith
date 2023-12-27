@@ -23,7 +23,7 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
     }
 
     [Fact]
-    [HasFileName("Created")]
+    [TestMethodName("Created")]
     public async Task ShouldReturnCreated()
     {
         // Arrange
@@ -38,7 +38,7 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
     }
     
     [Fact]
-    [HasFileName("Conflict")]
+    [TestMethodName("Conflict")]
     public async Task ShouldReturnConflict_WhenCategoryWithGivenNameAlreadyExists()
     {
         // Arrange
@@ -60,7 +60,7 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
     }
     
     [Fact]
-    [HasFileName("BadRequest")]
+    [TestMethodName("BadRequest")]
     public async Task ShouldReturnBadRequest_WhenCategoryNameIsEmpty()
     {
         // Arrange

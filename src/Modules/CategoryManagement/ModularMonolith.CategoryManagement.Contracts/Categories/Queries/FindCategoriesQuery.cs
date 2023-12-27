@@ -1,15 +1,19 @@
-﻿using ModularMonolith.CategoryManagement.Contracts.Categories.Responses;
+﻿using ModularMonolith.CategoryManagement.Contracts.Categories.Models;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Responses;
 using ModularMonolith.Shared.Contracts;
+using ModularMonolith.Shared.Contracts.Attributes;
 
 namespace ModularMonolith.CategoryManagement.Contracts.Categories.Queries;
 
 public sealed class FindCategoriesQuery : IQuery<CategoriesResponse>, IPaginatedQuery
 {
-    public required string? Search { get; init; }
+    public required string? Search { get; set; }
 
-    public required string? OrderBy { get; init; }
+    [DefaultOrderBy(nameof(CategoryItemModel.Name))]
+    public required string? OrderBy { get; set; }
 
-    public required int? Skip { get; init; }
+    public required int? Skip { get; set; }
 
-    public required int? Take { get; init; }
+    [DefaultTake(100)]
+    public required int? Take { get; set; }
 }

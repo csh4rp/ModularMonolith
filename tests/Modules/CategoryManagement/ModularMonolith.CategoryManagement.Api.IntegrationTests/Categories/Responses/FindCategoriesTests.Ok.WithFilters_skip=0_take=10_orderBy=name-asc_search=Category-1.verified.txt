@@ -1,0 +1,42 @@
+﻿[
+  {
+    id: Guid_1,
+    name: Category-1
+  },
+  {
+    id: Guid_2,
+    name: Category-10
+  },
+  {
+    id: Guid_3,
+    name: Category-11
+  },
+  {
+    id: Guid_4,
+    name: Category-12
+  },
+  {
+    id: Guid_5,
+    name: Category-13
+  },
+  {
+    id: Guid_6,
+    name: Category-14
+  },
+  {
+    id: Guid_7,
+    name: Category-15
+  },
+  {
+    id: Guid_8,
+    name: Category-16
+  },
+  {
+    id: Guid_9,
+    name: Category-17
+  },
+  {
+    id: Guid_10,
+    name: Category-18
+  }
+]

@@ -1,0 +1,82 @@
+﻿[
+  {
+    id: Guid_1,
+    name: Category-9
+  },
+  {
+    id: Guid_2,
+    name: Category-8
+  },
+  {
+    id: Guid_3,
+    name: Category-7
+  },
+  {
+    id: Guid_4,
+    name: Category-6
+  },
+  {
+    id: Guid_5,
+    name: Category-5
+  },
+  {
+    id: Guid_6,
+    name: Category-4
+  },
+  {
+    id: Guid_7,
+    name: Category-3
+  },
+  {
+    id: Guid_8,
+    name: Category-2
+  },
+  {
+    id: Guid_9,
+    name: Category-19
+  },
+  {
+    id: Guid_10,
+    name: Category-18
+  },
+  {
+    id: Guid_11,
+    name: Category-17
+  },
+  {
+    id: Guid_12,
+    name: Category-16
+  },
+  {
+    id: Guid_13,
+    name: Category-15
+  },
+  {
+    id: Guid_14,
+    name: Category-14
+  },
+  {
+    id: Guid_15,
+    name: Category-13
+  },
+  {
+    id: Guid_16,
+    name: Category-12
+  },
+  {
+    id: Guid_17,
+    name: Category-11
+  },
+  {
+    id: Guid_18,
+    name: Category-10
+  },
+  {
+    id: Guid_19,
+    name: Category-1
+  },
+  {
+    id: Guid_20,
+    name: Category-0
+  }
+]

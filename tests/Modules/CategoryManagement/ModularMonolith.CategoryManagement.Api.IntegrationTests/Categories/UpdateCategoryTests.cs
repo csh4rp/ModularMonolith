@@ -41,7 +41,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
     }
     
     [Fact]
-    [HasFileName("BadRequest")]
+    [TestMethodName("BadRequest")]
     public async Task ShouldReturnBadRequest_WhenCategoryNameIsEmpty()
     {
         // Arrange
@@ -56,7 +56,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
     }
     
     [Fact]
-    [HasFileName("NotFound")]
+    [TestMethodName("NotFound")]
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()
     {
         // Arrange
@@ -71,7 +71,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
     }
     
     [Fact]
-    [HasFileName("Conflict")]
+    [TestMethodName("Conflict")]
     public async Task ShouldReturnConflict_WhenCategoryWithGivenNameAlreadyExists()
     {
         // Arrange

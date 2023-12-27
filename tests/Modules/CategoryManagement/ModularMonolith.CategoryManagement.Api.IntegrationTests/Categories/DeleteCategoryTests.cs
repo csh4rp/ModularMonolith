@@ -24,11 +24,7 @@ public class DeleteCategoryTests : BaseIntegrationTest<DeleteCategoryTests>
     public async Task ShouldReturnNoContent()
     {
         // Arrange
-        var category = _categoryFixture.Clone()
-            .RuleFor(x => x.Id, f => f.Random.Guid())
-            .RuleFor(x => x.Name, f => f.Random.String(10))
-            .Generate();
-
+        var category = _categoryFixture.Generate();
         _postgresFixture.CategoryManagementDbContext.Categories.Add(category);
         await _postgresFixture.CategoryManagementDbContext.SaveChangesAsync();
         
@@ -40,7 +36,7 @@ public class DeleteCategoryTests : BaseIntegrationTest<DeleteCategoryTests>
     }
     
     [Fact]
-    [HasFileName("NotFound")]
+    [TestMethodName("NotFound")]
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()
     {
         // Arrange & Act
