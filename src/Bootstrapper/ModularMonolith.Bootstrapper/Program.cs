@@ -1,59 +1,9 @@
-﻿using FluentValidation;
-using ModularMonolith.Bootstrapper.Extensions;
-using ModularMonolith.Shared.Api.Exceptions;
-using ModularMonolith.Shared.Application;
-using ModularMonolith.Shared.Infrastructure.DataAccess;
-using ModularMonolith.Shared.Infrastructure.Events;
-using ModularMonolith.Shared.Infrastructure.Identity;
+﻿using ModularMonolith.Shared.Api;
 
-var builder = WebApplication.CreateBuilder(args);
-
-var modules = builder.Configuration.GetEnabledModules().ToList();
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var assemblies = modules.SelectMany(m => m.Assemblies).ToArray();
-
-builder.Services.AddMediator(assemblies);
-
-builder.Services.AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true);
-
-builder.Services.AddEvents(e =>
-{
-    e.Assemblies = [.. assemblies];
-});
-
-builder.Services.AddIdentityServices()
-    .AddSingleton(TimeProvider.System)
-    .AddExceptionHandlers();
-
-builder.Services.AddDataAccess(c =>
-{
-    c.ConnectionString = builder.Configuration.GetConnectionString("Database")!;
-});
-
-foreach (var appModule in modules)
-{
-    appModule.RegisterServices(builder.Services);
-}
-
-var app = builder.Build();
-
-app.UseExceptionHandler(o =>
-{
-
-});
-
-foreach (var appModule in modules)
-{
-    appModule.RegisterEndpoints(app);
-}
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+var builder = WebApplication.CreateBuilder(args)
+    .RegisterModules();
+        
+var app = builder.Build()
+    .PreparePipeline();
 
 await app.RunAsync();

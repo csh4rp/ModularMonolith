@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
-using ModularMonolith.Shared.Api;
 
-namespace ModularMonolith.Bootstrapper.Extensions;
+namespace ModularMonolith.Shared.Api;
 
 public static class ConfigurationExtensions
 {

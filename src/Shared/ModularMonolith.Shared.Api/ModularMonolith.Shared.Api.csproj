@@ -9,11 +9,15 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation"/>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions"/>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
+    <PackageReference Include="Swashbuckle.AspNetCore"/>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Application\ModularMonolith.CategoryManagement.Application.csproj"/>
     <ProjectReference Include="..\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
