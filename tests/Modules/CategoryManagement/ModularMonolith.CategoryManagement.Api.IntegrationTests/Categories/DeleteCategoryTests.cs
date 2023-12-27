@@ -29,7 +29,7 @@ public class DeleteCategoryTests : BaseIntegrationTest<DeleteCategoryTests>
         await _postgresFixture.CategoryManagementDbContext.SaveChangesAsync();
         
         // Act
-        using var response = await _client.DeleteAsync($"categories/{category.Id}");
+        using var response = await _client.DeleteAsync($"api/category-management/categories/{category.Id}");
         
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -40,7 +40,7 @@ public class DeleteCategoryTests : BaseIntegrationTest<DeleteCategoryTests>
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()
     {
         // Arrange & Act
-        using var response = await _client.DeleteAsync($"categories/{Guid.Empty}");
+        using var response = await _client.DeleteAsync($"api/category-management/categories/{Guid.Empty}");
         
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);

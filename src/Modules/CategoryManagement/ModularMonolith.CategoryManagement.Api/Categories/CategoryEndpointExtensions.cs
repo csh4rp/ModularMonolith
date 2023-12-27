@@ -13,11 +13,15 @@ namespace ModularMonolith.CategoryManagement.Api.Categories;
 
 internal static class CategoryEndpointExtensions
 {
-    private const string Prefix = "categories";
+    private const string Prefix = "api/category-management/categories";
 
     public static WebApplication UseCategoryEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup(Prefix);
+        var group = app.MapGroup(Prefix)
+            .WithApiVersionSet()
+            .HasApiVersion(1, 0)
+            .WithTags("Categories")
+            .WithGroupName("category-management-v1");
 
         group.MapPost(string.Empty, async (
                 [FromServices] IMediator mediator,
@@ -69,10 +73,10 @@ internal static class CategoryEndpointExtensions
                 CancellationToken cancellationToken) =>
             {
                 var query = new GetCategoryDetailsByIdQuery(id);
-
+        
                 var response = await mediator.Send(query, cancellationToken);
-
-                return response is null 
+        
+                return response is null
                     ? Results.NotFound(new ProblemDetails
                     {
                         Title = "Entity not found",
@@ -92,7 +96,7 @@ internal static class CategoryEndpointExtensions
                 CancellationToken cancellationToken) =>
             {
                 var response = await mediator.Send(query, cancellationToken);
-
+        
                 return PaginatedResult.From(response);
             })
             .AddValidation<FindCategoriesQuery>()

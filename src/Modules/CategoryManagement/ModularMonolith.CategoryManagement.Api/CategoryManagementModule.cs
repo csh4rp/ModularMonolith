@@ -6,7 +6,7 @@ using ModularMonolith.Shared.Api;
 
 namespace ModularMonolith.CategoryManagement.Api;
 
-public sealed class CategoryManagementModule : AppModule
+public class CategoryManagementModule : AppModule
 {
     private const string RootNamespace = "ModularMonolith.CategoryManagement";
 
@@ -18,7 +18,6 @@ public sealed class CategoryManagementModule : AppModule
     public override WebApplication RegisterEndpoints(WebApplication app)
     {
         app.UseCategoryEndpoints();
-
         return app;
     }
 
@@ -26,6 +25,7 @@ public sealed class CategoryManagementModule : AppModule
     {
         BusinessLogicAssembly, ContractsAssembly, DomainAssembly, InfrastructureAssembly
     }.ToFrozenSet();
+    
 
     public override IServiceCollection RegisterServices(IServiceCollection serviceCollection)
     {

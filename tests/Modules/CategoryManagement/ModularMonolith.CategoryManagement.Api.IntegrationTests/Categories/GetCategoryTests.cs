@@ -35,7 +35,7 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
         await _postgresFixture.CategoryManagementDbContext.SaveChangesAsync();
         
         // Act
-        using var response = await _client.GetAsync($"categories/{category.Id}");
+        using var response = await _client.GetAsync($"api/category-management/categories/{category.Id}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -47,7 +47,7 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()
     {
         // Arrange & Act
-        using var response = await _client.GetAsync($"categories/{Guid.Empty}");
+        using var response = await _client.GetAsync($"api/category-management/categories/{Guid.Empty}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);

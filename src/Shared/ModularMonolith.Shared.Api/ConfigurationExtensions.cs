@@ -24,7 +24,7 @@ public static class ConfigurationExtensions
             }
 
             var name = moduleSection.Key;
-
+            
             var appModuleType = files
                 .Where(file => file.EndsWith($".{name}.Api.dll"))
                 .Select(Assembly.LoadFile)

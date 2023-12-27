@@ -30,7 +30,7 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
         using var request = GetResource("CreateCategory.Valid.json");
         
         // Act
-        using var response = await _client.PostAsync("categories", request);
+        using var response = await _client.PostAsync("api/category-management/categories", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -52,7 +52,7 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
         using var request = GetResource("CreateCategory.DuplicateName.json");
         
         // Act
-        using var response = await _client.PostAsync("categories", request);
+        using var response = await _client.PostAsync("api/category-management/categories", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -67,7 +67,7 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
         using var request = GetResource("CreateCategory.EmptyName.json");
         
         // Act
-        using var response = await _client.PostAsync("categories", request);
+        using var response = await _client.PostAsync("api/category-management/categories", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);

@@ -1,9 +1,16 @@
-﻿namespace ModularMonolith.Shared.Api;
+﻿using Asp.Versioning;
+
+namespace ModularMonolith.Shared.Api;
 
 public static class WebApplicationException
 {
     public static WebApplication PreparePipeline(this WebApplication app)
     {
+        app.NewApiVersionSet()
+            .HasApiVersion(new ApiVersion(1, 0))
+            .ReportApiVersions()
+            .Build();
+        
         app.UseExceptionHandler(o =>
         {
 
@@ -18,8 +25,14 @@ public static class WebApplicationException
         
         if (app.Environment.IsDevelopment())
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwagger(o =>
+            {
+      
+            });
+            app.UseSwaggerUI(o =>
+            {
+                o.SwaggerEndpoint("/swagger/category-management-v1/swagger.json", "Category Management v1.0");
+            });
         }
         
         return app;

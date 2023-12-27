@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+﻿using Asp.Versioning;
+using FluentValidation;
+using Microsoft.OpenApi.Models;
 using ModularMonolith.Shared.Api.Exceptions;
 using ModularMonolith.Shared.Application;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
@@ -15,13 +17,25 @@ public static class WebApplicationBuilderExtensions
 
         foreach (var module in modules)
         {
-            builder.Services.AddSingleton<AppModule>(sp => (AppModule) Activator.CreateInstance(module.GetType())!);
+            builder.Services.AddSingleton<AppModule>(_ => (AppModule) Activator.CreateInstance(module.GetType())!);
         }
         
         var assemblies = modules.SelectMany(m => m.Assemblies).ToArray();
 
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(opt =>
+        {
+           opt.SwaggerDoc("category-management-v1", new OpenApiInfo
+           {
+               Version = "v1.0"
+           });
+        });
+        builder.Services.AddApiVersioning(options =>
+        {
+            options.ApiVersionReader = new MediaTypeApiVersionReader();
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+        });
         
         builder.Services.AddMediator(assemblies);
         builder.Services.AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true);

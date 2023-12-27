@@ -42,7 +42,7 @@ public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
         await _postgresFixture.CategoryManagementDbContext.SaveChangesAsync();
         
         // Act
-        using var response = await _client.GetAsync("categories");
+        using var response = await _client.GetAsync("api/category-management/categories");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -69,7 +69,7 @@ public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
         await _postgresFixture.CategoryManagementDbContext.SaveChangesAsync();
         
         // Act
-        using var response = await _client.GetAsync($"categories?skip={skip}&take={take}&orderBy={orderBy}&search={search}");
+        using var response = await _client.GetAsync($"api/category-management/categories?skip={skip}&take={take}&orderBy={orderBy}&search={search}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
