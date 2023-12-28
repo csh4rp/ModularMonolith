@@ -16,7 +16,7 @@ public static class WebApplicationException
 
         });
 
-        var modules = app.Services.GetServices<AppModule>();
+        var modules = app.Services.GetServices<AppModule>().ToList();
      
         foreach (var module in modules)
         {
@@ -29,9 +29,12 @@ public static class WebApplicationException
             {
       
             });
-            app.UseSwaggerUI(o =>
+            app.UseSwaggerUI(options =>
             {
-                o.SwaggerEndpoint("/swagger/category-management-v1/swagger.json", "Category Management v1.0");
+                foreach (var module in modules)
+                {
+                    module.SwaggerUIAction(options);
+                }
             });
         }
         

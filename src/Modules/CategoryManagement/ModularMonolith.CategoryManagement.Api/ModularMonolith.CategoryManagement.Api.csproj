@@ -9,11 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="FluentValidation.DependencyInjectionExtensions">
-      <HintPath>..\..\..\..\..\..\..\.nuget\packages\fluentvalidation.dependencyinjectionextensions\11.8.1\lib\netstandard2.1\FluentValidation.DependencyInjectionExtensions.dll</HintPath>
-    </Reference>
-    <Reference Include="MediatR">
-    </Reference>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions"/>
+    <PackageReference Include="MediatR"/>
   </ItemGroup>
 
   <ItemGroup>

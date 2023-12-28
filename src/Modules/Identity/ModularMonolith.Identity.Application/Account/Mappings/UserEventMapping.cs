@@ -1,5 +1,5 @@
 ﻿using ModularMonolith.Identity.Contracts.Account.Events;
-using ModularMonolith.Identity.Domain.Users.Events;
+using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Abstract;
 using ModularMonolith.Shared.Contracts;
 

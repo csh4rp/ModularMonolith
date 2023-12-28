@@ -5,7 +5,7 @@ using ModularMonolith.Shared.Domain.Entities;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.EntityConfigurations;
 
-internal sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<EventLog>
+public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<EventLog>
 {
     private readonly bool _excludeFromMigrations;
     private readonly string _table;

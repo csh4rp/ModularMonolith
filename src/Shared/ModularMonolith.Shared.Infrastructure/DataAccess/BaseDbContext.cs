@@ -35,9 +35,9 @@ public abstract class BaseDbContext : DbContext
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) =>
-        modelBuilder.ApplyConfiguration(new EventCorrelationLockEntityTypeConfiguration(true))
-            .ApplyConfiguration(new EventLogLockEntityTypeConfiguration(true))
-            .ApplyConfiguration(new EventLogEntityTypeConfiguration(true))
-            .ApplyConfiguration(new EventLogPublishAttemptEntityTypeConfiguration(true))
-            .ApplyConfiguration(new AuditLogEntityTypeConfiguration(true));
+        modelBuilder.ApplyConfiguration(new EventCorrelationLockEntityTypeConfiguration(true, schema: "shared"))
+            .ApplyConfiguration(new EventLogLockEntityTypeConfiguration(true, schema: "shared"))
+            .ApplyConfiguration(new EventLogEntityTypeConfiguration(true, schema: "shared"))
+            .ApplyConfiguration(new EventLogPublishAttemptEntityTypeConfiguration(true, schema: "shared"))
+            .ApplyConfiguration(new AuditLogEntityTypeConfiguration(true, schema: "shared"));
 }

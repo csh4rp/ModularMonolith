@@ -1,12 +1,15 @@
 ﻿using System.Collections.Frozen;
 using System.Reflection;
+using Microsoft.OpenApi.Models;
 using ModularMonolith.CategoryManagement.Api.Categories;
 using ModularMonolith.CategoryManagement.Infrastructure;
 using ModularMonolith.Shared.Api;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace ModularMonolith.CategoryManagement.Api;
 
-public class CategoryManagementModule : AppModule
+public sealed class CategoryManagementModule : AppModule
 {
     private const string RootNamespace = "ModularMonolith.CategoryManagement";
 
@@ -26,11 +29,23 @@ public class CategoryManagementModule : AppModule
         BusinessLogicAssembly, ContractsAssembly, DomainAssembly, InfrastructureAssembly
     }.ToFrozenSet();
     
-
     public override IServiceCollection RegisterServices(IServiceCollection serviceCollection)
     {
         serviceCollection.AddInfrastructure();
 
         return serviceCollection;
+    }
+
+    public override void SwaggerGenAction(SwaggerGenOptions options)
+    {
+        options.SwaggerDoc("category-management-v1", new OpenApiInfo
+        {
+            Version = "v1.0"
+        });
+    }
+
+    public override void SwaggerUIAction(SwaggerUIOptions options)
+    {
+        options.SwaggerEndpoint("/swagger/category-management-v1/swagger.json", "Category Management v1.0");
     }
 }

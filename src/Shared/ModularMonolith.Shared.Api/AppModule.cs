@@ -1,5 +1,7 @@
 ﻿using System.Collections.Frozen;
 using System.Reflection;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace ModularMonolith.Shared.Api;
 
@@ -12,4 +14,13 @@ public abstract class AppModule
     public abstract WebApplication RegisterEndpoints(WebApplication app);
 
     public abstract FrozenSet<Assembly> Assemblies { get; }
+
+    public virtual void SwaggerGenAction(SwaggerGenOptions options)
+    {
+    }
+
+    public virtual void SwaggerUIAction(SwaggerUIOptions options)
+    {
+        
+    }
 }

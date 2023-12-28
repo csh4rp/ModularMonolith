@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.Application.Abstract;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Factories;
-using ModularMonolith.Shared.Infrastructure.DataAccess.Internal;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Options;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;

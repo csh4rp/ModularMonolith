@@ -14,4 +14,8 @@
     <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Common\" />
+  </ItemGroup>
+
 </Project>

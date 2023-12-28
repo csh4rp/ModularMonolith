@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.CategoryManagement.Infrastructure.Common.DataAccess;
 using ModularMonolith.CategoryManagement.Migrations;
-using ModularMonolith.Shared.Infrastructure.DataAccess.Internal;
+using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.IntegrationTests.Common;
 using ModularMonolith.Shared.Migrations;
 using Npgsql;

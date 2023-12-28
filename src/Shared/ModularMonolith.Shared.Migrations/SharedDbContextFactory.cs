@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using ModularMonolith.Shared.Infrastructure.DataAccess.Internal;
+using ModularMonolith.Shared.Infrastructure.AuditLogs.Interceptors;
+using ModularMonolith.Shared.Infrastructure.DataAccess;
 
 namespace ModularMonolith.Shared.Migrations;
 
@@ -15,7 +16,8 @@ public sealed class SharedDbContextFactory : IDesignTimeDbContextFactory<SharedD
                 b.MigrationsAssembly(GetType().Assembly.FullName);
                 b.MigrationsHistoryTable("migration_history", "shared");
             })
-            .UseSnakeCaseNamingConvention();
+            .UseSnakeCaseNamingConvention()
+            .AddInterceptors(new AuditLogInterceptor());
 
         var options = optionsBuilder.Options;
 

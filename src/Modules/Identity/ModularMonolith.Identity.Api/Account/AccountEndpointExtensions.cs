@@ -8,9 +8,15 @@ namespace ModularMonolith.Identity.Api.Account;
 
 internal static class AccountEndpointExtensions
 {
+    private const string Prefix = "api/identity/account";
+
     public static WebApplication UseAccountEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("account");
+        var group = app.MapGroup(Prefix)
+            .WithApiVersionSet()
+            .HasApiVersion(1, 0)
+            .WithTags("Account")
+            .WithGroupName("identity-v1");
 
         group.MapPost("sign-in", async ([FromServices] IMediator mediator,
             [FromBody] SignInCommand command,
@@ -68,7 +74,7 @@ internal static class AccountEndpointExtensions
             }).AddValidation<RegisterCommand>()
             .Produces(StatusCodes.Status204NoContent);
 
-        group.MapPost("verify-account", async ([FromServices] IMediator mediator,
+        group.MapPost("verify", async ([FromServices] IMediator mediator,
                 [FromBody] VerifyAccountCommand command,
                 CancellationToken cancellationToken) =>
             {

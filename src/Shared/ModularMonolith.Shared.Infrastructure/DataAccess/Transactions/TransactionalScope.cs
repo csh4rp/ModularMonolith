@@ -3,7 +3,7 @@ using ModularMonolith.Shared.Application.Abstract;
 
 namespace ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
 
-internal sealed class TransactionalScope : ITransactionalScope
+public sealed class TransactionalScope : ITransactionalScope
 {
     public static readonly AsyncLocal<TransactionalScope?> Current = new();
 

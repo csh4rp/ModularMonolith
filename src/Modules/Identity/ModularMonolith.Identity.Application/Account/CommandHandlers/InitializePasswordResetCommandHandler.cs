@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModularMonolith.Identity.Contracts.Account.Commands;
-using ModularMonolith.Identity.Domain.Users.Entities;
-using ModularMonolith.Identity.Domain.Users.Events;
+using ModularMonolith.Identity.Domain.Common.Entities;
+using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Events;
 

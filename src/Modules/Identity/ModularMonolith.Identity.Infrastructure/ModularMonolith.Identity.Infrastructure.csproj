@@ -21,8 +21,4 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Users\DataAccess\" />
-  </ItemGroup>
-
 </Project>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using ModularMonolith.CategoryManagement.Infrastructure.Common.DataAccess;
+using ModularMonolith.Shared.Infrastructure.AuditLogs.Interceptors;
 
 namespace ModularMonolith.CategoryManagement.Migrations;
 
@@ -13,9 +14,10 @@ public sealed class CategoryManagementDbContextFactory : IDesignTimeDbContextFac
         optionsBuilder.UseNpgsql(args[0], b =>
         {
             b.MigrationsAssembly(GetType().Assembly.FullName);
-            b.MigrationsHistoryTable("migration_history", "first_module");
+            b.MigrationsHistoryTable("migration_history", "category_management");
         })
-        .UseSnakeCaseNamingConvention();
+        .UseSnakeCaseNamingConvention()
+        .AddInterceptors(new AuditLogInterceptor());
 
         var options = optionsBuilder.Options;
 

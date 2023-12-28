@@ -4,7 +4,7 @@ using ModularMonolith.Shared.Domain.Entities;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.EntityConfigurations;
 
-internal sealed class EventCorrelationLockEntityTypeConfiguration : IEntityTypeConfiguration<EventCorrelationLock>
+public sealed class EventCorrelationLockEntityTypeConfiguration : IEntityTypeConfiguration<EventCorrelationLock>
 {
     private readonly bool _excludeFromMigrations;
     private readonly string _table;

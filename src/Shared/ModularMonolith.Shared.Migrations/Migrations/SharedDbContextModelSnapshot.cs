@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ModularMonolith.Shared.Domain.ValueObjects;
-using ModularMonolith.Shared.Infrastructure.DataAccess.Internal;
+using ModularMonolith.Shared.Infrastructure.DataAccess;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
