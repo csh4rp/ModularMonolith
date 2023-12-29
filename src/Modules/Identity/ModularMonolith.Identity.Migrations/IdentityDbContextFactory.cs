@@ -16,8 +16,7 @@ public class IdentityDbContextFactory : IDesignTimeDbContextFactory<IdentityDbCo
                 b.MigrationsAssembly(GetType().Assembly.FullName);
                 b.MigrationsHistoryTable("migration_history", "identity");
             })
-            .UseSnakeCaseNamingConvention()
-            .AddInterceptors(new AuditLogInterceptor());
+            .UseSnakeCaseNamingConvention();
 
         var options = optionsBuilder.Options;
 

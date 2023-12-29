@@ -2,9 +2,7 @@
 using System.Reflection;
 using Microsoft.OpenApi.Models;
 using ModularMonolith.Identity.Api.Account;
-using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Infrastructure;
-using ModularMonolith.Identity.Infrastructure.Common.DataAccess;
 using ModularMonolith.Shared.Api;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -22,12 +20,6 @@ public sealed class IdentityModule : AppModule
 
     public override IServiceCollection RegisterServices(IServiceCollection serviceCollection)
     {
-        serviceCollection.AddIdentityCore<User>(o =>
-        {
-            
-        })
-            .AddEntityFrameworkStores<IdentityDbContext>();
-        
         serviceCollection.AddInfrastructure();
         return serviceCollection;
     }

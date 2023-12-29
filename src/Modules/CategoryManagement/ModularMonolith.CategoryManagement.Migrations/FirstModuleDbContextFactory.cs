@@ -12,12 +12,11 @@ public sealed class CategoryManagementDbContextFactory : IDesignTimeDbContextFac
         var optionsBuilder = new DbContextOptionsBuilder<CategoryManagementDbContext>();
 
         optionsBuilder.UseNpgsql(args[0], b =>
-        {
-            b.MigrationsAssembly(GetType().Assembly.FullName);
-            b.MigrationsHistoryTable("migration_history", "category_management");
-        })
-        .UseSnakeCaseNamingConvention()
-        .AddInterceptors(new AuditLogInterceptor());
+            {
+                b.MigrationsAssembly(GetType().Assembly.FullName);
+                b.MigrationsHistoryTable("migration_history", "category_management");
+            })
+            .UseSnakeCaseNamingConvention();
 
         var options = optionsBuilder.Options;
 

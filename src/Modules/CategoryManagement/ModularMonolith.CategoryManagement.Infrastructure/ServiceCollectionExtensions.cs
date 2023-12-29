@@ -21,6 +21,7 @@ public static class ServiceCollectionExtensions
 
             opt.UseNpgsql(options.Value.ConnectionString);
             opt.UseSnakeCaseNamingConvention();
+            opt.UseApplicationServiceProvider(sp);
         });
 
         serviceCollection.AddScoped<ICategoryDatabase>(sp => sp.GetRequiredService<CategoryManagementDbContext>());

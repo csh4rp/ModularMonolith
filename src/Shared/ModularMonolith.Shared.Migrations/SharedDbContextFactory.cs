@@ -16,8 +16,7 @@ public sealed class SharedDbContextFactory : IDesignTimeDbContextFactory<SharedD
                 b.MigrationsAssembly(GetType().Assembly.FullName);
                 b.MigrationsHistoryTable("migration_history", "shared");
             })
-            .UseSnakeCaseNamingConvention()
-            .AddInterceptors(new AuditLogInterceptor());
+            .UseSnakeCaseNamingConvention();
 
         var options = optionsBuilder.Options;
 

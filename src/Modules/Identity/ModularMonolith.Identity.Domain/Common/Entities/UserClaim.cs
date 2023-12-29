@@ -4,9 +4,11 @@ public sealed class UserClaim
 {
     public Guid Id { get; set; }
     
-    public Guid UserId { get; set; }
+    public required Guid UserId { get; set; }
     
-    public string? ClaimType { get; set; }
+    public User? User { get; set; }
     
-    public string? ClaimValue { get; set; }
+    public required string ClaimType { get; set; }
+    
+    public required string ClaimValue { get; set; }
 }

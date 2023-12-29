@@ -2,6 +2,7 @@
 using FluentValidation;
 using ModularMonolith.Shared.Api.Exceptions;
 using ModularMonolith.Shared.Application;
+using ModularMonolith.Shared.Infrastructure.AuditLogs;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Events;
 using ModularMonolith.Shared.Infrastructure.Identity;
@@ -54,6 +55,8 @@ public static class WebApplicationBuilderExtensions
         {
             c.ConnectionString = builder.Configuration.GetConnectionString("Database")!;
         });
+
+        builder.Services.AddAuditLogs();
 
         foreach (var module in modules)
         {

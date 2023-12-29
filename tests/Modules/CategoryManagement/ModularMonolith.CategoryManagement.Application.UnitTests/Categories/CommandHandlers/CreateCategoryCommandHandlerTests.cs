@@ -61,9 +61,8 @@ public class CreateCategoryCommandHandlerTests
     {
         var optionsBuilder = new DbContextOptionsBuilder<CategoryManagementDbContext>();
 
-        optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString(), opt =>
+        optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString(), _ =>
         {
-            opt.EnableNullChecks();
         });
 
         return new CategoryManagementDbContext(optionsBuilder.Options);
