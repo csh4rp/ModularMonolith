@@ -33,7 +33,7 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
             if (!parentExists)
             {
                 throw new ValidationException(
-                    PropertyError.InvalidArgument(nameof(CreateCategoryCommand.Name), request.ParentId));
+                    PropertyError.InvalidArgument(nameof(CreateCategoryCommand.ParentId), request.ParentId));
             }
         }
 

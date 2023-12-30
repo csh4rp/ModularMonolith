@@ -13,7 +13,7 @@ public class PropertyError
     public static PropertyError NotUnique(string propertyName, object? parameter) => new()
     {
         PropertyName = propertyName,
-        ErrorCode = "NOT_UNIQUE",
+        ErrorCode = ErrorCodes.NotUnique,
         Message = $"Item with {propertyName} equal to {parameter} already exists",
         Parameter = parameter
     };
@@ -21,7 +21,7 @@ public class PropertyError
     public static PropertyError InvalidArgument(string propertyName, object? parameter) => new()
     {
         PropertyName = propertyName,
-        ErrorCode = "INVALID_ARGUMENT",
+        ErrorCode = ErrorCodes.InvalidArgument,
         Message = $"Value for  {propertyName} is invalid",
         Parameter = parameter
     };

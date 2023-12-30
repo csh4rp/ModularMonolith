@@ -18,13 +18,14 @@ public class SignInCommandHandlerTests
     private readonly IEventBus _eventBus = Substitute.For<IEventBus>();
     private readonly AuthOptions _options = new()
     {
-        Audience = "", 
-        Issuer = "",
-        Key = "12345678123456781234567812345678", ExpirationTimeInMinutes = 1
+        Audience = "localhost", 
+        Issuer = "localhost",
+        Key = "12345678123456781234567812345678",
+        ExpirationTimeInMinutes = 15
     };
     
     [Fact]
-    public async Task ShouldSignIn()
+    public async Task ShouldSignIn_WhenUserNameAndPasswordIsCorrect()
     {
         // Arrange
         const string validEmail = "mail@mail.com";
@@ -37,13 +38,13 @@ public class SignInCommandHandlerTests
         _userManager.CheckPasswordAsync(user, validPassword)
             .Returns(true);
         
-        var cmd = new SignInCommand(validEmail, validPassword);
+        var command = new SignInCommand(validEmail, validPassword);
 
         var handler = new SignInCommandHandler(_userManager, _eventBus,
             new OptionsWrapper<AuthOptions>(_options), TimeProvider.System);
 
         // Act
-        var result = await handler.Handle(cmd, default);
+        var result = await handler.Handle(command, default);
 
         // Assert
         result.Should().NotBeNull();
@@ -67,13 +68,13 @@ public class SignInCommandHandlerTests
         _userManager.CheckPasswordAsync(user, validPassword)
             .Returns(true);
         
-        var cmd = new SignInCommand("invalid@mail.com", "invalid");
+        var command = new SignInCommand("invalid@mail.com", "invalid");
 
         var handler = new SignInCommandHandler(_userManager, _eventBus,
             new OptionsWrapper<AuthOptions>(_options), TimeProvider.System);
 
         // Act
-        var result = await handler.Handle(cmd, default);
+        var result = await handler.Handle(command, default);
 
         // Assert
         result.Should().NotBeNull();
@@ -100,13 +101,13 @@ public class SignInCommandHandlerTests
         _userManager.CheckPasswordAsync(user, validPassword)
             .Returns(true);
         
-        var cmd = new SignInCommand(validEmail, "invalid");
+        var command = new SignInCommand(validEmail, "invalid");
 
         var handler = new SignInCommandHandler(_userManager, _eventBus,
             new OptionsWrapper<AuthOptions>(_options), TimeProvider.System);
 
         // Act
-        var result = await handler.Handle(cmd, default);
+        var result = await handler.Handle(command, default);
 
         // Assert
         result.Should().NotBeNull();

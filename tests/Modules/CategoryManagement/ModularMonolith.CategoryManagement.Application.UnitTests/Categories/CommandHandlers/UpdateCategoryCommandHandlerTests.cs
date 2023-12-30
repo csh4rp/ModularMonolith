@@ -5,6 +5,7 @@ using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
 using ModularMonolith.CategoryManagement.Domain.Entities;
 using ModularMonolith.CategoryManagement.Infrastructure.Common.DataAccess;
 using ModularMonolith.Shared.Application.Exceptions;
+using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Contracts.Errors;
 using Xunit;
 
@@ -13,43 +14,43 @@ namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.Co
 public class UpdateCategoryCommandHandlerTests
 {
     [Fact]
-    public async Task ShouldUpdateCategory()
+    public async Task ShouldUpdateCategory_WhenNameIsUnique()
     {
         // Arrange
-        await using var cnx = CreateDatabase();
+        await using var context = CreateDbContext();
 
         var category = new Category { Id = Guid.NewGuid(), Name = "Category 1" };
 
-        cnx.Categories.Add(category);
-        await cnx.SaveChangesAsync();
+        context.Categories.Add(category);
+        await context.SaveChangesAsync();
 
-        var cmd = new UpdateCategoryCommand { Id = category.Id, Name = "Category 1-1", ParentId = Guid.NewGuid() };
+        var command = new UpdateCategoryCommand(category.Id, null, "Category 1-1");
 
-        var handler = new UpdateCategoryCommandHandler(cnx);
+        var handler = new UpdateCategoryCommandHandler(context);
 
         // Act
-        await handler.Handle(cmd, default);
+        await handler.Handle(command, default);
 
         // Assert
-        var updatedCategory = await cnx.Categories.FindAsync(category.Id);
+        var updatedCategory = await context.Categories.FindAsync(category.Id);
 
         updatedCategory.Should().NotBeNull();
-        updatedCategory!.Name.Should().Be(cmd.Name);
-        updatedCategory.ParentId.Should().Be(cmd.ParentId);
+        updatedCategory!.Name.Should().Be(command.Name);
+        updatedCategory.ParentId.Should().Be(command.ParentId);
     }
 
     [Fact]
     public async Task ShouldThrowException_WhenCategoryDoesNotExist()
     {
         // Arrange
-        await using var cnx = CreateDatabase();
+        await using var context = CreateDbContext();
 
-        var cmd = new UpdateCategoryCommand { Id = Guid.NewGuid(), ParentId = Guid.NewGuid(), Name = "Category 1" };
+        var command = new UpdateCategoryCommand(Guid.NewGuid(), null, "Category 1");
 
-        var handler = new UpdateCategoryCommandHandler(cnx);
+        var handler = new UpdateCategoryCommandHandler(context);
 
         // Act
-        var act = () => handler.Handle(cmd, default);
+        var act = () => handler.Handle(command, default);
 
         // Assert
         await act.Should().ThrowAsync<EntityNotFoundException>();
@@ -59,30 +60,54 @@ public class UpdateCategoryCommandHandlerTests
     public async Task ShouldThrowException_WhenCategoryWithNameAlreadyExists()
     {
         // Arrange
-        await using var cnx = CreateDatabase();
+        await using var context = CreateDbContext();
 
-        var category = new Category { Id = Guid.NewGuid(), Name = "Category 1-1" };
-        var existingCategoryWithName = new Category { Id = Guid.NewGuid(), Name = "Category 1" };
+        var category = new Category { Id = Guid.NewGuid(), Name = "Category 1" };
+        var existingCategoryWithName = new Category { Id = Guid.NewGuid(), Name = "Category 1-1" };
 
-        cnx.Categories.Add(category);
-        cnx.Categories.Add(existingCategoryWithName);
-        await cnx.SaveChangesAsync();
+        context.Categories.Add(category);
+        context.Categories.Add(existingCategoryWithName);
+        await context.SaveChangesAsync();
 
-        var cmd = new UpdateCategoryCommand { Id = category.Id, Name = "Category 1", ParentId = Guid.NewGuid() };
+        var command = new UpdateCategoryCommand(category.Id, null, "Category 1-1");
 
-        var handler = new UpdateCategoryCommandHandler(cnx);
+        var handler = new UpdateCategoryCommandHandler(context);
 
         // Act
-        var act = () => handler.Handle(cmd, default);
+        var act = () => handler.Handle(command, default);
 
         // Assert
-        var expectedErrors = new[] { PropertyError.NotUnique(nameof(cmd.Name), cmd.Name) };
+        var exceptionAssertion = await act.Should().ThrowAsync<ConflictException>();
+        exceptionAssertion.And.PropertyName.Should().Be(nameof(UpdateCategoryCommand.Name));
+        exceptionAssertion.And.ErrorCode.Should().Be(ErrorCodes.NotUnique);
+    }
+    
+    [Fact]
+    public async Task ShouldThrowException_WhenParentDoesNotExist()
+    {
+        // Arrange
+        await using var context = CreateDbContext();
+
+        var category = new Category { Id = Guid.NewGuid(), Name = "Category 1" };
+
+        context.Categories.Add(category);
+        await context.SaveChangesAsync();
+
+        var command = new UpdateCategoryCommand(category.Id, Guid.NewGuid() ,"Category 1-1");
+
+        var handler = new UpdateCategoryCommandHandler(context);
+
+        // Act
+        var act = () => handler.Handle(command, default);
+
+        // Assert
+        var expectedErrors = new[] { PropertyError.InvalidArgument(nameof(command.ParentId), command.ParentId) };
 
         var exceptionAssertion = await act.Should().ThrowAsync<ValidationException>();
         exceptionAssertion.And.Errors.Should().BeEquivalentTo(expectedErrors);
     }
 
-    private static CategoryManagementDbContext CreateDatabase()
+    private static CategoryManagementDbContext CreateDbContext()
     {
         var optionsBuilder = new DbContextOptionsBuilder<CategoryManagementDbContext>();
 

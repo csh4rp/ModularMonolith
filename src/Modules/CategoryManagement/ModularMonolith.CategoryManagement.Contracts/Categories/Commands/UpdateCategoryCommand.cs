@@ -3,12 +3,12 @@ using ModularMonolith.Shared.Contracts;
 
 namespace ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
 
-public class UpdateCategoryCommand : ICommand
+public record UpdateCategoryCommand(Guid Id, Guid? ParentId, string Name) : ICommand
 {
     [JsonIgnore]
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Id;
 
-    public required Guid? ParentId { get; set; }
+    public Guid? ParentId { get; private set; } = ParentId;
 
-    public required string Name { get; set; }
+    public string Name { get; private set; } = Name;
 }

@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.EntityConfigurations;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
+using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs.Entities;
 
 namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs;
 
-public class TestDbContext : DbContext
+public class TestDbContext : BaseDbContext
 {
     public TestDbContext(DbContextOptions<TestDbContext> options) : base(options)
     {
@@ -34,7 +35,11 @@ public class TestDbContext : DbContext
                 j => { });
 
         modelBuilder.Entity<FirstTestEntity>()
-            .Property(b => b.OwnedEntity).HasColumnType("jsonb");
+            .OwnsOne(b => b.OwnedEntity, b =>
+            {
+                b.WithOwner().HasForeignKey("OwnerEntityId");
+                b.ToJson();
+            });
 
         modelBuilder.Entity<SecondTestEntity>()
             .ToTable("SecondTestEntity")

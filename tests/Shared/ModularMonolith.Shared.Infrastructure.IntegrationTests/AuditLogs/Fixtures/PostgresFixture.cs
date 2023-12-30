@@ -56,13 +56,18 @@ public class PostgresFixture : IAsyncLifetime
             (
                 "Id" UUID NOT NULL PRIMARY KEY,
                 "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
-                "ChangeType" VARCHAR(8) NOT NULL,
+                "EntityState" VARCHAR(8) NOT NULL,
                 "EntityType" VARCHAR(255) NOT NULL,
                 "EntityKeys" JSONB NOT NULL,
-                "Changes" JSONB NOT NULL,
+                "EntityPropertyChanges" JSONB NOT NULL,
                 "UserId" UUID,
+                "UserName" VARCHAR(128),
                 "OperationName" VARCHAR(128),
-                "TraceId" VARCHAR(32)
+                "TraceId" VARCHAR(32),
+                "SpanId" VARCHAR(32),
+                "ParentSpanId" VARCHAR(32),
+                "IpAddress" VARCHAR(32),
+                "UserAgent" VARCHAR(32)
             );
             """;
 

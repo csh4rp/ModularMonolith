@@ -31,7 +31,7 @@ internal sealed class ChangePasswordCommandHandler : ICommandHandler<ChangePassw
         var result = await _userManager.ChangePasswordAsync(user!, request.CurrentPassword, request.NewPassword);
         if (!result.Succeeded)
         {
-            return;
+            
         }
 
         await _eventBus.PublishAsync(new PasswordChanged(userId), cancellationToken);

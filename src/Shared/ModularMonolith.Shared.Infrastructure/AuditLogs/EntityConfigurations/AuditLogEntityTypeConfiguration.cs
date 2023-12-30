@@ -12,7 +12,8 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
     private readonly string _table;
     private readonly string? _schema;
 
-    public AuditLogEntityTypeConfiguration(bool excludeFromMigrations, string table = "audit_log",
+    public AuditLogEntityTypeConfiguration(bool excludeFromMigrations,
+        string table = "audit_log",
         string? schema = null)
     {
         _excludeFromMigrations = excludeFromMigrations;
@@ -41,13 +42,17 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
             .IsRequired()
             .HasMaxLength(8);
 
-        builder.Property(b => b.EntityPropertyChanges)
-            .IsRequired()
-            .HasColumnType("jsonb");
-
-        builder.Property(b => b.EntityKeys)
-            .IsRequired()
-            .HasColumnType("jsonb");
+        builder.OwnsMany(b => b.EntityPropertyChanges, b =>
+        {
+            b.ToTable(_table);
+            b.ToJson();
+        });
+        
+        builder.OwnsMany(b => b.EntityKeys, b =>
+        {
+            b.ToTable(_table);
+            b.ToJson();
+        });
 
         builder.Property(b => b.OperationName)
             .IsRequired()

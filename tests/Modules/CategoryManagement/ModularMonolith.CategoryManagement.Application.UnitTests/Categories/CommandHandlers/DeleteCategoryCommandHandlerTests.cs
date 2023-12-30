@@ -12,25 +12,25 @@ namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.Co
 public class DeleteCategoryCommandHandlerTests
 {
     [Fact]
-    public async Task ShouldDeleteCategory()
+    public async Task ShouldDeleteCategory_WhenCategoryExists()
     {
         // Arrange
-        await using var cnx = CreateDatabase();
+        await using var context = CreateDbContext();
 
         var existingCategory = new Category { Id = Guid.NewGuid(), Name = "Category 1" };
 
-        cnx.Categories.Add(existingCategory);
-        await cnx.SaveChangesAsync();
+        context.Categories.Add(existingCategory);
+        await context.SaveChangesAsync();
 
-        var cmd = new DeleteCategoryCommand(existingCategory.Id);
+        var command = new DeleteCategoryCommand(existingCategory.Id);
 
-        var handler = new DeleteCategoryCommandHandler(cnx);
+        var handler = new DeleteCategoryCommandHandler(context);
 
         // Act
-        await handler.Handle(cmd, default);
+        await handler.Handle(command, default);
 
         // Assert
-        var category = await cnx.Categories.FindAsync(existingCategory.Id);
+        var category = await context.Categories.FindAsync(existingCategory.Id);
 
         category.Should().BeNull();
     }
@@ -39,20 +39,20 @@ public class DeleteCategoryCommandHandlerTests
     public async Task ShouldThrowException_WhenCategoryDoesNotExist()
     {
         // Arrange
-        await using var cnx = CreateDatabase();
+        await using var context = CreateDbContext();
 
-        var cmd = new DeleteCategoryCommand(Guid.NewGuid());
+        var command = new DeleteCategoryCommand(Guid.NewGuid());
 
-        var handler = new DeleteCategoryCommandHandler(cnx);
+        var handler = new DeleteCategoryCommandHandler(context);
 
         // Act
-        var act = () => handler.Handle(cmd, default);
+        var act = () => handler.Handle(command, default);
 
         // Assert
         await act.Should().ThrowAsync<EntityNotFoundException>();
     }
 
-    private static CategoryManagementDbContext CreateDatabase()
+    private static CategoryManagementDbContext CreateDbContext()
     {
         var optionsBuilder = new DbContextOptionsBuilder<CategoryManagementDbContext>();
 
