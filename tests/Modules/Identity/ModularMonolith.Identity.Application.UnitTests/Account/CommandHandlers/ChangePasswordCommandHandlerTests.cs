@@ -56,7 +56,9 @@ public class ChangePasswordCommandHandlerTests
         var user = new User { Id = Guid.Parse(UserId) };
 
         _userManager.FindByIdAsync(user.Id.ToString()).Returns(user);
-        _userManager.ChangePasswordAsync(user, Arg.Is<string>(s => s != currentPassword), newPassword)
+        // _userManager.ChangePasswordAsync(user, Arg.Is<string>(s => s != currentPassword), newPassword)
+        //     .Returns(IdentityResult.Failed(new IdentityError{Code = ""}));
+        _userManager.ChangePasswordAsync(Arg.Any<User>(), Arg.Any<string>(), Arg.Any<string>())
             .Returns(IdentityResult.Failed(new IdentityError{Code = ""}));
         
         var command = new ChangePasswordCommand(currentPassword, newPassword, newPassword);

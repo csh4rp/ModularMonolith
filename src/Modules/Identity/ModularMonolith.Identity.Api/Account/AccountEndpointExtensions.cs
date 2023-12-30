@@ -37,9 +37,15 @@ internal static class AccountEndpointExtensions
                 [FromBody] ChangePasswordCommand command,
                 CancellationToken cancellationToken) =>
             {
-                await mediator.Send(command, cancellationToken);
+                var result = await mediator.Send(command, cancellationToken);
 
-                return Results.NoContent();
+                return result.Error?.Code switch
+                {
+                    "" => Results.Ok(""),
+                    _ => Results.NoContent()
+                };
+
+                // return Results.NoContent();
             }).AddValidation<ChangePasswordCommand>()
             .Produces(StatusCodes.Status204NoContent)
             .RequireAuthorization();

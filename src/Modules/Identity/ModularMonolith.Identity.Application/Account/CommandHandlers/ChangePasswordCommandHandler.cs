@@ -5,10 +5,11 @@ using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Events;
 using ModularMonolith.Shared.Application.Identity;
+using ModularMonolith.Shared.Contracts;
 
 namespace ModularMonolith.Identity.Application.Account.CommandHandlers;
 
-internal sealed class ChangePasswordCommandHandler : ICommandHandler<ChangePasswordCommand>
+internal sealed class ChangePasswordCommandHandler : ICommandHandler<ChangePasswordCommand, Result>
 {
     private readonly UserManager<User> _userManager;
     private readonly IIdentityContextAccessor _identityContextAccessor;
@@ -22,7 +23,7 @@ internal sealed class ChangePasswordCommandHandler : ICommandHandler<ChangePassw
         _eventBus = eventBus;
     }
 
-    public async Task Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
     {
         var userId = _identityContextAccessor.Context!.UserId;
 
@@ -31,9 +32,11 @@ internal sealed class ChangePasswordCommandHandler : ICommandHandler<ChangePassw
         var result = await _userManager.ChangePasswordAsync(user!, request.CurrentPassword, request.NewPassword);
         if (!result.Succeeded)
         {
-            
+            return new Error("");
         }
 
         await _eventBus.PublishAsync(new PasswordChanged(userId), cancellationToken);
+
+        return Result.Successful();
     }
 }
