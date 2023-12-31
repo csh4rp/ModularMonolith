@@ -5,7 +5,7 @@ using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Events;
-using ModularMonolith.Shared.Application.Exceptions;
+using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Identity.Application.Account.CommandHandlers;
@@ -24,22 +24,27 @@ internal sealed class ResetPasswordCommandHandler : ICommandHandler<ResetPasswor
         _logger = logger;
     }
 
-    public async Task Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userManager.FindByIdAsync(request.UserId.ToString())
-                   ?? throw new ValidationException(PropertyError.InvalidArgument(
-                       nameof(ResetPasswordCommand.UserId), request.UserId));
+        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+
+        if (user is null)
+        {
+            return MemberError.InvalidValue(nameof(request.UserId));
+        }
 
         var result = await _userManager.ResetPasswordAsync(user, request.ResetPasswordToken, request.Password);
+        
         if (!result.Succeeded)
         {
             _logger.LogWarning("An attempt was made to reset password for user with ID: {UserId} using invalid token",
                 user.Id);
 
-            throw new ValidationException(PropertyError.InvalidArgument(
-                nameof(ResetPasswordCommand.ResetPasswordToken), request.ResetPasswordToken));
+            return MemberError.InvalidValue(nameof(request.ResetPasswordToken));
         }
 
         await _eventBus.PublishAsync(new PasswordReset(user.Id), cancellationToken);
+        
+        return Result.Successful;
     }
 }

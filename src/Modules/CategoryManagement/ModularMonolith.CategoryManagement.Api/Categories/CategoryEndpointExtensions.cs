@@ -30,7 +30,7 @@ internal static class CategoryEndpointExtensions
             {
                 var result = await mediator.Send(command, cancellationToken);
 
-                return TypedResults.Created($"{Prefix}/{result.Id}", result);
+                return ApiResult.From(result);
             })
             .AddValidation<CreateCategoryCommand>()
             .Produces<ValidationErrorResponse>(StatusCodes.Status400BadRequest)
@@ -44,9 +44,9 @@ internal static class CategoryEndpointExtensions
             {
                 command.Id = id;
 
-                await mediator.Send(command, cancellationToken);
+                var result = await mediator.Send(command, cancellationToken);
 
-                return TypedResults.NoContent();
+                return ApiResult.From(result);
             })
             .AddValidation<UpdateCategoryCommand>()
             .Produces(StatusCodes.Status204NoContent)
@@ -60,9 +60,9 @@ internal static class CategoryEndpointExtensions
             {
                 var command = new DeleteCategoryCommand(id);
 
-                await mediator.Send(command, cancellationToken);
+                var result = await mediator.Send(command, cancellationToken);
 
-                return TypedResults.NoContent();
+                return ApiResult.From(result);
             })
             .Produces(StatusCodes.Status204NoContent)
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound);

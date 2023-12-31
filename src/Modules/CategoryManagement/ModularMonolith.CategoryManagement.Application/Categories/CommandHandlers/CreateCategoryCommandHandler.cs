@@ -3,7 +3,6 @@ using ModularMonolith.CategoryManagement.Application.Categories.Abstract;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
 using ModularMonolith.CategoryManagement.Domain.Entities;
 using ModularMonolith.Shared.Application.Commands;
-using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Contracts.Errors;
 
@@ -15,14 +14,15 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
 
     public CreateCategoryCommandHandler(ICategoryDatabase categoryDatabase) => _categoryDatabase = categoryDatabase;
 
-    public async Task<CreatedResponse> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<Result<CreatedResponse>> Handle(CreateCategoryCommand request,
+        CancellationToken cancellationToken)
     {
         var categoryWithNameExists = await _categoryDatabase.Categories
             .AnyAsync(c => c.Name == request.Name, cancellationToken);
 
         if (categoryWithNameExists)
         {
-            throw new ConflictException(nameof(request.Name), ErrorCodes.NotUnique, "Category name must be unique.");
+            return MemberError.Conflict(nameof(request.Name));
         }
 
         if (request.ParentId.HasValue)
@@ -32,15 +32,13 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
 
             if (!parentExists)
             {
-                throw new ValidationException(
-                    PropertyError.InvalidArgument(nameof(CreateCategoryCommand.ParentId), request.ParentId));
+                return MemberError.InvalidValue(nameof(CreateCategoryCommand.ParentId));
             }
         }
 
         var category = new Category { ParentId = request.ParentId, Name = request.Name };
 
         _categoryDatabase.Categories.Add(category);
-
         await _categoryDatabase.SaveChangesAsync(cancellationToken);
 
         return new CreatedResponse(category.Id);

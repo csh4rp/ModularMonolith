@@ -1,5 +1,6 @@
 ﻿using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
+using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Shared.Contracts;
 

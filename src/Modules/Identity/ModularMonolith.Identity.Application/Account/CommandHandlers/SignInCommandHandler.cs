@@ -11,6 +11,8 @@ using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Events;
+using ModularMonolith.Shared.Contracts;
+using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Identity.Application.Account.CommandHandlers;
 
@@ -30,12 +32,12 @@ internal sealed class SignInCommandHandler : ICommandHandler<SignInCommand, Sign
         _timeProvider = timeProvider;
     }
 
-    public async Task<SignInResponse> Handle(SignInCommand request, CancellationToken cancellationToken)
+    public async Task<Result<SignInResponse>> Handle(SignInCommand request, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user is null)
         {
-            return SignInResponse.InvalidCredentials();
+            return MemberError.InvalidValue(nameof(request.Password));
         }
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
@@ -43,7 +45,7 @@ internal sealed class SignInCommandHandler : ICommandHandler<SignInCommand, Sign
         {
             await _eventBus.PublishAsync(new SignInFailed(user.Id), cancellationToken);
 
-            return SignInResponse.InvalidCredentials();
+            return MemberError.InvalidValue(nameof(request.Password));
         }
 
         var options = _options.Value;

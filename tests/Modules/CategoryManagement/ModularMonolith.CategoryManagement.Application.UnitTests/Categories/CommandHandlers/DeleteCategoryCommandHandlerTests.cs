@@ -4,7 +4,8 @@ using ModularMonolith.CategoryManagement.Application.Categories.CommandHandlers;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
 using ModularMonolith.CategoryManagement.Domain.Entities;
 using ModularMonolith.CategoryManagement.Infrastructure.Common.DataAccess;
-using ModularMonolith.Shared.Application.Exceptions;
+using ModularMonolith.Shared.Contracts.Errors;
+using ModularMonolith.Shared.TestUtils.Assertions;
 using Xunit;
 
 namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.CommandHandlers;
@@ -27,16 +28,18 @@ public class DeleteCategoryCommandHandlerTests
         var handler = new DeleteCategoryCommandHandler(context);
 
         // Act
-        await handler.Handle(command, default);
+        var result = await handler.Handle(command, default);
 
         // Assert
+        result.Should().BeSuccessful();
+        
         var category = await context.Categories.FindAsync(existingCategory.Id);
 
         category.Should().BeNull();
     }
 
     [Fact]
-    public async Task ShouldThrowException_WhenCategoryDoesNotExist()
+    public async Task ShouldReturnNotFoundError_WhenCategoryDoesNotExist()
     {
         // Arrange
         await using var context = CreateDbContext();
@@ -46,10 +49,11 @@ public class DeleteCategoryCommandHandlerTests
         var handler = new DeleteCategoryCommandHandler(context);
 
         // Act
-        var act = () => handler.Handle(command, default);
+        var result = await handler.Handle(command, default);
 
         // Assert
-        await act.Should().ThrowAsync<EntityNotFoundException>();
+        result.Should().NotBeSuccessful();
+        result.Error.Should().BeOfType<EntityNotFoundError>(); 
     }
 
     private static CategoryManagementDbContext CreateDbContext()

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Identity;
 using ModularMonolith.Identity.Application.Account.CommandHandlers;
 using ModularMonolith.Identity.Application.UnitTests.Account.Fakes;
 using ModularMonolith.Identity.Contracts.Account.Commands;
@@ -6,6 +7,8 @@ using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Events;
 using ModularMonolith.Shared.Application.Identity;
+using ModularMonolith.Shared.Contracts.Errors;
+using ModularMonolith.Shared.TestUtils.Assertions;
 using NSubstitute;
 using Xunit;
 
@@ -41,14 +44,16 @@ public class ChangePasswordCommandHandlerTests
         var handler = new ChangePasswordCommandHandler(_userManager, _identityContextAccessor, _eventBus);
         
         // Act
-        await handler.Handle(command, default);
+        var result = await handler.Handle(command, default);
         
         // Assert
+        result.Should().BeSuccessful();
+        
         await _eventBus.Received(1).PublishAsync(Arg.Is<PasswordChanged>(e => e.UserId == user.Id), default);
     }
     
     [Fact]
-    public async Task ShouldChangePassword_WhenCurrentPasswordIsInvalid()
+    public async Task ShouldNotChangePassword_WhenCurrentPasswordIsInvalid()
     {
         // Arrange
         const string currentPassword = "Pa$$word";
@@ -56,19 +61,24 @@ public class ChangePasswordCommandHandlerTests
         var user = new User { Id = Guid.Parse(UserId) };
 
         _userManager.FindByIdAsync(user.Id.ToString()).Returns(user);
-        // _userManager.ChangePasswordAsync(user, Arg.Is<string>(s => s != currentPassword), newPassword)
-        //     .Returns(IdentityResult.Failed(new IdentityError{Code = ""}));
         _userManager.ChangePasswordAsync(Arg.Any<User>(), Arg.Any<string>(), Arg.Any<string>())
-            .Returns(IdentityResult.Failed(new IdentityError{Code = ""}));
+            .Returns(IdentityResult.Failed(new IdentityError{Code = "PasswordMismatch"}));
         
         var command = new ChangePasswordCommand(currentPassword, newPassword, newPassword);
         
         var handler = new ChangePasswordCommandHandler(_userManager, _identityContextAccessor, _eventBus);
         
         // Act
-        await handler.Handle(command, default);
+        var result = await handler.Handle(command, default);
         
         // Assert
+        result.Should().NotBeSuccessful();
+        result.Error.Should().BeOfType<MemberError>();
+
+        var error = result.Error.As<MemberError>();
+        error.Target.Should().Be(nameof(command.CurrentPassword));
+        error.Code.Should().Be(ErrorCodes.InvalidValue);
+        
         await _eventBus.DidNotReceiveWithAnyArgs().PublishAsync(Arg.Any<PasswordChanged>(), default);
     }
 

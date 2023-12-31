@@ -6,10 +6,11 @@ using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Events;
 using ModularMonolith.Shared.Application.Identity;
 using ModularMonolith.Shared.Contracts;
+using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Identity.Application.Account.CommandHandlers;
 
-internal sealed class ChangePasswordCommandHandler : ICommandHandler<ChangePasswordCommand, Result>
+internal sealed class ChangePasswordCommandHandler : ICommandHandler<ChangePasswordCommand>
 {
     private readonly UserManager<User> _userManager;
     private readonly IIdentityContextAccessor _identityContextAccessor;
@@ -26,17 +27,21 @@ internal sealed class ChangePasswordCommandHandler : ICommandHandler<ChangePassw
     public async Task<Result> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
     {
         var userId = _identityContextAccessor.Context!.UserId;
-
         var user = await _userManager.FindByIdAsync(userId.ToString());
-
         var result = await _userManager.ChangePasswordAsync(user!, request.CurrentPassword, request.NewPassword);
-        if (!result.Succeeded)
+
+        if (result.Succeeded)
         {
-            return new Error("");
+            await _eventBus.PublishAsync(new PasswordChanged(userId), cancellationToken);
+
+            return Result.Successful;
         }
-
-        await _eventBus.PublishAsync(new PasswordChanged(userId), cancellationToken);
-
-        return Result.Successful();
+        
+        if (result.Errors.Any(e => e.Code.Equals("PasswordMismatch", StringComparison.OrdinalIgnoreCase)))
+        {
+            return MemberError.InvalidValue(nameof(request.CurrentPassword));
+        }
+        
+        return MemberError.InvalidValue(nameof(request.NewPassword));
     }
 }

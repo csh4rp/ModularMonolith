@@ -3,7 +3,6 @@ using ModularMonolith.CategoryManagement.Application.Categories.Abstract;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
 using ModularMonolith.CategoryManagement.Domain.Entities;
 using ModularMonolith.Shared.Application.Commands;
-using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Contracts.Errors;
 
@@ -15,18 +14,22 @@ internal sealed class UpdateCategoryCommandHandler : ICommandHandler<UpdateCateg
 
     public UpdateCategoryCommandHandler(ICategoryDatabase categoryDatabase) => _categoryDatabase = categoryDatabase;
 
-    public async Task Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
     {
-        var category =
-            await _categoryDatabase.Categories.FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken)
-            ?? throw new EntityNotFoundException(typeof(Category), request.Id);
+        var category = await _categoryDatabase.Categories
+            .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
 
+        if (category is null)
+        {
+            return new EntityNotFoundError(nameof(Category), request.Id);
+        }
+        
         var categoryWithNameExists = await _categoryDatabase.Categories
             .AnyAsync(c => c.Id != request.Id && c.Name == request.Name, cancellationToken);
 
         if (categoryWithNameExists)
         {
-            throw new ConflictException(nameof(request.Name), ErrorCodes.NotUnique, "A category with given name already exists.");
+            return MemberError.Conflict(nameof(request.Name));
         }
         
         if (request.ParentId.HasValue)
@@ -36,8 +39,7 @@ internal sealed class UpdateCategoryCommandHandler : ICommandHandler<UpdateCateg
 
             if (!parentExists)
             {
-                throw new ValidationException(
-                    PropertyError.InvalidArgument(nameof(CreateCategoryCommand.ParentId), request.ParentId));
+                return MemberError.InvalidValue(nameof(UpdateCategoryCommand.ParentId));
             }
         }
 
@@ -45,5 +47,7 @@ internal sealed class UpdateCategoryCommandHandler : ICommandHandler<UpdateCateg
         category.Name = request.Name;
 
         await _categoryDatabase.SaveChangesAsync(cancellationToken);
+
+        return Result.Successful;
     }
 }

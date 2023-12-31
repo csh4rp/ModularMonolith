@@ -7,8 +7,11 @@ using ModularMonolith.Identity.Core.Options;
 using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Events;
+using ModularMonolith.Shared.Contracts.Errors;
+using ModularMonolith.Shared.TestUtils.Assertions;
 using NSubstitute;
 using Xunit;
+
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.CommandHandlers;
 
@@ -47,8 +50,9 @@ public class SignInCommandHandlerTests
         var result = await handler.Handle(command, default);
 
         // Assert
-        result.Should().NotBeNull();
-        result.Token.Should().NotBeEmpty();
+        result.Should().BeSuccessful();
+        result.Value.Should().NotBeNull();
+        result.Value!.Token.Should().NotBeNullOrEmpty();
 
         await _eventBus.Received(1)
             .PublishAsync(Arg.Is<SignInSucceeded>(s => s.UserId == user.Id), default);
@@ -77,9 +81,8 @@ public class SignInCommandHandlerTests
         var result = await handler.Handle(command, default);
 
         // Assert
-        result.Should().NotBeNull();
-        result.Token.Should().BeNullOrEmpty();
-
+        result.Should().NotBeSuccessful();
+        
         await _eventBus.DidNotReceiveWithAnyArgs()
             .PublishAsync<SignInSucceeded>(default!, default);
         
@@ -88,7 +91,7 @@ public class SignInCommandHandlerTests
     }
     
     [Fact]
-    public async Task ShouldNotSignIn_WhenPasswordIsInvalid()
+    public async Task ShouldReturnInvalidPasswordError_WhenPasswordIsInvalid()
     {
         // Arrange
         const string validEmail = "mail@mail.com";
@@ -110,9 +113,13 @@ public class SignInCommandHandlerTests
         var result = await handler.Handle(command, default);
 
         // Assert
-        result.Should().NotBeNull();
-        result.Token.Should().BeNullOrEmpty();
+        result.Should().NotBeSuccessful();
+        result.Error.Should().BeOfType<MemberError>();
 
+        var error = result.Error.As<MemberError>();
+        error.Target.Should().Be(nameof(command.Password));
+        error.Code.Should().Be(ErrorCodes.InvalidValue);
+        
         await _eventBus.Received(1)
             .PublishAsync(Arg.Is<SignInFailed>(s => s.UserId == user.Id), default);
     }

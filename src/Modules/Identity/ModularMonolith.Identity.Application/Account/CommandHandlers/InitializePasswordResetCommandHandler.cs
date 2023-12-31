@@ -6,6 +6,7 @@ using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Events;
+using ModularMonolith.Shared.Contracts;
 
 namespace ModularMonolith.Identity.Application.Account.CommandHandlers;
 
@@ -24,7 +25,7 @@ internal sealed class InitializePasswordResetCommandHandler : ICommandHandler<In
         _logger = logger;
     }
 
-    public async Task Handle(InitializePasswordResetCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(InitializePasswordResetCommand request, CancellationToken cancellationToken)
     {
         var normalizedEmail = _userManager.NormalizeEmail(request.Email);
 
@@ -37,9 +38,11 @@ internal sealed class InitializePasswordResetCommandHandler : ICommandHandler<In
         {
             _logger.LogWarning("Password reset initialized for not existing user");
 
-            return;
+            return Result.Successful;
         }
 
         await _eventBus.PublishAsync(new PasswordResetInitialized(userId), cancellationToken);
+        
+        return Result.Successful;
     }
 }

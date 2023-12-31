@@ -6,7 +6,7 @@ using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Events;
-using ModularMonolith.Shared.Application.Exceptions;
+using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Identity.Application.Account.CommandHandlers;
@@ -22,15 +22,16 @@ internal sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand>
         _eventBus = eventBus;
     }
 
-    public async Task Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         var normalizedEmail = _userManager.NormalizeEmail(request.Email);
 
-        var emailExists =
-            await _userManager.Users.AnyAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
+        var emailExists = await _userManager.Users
+            .AnyAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
+        
         if (emailExists)
         {
-            throw new ValidationException(PropertyError.NotUnique(nameof(RegisterCommand.Email), request.Email));
+            return MemberError.Conflict(nameof(request.Email));
         }
 
         var user = new User { UserName = request.Email, Email = request.Email };
@@ -42,5 +43,7 @@ internal sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand>
         }
 
         await _eventBus.PublishAsync(new UserRegistered(user.Id, user.Email), cancellationToken);
+        
+        return Result.Successful;
     }
 }

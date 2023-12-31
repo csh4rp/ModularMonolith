@@ -42,22 +42,15 @@ internal sealed class ValidationEndpointFilter<TModel> : IEndpointFilter
         var errors = validationResult.Errors.Select(e =>
         {
             var codeMapped = ErrorCodeMapper.TryMap(e.ErrorCode, out var errorCode);
-
-            return new PropertyError
-            {
-                PropertyName = char.ToLower(e.PropertyName[0]) + e.PropertyName[1..],
-                Message = e.ErrorMessage,
-                ErrorCode = codeMapped ? errorCode! : e.ErrorCode,
-                Parameter = e.AttemptedValue
-            };
+            var code = codeMapped ? errorCode! : e.ErrorCode;
+            var target = char.ToLower(e.PropertyName[0]) + e.PropertyName[1..];
+            
+            return new MemberError(code, e.ErrorMessage, target);
         }).ToArray();
 
         var currentActivity = Activity.Current;
-        var detail = currentActivity is null
-            ? "One or more validation errors occurred"
-            : $"One or more validation errors occurred while handling: {currentActivity.OperationName}";
         var traceId = currentActivity?.TraceId.ToString() ?? context.HttpContext.TraceIdentifier;
-        var response = new ValidationErrorResponse(context.HttpContext.Request.Path, detail, traceId, errors);
+        var response = new ValidationErrorResponse(context.HttpContext.Request.Path, traceId, errors);
 
         return Results.BadRequest(response);
     }

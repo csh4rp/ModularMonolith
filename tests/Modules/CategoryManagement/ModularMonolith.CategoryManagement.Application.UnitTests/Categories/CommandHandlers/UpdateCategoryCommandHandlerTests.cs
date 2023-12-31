@@ -4,8 +4,7 @@ using ModularMonolith.CategoryManagement.Application.Categories.CommandHandlers;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
 using ModularMonolith.CategoryManagement.Domain.Entities;
 using ModularMonolith.CategoryManagement.Infrastructure.Common.DataAccess;
-using ModularMonolith.Shared.Application.Exceptions;
-using ModularMonolith.Shared.Contracts;
+using ModularMonolith.Shared.TestUtils.Assertions;
 using ModularMonolith.Shared.Contracts.Errors;
 using Xunit;
 
@@ -29,9 +28,11 @@ public class UpdateCategoryCommandHandlerTests
         var handler = new UpdateCategoryCommandHandler(context);
 
         // Act
-        await handler.Handle(command, default);
+        var result = await handler.Handle(command, default);
 
         // Assert
+        result.Should().BeSuccessful();
+
         var updatedCategory = await context.Categories.FindAsync(category.Id);
 
         updatedCategory.Should().NotBeNull();
@@ -40,7 +41,7 @@ public class UpdateCategoryCommandHandlerTests
     }
 
     [Fact]
-    public async Task ShouldThrowException_WhenCategoryDoesNotExist()
+    public async Task ShouldReturnNotFoundError_WhenCategoryDoesNotExist()
     {
         // Arrange
         await using var context = CreateDbContext();
@@ -50,14 +51,15 @@ public class UpdateCategoryCommandHandlerTests
         var handler = new UpdateCategoryCommandHandler(context);
 
         // Act
-        var act = () => handler.Handle(command, default);
+        var result = await handler.Handle(command, default);
 
         // Assert
-        await act.Should().ThrowAsync<EntityNotFoundException>();
+        result.Should().NotBeSuccessful();
+        result.Error.Should().BeOfType<EntityNotFoundError>();
     }
 
     [Fact]
-    public async Task ShouldThrowException_WhenCategoryWithNameAlreadyExists()
+    public async Task ShouldReturnConflictError_WhenCategoryWithNameAlreadyExists()
     {
         // Arrange
         await using var context = CreateDbContext();
@@ -74,16 +76,19 @@ public class UpdateCategoryCommandHandlerTests
         var handler = new UpdateCategoryCommandHandler(context);
 
         // Act
-        var act = () => handler.Handle(command, default);
+        var result = await handler.Handle(command, default);
 
         // Assert
-        var exceptionAssertion = await act.Should().ThrowAsync<ConflictException>();
-        exceptionAssertion.And.PropertyName.Should().Be(nameof(UpdateCategoryCommand.Name));
-        exceptionAssertion.And.ErrorCode.Should().Be(ErrorCodes.NotUnique);
+        result.Should().NotBeSuccessful();
+        result.Error.Should().BeOfType<MemberError>();
+
+        var error = result.Error.As<MemberError>();
+        error.Target.Should().Be(nameof(command.Name));
+        error.Code.Should().Be(ErrorCodes.Conflict);
     }
-    
+
     [Fact]
-    public async Task ShouldThrowException_WhenParentDoesNotExist()
+    public async Task ShouldReturnInvalidValueError_WhenParentDoesNotExist()
     {
         // Arrange
         await using var context = CreateDbContext();
@@ -93,18 +98,20 @@ public class UpdateCategoryCommandHandlerTests
         context.Categories.Add(category);
         await context.SaveChangesAsync();
 
-        var command = new UpdateCategoryCommand(category.Id, Guid.NewGuid() ,"Category 1-1");
+        var command = new UpdateCategoryCommand(category.Id, Guid.NewGuid(), "Category 1-1");
 
         var handler = new UpdateCategoryCommandHandler(context);
 
         // Act
-        var act = () => handler.Handle(command, default);
+        var result = await handler.Handle(command, default);
 
         // Assert
-        var expectedErrors = new[] { PropertyError.InvalidArgument(nameof(command.ParentId), command.ParentId) };
-
-        var exceptionAssertion = await act.Should().ThrowAsync<ValidationException>();
-        exceptionAssertion.And.Errors.Should().BeEquivalentTo(expectedErrors);
+        result.Should().NotBeSuccessful();
+        result.Error.Should().BeOfType<MemberError>();
+        
+        var error = result.Error.As<MemberError>();
+        error.Target.Should().Be(nameof(command.ParentId));
+        error.Code.Should().Be(ErrorCodes.InvalidValue);
     }
 
     private static CategoryManagementDbContext CreateDbContext()
