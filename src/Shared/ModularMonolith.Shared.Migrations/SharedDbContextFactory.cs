@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using ModularMonolith.Shared.Infrastructure.AuditLogs.Interceptors;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
+
+[assembly: ExcludeFromCodeCoverage]
 
 namespace ModularMonolith.Shared.Migrations;
 

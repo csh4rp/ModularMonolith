@@ -1,1 +1,1 @@
-﻿Console.WriteLine("Running migrations for SharedDbContext...");
+﻿Console.WriteLine("Running migrations...");
