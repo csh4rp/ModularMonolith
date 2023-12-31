@@ -8,7 +8,4 @@ public sealed class MemberError : Error
 
     public static MemberError InvalidValue(string target) => 
         new(ErrorCodes.InvalidValue, "Value is invalid", target);
-
-    public static MemberError Conflict(string target) => 
-        new(ErrorCodes.Conflict, "Value is conflicting", target);
 }

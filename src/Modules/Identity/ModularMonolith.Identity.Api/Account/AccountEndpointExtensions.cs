@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ModularMonolith.Identity.Contracts.Account.Commands;
 using ModularMonolith.Identity.Contracts.Account.Responses;
+using ModularMonolith.Shared.Api.CustomResults;
 using ModularMonolith.Shared.Api.Filters;
 
 namespace ModularMonolith.Identity.Api.Account;
@@ -19,34 +20,23 @@ internal static class AccountEndpointExtensions
             .WithGroupName("identity-v1");
 
         group.MapPost("sign-in", async ([FromServices] IMediator mediator,
-            [FromBody] SignInCommand command,
-            CancellationToken cancellationToken) =>
-        {
-            var result = await mediator.Send(command, cancellationToken);
-
-            if (string.IsNullOrEmpty(result.Token))
+                [FromBody] SignInCommand command,
+                CancellationToken cancellationToken) =>
             {
-                return Results.Problem();
-            }
+                var result = await mediator.Send(command, cancellationToken);
+                return ApiResult.From(result);
+            })
+            .AddValidation<SignInCommand>()
+            .Produces<SignInResponse>();
 
-            return Results.Ok(result);
-        }).AddValidation<SignInCommand>()
-        .Produces<SignInResponse>();
-        
         group.MapPost("change-password", async ([FromServices] IMediator mediator,
                 [FromBody] ChangePasswordCommand command,
                 CancellationToken cancellationToken) =>
             {
                 var result = await mediator.Send(command, cancellationToken);
-
-                return result.Error?.Code switch
-                {
-                    "" => Results.Ok(""),
-                    _ => Results.NoContent()
-                };
-
-                // return Results.NoContent();
-            }).AddValidation<ChangePasswordCommand>()
+                return ApiResult.From(result);
+            })
+            .AddValidation<ChangePasswordCommand>()
             .Produces(StatusCodes.Status204NoContent)
             .RequireAuthorization();
 
@@ -55,41 +45,41 @@ internal static class AccountEndpointExtensions
                 CancellationToken cancellationToken) =>
             {
                 await mediator.Send(command, cancellationToken);
-
                 return Results.NoContent();
-            }).AddValidation<InitializePasswordResetCommand>()
+            })
+            .AddValidation<InitializePasswordResetCommand>()
             .Produces(StatusCodes.Status204NoContent);
-        
+
         group.MapPost("reset-password", async ([FromServices] IMediator mediator,
                 [FromBody] ResetPasswordCommand command,
                 CancellationToken cancellationToken) =>
             {
-                await mediator.Send(command, cancellationToken);
-
-                return Results.NoContent();
-            }).AddValidation<ResetPasswordCommand>()
+                var result = await mediator.Send(command, cancellationToken);
+                return ApiResult.From(result);
+            })
+            .AddValidation<ResetPasswordCommand>()
             .Produces(StatusCodes.Status204NoContent);
-        
+
         group.MapPost("register", async ([FromServices] IMediator mediator,
                 [FromBody] RegisterCommand command,
                 CancellationToken cancellationToken) =>
             {
-                await mediator.Send(command, cancellationToken);
-
-                return Results.NoContent();
-            }).AddValidation<RegisterCommand>()
+                var result = await mediator.Send(command, cancellationToken);
+                return ApiResult.From(result);
+            })
+            .AddValidation<RegisterCommand>()
             .Produces(StatusCodes.Status204NoContent);
 
         group.MapPost("verify", async ([FromServices] IMediator mediator,
                 [FromBody] VerifyAccountCommand command,
                 CancellationToken cancellationToken) =>
             {
-                await mediator.Send(command, cancellationToken);
-
-                return Results.NoContent();
-            }).AddValidation<VerifyAccountCommand>()
+                var result = await mediator.Send(command, cancellationToken);
+                return ApiResult.From(result);
+            })
+            .AddValidation<VerifyAccountCommand>()
             .Produces(StatusCodes.Status204NoContent);
-        
+
         return app;
     }
 }

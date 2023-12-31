@@ -29,7 +29,7 @@ internal sealed class UpdateCategoryCommandHandler : ICommandHandler<UpdateCateg
 
         if (categoryWithNameExists)
         {
-            return MemberError.Conflict(nameof(request.Name));
+            return new ConflictError(nameof(request.Name));
         }
         
         if (request.ParentId.HasValue)

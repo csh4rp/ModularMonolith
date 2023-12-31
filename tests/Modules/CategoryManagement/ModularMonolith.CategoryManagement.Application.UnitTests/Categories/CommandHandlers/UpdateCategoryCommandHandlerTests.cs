@@ -80,11 +80,8 @@ public class UpdateCategoryCommandHandlerTests
 
         // Assert
         result.Should().NotBeSuccessful();
-        result.Error.Should().BeOfType<MemberError>();
-
-        var error = result.Error.As<MemberError>();
-        error.Target.Should().Be(nameof(command.Name));
-        error.Code.Should().Be(ErrorCodes.Conflict);
+        result.Error.Should().BeConflictError()
+            .And.HaveTarget(nameof(command.Name));
     }
 
     [Fact]
@@ -107,11 +104,9 @@ public class UpdateCategoryCommandHandlerTests
 
         // Assert
         result.Should().NotBeSuccessful();
-        result.Error.Should().BeOfType<MemberError>();
-        
-        var error = result.Error.As<MemberError>();
-        error.Target.Should().Be(nameof(command.ParentId));
-        error.Code.Should().Be(ErrorCodes.InvalidValue);
+        result.Error.Should().BeMemberError()
+            .And.HaveCode(ErrorCodes.InvalidValue)
+            .And.HaveTarget(nameof(command.ParentId));
     }
 
     private static CategoryManagementDbContext CreateDbContext()

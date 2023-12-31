@@ -4,8 +4,8 @@ using ModularMonolith.CategoryManagement.Application.Categories.CommandHandlers;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
 using ModularMonolith.CategoryManagement.Domain.Entities;
 using ModularMonolith.CategoryManagement.Infrastructure.Common.DataAccess;
-using ModularMonolith.Shared.TestUtils.Assertions;
 using ModularMonolith.Shared.Contracts.Errors;
+using ModularMonolith.Shared.TestUtils.Assertions;
 using Xunit;
 
 namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.CommandHandlers;
@@ -52,11 +52,8 @@ public class CreateCategoryCommandHandlerTests
 
         // Assert
         result.Should().NotBeSuccessful();
-        result.Error.Should().BeOfType<MemberError>();
-
-        var error = result.Error.As<MemberError>();
-        error.Target.Should().Be(nameof(command.Name));
-        error.Code.Should().Be(ErrorCodes.Conflict);
+        result.Error.Should().BeConflictError()
+            .And.HaveTarget(nameof(command.Name)); 
     }
     
     [Fact]
@@ -74,11 +71,9 @@ public class CreateCategoryCommandHandlerTests
 
         // Assert
         result.Should().NotBeSuccessful();
-        result.Error.Should().BeOfType<MemberError>();
-
-        var error = result.Error.As<MemberError>();
-        error.Target.Should().Be(nameof(command.ParentId));
-        error.Code.Should().Be(ErrorCodes.InvalidValue);
+        result.Error.Should().BeMemberError()
+            .And.HaveCode(ErrorCodes.InvalidValue)
+            .And.HaveTarget(nameof(command.ParentId));
     }
 
     private static CategoryManagementDbContext CreateDbContext()

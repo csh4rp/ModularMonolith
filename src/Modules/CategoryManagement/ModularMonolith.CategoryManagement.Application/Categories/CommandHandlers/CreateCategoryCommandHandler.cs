@@ -22,7 +22,7 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
 
         if (categoryWithNameExists)
         {
-            return MemberError.Conflict(nameof(request.Name));
+            return new ConflictError(nameof(request.Name));
         }
 
         if (request.ParentId.HasValue)

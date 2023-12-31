@@ -22,12 +22,9 @@ public class ChangePasswordCommandHandlerTests
     private readonly IIdentityContextAccessor _identityContextAccessor = Substitute.For<IIdentityContextAccessor>();
     private readonly IEventBus _eventBus = Substitute.For<IEventBus>();
 
-    public ChangePasswordCommandHandlerTests()
-    {
-        _identityContextAccessor.Context.Returns(
-            new IdentityContext(Guid.Parse(UserId), "User"));
-    }
-    
+    public ChangePasswordCommandHandlerTests() => 
+        _identityContextAccessor.Context.Returns(new IdentityContext(Guid.Parse(UserId), "User"));
+
     [Fact]
     public async Task ShouldChangePassword_WhenCurrentPasswordIsValid()
     {
@@ -73,13 +70,11 @@ public class ChangePasswordCommandHandlerTests
         
         // Assert
         result.Should().NotBeSuccessful();
-        result.Error.Should().BeOfType<MemberError>();
-
-        var error = result.Error.As<MemberError>();
-        error.Target.Should().Be(nameof(command.CurrentPassword));
-        error.Code.Should().Be(ErrorCodes.InvalidValue);
+        result.Error.Should().BeMemberError()
+            .And.HaveTarget(nameof(command.CurrentPassword))
+            .And.HaveCode(ErrorCodes.InvalidValue);
         
-        await _eventBus.DidNotReceiveWithAnyArgs().PublishAsync(Arg.Any<PasswordChanged>(), default);
+        await _eventBus.DidNotReceiveWithAnyArgs().PublishAsync<PasswordChanged>(default!, default);
     }
 
 }

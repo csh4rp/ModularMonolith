@@ -13,7 +13,7 @@ public class CreatedAtResult : IResult
 
     public Task ExecuteAsync(HttpContext httpContext)
     {
-        var url = httpContext.Request.Path.Add(new PathString(_response.Id.ToString()));
+        var url = httpContext.Request.Path.Add(new PathString($"/{_response.Id}"));
         
         httpContext.Response.Headers.Append("Location", url.ToString());
         httpContext.Response.StatusCode = StatusCodes.Status201Created;

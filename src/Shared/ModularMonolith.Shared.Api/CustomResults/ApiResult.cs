@@ -15,6 +15,8 @@ public class ApiResult
         error switch
         {
             MemberError memberError => new MemberErrorResult(memberError),
+            ConflictError conflictError => new ConflictResult(conflictError),
+            EntityNotFoundError entityNotFoundError => new NotFoundResult(entityNotFoundError),
             _ => Results.BadRequest()
         };
 }

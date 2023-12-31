@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Identity.Application.Account.Exceptions;
 using ModularMonolith.Identity.Contracts.Account.Commands;
 using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Domain.Common.Events;
@@ -28,22 +27,23 @@ internal sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand>
 
         var emailExists = await _userManager.Users
             .AnyAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
-        
+
         if (emailExists)
         {
-            return MemberError.Conflict(nameof(request.Email));
+            return new ConflictError(nameof(request.Email));
         }
 
         var user = new User { UserName = request.Email, Email = request.Email };
 
         var result = await _userManager.CreateAsync(user, request.Password);
+
         if (!result.Succeeded)
         {
-            throw new UserRegistrationException(result.Errors);
+            return MemberError.InvalidValue(nameof(request.Password));
         }
 
         await _eventBus.PublishAsync(new UserRegistered(user.Id, user.Email), cancellationToken);
-        
+
         return Result.Successful;
     }
 }

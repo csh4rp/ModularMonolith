@@ -83,6 +83,10 @@ public class SignInCommandHandlerTests
         // Assert
         result.Should().NotBeSuccessful();
         
+        result.Error.Should().BeMemberError()
+            .And.HaveCode(ErrorCodes.InvalidValue)
+            .And.HaveTarget(nameof(command.Password));
+        
         await _eventBus.DidNotReceiveWithAnyArgs()
             .PublishAsync<SignInSucceeded>(default!, default);
         
@@ -114,11 +118,9 @@ public class SignInCommandHandlerTests
 
         // Assert
         result.Should().NotBeSuccessful();
-        result.Error.Should().BeOfType<MemberError>();
-
-        var error = result.Error.As<MemberError>();
-        error.Target.Should().Be(nameof(command.Password));
-        error.Code.Should().Be(ErrorCodes.InvalidValue);
+        result.Error.Should().BeMemberError()
+            .And.HaveCode(ErrorCodes.InvalidValue)
+            .And.HaveTarget(nameof(command.Password));
         
         await _eventBus.Received(1)
             .PublishAsync(Arg.Is<SignInFailed>(s => s.UserId == user.Id), default);

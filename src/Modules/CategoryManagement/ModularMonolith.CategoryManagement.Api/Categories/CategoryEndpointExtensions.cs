@@ -29,7 +29,6 @@ internal static class CategoryEndpointExtensions
                 CancellationToken cancellationToken) =>
             {
                 var result = await mediator.Send(command, cancellationToken);
-
                 return ApiResult.From(result);
             })
             .AddValidation<CreateCategoryCommand>()
@@ -43,9 +42,7 @@ internal static class CategoryEndpointExtensions
                 CancellationToken cancellationToken) =>
             {
                 command.Id = id;
-
                 var result = await mediator.Send(command, cancellationToken);
-
                 return ApiResult.From(result);
             })
             .AddValidation<UpdateCategoryCommand>()
@@ -59,9 +56,7 @@ internal static class CategoryEndpointExtensions
                 CancellationToken cancellationToken) =>
             {
                 var command = new DeleteCategoryCommand(id);
-
                 var result = await mediator.Send(command, cancellationToken);
-
                 return ApiResult.From(result);
             })
             .Produces(StatusCodes.Status204NoContent)
@@ -73,9 +68,8 @@ internal static class CategoryEndpointExtensions
                 CancellationToken cancellationToken) =>
             {
                 var query = new GetCategoryDetailsByIdQuery(id);
-        
                 var response = await mediator.Send(query, cancellationToken);
-        
+
                 return response is null
                     ? Results.NotFound(new ProblemDetails
                     {
@@ -96,7 +90,6 @@ internal static class CategoryEndpointExtensions
                 CancellationToken cancellationToken) =>
             {
                 var response = await mediator.Send(query, cancellationToken);
-        
                 return PaginatedResult.From(response);
             })
             .AddValidation<FindCategoriesQuery>()
