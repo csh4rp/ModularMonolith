@@ -42,7 +42,7 @@ public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<E
         builder.Property(b => b.EventName)
             .IsRequired()
             .HasMaxLength(128);
-        
+
         builder.Property(b => b.EventType)
             .IsRequired()
             .HasMaxLength(256);
@@ -55,25 +55,25 @@ public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<E
             .IsRequired()
             .IsUnicode(false)
             .HasMaxLength(32);
-        
+
         builder.Property(b => b.SpanId)
             .IsRequired()
             .IsUnicode(false)
             .HasMaxLength(16);
-        
+
         builder.Property(b => b.ParentSpanId)
             .IsUnicode(false)
             .HasMaxLength(16);
 
         builder.Property(b => b.UserName)
             .HasMaxLength(128);
-        
+
         builder.Property(b => b.IpAddress)
             .HasMaxLength(32);
 
         builder.Property(b => b.UserAgent)
             .HasMaxLength(256);
-        
+
         builder.HasIndex(b => b.PublishedAt).HasFilter("published_at IS NULL");
 
         builder.HasIndex(b => new { b.UserId, b.EventType, b.CreatedAt });

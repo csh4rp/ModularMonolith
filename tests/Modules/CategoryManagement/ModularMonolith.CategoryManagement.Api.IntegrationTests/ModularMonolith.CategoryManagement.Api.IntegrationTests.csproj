@@ -1,36 +1,36 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <IsTestProject>true</IsTestProject>
-    </PropertyGroup>
+  <PropertyGroup>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Bogus" />
-        <PackageReference Include="EFCore.NamingConventions"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
-        <PackageReference Include="Respawn"/>
-        <PackageReference Include="Respawn.Postgres"/>
-        <PackageReference Include="Testcontainers.PostgreSql"/>
-        <PackageReference Include="Verify" />
-        <PackageReference Include="Verify.Http" />
-        <PackageReference Include="Verify.Xunit" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Bogus"/>
+    <PackageReference Include="EFCore.NamingConventions"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
+    <PackageReference Include="Respawn"/>
+    <PackageReference Include="Respawn.Postgres"/>
+    <PackageReference Include="Testcontainers.PostgreSql"/>
+    <PackageReference Include="Verify"/>
+    <PackageReference Include="Verify.Http"/>
+    <PackageReference Include="Verify.Xunit"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Api\ModularMonolith.CategoryManagement.Api.csproj" />
-      <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Migrations\ModularMonolith.CategoryManagement.Migrations.csproj" />
-      <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Migrations\ModularMonolith.Identity.Migrations.csproj" />
-      <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.Migrations\ModularMonolith.Shared.Migrations.csproj" />
-      <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.IntegrationTests.Common\ModularMonolith.Shared.IntegrationTests.Common.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Api\ModularMonolith.CategoryManagement.Api.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Migrations\ModularMonolith.CategoryManagement.Migrations.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Migrations\ModularMonolith.Identity.Migrations.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.Migrations\ModularMonolith.Shared.Migrations.csproj"/>
+    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.IntegrationTests.Common\ModularMonolith.Shared.IntegrationTests.Common.csproj"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <EmbeddedResource Include="Categories\Resources\CreateCategory.DuplicateName.json" />
-      <EmbeddedResource Include="Categories\Resources\CreateCategory.EmptyName.json" />
-      <EmbeddedResource Include="Categories\Resources\CreateCategory.Valid.json" />
-      <EmbeddedResource Include="Categories\Resources\UpdateCategory.DuplicateName.json" />
-      <EmbeddedResource Include="Categories\Resources\UpdateCategory.EmptyName.json" />
-      <EmbeddedResource Include="Categories\Resources\UpdateCategory.Valid.json" />
-    </ItemGroup>
-  
+  <ItemGroup>
+    <EmbeddedResource Include="Categories\Resources\CreateCategory.DuplicateName.json"/>
+    <EmbeddedResource Include="Categories\Resources\CreateCategory.EmptyName.json"/>
+    <EmbeddedResource Include="Categories\Resources\CreateCategory.Valid.json"/>
+    <EmbeddedResource Include="Categories\Resources\UpdateCategory.DuplicateName.json"/>
+    <EmbeddedResource Include="Categories\Resources\UpdateCategory.EmptyName.json"/>
+    <EmbeddedResource Include="Categories\Resources\UpdateCategory.Valid.json"/>
+  </ItemGroup>
+
 </Project>

@@ -11,7 +11,7 @@ public abstract class BaseIntegrationTest<TClass> : IAsyncLifetime
     protected StringContent GetResource(string name)
     {
         var @namespace = $"{typeof(TClass).Namespace}.Resources.{name}";
-        
+
         using var stream = typeof(TClass).Assembly.GetManifestResourceStream(@namespace);
         var buffer = new byte[stream!.Length];
 
@@ -33,16 +33,16 @@ public abstract class BaseIntegrationTest<TClass> : IAsyncLifetime
         {
             fileName = $"{attribute.Name}";
         }
-        
+
         var directory = Path.Join(Path.GetDirectoryName(filePath), "Responses");
 
         var settings = new VerifySettings();
-        
+
         if (!string.IsNullOrEmpty(fileName))
         {
             settings.UseMethodName(fileName);
         }
-        
+
         settings.UseDirectory(directory);
 
         if (parameters is not null)

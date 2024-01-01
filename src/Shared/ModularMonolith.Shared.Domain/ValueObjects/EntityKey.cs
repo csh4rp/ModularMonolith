@@ -5,7 +5,7 @@ public record EntityKey
     public EntityKey()
     {
     }
-    
+
     public EntityKey(string propertyName, object? value)
     {
         PropertyName = propertyName;

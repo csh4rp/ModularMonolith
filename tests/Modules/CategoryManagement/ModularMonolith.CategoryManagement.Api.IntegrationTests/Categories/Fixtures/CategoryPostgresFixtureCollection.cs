@@ -3,4 +3,5 @@
 namespace ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories.Fixtures;
 
 [CollectionDefinition("Categories")]
-public class CategoryPostgresFixtureCollection : ICollectionFixture<CategoryFixture>, ICollectionFixture<CategoryManagementFixture>;
+public class CategoryPostgresFixtureCollection : ICollectionFixture<CategoryFixture>,
+    ICollectionFixture<CategoryManagementFixture>;

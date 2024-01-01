@@ -13,11 +13,11 @@ public readonly record struct Result
     }
 
     public static readonly Result Successful = new(true);
-    
+
     private readonly ResultState _resultState;
 
     public Result() => _resultState = ResultState.Undefined;
-    
+
     private Result(bool isSuccessful) => _resultState = isSuccessful ? ResultState.Success : ResultState.Undefined;
 
     private Result(Error error)
@@ -25,16 +25,16 @@ public readonly record struct Result
         Error = error;
         _resultState = ResultState.Failure;
     }
-    
+
     public Error? Error { get; private init; }
 
     [MemberNotNullWhen(false, nameof(Error))]
     public bool IsSuccessful => _resultState == ResultState.Success;
 
     public static implicit operator Error?(Result result) => result.Error;
-    
+
     public static implicit operator Result(Error error) => new(error);
-    
+
     public static Result Failure(Error error) => new(error);
 }
 
@@ -56,15 +56,15 @@ public readonly record struct Result<T>
         Value = value;
         _resultState = ResultState.Success;
     }
-    
+
     public Result(Error error)
     {
         Error = error;
         _resultState = ResultState.Failure;
     }
-    
+
     public T? Value { get; private init; }
-    
+
     public Error? Error { get; private init; }
 
     [MemberNotNullWhen(false, nameof(Error))]
@@ -74,8 +74,8 @@ public readonly record struct Result<T>
     public static implicit operator Error?(Result<T> result) => result.Error;
 
     public static implicit operator Result<T>(Error error) => new(error);
-    
+
     public static implicit operator Result<T>(T value) => new(value);
-    
+
     public static implicit operator T?(Result<T> result) => result.Value;
 }

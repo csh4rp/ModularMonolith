@@ -9,20 +9,20 @@ internal sealed class UserLoginEntityTypeConfiguration : IEntityTypeConfiguratio
     public void Configure(EntityTypeBuilder<UserLogin> builder)
     {
         builder.ToTable("user_login");
-        
-        builder.HasKey(b => new {b.UserId, b.LoginProvider, b.ProviderKey});
-        
+
+        builder.HasKey(b => new { b.UserId, b.LoginProvider, b.ProviderKey });
+
         builder.Property(b => b.LoginProvider)
             .IsRequired()
             .HasMaxLength(128);
-        
+
         builder.Property(b => b.ProviderKey)
             .IsRequired()
             .HasMaxLength(128);
-        
+
         builder.Property(b => b.ProviderDisplayName)
             .HasMaxLength(128);
-        
+
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(b => b.UserId);

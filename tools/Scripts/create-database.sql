@@ -1,1 +1,2 @@
-CREATE DATABASE modular_monolith;
+CREATE
+DATABASE modular_monolith;

@@ -16,10 +16,11 @@ public class InitializePasswordResetCommandHandlerTests
 {
     private readonly FakeUserManager _userManager = Substitute.For<FakeUserManager>();
     private readonly IEventBus _eventBus = Substitute.For<IEventBus>();
+
     private readonly ILogger<InitializePasswordResetCommandHandler> _logger =
         Substitute.For<ILogger<InitializePasswordResetCommandHandler>>();
-    
-    
+
+
     [Fact]
     public async Task ShouldInitializePasswordReset_WhenEmailMatchesUser()
     {
@@ -30,21 +31,21 @@ public class InitializePasswordResetCommandHandlerTests
 
         _userManager.NormalizeEmail(Arg.Any<string>()).Returns(c => c.Args().First().ToString()?.ToUpper());
         _userManager.Users.Returns(users);
-        
+
         var command = new InitializePasswordResetCommand(validEmail);
 
         var handler = new InitializePasswordResetCommandHandler(_userManager, _eventBus, _logger);
 
         // Act
         var result = await handler.Handle(command, default);
-        
+
         // Assert
         result.Should().BeSuccessful();
 
         await _eventBus.Received(1)
             .PublishAsync(Arg.Is<PasswordResetInitialized>(e => e.UserId == user.Id), default);
     }
-    
+
     [Fact]
     public async Task ShouldNotInitializePasswordReset_WhenEmailDoesNotMatchUser()
     {
@@ -55,14 +56,14 @@ public class InitializePasswordResetCommandHandlerTests
 
         _userManager.NormalizeEmail(Arg.Any<string>()).Returns(c => c.Args().First().ToString()?.ToUpper());
         _userManager.Users.Returns(users);
-        
+
         var command = new InitializePasswordResetCommand("invalid@mail.com");
 
         var handler = new InitializePasswordResetCommandHandler(_userManager, _eventBus, _logger);
 
         // Act
         var result = await handler.Handle(command, default);
-        
+
         // Assert
         result.Should().BeSuccessful();
 

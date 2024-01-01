@@ -12,7 +12,7 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
     private readonly CategoryManagementFixture _categoryManagementFixture;
     private readonly CategoryFixture _categoryFixture;
     private readonly HttpClient _client;
-    
+
     public GetCategoryTests(CategoryManagementFixture categoryManagementFixture, CategoryFixture categoryFixture)
     {
         _categoryManagementFixture = categoryManagementFixture;
@@ -28,10 +28,10 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
         var category = _categoryFixture.Clone()
             .RuleFor(x => x.Name, "Category-Name-1")
             .Generate();
-        
+
         _categoryManagementFixture.CategoryManagementDbContext.Categories.Add(category);
         await _categoryManagementFixture.CategoryManagementDbContext.SaveChangesAsync();
-        
+
         // Act
         using var response = await _client.GetAsync($"api/category-management/categories/{category.Id}");
 
@@ -39,7 +39,7 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         await VerifyResponse(response);
     }
-    
+
     [Fact]
     [TestFileName("NotFound_CategoryDoesNotExist")]
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()

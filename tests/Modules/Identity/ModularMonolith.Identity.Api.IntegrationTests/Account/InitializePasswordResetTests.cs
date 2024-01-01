@@ -12,7 +12,7 @@ public class InitializePasswordResetTests : BaseIntegrationTest<InitializePasswo
     private readonly IdentityFixture _identityFixture;
     private readonly AccountFixture _accountFixture;
     private readonly HttpClient _client;
-    
+
     public InitializePasswordResetTests(IdentityFixture identityFixture, AccountFixture accountFixture)
     {
         _identityFixture = identityFixture;
@@ -27,18 +27,15 @@ public class InitializePasswordResetTests : BaseIntegrationTest<InitializePasswo
         var user = _accountFixture.AActiveUser();
         _identityFixture.IdentityDbContext.Users.Add(user);
         await _identityFixture.IdentityDbContext.SaveChangesAsync();
-        
+
         using var request = GetResource("InitializePasswordReset.Valid.json");
-        
+
         // Act
         using var response = await _client.PostAsync("/api/identity/account/initialize-password-reset", request);
-        
+
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
-    
-    public override async Task DisposeAsync()
-    {
-        await _identityFixture.ResetAsync();
-    }
+
+    public override async Task DisposeAsync() => await _identityFixture.ResetAsync();
 }

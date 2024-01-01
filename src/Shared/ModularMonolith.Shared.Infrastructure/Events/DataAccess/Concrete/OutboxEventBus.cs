@@ -62,7 +62,7 @@ internal sealed class OutboxEventBus : IEventBus
             SpanId = currentActivity.SpanId.ToString(),
             ParentSpanId = currentActivity.Parent is null ? null : currentActivity.ParentSpanId.ToString(),
             IpAddress = remoteIpAddress?.ToString(),
-            UserAgent = userAgent,
+            UserAgent = userAgent
         };
 
         var scope = TransactionalScope.Current.Value;
@@ -108,7 +108,7 @@ internal sealed class OutboxEventBus : IEventBus
                 SpanId = currentActivity.SpanId.ToString(),
                 ParentSpanId = currentActivity.Parent is null ? null : currentActivity.ParentSpanId.ToString(),
                 IpAddress = remoteIpAddress?.ToString(),
-                UserAgent = userAgent,
+                UserAgent = userAgent
             };
         });
 

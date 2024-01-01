@@ -17,7 +17,7 @@ internal sealed class DeleteCategoryCommandHandler : ICommandHandler<DeleteCateg
     public async Task<Result> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
     {
         var category = await _categoryDatabase.Categories
-                           .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
+            .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
 
         if (category is null)
         {

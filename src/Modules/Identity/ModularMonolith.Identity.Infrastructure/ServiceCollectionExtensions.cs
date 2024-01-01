@@ -25,10 +25,10 @@ public static class ServiceCollectionExtensions
             .AddDefaultTokenProviders();
 
         serviceCollection.AddDataProtection();
-        
+
         serviceCollection.AddScoped<IRoleStore<Role>, RoleStore>();
         serviceCollection.AddScoped<IUserStore<User>, UserStore>();
-        
+
         serviceCollection.AddDbContextFactory<IdentityDbContext>((sp, b) =>
         {
             var options = sp.GetRequiredService<IOptions<DatabaseOptions>>();
@@ -36,7 +36,7 @@ public static class ServiceCollectionExtensions
             b.UseNpgsql(options.Value.ConnectionString);
             b.UseSnakeCaseNamingConvention();
         });
-        
+
         return serviceCollection;
     }
 }

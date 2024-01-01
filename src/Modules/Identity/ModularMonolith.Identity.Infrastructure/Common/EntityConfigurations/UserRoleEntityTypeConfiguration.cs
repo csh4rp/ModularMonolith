@@ -9,13 +9,13 @@ internal sealed class UserRoleEntityTypeConfiguration : IEntityTypeConfiguration
     public void Configure(EntityTypeBuilder<UserRole> builder)
     {
         builder.ToTable("user_role");
-        
-        builder.HasKey(b => new {b.UserId, b.RoleId});
-        
+
+        builder.HasKey(b => new { b.UserId, b.RoleId });
+
         builder.HasOne(b => b.User)
             .WithMany()
             .HasForeignKey(b => b.UserId);
-        
+
         builder.HasOne(b => b.Role)
             .WithMany()
             .HasForeignKey(b => b.RoleId);

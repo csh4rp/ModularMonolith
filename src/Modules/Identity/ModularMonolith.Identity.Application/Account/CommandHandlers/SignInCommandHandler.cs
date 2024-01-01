@@ -35,14 +35,14 @@ internal sealed class SignInCommandHandler : ICommandHandler<SignInCommand, Sign
     public async Task<Result<SignInResponse>> Handle(SignInCommand request, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
-        
+
         if (user is null)
         {
             return MemberError.InvalidValue(nameof(request.Password));
         }
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
-        
+
         if (!isPasswordValid)
         {
             await _eventBus.PublishAsync(new SignInFailed(user.Id), cancellationToken);

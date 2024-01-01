@@ -8,14 +8,14 @@ public sealed class Role
         NormalizedName = default!;
         ConcurrencyStamp = default!;
     }
-    
+
     public Role(string name)
     {
         Name = name;
         NormalizedName = name.ToUpperInvariant();
         ConcurrencyStamp = Guid.NewGuid().ToString();
     }
-    
+
     public Guid Id { get; set; }
 
     public string Name { get; set; }

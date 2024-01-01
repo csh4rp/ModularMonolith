@@ -19,14 +19,15 @@ public class SignInCommandHandlerTests
 {
     private readonly FakeUserManager _userManager = Substitute.For<FakeUserManager>();
     private readonly IEventBus _eventBus = Substitute.For<IEventBus>();
+
     private readonly AuthOptions _options = new()
     {
-        Audience = "localhost", 
+        Audience = "localhost",
         Issuer = "localhost",
         Key = "12345678123456781234567812345678",
         ExpirationTimeInMinutes = 15
     };
-    
+
     [Fact]
     public async Task ShouldSignIn_WhenUserNameAndPasswordIsCorrect()
     {
@@ -34,13 +35,13 @@ public class SignInCommandHandlerTests
         const string validEmail = "mail@mail.com";
         const string validPassword = "Pa$$word";
         var user = new User(validEmail) { Id = Guid.NewGuid() };
-        
+
         _userManager.FindByEmailAsync(validEmail)
             .Returns(user);
-        
+
         _userManager.CheckPasswordAsync(user, validPassword)
             .Returns(true);
-        
+
         var command = new SignInCommand(validEmail, validPassword);
 
         var handler = new SignInCommandHandler(_userManager, _eventBus,
@@ -57,21 +58,21 @@ public class SignInCommandHandlerTests
         await _eventBus.Received(1)
             .PublishAsync(Arg.Is<SignInSucceeded>(s => s.UserId == user.Id), default);
     }
-    
+
     [Fact]
     public async Task ShouldNotSignIn_WhenUserNameIsInvalid()
     {
         // Arrange
         const string validEmail = "mail@mail.com";
         const string validPassword = "Pa$$word";
-        var user = new User(validEmail) { Id = Guid.NewGuid()};
+        var user = new User(validEmail) { Id = Guid.NewGuid() };
 
         _userManager.FindByEmailAsync(validEmail)
             .Returns(user);
-        
+
         _userManager.CheckPasswordAsync(user, validPassword)
             .Returns(true);
-        
+
         var command = new SignInCommand("invalid@mail.com", "invalid");
 
         var handler = new SignInCommandHandler(_userManager, _eventBus,
@@ -82,32 +83,32 @@ public class SignInCommandHandlerTests
 
         // Assert
         result.Should().NotBeSuccessful();
-        
+
         result.Error.Should().BeMemberError()
             .And.HaveCode(ErrorCodes.InvalidValue)
             .And.HaveTarget(nameof(command.Password));
-        
+
         await _eventBus.DidNotReceiveWithAnyArgs()
             .PublishAsync<SignInSucceeded>(default!, default);
-        
+
         await _eventBus.DidNotReceiveWithAnyArgs()
             .PublishAsync<SignInFailed>(default!, default);
     }
-    
+
     [Fact]
     public async Task ShouldReturnInvalidPasswordError_WhenPasswordIsInvalid()
     {
         // Arrange
         const string validEmail = "mail@mail.com";
         const string validPassword = "Pa$$word";
-        var user = new User(validEmail) { Id = Guid.NewGuid()};
+        var user = new User(validEmail) { Id = Guid.NewGuid() };
 
         _userManager.FindByEmailAsync(validEmail)
             .Returns(user);
-        
+
         _userManager.CheckPasswordAsync(user, validPassword)
             .Returns(true);
-        
+
         var command = new SignInCommand(validEmail, "invalid");
 
         var handler = new SignInCommandHandler(_userManager, _eventBus,
@@ -121,7 +122,7 @@ public class SignInCommandHandlerTests
         result.Error.Should().BeMemberError()
             .And.HaveCode(ErrorCodes.InvalidValue)
             .And.HaveTarget(nameof(command.Password));
-        
+
         await _eventBus.Received(1)
             .PublishAsync(Arg.Is<SignInFailed>(s => s.UserId == user.Id), default);
     }

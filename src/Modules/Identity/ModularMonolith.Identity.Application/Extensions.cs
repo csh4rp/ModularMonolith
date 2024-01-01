@@ -7,5 +7,4 @@ namespace ModularMonolith.Identity.Application;
 
 public class Extensions
 {
-    
 }

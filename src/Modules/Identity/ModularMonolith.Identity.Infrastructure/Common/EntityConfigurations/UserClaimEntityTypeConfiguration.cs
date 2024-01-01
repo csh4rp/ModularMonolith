@@ -9,17 +9,17 @@ internal sealed class UserClaimEntityTypeConfiguration : IEntityTypeConfiguratio
     public void Configure(EntityTypeBuilder<UserClaim> builder)
     {
         builder.ToTable("user_claim");
-        
+
         builder.HasKey(b => b.Id);
-        
+
         builder.Property(b => b.ClaimType)
             .IsRequired()
             .HasMaxLength(128);
-        
+
         builder.Property(b => b.ClaimValue)
             .IsRequired()
             .HasMaxLength(128);
-        
+
         builder.HasOne(b => b.User)
             .WithMany()
             .HasForeignKey(b => b.UserId);

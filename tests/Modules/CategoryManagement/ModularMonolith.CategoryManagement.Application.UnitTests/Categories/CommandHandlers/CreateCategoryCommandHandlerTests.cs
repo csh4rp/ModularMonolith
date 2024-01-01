@@ -26,9 +26,9 @@ public class CreateCategoryCommandHandlerTests
 
         // Assert
         result.Should().BeSuccessful();
-        
+
         var item = await dbContext.Categories.FindAsync(result.Value!.Id);
-        
+
         result.Value.Id.Should().NotBeEmpty();
         item.Should().NotBeNull();
         item!.Name.Should().Be(command.Name);
@@ -53,9 +53,9 @@ public class CreateCategoryCommandHandlerTests
         // Assert
         result.Should().NotBeSuccessful();
         result.Error.Should().BeConflictError()
-            .And.HaveTarget(nameof(command.Name)); 
+            .And.HaveTarget(nameof(command.Name));
     }
-    
+
     [Fact]
     public async Task ShouldReturnInvalidValueError_WhenParentCategoryDoesNotExist()
     {
@@ -67,7 +67,7 @@ public class CreateCategoryCommandHandlerTests
         var handler = new CreateCategoryCommandHandler(context);
 
         // Act
-        var result =  await handler.Handle(command, default);
+        var result = await handler.Handle(command, default);
 
         // Assert
         result.Should().NotBeSuccessful();

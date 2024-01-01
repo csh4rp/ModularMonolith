@@ -59,7 +59,8 @@ internal sealed class EventPublisher
                     identitySetter.Set(new IdentityContext(eventLog.UserId.Value, eventLog.UserName!));
                 }
 
-                using var activity = EventPublisherActivitySource.CreateActivity(eventLog.EventName, ActivityKind.Internal);
+                using var activity =
+                    EventPublisherActivitySource.CreateActivity(eventLog.EventName, ActivityKind.Internal);
                 activity?.SetParentId(eventLog.TraceId);
                 activity?.Start();
 

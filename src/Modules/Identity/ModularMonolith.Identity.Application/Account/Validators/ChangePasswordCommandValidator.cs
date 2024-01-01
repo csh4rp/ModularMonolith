@@ -10,11 +10,11 @@ internal sealed class ChangePasswordCommandValidator : AbstractValidator<ChangeP
         RuleFor(x => x.CurrentPassword)
             .NotEmpty()
             .MaximumLength(128);
-        
+
         RuleFor(x => x.NewPassword)
             .NotEmpty()
             .MaximumLength(128);
-        
+
         RuleFor(x => x.NewPasswordConfirmed)
             .NotEmpty()
             .MaximumLength(128)

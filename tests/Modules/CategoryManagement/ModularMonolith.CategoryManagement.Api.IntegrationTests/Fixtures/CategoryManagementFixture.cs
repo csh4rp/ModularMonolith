@@ -22,17 +22,17 @@ public class CategoryManagementFixture : IAsyncLifetime
     private const string AuthAudience = "localhost";
     private const string AuthIssuer = "localhost";
     private const string AuthSigningKey = "12345678123456781234567812345678";
-    
+
     private NpgsqlConnection? _connection;
     private PostgreSqlContainer? _container;
     private Respawner? _respawner;
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
-    
+
     public SharedDbContext SharedDbContext { get; private set; } = default!;
-    
+
     public CategoryManagementDbContext CategoryManagementDbContext { get; private set; } = default!;
-    
+
     public async Task InitializeAsync()
     {
         _container = new PostgreSqlBuilder()
@@ -43,20 +43,20 @@ public class CategoryManagementFixture : IAsyncLifetime
             .WithPassword("Admin123!@#")
             .WithPortBinding("5432", true)
             .Build();
-        
+
         await _container.StartAsync();
 
         var connectionString = _container.GetConnectionString();
-        
+
         _connection = new NpgsqlConnection(connectionString);
         await _connection.OpenAsync();
-        
+
         SharedDbContext = new SharedDbContextFactory().CreateDbContext([connectionString]);
         await SharedDbContext.Database.MigrateAsync();
-        
+
         CategoryManagementDbContext = new CategoryManagementDbContextFactory().CreateDbContext([connectionString]);
         await CategoryManagementDbContext.Database.MigrateAsync();
-        
+
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
 
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
@@ -72,7 +72,7 @@ public class CategoryManagementFixture : IAsyncLifetime
 
         _testServer = _factory.Server;
     }
-    
+
     public HttpClient CreateClient()
     {
         var client = _testServer.CreateClient();
@@ -80,7 +80,7 @@ public class CategoryManagementFixture : IAsyncLifetime
 
         return client;
     }
-    
+
     public HttpClient CreateClientWithAuthToken()
     {
         var client = CreateClient();
@@ -93,21 +93,17 @@ public class CategoryManagementFixture : IAsyncLifetime
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(AuthSigningKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-        var claims = new[]
-        {
-            new Claim("id", Guid.NewGuid().ToString()),
-            new Claim("sub","mail@mail.com"),
-        };
-        
+        var claims = new[] { new Claim("id", Guid.NewGuid().ToString()), new Claim("sub", "mail@mail.com") };
+
         var token = new JwtSecurityToken(AuthIssuer,
             AuthAudience,
             claims,
             expires: DateTimeOffset.UtcNow.AddMinutes(15).UtcDateTime,
             signingCredentials: credentials);
 
-        return new JwtSecurityTokenHandler().WriteToken(token);        
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    
+
     public async Task DisposeAsync()
     {
         if (_respawner is not null && _connection is not null)
@@ -126,7 +122,7 @@ public class CategoryManagementFixture : IAsyncLifetime
         await CategoryManagementDbContext.DisposeAsync();
         await _factory.DisposeAsync();
     }
-    
+
     public Task ResetAsync()
     {
         Debug.Assert(_connection is not null);

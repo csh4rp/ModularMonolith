@@ -11,14 +11,13 @@ public static class WebApplicationException
             .HasApiVersion(new ApiVersion(1, 0))
             .ReportApiVersions()
             .Build();
-        
+
         var modules = app.Services.GetServices<AppModule>().ToList();
-        
+
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger(o =>
             {
-      
             });
             app.UseSwaggerUI(options =>
             {
@@ -28,7 +27,7 @@ public static class WebApplicationException
                 }
             });
         }
-        
+
         app.UseExceptionHandler(o =>
         {
             o.Use(async (c, d) =>
@@ -39,7 +38,7 @@ public static class WebApplicationException
 
         app.UseRouting();
 
-        
+
         app.UseAuthentication();
         app.UseAuthorization();
 
@@ -47,14 +46,13 @@ public static class WebApplicationException
 
         app.UseEndpoints(e =>
         {
-            
         });
-        
+
         foreach (var module in modules)
         {
             module.RegisterEndpoints(app);
         }
-        
+
         return app;
     }
 }

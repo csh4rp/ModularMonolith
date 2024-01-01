@@ -10,13 +10,13 @@ public class RegisterTests : BaseIntegrationTest<RegisterTests>
 {
     private readonly IdentityFixture _identityFixture;
     private readonly HttpClient _client;
-    
+
     public RegisterTests(IdentityFixture identityFixture)
     {
         _identityFixture = identityFixture;
         _client = identityFixture.CreateClient();
     }
-    
+
     [Fact]
     public async Task ShouldReturnNoContent_WhenUserWithEmailDoesNotExist()
     {
@@ -30,8 +30,5 @@ public class RegisterTests : BaseIntegrationTest<RegisterTests>
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
-    public override async Task DisposeAsync()
-    {
-        await _identityFixture.ResetAsync();
-    }
+    public override async Task DisposeAsync() => await _identityFixture.ResetAsync();
 }

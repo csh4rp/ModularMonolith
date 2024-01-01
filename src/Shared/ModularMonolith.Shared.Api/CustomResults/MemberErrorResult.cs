@@ -16,7 +16,7 @@ public sealed class MemberErrorResult : IResult
         var traceId = currentActivity?.TraceId.ToString() ?? httpContext.TraceIdentifier;
 
         var response = new ValidationErrorResponse(httpContext.Request.Path, traceId, _errors);
-        
+
         httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
         return httpContext.Response.WriteAsJsonAsync(response);
     }

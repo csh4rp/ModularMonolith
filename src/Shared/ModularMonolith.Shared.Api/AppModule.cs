@@ -21,6 +21,5 @@ public abstract class AppModule
 
     public virtual void SwaggerUIAction(SwaggerUIOptions options)
     {
-        
     }
 }

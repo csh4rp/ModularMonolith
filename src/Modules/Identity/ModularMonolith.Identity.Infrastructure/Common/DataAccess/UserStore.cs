@@ -28,12 +28,9 @@ internal sealed class UserStore : IUserLoginStore<User>,
         _identityErrorDescriber = identityErrorDescriber;
     }
 
-    public void Dispose()
-    {
-        _identityDbContext.Dispose();
-    }
+    public void Dispose() => _identityDbContext.Dispose();
 
-    public Task<string> GetUserIdAsync(User user, CancellationToken cancellationToken) => 
+    public Task<string> GetUserIdAsync(User user, CancellationToken cancellationToken) =>
         Task.FromResult(user.Id.ToString());
 
     public Task<string?> GetUserNameAsync(User user, CancellationToken cancellationToken) =>
@@ -42,7 +39,7 @@ internal sealed class UserStore : IUserLoginStore<User>,
     public Task SetUserNameAsync(User user, string? userName, CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrEmpty(userName);
-        
+
         user.UserName = userName;
         return Task.CompletedTask;
     }
@@ -53,7 +50,7 @@ internal sealed class UserStore : IUserLoginStore<User>,
     public Task SetNormalizedUserNameAsync(User user, string? normalizedName, CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrEmpty(normalizedName);
-        
+
         user.NormalizedUserName = normalizedName;
         return Task.CompletedTask;
     }
@@ -71,7 +68,7 @@ internal sealed class UserStore : IUserLoginStore<User>,
         _identityDbContext.Attach(user);
         user.ConcurrencyStamp = Guid.NewGuid().ToString();
         _identityDbContext.Update(user);
-        
+
         try
         {
             await _identityDbContext.SaveChangesAsync(cancellationToken);
@@ -80,14 +77,14 @@ internal sealed class UserStore : IUserLoginStore<User>,
         {
             return IdentityResult.Failed(_identityErrorDescriber.ConcurrencyFailure());
         }
-        
+
         return IdentityResult.Success;
     }
 
     public async Task<IdentityResult> DeleteAsync(User user, CancellationToken cancellationToken)
     {
         _identityDbContext.Users.Remove(user);
-        
+
         try
         {
             await _identityDbContext.SaveChangesAsync(cancellationToken);
@@ -96,11 +93,11 @@ internal sealed class UserStore : IUserLoginStore<User>,
         {
             return IdentityResult.Failed(_identityErrorDescriber.ConcurrencyFailure());
         }
-        
+
         return IdentityResult.Success;
     }
 
-    public Task<User?> FindByIdAsync(string userId, CancellationToken cancellationToken) => 
+    public Task<User?> FindByIdAsync(string userId, CancellationToken cancellationToken) =>
         _identityDbContext.Users.FindAsync([Guid.Parse(userId)], cancellationToken).AsTask();
 
     public Task<User?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken) =>
@@ -112,14 +109,14 @@ internal sealed class UserStore : IUserLoginStore<User>,
         var claims = await _identityDbContext.UserClaims
             .Where(uc => uc.UserId == user.Id)
             .ToListAsync(cancellationToken);
-        
+
         return claims.Select(uc => new Claim(uc.ClaimType!, uc.ClaimValue!)).ToList();
     }
 
     public Task AddClaimsAsync(User user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
     {
         var userClaims = claims.Select(c => new UserClaim(user.Id, c.Type, c.Value));
-        
+
         _identityDbContext.UserClaims.AddRange(userClaims);
         return _identityDbContext.SaveChangesAsync(cancellationToken);
     }
@@ -152,7 +149,7 @@ internal sealed class UserStore : IUserLoginStore<User>,
             {
                 continue;
             }
-            
+
             _identityDbContext.UserClaims.Remove(claimToRemove);
         }
 
@@ -214,10 +211,10 @@ internal sealed class UserStore : IUserLoginStore<User>,
         return Task.CompletedTask;
     }
 
-    public Task<int> GetAccessFailedCountAsync(User user, CancellationToken cancellationToken) => 
+    public Task<int> GetAccessFailedCountAsync(User user, CancellationToken cancellationToken) =>
         Task.FromResult(user.AccessFailedCount);
 
-    public Task<bool> GetLockoutEnabledAsync(User user, CancellationToken cancellationToken) => 
+    public Task<bool> GetLockoutEnabledAsync(User user, CancellationToken cancellationToken) =>
         Task.FromResult(user.LockoutEnabled);
 
     public Task SetLockoutEnabledAsync(User user, bool enabled, CancellationToken cancellationToken)
@@ -235,7 +232,7 @@ internal sealed class UserStore : IUserLoginStore<User>,
             ProviderKey = login.ProviderKey,
             ProviderDisplayName = login.ProviderDisplayName
         };
-        
+
         _identityDbContext.UserLogins.Add(userLogin);
         return _identityDbContext.SaveChangesAsync(cancellationToken);
     }
@@ -252,7 +249,7 @@ internal sealed class UserStore : IUserLoginStore<User>,
         {
             return Task.CompletedTask;
         }
-        
+
         _identityDbContext.UserLogins.Remove(userLogin);
         return _identityDbContext.SaveChangesAsync(cancellationToken);
     }
@@ -262,33 +259,34 @@ internal sealed class UserStore : IUserLoginStore<User>,
         var userLogins = await _identityDbContext.UserLogins
             .Where(ul => ul.UserId == user.Id)
             .ToListAsync(cancellationToken);
-        
+
         return userLogins.Select(ul => new UserLoginInfo(ul.LoginProvider, ul.ProviderKey, ul.ProviderDisplayName))
             .ToList();
     }
 
-    public async Task<User?> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
+    public async Task<User?> FindByLoginAsync(string loginProvider, string providerKey,
+        CancellationToken cancellationToken)
     {
         var userLogin = await _identityDbContext.UserLogins.FirstOrDefaultAsync(ul =>
             ul.LoginProvider == loginProvider && ul.ProviderKey == providerKey, cancellationToken);
 
         return userLogin is null
             ? null
-            : await _identityDbContext.Users.FindAsync([userLogin.UserId], cancellationToken: cancellationToken);
+            : await _identityDbContext.Users.FindAsync([userLogin.UserId], cancellationToken);
     }
 
     public Task SetPasswordHashAsync(User user, string? passwordHash, CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrEmpty(passwordHash);
-        
+
         user.PasswordHash = passwordHash;
         return Task.CompletedTask;
     }
 
-    public Task<string?> GetPasswordHashAsync(User user, CancellationToken cancellationToken) => 
+    public Task<string?> GetPasswordHashAsync(User user, CancellationToken cancellationToken) =>
         Task.FromResult((string?)user.PasswordHash);
 
-    public Task<bool> HasPasswordAsync(User user, CancellationToken cancellationToken) => 
+    public Task<bool> HasPasswordAsync(User user, CancellationToken cancellationToken) =>
         Task.FromResult(!string.IsNullOrEmpty(user.PasswordHash));
 
     public Task SetSecurityStampAsync(User user, string stamp, CancellationToken cancellationToken)
@@ -297,21 +295,21 @@ internal sealed class UserStore : IUserLoginStore<User>,
         return Task.CompletedTask;
     }
 
-    public Task<string?> GetSecurityStampAsync(User user, CancellationToken cancellationToken) => 
+    public Task<string?> GetSecurityStampAsync(User user, CancellationToken cancellationToken) =>
         Task.FromResult((string?)user.SecurityStamp);
 
     public Task SetEmailAsync(User user, string? email, CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrEmpty(email);
-        
+
         user.Email = email;
         return Task.CompletedTask;
     }
 
-    public Task<string?> GetEmailAsync(User user, CancellationToken cancellationToken) => 
+    public Task<string?> GetEmailAsync(User user, CancellationToken cancellationToken) =>
         Task.FromResult((string?)user.Email);
 
-    public Task<bool> GetEmailConfirmedAsync(User user, CancellationToken cancellationToken) => 
+    public Task<bool> GetEmailConfirmedAsync(User user, CancellationToken cancellationToken) =>
         Task.FromResult(user.EmailConfirmed);
 
     public Task SetEmailConfirmedAsync(User user, bool confirmed, CancellationToken cancellationToken)
@@ -320,16 +318,16 @@ internal sealed class UserStore : IUserLoginStore<User>,
         return Task.CompletedTask;
     }
 
-    public Task<User?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken) => 
+    public Task<User?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken) =>
         _identityDbContext.Users.FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
 
-    public Task<string?> GetNormalizedEmailAsync(User user, CancellationToken cancellationToken) => 
+    public Task<string?> GetNormalizedEmailAsync(User user, CancellationToken cancellationToken) =>
         Task.FromResult((string?)user.NormalizedEmail);
 
     public Task SetNormalizedEmailAsync(User user, string? normalizedEmail, CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrEmpty(normalizedEmail);
-        
+
         user.NormalizedEmail = normalizedEmail;
         return Task.CompletedTask;
     }
@@ -340,10 +338,10 @@ internal sealed class UserStore : IUserLoginStore<User>,
         return Task.CompletedTask;
     }
 
-    public Task<string?> GetPhoneNumberAsync(User user, CancellationToken cancellationToken) => 
+    public Task<string?> GetPhoneNumberAsync(User user, CancellationToken cancellationToken) =>
         Task.FromResult(user.PhoneNumber);
 
-    public Task<bool> GetPhoneNumberConfirmedAsync(User user, CancellationToken cancellationToken) => 
+    public Task<bool> GetPhoneNumberConfirmedAsync(User user, CancellationToken cancellationToken) =>
         Task.FromResult(user.PhoneNumberConfirmed);
 
     public Task SetPhoneNumberConfirmedAsync(User user, bool confirmed, CancellationToken cancellationToken)
@@ -360,65 +358,66 @@ internal sealed class UserStore : IUserLoginStore<User>,
         return Task.CompletedTask;
     }
 
-    public Task<bool> GetTwoFactorEnabledAsync(User user, CancellationToken cancellationToken) => 
+    public Task<bool> GetTwoFactorEnabledAsync(User user, CancellationToken cancellationToken) =>
         Task.FromResult(user.TwoFactorEnabled);
 
     public Task SetTokenAsync(User user, string loginProvider, string name, string? value,
         CancellationToken cancellationToken)
     {
         var userToken = new UserToken { UserId = user.Id, LoginProvider = loginProvider, Name = name, Value = value };
-        
+
         _identityDbContext.UserTokens.Add(userToken);
         return _identityDbContext.SaveChangesAsync(cancellationToken);
     }
 
     public Task RemoveTokenAsync(User user, string loginProvider, string name, CancellationToken cancellationToken) =>
-        _identityDbContext.UserTokens.Where(ut => 
-                ut.UserId == user.Id 
-                && ut.LoginProvider == loginProvider 
+        _identityDbContext.UserTokens.Where(ut =>
+                ut.UserId == user.Id
+                && ut.LoginProvider == loginProvider
                 && ut.Name == name)
             .ExecuteDeleteAsync(cancellationToken);
 
-    public Task<string?> GetTokenAsync(User user, string loginProvider, string name, CancellationToken cancellationToken) => 
-        _identityDbContext.UserTokens.Where(ut => 
-                ut.UserId == user.Id 
-                && ut.LoginProvider == loginProvider 
+    public Task<string?> GetTokenAsync(User user, string loginProvider, string name,
+        CancellationToken cancellationToken) =>
+        _identityDbContext.UserTokens.Where(ut =>
+                ut.UserId == user.Id
+                && ut.LoginProvider == loginProvider
                 && ut.Name == name)
             .Select(ut => ut.Value)
             .FirstOrDefaultAsync(cancellationToken);
 
-    public Task SetAuthenticatorKeyAsync(User user, string key, CancellationToken cancellationToken) => 
+    public Task SetAuthenticatorKeyAsync(User user, string key, CancellationToken cancellationToken) =>
         SetTokenAsync(user, "[UserStore]", "AuthenticatorKey", key, cancellationToken);
 
-    public Task<string?> GetAuthenticatorKeyAsync(User user, CancellationToken cancellationToken) => 
+    public Task<string?> GetAuthenticatorKeyAsync(User user, CancellationToken cancellationToken) =>
         GetTokenAsync(user, "[UserStore]", "AuthenticatorKey", cancellationToken);
 
     public Task ReplaceCodesAsync(User user, IEnumerable<string> recoveryCodes, CancellationToken cancellationToken)
     {
         var str = string.Join(";", recoveryCodes);
-        return this.SetTokenAsync(user, "[UserStore]", "RecoveryCodes", str, cancellationToken);
+        return SetTokenAsync(user, "[UserStore]", "RecoveryCodes", str, cancellationToken);
     }
 
     public async Task<bool> RedeemCodeAsync(User user, string code, CancellationToken cancellationToken)
     {
-        var source = await this.GetTokenAsync(user, "[UserStore]", "RecoveryCodes", cancellationToken)
+        var source = await GetTokenAsync(user, "[UserStore]", "RecoveryCodes", cancellationToken)
                      ?? string.Empty;
-        
+
         var codes = source.Split(';');
         if (!codes.Contains(code))
         {
             return false;
         }
-        
-        await this.ReplaceCodesAsync(user, codes, cancellationToken).ConfigureAwait(false);
+
+        await ReplaceCodesAsync(user, codes, cancellationToken).ConfigureAwait(false);
         return true;
     }
 
     public async Task<int> CountCodesAsync(User user, CancellationToken cancellationToken)
     {
-        var text = await this.GetTokenAsync(user, "[UserStore]", "RecoveryCodes", cancellationToken)
-            ?? string.Empty;
-        
+        var text = await GetTokenAsync(user, "[UserStore]", "RecoveryCodes", cancellationToken)
+                   ?? string.Empty;
+
         return text.Length <= 0 ? 0 : text.AsSpan().Count(';') + 1;
     }
 }

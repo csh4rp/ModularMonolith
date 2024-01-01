@@ -10,7 +10,7 @@ public class PostgresFixture : IAsyncLifetime
     private NpgsqlConnection? _connection;
     private PostgreSqlContainer? _container;
     private Respawner? _respawner;
-    
+
     public string ConnectionString => _container!.GetConnectionString();
 
     public async Task InitializeAsync()

@@ -9,7 +9,7 @@ internal sealed class VerifyAccountCommandValidator : AbstractValidator<VerifyAc
     {
         RuleFor(x => x.UserId)
             .NotEmpty();
-        
+
         RuleFor(x => x.VerificationToken)
             .NotEmpty()
             .MaximumLength(1024);

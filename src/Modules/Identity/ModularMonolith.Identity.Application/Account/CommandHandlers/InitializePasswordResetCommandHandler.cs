@@ -42,7 +42,7 @@ internal sealed class InitializePasswordResetCommandHandler : ICommandHandler<In
         }
 
         await _eventBus.PublishAsync(new PasswordResetInitialized(userId), cancellationToken);
-        
+
         return Result.Successful;
     }
 }

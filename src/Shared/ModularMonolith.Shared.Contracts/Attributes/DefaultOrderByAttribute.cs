@@ -10,6 +10,6 @@ public class DefaultOrderByAttribute : Attribute
     }
 
     public string PropertyName { get; }
-    
+
     public bool IsAscending { get; }
 }

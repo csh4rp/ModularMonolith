@@ -36,12 +36,12 @@ internal sealed class ChangePasswordCommandHandler : ICommandHandler<ChangePassw
 
             return Result.Successful;
         }
-        
+
         if (result.Errors.Any(e => e.Code.Equals("PasswordMismatch", StringComparison.OrdinalIgnoreCase)))
         {
             return MemberError.InvalidValue(nameof(request.CurrentPassword));
         }
-        
+
         return MemberError.InvalidValue(nameof(request.NewPassword));
     }
 }

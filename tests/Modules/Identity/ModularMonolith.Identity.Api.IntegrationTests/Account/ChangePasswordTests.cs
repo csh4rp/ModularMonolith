@@ -10,16 +10,16 @@ namespace ModularMonolith.Identity.Api.IntegrationTests.Account;
 public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
 {
     private static readonly Guid UserId = Guid.Parse("FDCD0B4A-828E-40ED-9DDB-AB987B2E70F7");
-    
+
     private readonly IdentityFixture _identityFixture;
     private readonly AccountFixture _accountFixture;
-    
+
     public ChangePasswordTests(IdentityFixture identityFixture, AccountFixture accountFixture)
     {
         _identityFixture = identityFixture;
         _accountFixture = accountFixture;
     }
-    
+
     [Fact]
     public async Task ShouldReturnNoContent_WhenPasswordIsValid()
     {
@@ -31,10 +31,10 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
 
         using var client = _identityFixture.CreateClientWithAuthToken(UserId);
         using var request = GetResource("ChangePassword.Valid.json");
-    
+
         // Act
         using var response = await client.PostAsync("/api/identity/account/change-password", request);
-    
+
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
@@ -51,15 +51,15 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
 
         using var client = _identityFixture.CreateClientWithAuthToken(UserId);
         using var request = GetResource("ChangePassword.InvalidCurrentPassword.json");
-    
+
         // Act
         using var response = await client.PostAsync("/api/identity/account/change-password", request);
-    
+
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         await VerifyResponse(response);
     }
-    
+
     [Fact]
     [TestFileName("BadRequest_NewPasswordDoesNotMatchPolicy")]
     public async Task ShouldReturnNoContent_WhenNewPasswordDoesNotMatchPolicy()
@@ -72,31 +72,28 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
 
         using var client = _identityFixture.CreateClientWithAuthToken(UserId);
         using var request = GetResource("ChangePassword.NewPasswordNotMatchingPolicy.json");
-    
+
         // Act
         using var response = await client.PostAsync("/api/identity/account/change-password", request);
-    
+
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         await VerifyResponse(response);
     }
-    
+
     [Fact]
     public async Task ShouldReturnUnauthorized_WhenRequestIsMissingToken()
     {
         // Arrange
         using var client = _identityFixture.CreateClient();
         using var request = GetResource("ChangePassword.Valid.json");
-    
+
         // Act
         using var response = await client.PostAsync("/api/identity/account/change-password", request);
-    
+
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
-    
-    public override async Task DisposeAsync()
-    {
-        await _identityFixture.ResetAsync();
-    }
+
+    public override async Task DisposeAsync() => await _identityFixture.ResetAsync();
 }

@@ -9,8 +9,8 @@ public sealed class ConflictException : AppException
     }
 
     public override string Code => "CONFLICT";
-    
+
     public string PropertyName { get; }
-    
+
     public string ErrorCode { get; }
 }

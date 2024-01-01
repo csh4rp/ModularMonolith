@@ -18,9 +18,10 @@ public class ResetPasswordCommandHandlerTests
 {
     private readonly FakeUserManager _userManager = Substitute.For<FakeUserManager>();
     private readonly IEventBus _eventBus = Substitute.For<IEventBus>();
+
     private readonly ILogger<ResetPasswordCommandHandler> _logger =
         Substitute.For<ILogger<ResetPasswordCommandHandler>>();
-    
+
     [Fact]
     public async Task ShouldResetPassword_WhenPasswordResetTokenIsValid()
     {
@@ -35,18 +36,19 @@ public class ResetPasswordCommandHandlerTests
         _userManager.ResetPasswordAsync(user, token, password).Returns(IdentityResult.Success);
 
         var command = new ResetPasswordCommand(userId, token, password, password);
-        
+
         var handler = new ResetPasswordCommandHandler(_userManager, _eventBus, _logger);
-        
+
         // Act
         var result = await handler.Handle(command, default);
-        
+
         // Assert
         result.Should().BeSuccessful();
 
         await _eventBus.Received(1)
             .PublishAsync(Arg.Is<PasswordReset>(e => e.UserId == userId), default);
     }
+
     [Fact]
     public async Task ShouldReturnTokenError_WhenPasswordResetTokenIsInvalid()
     {
@@ -62,21 +64,20 @@ public class ResetPasswordCommandHandlerTests
             .Returns(IdentityResult.Failed(new IdentityErrorDescriber().InvalidToken()));
 
         var command = new ResetPasswordCommand(userId, token, password, password);
-        
+
         var handler = new ResetPasswordCommandHandler(_userManager, _eventBus, _logger);
-        
+
         // Act
         var result = await handler.Handle(command, default);
-        
+
         // Assert
         result.Should().NotBeSuccessful();
 
         result.Error.Should().BeMemberError()
             .And.HaveCode(ErrorCodes.InvalidValue)
             .And.HaveTarget(nameof(command.ResetPasswordToken));
-        
+
         await _eventBus.DidNotReceiveWithAnyArgs()
             .PublishAsync<PasswordReset>(default!, default);
     }
-    
 }

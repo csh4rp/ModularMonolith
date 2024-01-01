@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <NoWarn>$(NoWarn);IDE0005;</NoWarn>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="EFCore.NamingConventions"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">

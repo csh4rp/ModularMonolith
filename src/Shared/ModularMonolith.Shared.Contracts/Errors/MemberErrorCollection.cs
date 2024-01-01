@@ -9,7 +9,7 @@ public class MemberErrorCollection : Error, IEnumerable<MemberError>
     public MemberErrorCollection() : base("MEMBER_ERRORS", "One or more errors occurred")
     {
     }
-    
+
     public void Add(MemberError memberError) => _errors.Add(memberError);
 
     public IEnumerator<MemberError> GetEnumerator() => _errors.GetEnumerator();

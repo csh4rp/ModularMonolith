@@ -12,14 +12,14 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
     private readonly CategoryManagementFixture _categoryManagementFixture;
     private readonly CategoryFixture _categoryFixture;
     private readonly HttpClient _client;
-    
+
     public UpdateCategoryTests(CategoryManagementFixture categoryManagementFixture, CategoryFixture categoryFixture)
     {
         _categoryManagementFixture = categoryManagementFixture;
         _categoryFixture = categoryFixture;
         _client = categoryManagementFixture.CreateClientWithAuthToken();
     }
-    
+
     [Fact]
     public async Task ShouldReturnNoContent_WhenCategoryExists()
     {
@@ -28,23 +28,23 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
 
         _categoryManagementFixture.CategoryManagementDbContext.Categories.Add(category);
         await _categoryManagementFixture.CategoryManagementDbContext.SaveChangesAsync();
-        
+
         using var request = GetResource("UpdateCategory.Valid.json");
-        
+
         // Act
         using var response = await _client.PutAsync($"api/category-management/categories/{category.Id}", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
-    
+
     [Fact]
     [TestFileName("BadRequest_CategoryNameIsEmpty")]
     public async Task ShouldReturnBadRequest_WhenCategoryNameIsEmpty()
     {
         // Arrange
         using var request = GetResource("UpdateCategory.EmptyName.json");
-        
+
         // Act
         using var response = await _client.PutAsync($"api/category-management/categories/{Guid.Empty}", request);
 
@@ -52,14 +52,14 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         await VerifyResponse(response);
     }
-    
+
     [Fact]
     [TestFileName("NotFound_CategoryDoesNotExist")]
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()
     {
         // Arrange
         using var request = GetResource("UpdateCategory.Valid.json");
-        
+
         // Act
         using var response = await _client.PutAsync($"api/category-management/categories/{Guid.Empty}", request);
 
@@ -67,7 +67,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         await VerifyResponse(response);
     }
-    
+
     [Fact]
     [TestFileName("Conflict_WhenCategoryNameIsAlreadyUsed")]
     public async Task ShouldReturnConflict_WhenCategoryNameIsAlreadyUsed()
@@ -76,26 +76,25 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
         var currentCategory = _categoryFixture.Clone()
             .RuleFor(x => x.Id, Guid.Parse("775DA6BC-13FE-46E9-9D00-55374A95C542"))
             .Generate();
-        
+
         var otherCategory = _categoryFixture.Clone()
             .RuleFor(x => x.Name, "Updated-Category-Duplicate")
             .Generate();
 
-        await _categoryManagementFixture.CategoryManagementDbContext.Categories.AddRangeAsync(currentCategory, otherCategory);
+        await _categoryManagementFixture.CategoryManagementDbContext.Categories.AddRangeAsync(currentCategory,
+            otherCategory);
         await _categoryManagementFixture.CategoryManagementDbContext.SaveChangesAsync();
-        
+
         using var request = GetResource("UpdateCategory.DuplicateName.json");
-        
+
         // Act
-        using var response = await _client.PutAsync($"api/category-management/categories/{currentCategory.Id}", request);
+        using var response =
+            await _client.PutAsync($"api/category-management/categories/{currentCategory.Id}", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
         await VerifyResponse(response);
     }
-    
-    public override async Task DisposeAsync()
-    {
-        await _categoryManagementFixture.ResetAsync();
-    }
+
+    public override async Task DisposeAsync() => await _categoryManagementFixture.ResetAsync();
 }

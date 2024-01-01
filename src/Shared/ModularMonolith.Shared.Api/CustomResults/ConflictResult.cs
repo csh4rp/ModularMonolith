@@ -16,7 +16,7 @@ public class ConflictResult : IResult
         var traceId = currentActivity?.TraceId.ToString() ?? httpContext.TraceIdentifier;
 
         var response = new ConflictErrorResponse(httpContext.Request.Path, traceId, _conflictError.Target);
-        
+
         httpContext.Response.StatusCode = StatusCodes.Status409Conflict;
         return httpContext.Response.WriteAsJsonAsync(response);
     }

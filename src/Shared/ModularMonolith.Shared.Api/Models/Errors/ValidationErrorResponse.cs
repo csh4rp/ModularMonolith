@@ -20,6 +20,6 @@ public class ValidationErrorResponse : ProblemDetails
     public string TraceId { get; }
 
     public DateTimeOffset Timestamp { get; }
-    
+
     public IReadOnlyList<MemberError> Errors { get; }
 }

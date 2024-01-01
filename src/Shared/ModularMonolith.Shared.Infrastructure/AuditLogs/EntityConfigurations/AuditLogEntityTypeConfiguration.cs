@@ -41,13 +41,13 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
             .HasConversion(b => b.ToString(), b => Enum.Parse<EntityState>(b))
             .IsRequired()
             .HasMaxLength(8);
-        
+
         builder.OwnsMany(b => b.EntityPropertyChanges, b =>
         {
             b.ToTable(_table);
             b.ToJson("entity_property_changes");
         });
-        
+
         builder.OwnsMany(b => b.EntityKeys, b =>
         {
             b.ToTable(_table);
@@ -57,7 +57,7 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
         builder.Property(b => b.EntityType)
             .IsRequired()
             .HasMaxLength(256);
-        
+
         builder.Property(b => b.OperationName)
             .IsRequired()
             .HasMaxLength(128);
@@ -66,25 +66,25 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
             .IsRequired()
             .IsUnicode(false)
             .HasMaxLength(32);
-        
+
         builder.Property(b => b.SpanId)
             .IsRequired()
             .IsUnicode(false)
             .HasMaxLength(16);
-        
+
         builder.Property(b => b.ParentSpanId)
             .IsUnicode(false)
             .HasMaxLength(16);
 
         builder.Property(b => b.UserName)
             .HasMaxLength(128);
-        
+
         builder.Property(b => b.IpAddress)
             .HasMaxLength(32);
 
         builder.Property(b => b.UserAgent)
             .HasMaxLength(256);
-        
+
         // TODO: Add index for EntityKey, EntityType [{"PropertyName": "id", "Value": "GUID"}]
     }
 }

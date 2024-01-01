@@ -8,8 +8,8 @@ public sealed class EntityNotFoundError : Error
         EntityName = entityName;
         EntityId = entityId;
     }
-    
+
     public string EntityName { get; init; }
-    
+
     public object EntityId { get; init; }
 }

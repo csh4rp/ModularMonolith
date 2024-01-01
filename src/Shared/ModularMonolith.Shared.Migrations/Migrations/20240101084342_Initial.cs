@@ -123,6 +123,28 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                 schema: "shared",
                 table: "event_log",
                 columns: new[] { "user_id", "event_type", "created_at" });
+            
+            migrationBuilder.Sql(
+                """
+                CREATE OR REPLACE FUNCTION shared.event_log_inserted()
+                    RETURNS TRIGGER AS
+                $$
+                DECLARE
+                    payload text;
+                BEGIN
+                    payload := pg_notify('event_log_queue', NEW.id::text || '/' || COALESCE(NEW.correlation_id::text, ''));
+                    RETURN NEW;
+                END
+                $$ LANGUAGE plpgsql;
+                """);
+
+            migrationBuilder.Sql(
+                """
+                CREATE OR REPLACE TRIGGER tr_event_log_inserted
+                AFTER INSERT ON shared.event_log
+                FOR EACH ROW
+                EXECUTE FUNCTION shared.event_log_inserted();
+                """);
         }
 
         /// <inheritdoc />

@@ -3,6 +3,7 @@ using Asp.Versioning;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using ModularMonolith.Shared.Api.Exceptions;
 using ModularMonolith.Shared.Api.Middlewares;
 using ModularMonolith.Shared.Application;
@@ -27,19 +28,19 @@ public static class WebApplicationBuilderExtensions
         var assemblies = modules.SelectMany(m => m.Assemblies).ToArray();
 
         var authType = builder.Configuration.GetSection("Authentication:Type").Get<string>()
-            ?? throw new ArgumentException("'Authentication:Type' is not configured");
+                       ?? throw new ArgumentException("'Authentication:Type' is not configured");
 
         if (authType.Equals("Bearer"))
         {
             var key = builder.Configuration.GetSection("Authentication:SigningKey").Get<string>()
-                ?? throw new ArgumentException("'Authentication:SigningKey' is not configured");
-            
+                      ?? throw new ArgumentException("'Authentication:SigningKey' is not configured");
+
             var audience = builder.Configuration.GetSection("Authentication:Audience").Get<string>()
-                ?? throw new ArgumentException("'Authentication:Audience' is not configured");
-            
+                           ?? throw new ArgumentException("'Authentication:Audience' is not configured");
+
             var issuer = builder.Configuration.GetSection("Authentication:Issuer").Get<string>()
-                ?? throw new ArgumentException("'Authentication:Issuer' is not configured");
-            
+                         ?? throw new ArgumentException("'Authentication:Issuer' is not configured");
+
             builder.Services.AddAuthentication(options =>
                 {
                     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -65,15 +66,38 @@ public static class WebApplicationBuilderExtensions
         }
 
         builder.Services.AddScoped<IdentityMiddleware>();
-        
+
         builder.Services.AddAuthorization(options =>
         {
-
         });
-        
+
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(opt =>
         {
+            opt.AddSecurityDefinition("Bearer",
+                new OpenApiSecurityScheme
+                {
+                    Description = "",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+            opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" },
+                        Scheme = "OAuth2",
+                        Name = "Bearer",
+                        In = ParameterLocation.Header
+                    },
+                    new List<string>()
+                }
+            });
+
             foreach (var module in modules)
             {
                 module.SwaggerGenAction(opt);

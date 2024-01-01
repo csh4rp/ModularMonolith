@@ -14,7 +14,8 @@ internal sealed class AuditLogFactory
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly TimeProvider _timeProvider;
 
-    public AuditLogFactory(IIdentityContextAccessor identityContextAccessor, TimeProvider timeProvider, IHttpContextAccessor httpContextAccessor)
+    public AuditLogFactory(IIdentityContextAccessor identityContextAccessor, TimeProvider timeProvider,
+        IHttpContextAccessor httpContextAccessor)
     {
         _identityContextAccessor = identityContextAccessor;
         _timeProvider = timeProvider;
@@ -70,10 +71,10 @@ internal sealed class AuditLogFactory
         var activity = Activity.Current;
         var httpContext = _httpContextAccessor.HttpContext;
         var identityContext = _identityContextAccessor.Context;
-        
+
         var ipAddress = httpContext?.Connection.RemoteIpAddress?.ToString();
         var userAgent = httpContext?.Request.Headers.UserAgent;
-        
+
         return new AuditLog
         {
             CreatedAt = _timeProvider.GetUtcNow(),

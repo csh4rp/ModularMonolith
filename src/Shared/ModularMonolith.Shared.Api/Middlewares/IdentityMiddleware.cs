@@ -7,10 +7,8 @@ public class IdentityMiddleware : IMiddleware
 {
     private readonly IIdentityContextSetter _identityContextSetter;
 
-    public IdentityMiddleware(IIdentityContextSetter identityContextSetter)
-    {
+    public IdentityMiddleware(IIdentityContextSetter identityContextSetter) =>
         _identityContextSetter = identityContextSetter;
-    }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {

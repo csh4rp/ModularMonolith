@@ -15,7 +15,7 @@ internal sealed class RegisterCommandValidator : AbstractValidator<RegisterComma
         RuleFor(x => x.Password)
             .NotEmpty()
             .MaximumLength(128);
-        
+
         RuleFor(x => x.PasswordConfirmed)
             .NotEmpty()
             .MaximumLength(128)

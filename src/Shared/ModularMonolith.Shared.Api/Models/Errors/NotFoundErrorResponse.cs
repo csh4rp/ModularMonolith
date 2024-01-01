@@ -20,8 +20,8 @@ public class NotFoundErrorResponse : ProblemDetails
     public string TraceId { get; }
 
     public DateTimeOffset Timestamp { get; }
-    
+
     public string EntityType { get; }
-    
+
     public string EntityId { get; }
 }

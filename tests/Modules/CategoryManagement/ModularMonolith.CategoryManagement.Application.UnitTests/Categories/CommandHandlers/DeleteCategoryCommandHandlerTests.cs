@@ -32,7 +32,7 @@ public class DeleteCategoryCommandHandlerTests
 
         // Assert
         result.Should().BeSuccessful();
-        
+
         var category = await context.Categories.FindAsync(existingCategory.Id);
 
         category.Should().BeNull();
@@ -53,7 +53,7 @@ public class DeleteCategoryCommandHandlerTests
 
         // Assert
         result.Should().NotBeSuccessful();
-        result.Error.Should().BeOfType<EntityNotFoundError>(); 
+        result.Error.Should().BeOfType<EntityNotFoundError>();
     }
 
     private static CategoryManagementDbContext CreateDbContext()

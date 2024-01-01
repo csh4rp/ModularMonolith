@@ -7,8 +7,8 @@ public abstract class Error
         Code = code;
         Message = message;
     }
-    
+
     public string Code { get; protected set; }
-    
+
     public string Message { get; protected set; }
 }

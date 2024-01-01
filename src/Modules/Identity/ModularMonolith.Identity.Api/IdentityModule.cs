@@ -23,10 +23,10 @@ public sealed class IdentityModule : AppModule
     {
         serviceCollection.AddOptions<AuthOptions>()
             .Configure<IConfiguration>((opt, conf) =>
-        {
-            conf.GetSection("Modules:Identity:Auth").Bind(opt);
-        });
-        
+            {
+                conf.GetSection("Modules:Identity:Auth").Bind(opt);
+            });
+
         serviceCollection.AddInfrastructure();
         return serviceCollection;
     }
@@ -41,17 +41,10 @@ public sealed class IdentityModule : AppModule
     {
         BusinessLogicAssembly, ContractsAssembly, DomainAssembly, InfrastructureAssembly
     }.ToFrozenSet();
-    
-    public override void SwaggerGenAction(SwaggerGenOptions options)
-    {
-        options.SwaggerDoc("identity-v1", new OpenApiInfo
-        {
-            Version = "v1.0"
-        });
-    }
 
-    public override void SwaggerUIAction(SwaggerUIOptions options)
-    {
+    public override void SwaggerGenAction(SwaggerGenOptions options) =>
+        options.SwaggerDoc("identity-v1", new OpenApiInfo { Version = "v1.0" });
+
+    public override void SwaggerUIAction(SwaggerUIOptions options) =>
         options.SwaggerEndpoint("/swagger/identity-v1/swagger.json", "Identity v1.0");
-    }
 }

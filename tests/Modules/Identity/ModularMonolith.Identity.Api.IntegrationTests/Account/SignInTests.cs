@@ -19,7 +19,7 @@ public class SignInTests : BaseIntegrationTest<SignInTests>
         _accountFixture = accountFixture;
         _client = identityFixture.CreateClient();
     }
-    
+
     [Fact]
     [TestFileName("Ok_CredentialsAreValid")]
     public async Task ShouldReturnOk_WhenCredentialsAreValid()
@@ -28,7 +28,7 @@ public class SignInTests : BaseIntegrationTest<SignInTests>
         var user = _accountFixture.AActiveUser();
         _identityFixture.IdentityDbContext.Users.Add(user);
         await _identityFixture.IdentityDbContext.SaveChangesAsync();
-        
+
         using var request = GetResource("SignIn.Valid.json");
 
         // Act
@@ -38,7 +38,7 @@ public class SignInTests : BaseIntegrationTest<SignInTests>
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         await VerifyResponse(response);
     }
-    
+
     [Fact]
     [TestFileName("BadRequest_PasswordIsIncorrect")]
     public async Task ShouldReturnBadRequest_WhenPasswordIsIncorrect()
@@ -47,7 +47,7 @@ public class SignInTests : BaseIntegrationTest<SignInTests>
         var user = _accountFixture.AActiveUser();
         _identityFixture.IdentityDbContext.Users.Add(user);
         await _identityFixture.IdentityDbContext.SaveChangesAsync();
-        
+
         using var request = GetResource("SignIn.InvalidPassword.json");
 
         // Act
@@ -57,9 +57,6 @@ public class SignInTests : BaseIntegrationTest<SignInTests>
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         await VerifyResponse(response);
     }
-    
-    public override async Task DisposeAsync()
-    {
-        await _identityFixture.ResetAsync();
-    }
+
+    public override async Task DisposeAsync() => await _identityFixture.ResetAsync();
 }

@@ -19,6 +19,6 @@ public class ConflictErrorResponse : ProblemDetails
     public string TraceId { get; }
 
     public DateTimeOffset Timestamp { get; }
-    
+
     public string Target { get; }
 }

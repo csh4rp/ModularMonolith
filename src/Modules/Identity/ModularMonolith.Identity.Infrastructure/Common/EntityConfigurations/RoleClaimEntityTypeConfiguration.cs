@@ -9,13 +9,13 @@ internal sealed class RoleClaimEntityTypeConfiguration : IEntityTypeConfiguratio
     public void Configure(EntityTypeBuilder<RoleClaim> builder)
     {
         builder.ToTable("role_claim");
-        
+
         builder.HasKey(b => b.Id);
-        
+
         builder.Property(b => b.ClaimType)
             .IsRequired()
             .HasMaxLength(128);
-        
+
         builder.Property(b => b.ClaimValue)
             .IsRequired()
             .HasMaxLength(128);

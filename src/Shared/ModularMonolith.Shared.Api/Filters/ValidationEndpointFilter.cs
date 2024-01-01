@@ -44,7 +44,7 @@ internal sealed class ValidationEndpointFilter<TModel> : IEndpointFilter
             var codeMapped = ErrorCodeMapper.TryMap(e.ErrorCode, out var errorCode);
             var code = codeMapped ? errorCode! : e.ErrorCode;
             var target = char.ToLower(e.PropertyName[0]) + e.PropertyName[1..];
-            
+
             return new MemberError(code, e.ErrorMessage, target);
         }).ToArray();
 

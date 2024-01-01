@@ -9,13 +9,13 @@ internal sealed class UserTokenEntityTypeConfiguration : IEntityTypeConfiguratio
     public void Configure(EntityTypeBuilder<UserToken> builder)
     {
         builder.ToTable("user_token");
-        
-        builder.HasKey(b => new {b.UserId, b.LoginProvider, b.Name});
-        
+
+        builder.HasKey(b => new { b.UserId, b.LoginProvider, b.Name });
+
         builder.Property(b => b.LoginProvider)
             .IsRequired()
             .HasMaxLength(128);
-        
+
         builder.Property(b => b.Name)
             .IsRequired()
             .HasMaxLength(128);
@@ -23,7 +23,7 @@ internal sealed class UserTokenEntityTypeConfiguration : IEntityTypeConfiguratio
         builder.Property(b => b.Value)
             .IsRequired()
             .HasMaxLength(1024);
-        
+
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(b => b.UserId);

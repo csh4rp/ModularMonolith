@@ -22,7 +22,7 @@ public class ResultAssertions : ReferenceTypeAssertions<Result, ResultAssertions
 
         return new AndConstraint<ResultAssertions>(this);
     }
-    
+
     public AndConstraint<ResultAssertions> NotBeSuccessful(string because = "", params object[] becauseArgs)
     {
         Execute.Assertion
@@ -32,7 +32,6 @@ public class ResultAssertions : ReferenceTypeAssertions<Result, ResultAssertions
 
         return new AndConstraint<ResultAssertions>(this);
     }
-
 }
 
 public class ResultAssertions<T> : ReferenceTypeAssertions<Result<T>, ResultAssertions<T>>
@@ -52,7 +51,7 @@ public class ResultAssertions<T> : ReferenceTypeAssertions<Result<T>, ResultAsse
 
         return new AndConstraint<ResultAssertions<T>>(this);
     }
-    
+
     public AndConstraint<ResultAssertions<T>> NotBeSuccessful(string because = "", params object[] becauseArgs)
     {
         Execute.Assertion
@@ -62,5 +61,4 @@ public class ResultAssertions<T> : ReferenceTypeAssertions<Result<T>, ResultAsse
 
         return new AndConstraint<ResultAssertions<T>>(this);
     }
-
 }

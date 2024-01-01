@@ -9,15 +9,15 @@ internal sealed class ResetPasswordCommandValidator : AbstractValidator<ResetPas
     {
         RuleFor(x => x.UserId)
             .NotEmpty();
-        
+
         RuleFor(x => x.ResetPasswordToken)
             .NotEmpty()
             .MaximumLength(1024);
-        
+
         RuleFor(x => x.NewPassword)
             .NotEmpty()
             .MaximumLength(128);
-        
+
         RuleFor(x => x.NewPasswordConfirmed)
             .NotEmpty()
             .MaximumLength(128)

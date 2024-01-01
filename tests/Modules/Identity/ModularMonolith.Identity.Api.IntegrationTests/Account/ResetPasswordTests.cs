@@ -18,7 +18,7 @@ public class ResetPasswordTests : BaseIntegrationTest<ResetPasswordTests>
     private readonly AccountFixture _accountFixture;
     private readonly AsyncServiceScope _serviceScope;
     private readonly HttpClient _httpClient;
-    
+
     public ResetPasswordTests(IdentityFixture identityFixture, AccountFixture accountFixture)
     {
         _identityFixture = identityFixture;
@@ -34,7 +34,7 @@ public class ResetPasswordTests : BaseIntegrationTest<ResetPasswordTests>
         var user = _accountFixture.AActiveUser();
         _identityFixture.IdentityDbContext.Users.Add(user);
         await _identityFixture.IdentityDbContext.SaveChangesAsync();
-        
+
         var manager = _serviceScope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var token = await manager.GeneratePasswordResetTokenAsync(user);
 
@@ -43,18 +43,18 @@ public class ResetPasswordTests : BaseIntegrationTest<ResetPasswordTests>
             UserId = user.Id,
             ResetPasswordToken = token,
             NewPassword = "123!@#Pa$$word!@#123",
-            NewPasswordConfirmed = "123!@#Pa$$word!@#123",
+            NewPasswordConfirmed = "123!@#Pa$$word!@#123"
         };
 
         using var request = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-        
+
         // Act
         using var response = await _httpClient.PostAsync("/api/identity/account/reset-password", request);
-        
+
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
-    
+
     [Fact]
     [TestFileName("BadRequest_UserIdIsInvalid")]
     public async Task ShouldReturnBadRequest_WhenUserIdIsInvalid()
@@ -65,19 +65,19 @@ public class ResetPasswordTests : BaseIntegrationTest<ResetPasswordTests>
             UserId = Guid.NewGuid(),
             ResetPasswordToken = "123",
             NewPassword = "123!@#Pa$$word!@#123",
-            NewPasswordConfirmed = "123!@#Pa$$word!@#123",
+            NewPasswordConfirmed = "123!@#Pa$$word!@#123"
         };
 
         using var request = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-        
+
         // Act
         using var response = await _httpClient.PostAsync("/api/identity/account/reset-password", request);
-        
+
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         await VerifyResponse(response);
     }
-    
+
     [Fact]
     [TestFileName("BadRequest_TokenIsInvalid")]
     public async Task ShouldReturnBadRequest_WhenTokenIsInvalid()
@@ -86,27 +86,24 @@ public class ResetPasswordTests : BaseIntegrationTest<ResetPasswordTests>
         var user = _accountFixture.AActiveUser();
         _identityFixture.IdentityDbContext.Users.Add(user);
         await _identityFixture.IdentityDbContext.SaveChangesAsync();
-        
+
         var payload = new
         {
             UserId = user.Id,
             ResetPasswordToken = "123",
             NewPassword = "123!@#Pa$$word!@#123",
-            NewPasswordConfirmed = "123!@#Pa$$word!@#123",
+            NewPasswordConfirmed = "123!@#Pa$$word!@#123"
         };
 
         using var request = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-        
+
         // Act
         using var response = await _httpClient.PostAsync("/api/identity/account/reset-password", request);
-        
+
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         await VerifyResponse(response);
     }
-    
-    public override async Task DisposeAsync()
-    {
-        await _identityFixture.ResetAsync();
-    }
+
+    public override async Task DisposeAsync() => await _identityFixture.ResetAsync();
 }

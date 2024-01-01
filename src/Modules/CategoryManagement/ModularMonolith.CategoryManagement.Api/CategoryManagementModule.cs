@@ -28,7 +28,7 @@ public sealed class CategoryManagementModule : AppModule
     {
         BusinessLogicAssembly, ContractsAssembly, DomainAssembly, InfrastructureAssembly
     }.ToFrozenSet();
-    
+
     public override IServiceCollection RegisterServices(IServiceCollection serviceCollection)
     {
         serviceCollection.AddInfrastructure();
@@ -36,16 +36,9 @@ public sealed class CategoryManagementModule : AppModule
         return serviceCollection;
     }
 
-    public override void SwaggerGenAction(SwaggerGenOptions options)
-    {
-        options.SwaggerDoc("category-management-v1", new OpenApiInfo
-        {
-            Version = "v1.0"
-        });
-    }
+    public override void SwaggerGenAction(SwaggerGenOptions options) =>
+        options.SwaggerDoc("category-management-v1", new OpenApiInfo { Version = "v1.0" });
 
-    public override void SwaggerUIAction(SwaggerUIOptions options)
-    {
+    public override void SwaggerUIAction(SwaggerUIOptions options) =>
         options.SwaggerEndpoint("/swagger/category-management-v1/swagger.json", "Category Management v1.0");
-    }
 }

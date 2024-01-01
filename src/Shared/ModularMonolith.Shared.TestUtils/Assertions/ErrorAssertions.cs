@@ -12,33 +12,37 @@ public class ErrorAssertions : ReferenceTypeAssertions<Error?, ErrorAssertions>
     }
 
     protected override string Identifier => "Error";
-    
-    public AndConstraint<ErrorAssertions<T>> HaveType<T>(string because = "", params object[] becauseArgs) where T : Error
+
+    public AndConstraint<ErrorAssertions<T>> HaveType<T>(string because = "", params object[] becauseArgs)
+        where T : Error
     {
         Execute.Assertion
             .BecauseOf(because, becauseArgs)
             .ForCondition(Subject is T)
-            .FailWith("Expected {context:Error} to be of type {0}{reason}, but it was {1}", typeof(T), Subject!.GetType());
+            .FailWith("Expected {context:Error} to be of type {0}{reason}, but it was {1}", typeof(T),
+                Subject!.GetType());
 
         return new AndConstraint<ErrorAssertions<T>>(new ErrorAssertions<T>((T)Subject));
     }
-    
+
     public AndConstraint<MemberErrorAssertions> BeMemberError(string because = "", params object[] becauseArgs)
     {
         Execute.Assertion
             .BecauseOf(because, becauseArgs)
             .ForCondition(Subject is MemberError)
-            .FailWith("Expected {context:Error} to be of type {0}{reason}, but it was {1}", typeof(MemberError), Subject!.GetType());
+            .FailWith("Expected {context:Error} to be of type {0}{reason}, but it was {1}", typeof(MemberError),
+                Subject!.GetType());
 
         return new AndConstraint<MemberErrorAssertions>(new MemberErrorAssertions((MemberError)Subject));
     }
-    
+
     public AndConstraint<ConflictErrorAssertions> BeConflictError(string because = "", params object[] becauseArgs)
     {
         Execute.Assertion
             .BecauseOf(because, becauseArgs)
             .ForCondition(Subject is ConflictError)
-            .FailWith("Expected {context:Error} to be of type {0}{reason}, but it was {1}", typeof(ConflictError), Subject!.GetType());
+            .FailWith("Expected {context:Error} to be of type {0}{reason}, but it was {1}", typeof(ConflictError),
+                Subject!.GetType());
 
         return new AndConstraint<ConflictErrorAssertions>(new ConflictErrorAssertions((ConflictError)Subject));
     }
@@ -51,7 +55,7 @@ public class MemberErrorAssertions : ReferenceTypeAssertions<MemberError, Member
     }
 
     protected override string Identifier => "Error";
-    
+
     public AndConstraint<MemberErrorAssertions> HaveCode(string code, string because = "", params object[] becauseArgs)
     {
         Execute.Assertion
@@ -61,8 +65,9 @@ public class MemberErrorAssertions : ReferenceTypeAssertions<MemberError, Member
 
         return new AndConstraint<MemberErrorAssertions>(this);
     }
-    
-    public AndConstraint<MemberErrorAssertions> HaveTarget(string target, string because = "", params object[] becauseArgs)
+
+    public AndConstraint<MemberErrorAssertions> HaveTarget(string target, string because = "",
+        params object[] becauseArgs)
     {
         Execute.Assertion
             .BecauseOf(because, becauseArgs)
@@ -80,8 +85,9 @@ public class ConflictErrorAssertions : ReferenceTypeAssertions<ConflictError, Co
     }
 
     protected override string Identifier => "Error";
-    
-    public AndConstraint<ConflictErrorAssertions> HaveTarget(string target, string because = "", params object[] becauseArgs)
+
+    public AndConstraint<ConflictErrorAssertions> HaveTarget(string target, string because = "",
+        params object[] becauseArgs)
     {
         Execute.Assertion
             .BecauseOf(because, becauseArgs)

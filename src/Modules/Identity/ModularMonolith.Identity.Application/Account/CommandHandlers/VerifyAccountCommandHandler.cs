@@ -47,7 +47,7 @@ internal sealed class VerifyAccountCommandHandler : ICommandHandler<VerifyAccoun
         }
 
         await _eventBus.PublishAsync(new AccountVerified(user.Id), cancellationToken);
-        
+
         return Result.Successful;
     }
 }

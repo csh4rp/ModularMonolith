@@ -23,7 +23,7 @@ internal sealed class UpdateCategoryCommandHandler : ICommandHandler<UpdateCateg
         {
             return new EntityNotFoundError(nameof(Category), request.Id);
         }
-        
+
         var categoryWithNameExists = await _categoryDatabase.Categories
             .AnyAsync(c => c.Id != request.Id && c.Name == request.Name, cancellationToken);
 
@@ -31,7 +31,7 @@ internal sealed class UpdateCategoryCommandHandler : ICommandHandler<UpdateCateg
         {
             return new ConflictError(nameof(request.Name));
         }
-        
+
         if (request.ParentId.HasValue)
         {
             var parentExists = await _categoryDatabase.Categories

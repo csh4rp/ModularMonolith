@@ -19,8 +19,10 @@ public static class DataAccessExtensions
         {
             var property = objType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Single(p => fieldName.Equals(p.Name, StringComparison.InvariantCultureIgnoreCase));
-            
-            var method = typeof(DataAccessExtensions).GetMethod(nameof(ApplyOrdering), BindingFlags.Static | BindingFlags.NonPublic)!;
+
+            var method =
+                typeof(DataAccessExtensions).GetMethod(nameof(ApplyOrdering),
+                    BindingFlags.Static | BindingFlags.NonPublic)!;
             var genericMethod = method.MakeGenericMethod(objType, property.PropertyType);
 
             query = (IOrderedQueryable<T>)genericMethod.Invoke(null,
@@ -41,14 +43,16 @@ public static class DataAccessExtensions
 
             if (attribute is null)
             {
-                var method = typeof(DataAccessExtensions).GetMethod(nameof(ApplyOrdering), BindingFlags.Static | BindingFlags.NonPublic)!;
+                var method = typeof(DataAccessExtensions).GetMethod(nameof(ApplyOrdering),
+                    BindingFlags.Static | BindingFlags.NonPublic)!;
                 var genericMethod = method.MakeGenericMethod(objType, property.PropertyType);
 
                 query = (IOrderedQueryable<T>)genericMethod.Invoke(null, [queryable, property, isAscending])!;
             }
             else
             {
-                var method = typeof(DataAccessExtensions).GetMethod(nameof(ApplyOrdering), BindingFlags.Static | BindingFlags.NonPublic)!;
+                var method = typeof(DataAccessExtensions).GetMethod(nameof(ApplyOrdering),
+                    BindingFlags.Static | BindingFlags.NonPublic)!;
                 var genericMethod = method.MakeGenericMethod(objType, property.PropertyType);
 
                 query = (IOrderedQueryable<T>)genericMethod.Invoke(null, [queryable, property, isAscending])!;

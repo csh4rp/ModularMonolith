@@ -15,7 +15,7 @@ internal sealed class RoleEntityTypeConfiguration : IEntityTypeConfiguration<Rol
         builder.Property(b => b.Name)
             .IsRequired()
             .HasMaxLength(128);
-        
+
         builder.Property(b => b.NormalizedName)
             .IsRequired()
             .HasMaxLength(128);
@@ -23,7 +23,7 @@ internal sealed class RoleEntityTypeConfiguration : IEntityTypeConfiguration<Rol
         builder.Property(b => b.ConcurrencyStamp)
             .IsRequired()
             .HasMaxLength(64);
-        
+
         builder.HasIndex(b => b.NormalizedName).IsUnique();
     }
 }

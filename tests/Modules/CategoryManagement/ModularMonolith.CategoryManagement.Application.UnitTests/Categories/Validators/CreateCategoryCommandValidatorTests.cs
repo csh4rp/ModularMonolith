@@ -9,26 +9,26 @@ namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.Va
 public class CreateCategoryCommandValidatorTests
 {
     private readonly CreateCategoryCommandValidator _validator = new();
-    
+
     [Fact]
     public void ShouldReturnValid_WhenCommandIsValid()
     {
         // Arrange
         var command = new CreateCategoryCommand(Guid.NewGuid(), "Category-1");
-        
+
         // Act
         var validationResult = _validator.TestValidate(command);
 
         // Assert
         validationResult.IsValid.Should().BeTrue();
     }
-    
+
     [Fact]
     public void ShouldReturnInvalid_WhenNameIsEmpty()
     {
         // Arrange
         var command = new CreateCategoryCommand(null, string.Empty);
-        
+
         // Act
         var validationResult = _validator.TestValidate(command);
 
@@ -38,5 +38,4 @@ public class CreateCategoryCommandValidatorTests
         validationResult.ShouldHaveValidationErrorFor(x => x.Name)
             .WithErrorCode("NotEmptyValidator");
     }
-
 }

@@ -16,7 +16,7 @@ public sealed class CategoryManagementDbContext : BaseDbContext, ICategoryDataba
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CategoryManagementDbContext).Assembly);
         modelBuilder.HasDefaultSchema("category_management");
     }

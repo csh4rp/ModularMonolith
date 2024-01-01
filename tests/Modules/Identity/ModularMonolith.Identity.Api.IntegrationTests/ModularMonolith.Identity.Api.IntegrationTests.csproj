@@ -1,42 +1,41 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <IsTestProject>true</IsTestProject>
-    </PropertyGroup>
+  <PropertyGroup>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Bogus" />
-      <PackageReference Include="EFCore.NamingConventions"/>
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
-      <PackageReference Include="Respawn"/>
-      <PackageReference Include="FluentAssertions"/>
-      <PackageReference Include="Respawn.Postgres"/>
-      <PackageReference Include="Testcontainers.PostgreSql"/>
-      <PackageReference Include="Verify" />
-      <PackageReference Include="Verify.Http" />
-      <PackageReference Include="Verify.Xunit" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Bogus"/>
+    <PackageReference Include="EFCore.NamingConventions"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
+    <PackageReference Include="Respawn"/>
+    <PackageReference Include="FluentAssertions"/>
+    <PackageReference Include="Respawn.Postgres"/>
+    <PackageReference Include="Testcontainers.PostgreSql"/>
+    <PackageReference Include="Verify"/>
+    <PackageReference Include="Verify.Http"/>
+    <PackageReference Include="Verify.Xunit"/>
+  </ItemGroup>
 
 
+  <ItemGroup>
+    <None Remove="Account\Resources\SignIn.Valid.json"/>
+    <EmbeddedResource Include="Account\Resources\ChangePassword.InvalidCurrentPassword.json"/>
+    <EmbeddedResource Include="Account\Resources\ChangePassword.NewPasswordNotMatchingPolicy.json"/>
+    <EmbeddedResource Include="Account\Resources\ChangePassword.Valid.json"/>
+    <EmbeddedResource Include="Account\Resources\InitializePasswordReset.Valid.json"/>
+    <EmbeddedResource Include="Account\Resources\Register.Valid.json"/>
+    <EmbeddedResource Include="Account\Resources\SignIn.InvalidPassword.json"/>
+    <EmbeddedResource Include="Account\Resources\SignIn.Valid.json"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="Account\Resources\SignIn.Valid.json" />
-      <EmbeddedResource Include="Account\Resources\ChangePassword.InvalidCurrentPassword.json" />
-      <EmbeddedResource Include="Account\Resources\ChangePassword.NewPasswordNotMatchingPolicy.json" />
-      <EmbeddedResource Include="Account\Resources\ChangePassword.Valid.json" />
-      <EmbeddedResource Include="Account\Resources\InitializePasswordReset.Valid.json" />
-      <EmbeddedResource Include="Account\Resources\Register.Valid.json" />
-      <EmbeddedResource Include="Account\Resources\SignIn.InvalidPassword.json" />
-      <EmbeddedResource Include="Account\Resources\SignIn.Valid.json" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Api\ModularMonolith.Identity.Api.csproj" />
-      <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Migrations\ModularMonolith.Identity.Migrations.csproj" />
-      <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.Migrations\ModularMonolith.Shared.Migrations.csproj" />
-      <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.TestUtils\ModularMonolith.Shared.TestUtils.csproj" />
-      <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.IntegrationTests.Common\ModularMonolith.Shared.IntegrationTests.Common.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Api\ModularMonolith.Identity.Api.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Migrations\ModularMonolith.Identity.Migrations.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.Migrations\ModularMonolith.Shared.Migrations.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.TestUtils\ModularMonolith.Shared.TestUtils.csproj"/>
+    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.IntegrationTests.Common\ModularMonolith.Shared.IntegrationTests.Common.csproj"/>
+  </ItemGroup>
 
 </Project>
