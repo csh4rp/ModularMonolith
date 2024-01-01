@@ -52,18 +52,23 @@ internal sealed class RoleStore : IRoleStore<Role>
     public Task<string> GetRoleIdAsync(Role role, CancellationToken cancellationToken) =>
         Task.FromResult(role.Id.ToString());
 
-    public Task<string?> GetRoleNameAsync(Role role, CancellationToken cancellationToken) => Task.FromResult(role.Name);
+    public Task<string?> GetRoleNameAsync(Role role, CancellationToken cancellationToken) => Task.FromResult((string?)role.Name);
 
     public Task SetRoleNameAsync(Role role, string? roleName, CancellationToken cancellationToken)
     {
+        ArgumentException.ThrowIfNullOrEmpty(roleName);
+        
         role.Name = roleName;
         return Task.CompletedTask;
     }
 
-    public Task<string?> GetNormalizedRoleNameAsync(Role role, CancellationToken cancellationToken) => Task.FromResult(role.NormalizedName);
+    public Task<string?> GetNormalizedRoleNameAsync(Role role, CancellationToken cancellationToken) =>
+        Task.FromResult((string?)role.NormalizedName);
 
     public Task SetNormalizedRoleNameAsync(Role role, string? normalizedName, CancellationToken cancellationToken)
     {
+        ArgumentException.ThrowIfNullOrEmpty(normalizedName);
+        
         role.NormalizedName = normalizedName;
         return Task.CompletedTask;
     }

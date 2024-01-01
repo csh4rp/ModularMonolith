@@ -8,7 +8,7 @@ namespace ModularMonolith.Shared.Infrastructure.DataAccess;
 
 public sealed class SharedDbContext : BaseDbContext, IEventLogDbContext
 {
-    public SharedDbContext(DbContextOptions options) : base(options)
+    public SharedDbContext(DbContextOptions<SharedDbContext> options) : base(options)
     {
     }
 

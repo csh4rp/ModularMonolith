@@ -37,19 +37,23 @@ internal sealed class UserStore : IUserLoginStore<User>,
         Task.FromResult(user.Id.ToString());
 
     public Task<string?> GetUserNameAsync(User user, CancellationToken cancellationToken) =>
-        Task.FromResult(user.UserName);
+        Task.FromResult((string?)user.UserName);
 
     public Task SetUserNameAsync(User user, string? userName, CancellationToken cancellationToken)
     {
+        ArgumentException.ThrowIfNullOrEmpty(userName);
+        
         user.UserName = userName;
         return Task.CompletedTask;
     }
 
     public Task<string?> GetNormalizedUserNameAsync(User user, CancellationToken cancellationToken) =>
-        Task.FromResult(user.NormalizedUserName);
+        Task.FromResult((string?)user.NormalizedUserName);
 
     public Task SetNormalizedUserNameAsync(User user, string? normalizedName, CancellationToken cancellationToken)
     {
+        ArgumentException.ThrowIfNullOrEmpty(normalizedName);
+        
         user.NormalizedUserName = normalizedName;
         return Task.CompletedTask;
     }
@@ -114,12 +118,7 @@ internal sealed class UserStore : IUserLoginStore<User>,
 
     public Task AddClaimsAsync(User user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
     {
-        var userClaims = claims.Select(c => new UserClaim
-        {
-            UserId = user.Id,
-            ClaimType = c.Type,
-            ClaimValue = c.Value
-        });
+        var userClaims = claims.Select(c => new UserClaim(user.Id, c.Type, c.Value));
         
         _identityDbContext.UserClaims.AddRange(userClaims);
         return _identityDbContext.SaveChangesAsync(cancellationToken);
@@ -280,12 +279,14 @@ internal sealed class UserStore : IUserLoginStore<User>,
 
     public Task SetPasswordHashAsync(User user, string? passwordHash, CancellationToken cancellationToken)
     {
+        ArgumentException.ThrowIfNullOrEmpty(passwordHash);
+        
         user.PasswordHash = passwordHash;
         return Task.CompletedTask;
     }
 
     public Task<string?> GetPasswordHashAsync(User user, CancellationToken cancellationToken) => 
-        Task.FromResult(user.PasswordHash);
+        Task.FromResult((string?)user.PasswordHash);
 
     public Task<bool> HasPasswordAsync(User user, CancellationToken cancellationToken) => 
         Task.FromResult(!string.IsNullOrEmpty(user.PasswordHash));
@@ -297,16 +298,18 @@ internal sealed class UserStore : IUserLoginStore<User>,
     }
 
     public Task<string?> GetSecurityStampAsync(User user, CancellationToken cancellationToken) => 
-        Task.FromResult(user.SecurityStamp);
+        Task.FromResult((string?)user.SecurityStamp);
 
     public Task SetEmailAsync(User user, string? email, CancellationToken cancellationToken)
     {
+        ArgumentException.ThrowIfNullOrEmpty(email);
+        
         user.Email = email;
         return Task.CompletedTask;
     }
 
     public Task<string?> GetEmailAsync(User user, CancellationToken cancellationToken) => 
-        Task.FromResult(user.Email);
+        Task.FromResult((string?)user.Email);
 
     public Task<bool> GetEmailConfirmedAsync(User user, CancellationToken cancellationToken) => 
         Task.FromResult(user.EmailConfirmed);
@@ -321,10 +324,12 @@ internal sealed class UserStore : IUserLoginStore<User>,
         _identityDbContext.Users.FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
 
     public Task<string?> GetNormalizedEmailAsync(User user, CancellationToken cancellationToken) => 
-        Task.FromResult(user.NormalizedEmail);
+        Task.FromResult((string?)user.NormalizedEmail);
 
     public Task SetNormalizedEmailAsync(User user, string? normalizedEmail, CancellationToken cancellationToken)
     {
+        ArgumentException.ThrowIfNullOrEmpty(normalizedEmail);
+        
         user.NormalizedEmail = normalizedEmail;
         return Task.CompletedTask;
     }

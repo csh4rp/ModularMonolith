@@ -25,7 +25,7 @@ public class InitializePasswordResetCommandHandlerTests
     {
         // Arrange
         const string validEmail = "mail@mail.com";
-        var user = new User { Id = Guid.NewGuid(), NormalizedEmail = validEmail.ToUpper() };
+        var user = new User(validEmail) { Id = Guid.NewGuid() };
         var users = new[] { user }.BuildMock();
 
         _userManager.NormalizeEmail(Arg.Any<string>()).Returns(c => c.Args().First().ToString()?.ToUpper());
@@ -50,7 +50,7 @@ public class InitializePasswordResetCommandHandlerTests
     {
         // Arrange
         const string validEmail = "mail@mail.com";
-        var user = new User { Id = Guid.NewGuid(), NormalizedEmail = validEmail.ToUpper() };
+        var user = new User(validEmail) { Id = Guid.NewGuid() };
         var users = new[] { user }.BuildMock();
 
         _userManager.NormalizeEmail(Arg.Any<string>()).Returns(c => c.Args().First().ToString()?.ToUpper());

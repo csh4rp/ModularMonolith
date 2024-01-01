@@ -7,67 +7,67 @@ namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs.Fixtu
 
 public class PostgresFixture : IAsyncLifetime
 {
-    public const string ConnectionString =
-        "Server=localhost; Port=5434; UserName=testuser; Password=testuser123; Database=test_db;";
-
     private NpgsqlConnection? _connection;
     private PostgreSqlContainer? _container;
     private Respawner? _respawner;
+    
+    public string ConnectionString => _container!.GetConnectionString();
 
     public async Task InitializeAsync()
     {
         _container = new PostgreSqlBuilder()
             .WithDatabase("test_db")
+            .WithName("shared_automated_tests")
             .WithUsername("testuser")
             .WithPassword("testuser123")
-            .WithPortBinding("5434", "5432")
+            .WithPortBinding("5432", true)
             .Build();
 
         await _container.StartAsync();
 
-        _connection = new NpgsqlConnection(ConnectionString);
+        _connection = new NpgsqlConnection(_container.GetConnectionString());
         await _connection.OpenAsync();
 
         await using var cmd = _connection.CreateCommand();
         cmd.CommandText =
             """
-            CREATE TABLE "FirstTestEntity"
+            CREATE TABLE "first_test_entity"
             (
-                "Id" UUID NOT NULL PRIMARY KEY,
-                "Name" VARCHAR(128),
-                "Sensitive" VARCHAR(128),
-                "OwnedEntity" JSONB
+                "id" UUID NOT NULL PRIMARY KEY,
+                "name" VARCHAR(128),
+                "sensitive" VARCHAR(128),
+                "owned_entity" JSONB
             );
 
-            CREATE TABLE "SecondTestEntity"
+            CREATE TABLE "second_test_entity"
             (
-                "Id" UUID NOT NULL PRIMARY KEY,
-                "Name" VARCHAR(128)
+                "id" UUID NOT NULL PRIMARY KEY,
+                "name" VARCHAR(128)
             );
 
-            CREATE TABLE "FirstEntitySecondEntity"
+            CREATE TABLE "first_entity_second_entity"
             (
-                "FirstTestEntityId" UUID NOT NULL,
-                "SecondTestEntityId" UUID NOT NULL,
-                PRIMARY KEY ("FirstTestEntityId", "SecondTestEntityId")
+                "first_test_entity_id" UUID NOT NULL,
+                "second_test_entity_id" UUID NOT NULL,
+                PRIMARY KEY ("first_test_entity_id", "second_test_entity_id")
             );
 
-            CREATE TABLE "AuditLog"
+            CREATE TABLE "audit_log"
             (
-                "Id" UUID NOT NULL PRIMARY KEY,
-                "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
-                "EntityState" VARCHAR(8) NOT NULL,
-                "EntityType" VARCHAR(255) NOT NULL,
-                "EntityKeys" JSONB NOT NULL,
-                "EntityPropertyChanges" JSONB NOT NULL,
-                "UserId" UUID,
-                "UserName" VARCHAR(128),
-                "OperationName" VARCHAR(128),
-                "TraceId" VARCHAR(32),
-                "SpanId" VARCHAR(32),
-                "ParentSpanId" VARCHAR(32),
-                "IpAddress" VARCHAR(32),
-                "UserAgent" VARCHAR(32)
+                "id" UUID NOT NULL PRIMARY KEY,
+                "created_at" TIMESTAMP WITH TIME ZONE NOT NULL,
+                "entity_state" VARCHAR(8) NOT NULL,
+                "entity_type" VARCHAR(255) NOT NULL,
+                "entity_keys" JSONB NOT NULL,
+                "entity_property_changes" JSONB NOT NULL,
+                "user_id" UUID,
+                "user_name" VARCHAR(128),
+                "operation_name" VARCHAR(128),
+                "trace_id" VARCHAR(32),
+                "span_id" VARCHAR(32),
+                "parent_span_id" VARCHAR(32),
+                "ip_address" VARCHAR(32),
+                "user_agent" VARCHAR(32)
             );
             """;
 

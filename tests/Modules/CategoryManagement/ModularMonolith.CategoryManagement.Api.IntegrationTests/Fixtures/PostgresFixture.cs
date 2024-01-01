@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.CategoryManagement.Infrastructure.Common.DataAccess;
 using ModularMonolith.CategoryManagement.Migrations;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
@@ -27,11 +26,11 @@ public class PostgresFixture : IAsyncLifetime, IDatabaseFixture
     {
         _container = new PostgreSqlBuilder()
             .WithImage("postgres:16.1")
-            .WithName("postgres_automated_tests")
+            .WithName("category_management_automated_tests")
             .WithDatabase("tests_database")
             .WithUsername("postgres")
             .WithPassword("Admin123!@#")
-            .WithPortBinding("5434", "5432")
+            .WithPortBinding("5432", true)
             .Build();
         
         await _container.StartAsync();
@@ -40,11 +39,9 @@ public class PostgresFixture : IAsyncLifetime, IDatabaseFixture
         await _connection.OpenAsync();
         
         SharedDbContext = new SharedDbContextFactory().CreateDbContext([ConnectionString]);
-        // await SharedDbContext.Database.EnsureCreatedAsync();
         await SharedDbContext.Database.MigrateAsync();
         
         CategoryManagementDbContext = new CategoryManagementDbContextFactory().CreateDbContext([ConnectionString]);
-        // await CategoryManagementDbContext.Database.EnsureCreatedAsync();
         await CategoryManagementDbContext.Database.MigrateAsync();
         
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
@@ -67,13 +64,5 @@ public class PostgresFixture : IAsyncLifetime, IDatabaseFixture
         await SharedDbContext.DisposeAsync();
         await CategoryManagementDbContext.DisposeAsync();
         
-    }
-
-    public Task ResetAsync()
-    {
-        Debug.Assert(_connection is not null);
-        Debug.Assert(_respawner is not null);
-
-        return _respawner.ResetAsync(_connection);
     }
 }

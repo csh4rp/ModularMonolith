@@ -33,6 +33,12 @@ internal sealed class UserEntityTypeConfiguration : IEntityTypeConfiguration<Use
             .HasMaxLength(64)
             .IsConcurrencyToken();
 
+        builder.Property(b => b.SecurityStamp)
+            .IsRequired()
+            .HasMaxLength(64)
+            .IsConcurrencyToken();
+
+        
         builder.Property(b => b.PhoneNumber)
             .HasMaxLength(64);
 

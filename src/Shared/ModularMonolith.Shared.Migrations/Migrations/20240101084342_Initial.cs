@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
-using ModularMonolith.Shared.Domain.ValueObjects;
 
 #nullable disable
 
@@ -23,10 +21,8 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    entity_type = table.Column<string>(type: "text", nullable: false),
+                    entity_type = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     entity_state = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
-                    entity_property_changes = table.Column<List<PropertyChange>>(type: "jsonb", nullable: false),
-                    entity_keys = table.Column<List<EntityKey>>(type: "jsonb", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: true),
                     user_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     operation_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
@@ -34,7 +30,9 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                     span_id = table.Column<string>(type: "character varying(16)", unicode: false, maxLength: 16, nullable: false),
                     parent_span_id = table.Column<string>(type: "character varying(16)", unicode: false, maxLength: 16, nullable: true),
                     ip_address = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
-                    user_agent = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
+                    user_agent = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    entity_keys = table.Column<string>(type: "jsonb", nullable: true),
+                    entity_property_changes = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -125,25 +123,6 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                 schema: "shared",
                 table: "event_log",
                 columns: new[] { "user_id", "event_type", "created_at" });
-            
-            migrationBuilder.Sql(
-                """
-                CREATE OR REPLACE FUNCTION shared.event_log_inserted()
-                    RETURNS TRIGGER AS
-                $$
-                BEGIN
-                    SELECT pg_notify('event_log_queue', NEW.id::text || '/' || COALESCE(NEW.correlation_id::text, ''));
-                END
-                $$ LANGUAGE plpgsql;
-                """);
-
-            migrationBuilder.Sql(
-                """
-                CREATE OR REPLACE TRIGGER tr_event_log_inserted
-                AFTER INSERT ON shared.event_log
-                FOR EACH ROW
-                EXECUTE FUNCTION shared.event_log_inserted();
-                """);
         }
 
         /// <inheritdoc />

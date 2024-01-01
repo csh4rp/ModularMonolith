@@ -1,0 +1,7 @@
+﻿{
+  type: https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4,
+  title: Entity not found,
+  status: 404,
+  detail: Entity of type: 'Category' with id: '00000000-0000-0000-0000-000000000000' was not found,
+  instance: categories/00000000-0000-0000-0000-000000000000
+}

@@ -20,6 +20,10 @@ internal sealed class RoleEntityTypeConfiguration : IEntityTypeConfiguration<Rol
             .IsRequired()
             .HasMaxLength(128);
 
+        builder.Property(b => b.ConcurrencyStamp)
+            .IsRequired()
+            .HasMaxLength(64);
+        
         builder.HasIndex(b => b.NormalizedName).IsUnique();
     }
 }

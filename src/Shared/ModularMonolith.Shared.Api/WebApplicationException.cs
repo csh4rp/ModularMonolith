@@ -13,7 +13,10 @@ public static class WebApplicationException
         
         app.UseExceptionHandler(o =>
         {
-
+            o.Use(async (c, d) =>
+            {
+                await d();
+            });
         });
 
         var modules = app.Services.GetServices<AppModule>().ToList();

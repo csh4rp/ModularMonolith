@@ -12,11 +12,11 @@ internal sealed class UserRoleEntityTypeConfiguration : IEntityTypeConfiguration
         
         builder.HasKey(b => new {b.UserId, b.RoleId});
         
-        builder.HasOne<User>()
+        builder.HasOne(b => b.User)
             .WithMany()
             .HasForeignKey(b => b.UserId);
         
-        builder.HasOne<Role>()
+        builder.HasOne(b => b.Role)
             .WithMany()
             .HasForeignKey(b => b.RoleId);
     }

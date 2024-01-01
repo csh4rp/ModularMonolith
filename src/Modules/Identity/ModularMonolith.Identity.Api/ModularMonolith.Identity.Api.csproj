@@ -11,7 +11,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Api\ModularMonolith.Shared.Api.csproj" />
+    <ProjectReference Include="..\ModularMonolith.Identity.Application\ModularMonolith.Identity.Application.csproj" />
     <ProjectReference Include="..\ModularMonolith.Identity.Contracts\ModularMonolith.Identity.Contracts.csproj" />
+    <ProjectReference Include="..\ModularMonolith.Identity.Core\ModularMonolith.Identity.Core.csproj" />
     <ProjectReference Include="..\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj" />
   </ItemGroup>
 

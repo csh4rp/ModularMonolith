@@ -23,8 +23,8 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
     }
 
     [Fact]
-    [TestMethodName("Ok")]
-    public async Task ShouldReturnOk()
+    [TestMethodName("Ok_CategoryExists")]
+    public async Task ShouldReturnOk_WhenCategoryExists()
     {
         // Arrange
         var category = _categoryFixture.Clone()
@@ -43,7 +43,7 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
     }
     
     [Fact]
-    [TestMethodName("NotFound")]
+    [TestMethodName("NotFound_CategoryDoesNotExist")]
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()
     {
         // Arrange & Act

@@ -41,19 +41,23 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
             .HasConversion(b => b.ToString(), b => Enum.Parse<EntityState>(b))
             .IsRequired()
             .HasMaxLength(8);
-
+        
         builder.OwnsMany(b => b.EntityPropertyChanges, b =>
         {
             b.ToTable(_table);
-            b.ToJson();
+            b.ToJson("entity_property_changes");
         });
         
         builder.OwnsMany(b => b.EntityKeys, b =>
         {
             b.ToTable(_table);
-            b.ToJson();
+            b.ToJson("entity_keys");
         });
 
+        builder.Property(b => b.EntityType)
+            .IsRequired()
+            .HasMaxLength(256);
+        
         builder.Property(b => b.OperationName)
             .IsRequired()
             .HasMaxLength(128);

@@ -12,6 +12,6 @@ internal sealed class VerifyAccountCommandValidator : AbstractValidator<VerifyAc
         
         RuleFor(x => x.VerificationToken)
             .NotEmpty()
-            .MaximumLength(256);
+            .MaximumLength(1024);
     }
 }

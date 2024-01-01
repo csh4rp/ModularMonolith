@@ -6,7 +6,7 @@ using System.Text;
 namespace ModularMonolith.Shared.IntegrationTests.Common;
 
 [UsesVerify]
-public abstract class BaseIntegrationTest<TClass>
+public abstract class BaseIntegrationTest<TClass> : IAsyncLifetime
 {
     protected StringContent GetResource(string name)
     {
@@ -52,4 +52,8 @@ public abstract class BaseIntegrationTest<TClass>
 
         await VerifyJson(httpResponseMessage.Content.ReadAsStreamAsync(), settings);
     }
+
+    public virtual Task InitializeAsync() => Task.CompletedTask;
+
+    public virtual Task DisposeAsync() => Task.CompletedTask;
 }

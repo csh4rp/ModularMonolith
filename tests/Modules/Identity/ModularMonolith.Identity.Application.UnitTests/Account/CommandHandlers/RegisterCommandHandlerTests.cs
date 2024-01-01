@@ -45,7 +45,7 @@ public class RegisterCommandHandlerTests
     {
         // Arrange
         const string email = "mail@mail.com";
-        var existingUser = new User { Id = Guid.NewGuid(), NormalizedEmail = email.ToUpper() };
+        var existingUser = new User(email) { Id = Guid.NewGuid() };
         
         _userManager.Users.Returns(new[]{existingUser}.BuildMock());
         _userManager.NormalizeEmail(Arg.Any<string>()).Returns(c => c.Arg<string>().ToUpper());

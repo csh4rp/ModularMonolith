@@ -33,7 +33,7 @@ public class SignInCommandHandlerTests
         // Arrange
         const string validEmail = "mail@mail.com";
         const string validPassword = "Pa$$word";
-        var user = new User { Id = Guid.NewGuid(), Email = validEmail, UserName = validEmail};
+        var user = new User(validEmail) { Id = Guid.NewGuid() };
         
         _userManager.FindByEmailAsync(validEmail)
             .Returns(user);
@@ -64,7 +64,7 @@ public class SignInCommandHandlerTests
         // Arrange
         const string validEmail = "mail@mail.com";
         const string validPassword = "Pa$$word";
-        var user = new User { Id = Guid.NewGuid(), Email = validEmail, UserName = validEmail};
+        var user = new User(validEmail) { Id = Guid.NewGuid()};
 
         _userManager.FindByEmailAsync(validEmail)
             .Returns(user);
@@ -100,7 +100,7 @@ public class SignInCommandHandlerTests
         // Arrange
         const string validEmail = "mail@mail.com";
         const string validPassword = "Pa$$word";
-        var user = new User { Id = Guid.NewGuid(), Email = validEmail, UserName = validEmail};
+        var user = new User(validEmail) { Id = Guid.NewGuid()};
 
         _userManager.FindByEmailAsync(validEmail)
             .Returns(user);

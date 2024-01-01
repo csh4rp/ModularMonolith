@@ -29,7 +29,7 @@ public class ResetPasswordCommandHandlerTests
         const string token = "123";
         const string password = "Pa$$word123!@#";
 
-        var user = new User { Id = userId };
+        var user = new User("mail@mail.com") { Id = userId };
 
         _userManager.FindByIdAsync(userId.ToString()).Returns(user);
         _userManager.ResetPasswordAsync(user, token, password).Returns(IdentityResult.Success);
@@ -55,7 +55,7 @@ public class ResetPasswordCommandHandlerTests
         const string token = "123";
         const string password = "Pa$$word123!@#";
 
-        var user = new User { Id = userId };
+        var user = new User("mail@mail.com") { Id = userId };
 
         _userManager.FindByIdAsync(userId.ToString()).Returns(user);
         _userManager.ResetPasswordAsync(user, token, password)

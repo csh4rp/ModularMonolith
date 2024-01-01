@@ -27,7 +27,7 @@ public class VerifyAccountCommandHandlerTests
         var userId = Guid.Parse("4B992E53-CA70-4910-BB44-AEE860F084FD");
         const string token = "123";
 
-        var user = new User { Id = userId };
+        var user = new User("mail@mail.com") { Id = userId };
 
         _userManager.FindByIdAsync(userId.ToString()).Returns(user);
         _userManager.ConfirmEmailAsync(user, token).Returns(IdentityResult.Success);
@@ -72,7 +72,7 @@ public class VerifyAccountCommandHandlerTests
         var userId = Guid.Parse("4B992E53-CA70-4910-BB44-AEE860F084FD");
         const string token = "123";
         
-        var user = new User { Id = userId };
+        var user = new User("mail@mail.com") { Id = userId };
 
         _userManager.FindByIdAsync(userId.ToString()).Returns(user);
         _userManager.ConfirmEmailAsync(user, token).Returns(IdentityResult.Failed(new IdentityErrorDescriber().InvalidToken()));

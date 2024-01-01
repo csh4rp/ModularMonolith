@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -23,7 +22,7 @@ namespace ModularMonolith.Identity.Migrations.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     normalized_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    concurrency_stamp = table.Column<string>(type: "text", nullable: true)
+                    concurrency_stamp = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -41,8 +40,8 @@ namespace ModularMonolith.Identity.Migrations.Migrations
                     email = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     normalized_email = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     email_confirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    password_hash = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    security_stamp = table.Column<string>(type: "text", nullable: true),
+                    password_hash = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    security_stamp = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     concurrency_stamp = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     phone_number = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     phone_number_confirmed = table.Column<bool>(type: "boolean", nullable: false),
@@ -61,8 +60,7 @@ namespace ModularMonolith.Identity.Migrations.Migrations
                 schema: "identity",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     role_id = table.Column<Guid>(type: "uuid", nullable: false),
                     claim_type = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     claim_value = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false)
@@ -84,8 +82,7 @@ namespace ModularMonolith.Identity.Migrations.Migrations
                 schema: "identity",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     claim_type = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     claim_value = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false)
@@ -159,7 +156,7 @@ namespace ModularMonolith.Identity.Migrations.Migrations
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     login_provider = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    value = table.Column<string>(type: "text", nullable: true)
+                    value = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: false)
                 },
                 constraints: table =>
                 {

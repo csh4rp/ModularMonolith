@@ -31,7 +31,7 @@ public class ChangePasswordCommandHandlerTests
         // Arrange
         const string currentPassword = "Pa$$word";
         const string newPassword = "Pa$$word123";
-        var user = new User { Id = Guid.Parse(UserId) };
+        var user = new User("mail@mail.com") { Id = Guid.Parse(UserId) };
 
         _userManager.FindByIdAsync(user.Id.ToString()).Returns(user);
         _userManager.ChangePasswordAsync(user, currentPassword, newPassword).Returns(IdentityResult.Success);
@@ -55,7 +55,7 @@ public class ChangePasswordCommandHandlerTests
         // Arrange
         const string currentPassword = "Pa$$word";
         const string newPassword = "Pa$$word123";
-        var user = new User { Id = Guid.Parse(UserId) };
+        var user = new User("mail@mail.com") { Id = Guid.Parse(UserId) };
 
         _userManager.FindByIdAsync(user.Id.ToString()).Returns(user);
         _userManager.ChangePasswordAsync(Arg.Any<User>(), Arg.Any<string>(), Arg.Any<string>())

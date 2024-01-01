@@ -172,7 +172,8 @@ public class AuditLogInterceptorTests : IAsyncDisposable
         var builder = new DbContextOptionsBuilder<TestDbContext>();
         builder.UseApplicationServiceProvider(serviceCollection.BuildServiceProvider());
         builder.AddInterceptors(new AuditLogInterceptor());
-        builder.UseNpgsql(PostgresFixture.ConnectionString);
+        builder.UseNpgsql(_postgresFixture.ConnectionString)
+            .UseSnakeCaseNamingConvention();
 
         return new TestDbContext(builder.Options);
     }

@@ -23,8 +23,8 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
     }
 
     [Fact]
-    [TestMethodName("Created")]
-    public async Task ShouldReturnCreated()
+    [TestMethodName("Created_CategoryNameIsNotUsed")]
+    public async Task ShouldReturnCreated_WhenCategoryNameIsNotUsed()
     {
         // Arrange
         using var request = GetResource("CreateCategory.Valid.json");
@@ -38,8 +38,8 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
     }
     
     [Fact]
-    [TestMethodName("Conflict")]
-    public async Task ShouldReturnConflict_WhenCategoryWithGivenNameAlreadyExists()
+    [TestMethodName("Conflict_CategoryNameIsAlreadyUsed")]
+    public async Task ShouldReturnConflict_WhenCategoryNameIsAlreadyUsed()
     {
         // Arrange
         var category = _categoryFixture.Clone()
@@ -60,7 +60,7 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
     }
     
     [Fact]
-    [TestMethodName("BadRequest")]
+    [TestMethodName("BadRequest_CategoryNameIsEmpty")]
     public async Task ShouldReturnBadRequest_WhenCategoryNameIsEmpty()
     {
         // Arrange

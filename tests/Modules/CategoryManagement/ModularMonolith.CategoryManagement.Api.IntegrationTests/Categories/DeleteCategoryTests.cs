@@ -21,7 +21,7 @@ public class DeleteCategoryTests : BaseIntegrationTest<DeleteCategoryTests>
     }
 
     [Fact]
-    public async Task ShouldReturnNoContent()
+    public async Task ShouldReturnNoContent_WhenCategoryExists()
     {
         // Arrange
         var category = _categoryFixture.Generate();
@@ -36,7 +36,7 @@ public class DeleteCategoryTests : BaseIntegrationTest<DeleteCategoryTests>
     }
     
     [Fact]
-    [TestMethodName("NotFound")]
+    [TestMethodName("NotFound_CategoryDoesNotExist")]
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()
     {
         // Arrange & Act

@@ -33,7 +33,7 @@ internal sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand>
             return new ConflictError(nameof(request.Email));
         }
 
-        var user = new User { UserName = request.Email, Email = request.Email };
+        var user = new User(request.Email);
 
         var result = await _userManager.CreateAsync(user, request.Password);
 

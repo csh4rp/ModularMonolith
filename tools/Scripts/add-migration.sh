@@ -2,13 +2,13 @@
 
 contexts=("SharedDbContext" "CategoryManagementDbContext" "IdentityDbContext")
 
-connection_strings=("User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;" \
-  "User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;"
+connection_strings=("User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;" 
+  "User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;" 
   "User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;"
 )
 
-projects=("../../src/Shared/ModularMonolith.Shared.Migrations" \
-  "../../src/Modules/CategoryManagement/ModularMonolith.CategoryManagement.Migrations"
+projects=("../../src/Shared/ModularMonolith.Shared.Migrations" 
+  "../../src/Modules/CategoryManagement/ModularMonolith.CategoryManagement.Migrations" 
   "../../src/Modules/Identity/ModularMonolith.Identity.Migrations"
 )
 
@@ -34,6 +34,9 @@ else
 
   echo Adding migration: "$2" for context: "${contexts[$index]}"
   
+  echo Project: "${projects[$index]}"
+  
+
   dotnet ef migrations add \
     --context "$1" \
     --project "${projects[$index]}" \

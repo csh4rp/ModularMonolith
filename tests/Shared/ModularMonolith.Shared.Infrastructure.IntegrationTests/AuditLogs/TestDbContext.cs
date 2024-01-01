@@ -19,7 +19,7 @@ public class TestDbContext : BaseDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<FirstTestEntity>()
-            .ToTable("FirstTestEntity")
+            .ToTable("first_test_entity")
             .HasKey(b => b.Id);
 
         modelBuilder.Entity<FirstTestEntity>()
@@ -38,16 +38,16 @@ public class TestDbContext : BaseDbContext
             .OwnsOne(b => b.OwnedEntity, b =>
             {
                 b.WithOwner().HasForeignKey("OwnerEntityId");
-                b.ToJson();
+                b.ToJson("owned_entity");
             });
 
         modelBuilder.Entity<SecondTestEntity>()
-            .ToTable("SecondTestEntity")
             .HasKey(b => b.Id);
 
         modelBuilder.Entity<SecondTestEntity>()
+            .ToTable("second_test_entity")
             .AuditIgnore();
 
-        modelBuilder.ApplyConfiguration(new AuditLogEntityTypeConfiguration(false, "AuditLog"));
+        modelBuilder.ApplyConfiguration(new AuditLogEntityTypeConfiguration(false));
     }
 }

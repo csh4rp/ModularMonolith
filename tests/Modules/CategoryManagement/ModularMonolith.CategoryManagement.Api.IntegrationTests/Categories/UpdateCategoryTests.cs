@@ -23,7 +23,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
     }
 
     [Fact]
-    public async Task ShouldReturnNoContent()
+    public async Task ShouldReturnNoContent_WhenCategoryExists()
     {
         // Arrange
         var category = _categoryFixture.Generate();
@@ -41,7 +41,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
     }
     
     [Fact]
-    [TestMethodName("BadRequest")]
+    [TestMethodName("BadRequest_CategoryNameIsEmpty")]
     public async Task ShouldReturnBadRequest_WhenCategoryNameIsEmpty()
     {
         // Arrange
@@ -56,7 +56,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
     }
     
     [Fact]
-    [TestMethodName("NotFound")]
+    [TestMethodName("NotFound_CategoryDoesNotExist")]
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()
     {
         // Arrange
@@ -71,8 +71,8 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
     }
     
     [Fact]
-    [TestMethodName("Conflict")]
-    public async Task ShouldReturnConflict_WhenCategoryWithGivenNameAlreadyExists()
+    [TestMethodName("Conflict_WhenCategoryNameIsAlreadyUsed")]
+    public async Task ShouldReturnConflict_WhenCategoryNameIsAlreadyUsed()
     {
         // Arrange
         var currentCategory = _categoryFixture.Clone()

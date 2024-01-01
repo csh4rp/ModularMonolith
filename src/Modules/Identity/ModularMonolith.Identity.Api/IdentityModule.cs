@@ -2,6 +2,7 @@
 using System.Reflection;
 using Microsoft.OpenApi.Models;
 using ModularMonolith.Identity.Api.Account;
+using ModularMonolith.Identity.Core.Options;
 using ModularMonolith.Identity.Infrastructure;
 using ModularMonolith.Shared.Api;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -20,6 +21,12 @@ public sealed class IdentityModule : AppModule
 
     public override IServiceCollection RegisterServices(IServiceCollection serviceCollection)
     {
+        serviceCollection.AddOptions<AuthOptions>()
+            .Configure<IConfiguration>((opt, conf) =>
+        {
+            conf.GetSection("Modules:Identity:Auth").Bind(opt);
+        });
+        
         serviceCollection.AddInfrastructure();
         return serviceCollection;
     }

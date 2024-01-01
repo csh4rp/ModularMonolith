@@ -24,8 +24,8 @@ public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
     }
 
     [Fact]
-    [TestMethodName("Ok.NoFilters")]
-    public async Task ShouldReturnOk()
+    [TestMethodName("Ok_FiltersAreNotSet")]
+    public async Task ShouldReturnOk_WhenFiltersAreNotSet()
     {
         // Arrange
         await _postgresFixture.CategoryManagementDbContext.Categories.ExecuteDeleteAsync();
@@ -51,8 +51,8 @@ public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
     
     [Theory]
     [MemberData(nameof(FilterValues))]
-    [TestMethodName("Ok.WithFilters")]
-    public async Task ShouldReturnOk_WhenGettingCategoriesWithFilters(int skip, int take, string orderBy, string? search)
+    [TestMethodName("Ok_FiltersAreSet")]
+    public async Task ShouldReturnOk_WhenFiltersAreSet(int skip, int take, string orderBy, string? search)
     {
         // Arrange
         await _postgresFixture.CategoryManagementDbContext.Categories.ExecuteDeleteAsync();

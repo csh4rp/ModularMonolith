@@ -20,7 +20,7 @@ internal sealed class UserClaimEntityTypeConfiguration : IEntityTypeConfiguratio
             .IsRequired()
             .HasMaxLength(128);
         
-        builder.HasOne<User>()
+        builder.HasOne(b => b.User)
             .WithMany()
             .HasForeignKey(b => b.UserId);
     }
