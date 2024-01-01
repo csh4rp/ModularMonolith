@@ -18,6 +18,7 @@ internal static class CategoryEndpointExtensions
     public static WebApplication UseCategoryEndpoints(this WebApplication app)
     {
         var group = app.MapGroup(Prefix)
+            .RequireAuthorization()
             .WithApiVersionSet()
             .HasApiVersion(1, 0)
             .WithTags("Categories")

@@ -23,7 +23,7 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
     }
 
     [Fact]
-    [TestMethodName("Created_CategoryNameIsNotUsed")]
+    [TestFileName("Created_CategoryNameIsNotUsed")]
     public async Task ShouldReturnCreated_WhenCategoryNameIsNotUsed()
     {
         // Arrange
@@ -38,7 +38,7 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
     }
     
     [Fact]
-    [TestMethodName("Conflict_CategoryNameIsAlreadyUsed")]
+    [TestFileName("Conflict_CategoryNameIsAlreadyUsed")]
     public async Task ShouldReturnConflict_WhenCategoryNameIsAlreadyUsed()
     {
         // Arrange
@@ -60,7 +60,7 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
     }
     
     [Fact]
-    [TestMethodName("BadRequest_CategoryNameIsEmpty")]
+    [TestFileName("BadRequest_CategoryNameIsEmpty")]
     public async Task ShouldReturnBadRequest_WhenCategoryNameIsEmpty()
     {
         // Arrange
@@ -72,6 +72,12 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         await VerifyResponse(response);
+    }
+
+    public override async Task DisposeAsync()
+    {
+        _client.Dispose();
+        await _postgresFixture.ResetAsync();
     }
 }
 

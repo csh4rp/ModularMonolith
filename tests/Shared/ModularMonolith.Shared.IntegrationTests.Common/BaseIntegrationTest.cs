@@ -26,7 +26,7 @@ public abstract class BaseIntegrationTest<TClass> : IAsyncLifetime
         [CallerFilePath] string filePath = default!)
     {
         var type = GetType();
-        var attribute = type.GetMethod(method)?.GetCustomAttribute<TestMethodName>();
+        var attribute = type.GetMethod(method)?.GetCustomAttribute<TestFileNameAttribute>();
 
         string? fileName = null;
         if (attribute is not null)

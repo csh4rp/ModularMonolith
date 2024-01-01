@@ -52,7 +52,7 @@ public class VerifyAccountTests : BaseIntegrationTest<VerifyAccountTests>
     }
     
     [Fact]
-    [TestMethodName("BadRequest_UserIdIsInvalid")]
+    [TestFileName("BadRequest_UserIdIsInvalid")]
     public async Task ShouldReturnBadRequest_WhenUserIdIsInvalid()
     {
         // Arrange
@@ -76,7 +76,7 @@ public class VerifyAccountTests : BaseIntegrationTest<VerifyAccountTests>
     }
 
     [Fact]
-    [TestMethodName("BadRequest_VerificationTokenIsInvalid")]
+    [TestFileName("BadRequest_VerificationTokenIsInvalid")]
     public async Task ShouldReturnBadRequest_WhenVerificationTokenIsInvalid()
     {
         // Arrange

@@ -1,5 +1,8 @@
-﻿using Asp.Versioning;
+﻿using System.Text;
+using Asp.Versioning;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using ModularMonolith.Shared.Api.Exceptions;
 using ModularMonolith.Shared.Application;
 using ModularMonolith.Shared.Infrastructure.AuditLogs;
@@ -22,6 +25,50 @@ public static class WebApplicationBuilderExtensions
 
         var assemblies = modules.SelectMany(m => m.Assemblies).ToArray();
 
+        var authType = builder.Configuration.GetSection("Authentication:Type").Get<string>()
+            ?? throw new ArgumentException("'Authentication:Type' is not configured");
+
+        if (authType.Equals("Bearer"))
+        {
+            var key = builder.Configuration.GetSection("Authentication:SigningKey").Get<string>()
+                ?? throw new ArgumentException("'Authentication:SigningKey' is not configured");
+            
+            var audience = builder.Configuration.GetSection("Authentication:Audience").Get<string>()
+                ?? throw new ArgumentException("'Authentication:Audience' is not configured");
+            
+            var issuer = builder.Configuration.GetSection("Authentication:Issuer").Get<string>()
+                ?? throw new ArgumentException("'Authentication:Issuer' is not configured");
+            
+            builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidAudience = audience,
+                        ValidIssuer = issuer,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                        // RequireAudience = true,
+                        // RequireSignedTokens = true,
+                        // ValidateAudience = true,
+                        // ValidateIssuer = true,
+                        // ValidateIssuerSigningKey = true
+                    };
+                });
+        }
+        else
+        {
+            throw new NotSupportedException("Other auth types are not supported yet");
+        }
+
+
+        builder.Services.AddAuthorization(c =>
+        {
+
+        });
+        
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(opt =>
         {

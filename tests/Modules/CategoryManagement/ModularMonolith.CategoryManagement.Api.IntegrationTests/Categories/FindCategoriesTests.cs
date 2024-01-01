@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories.Fixtures;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Fixtures;
 using ModularMonolith.Shared.IntegrationTests.Common;
@@ -24,12 +23,10 @@ public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
     }
 
     [Fact]
-    [TestMethodName("Ok_FiltersAreNotSet")]
+    [TestFileName("Ok_FiltersAreNotSet")]
     public async Task ShouldReturnOk_WhenFiltersAreNotSet()
     {
         // Arrange
-        await _postgresFixture.CategoryManagementDbContext.Categories.ExecuteDeleteAsync();
-
         int index = 0;
         var categories = _categoryFixture
             .Clone()
@@ -51,12 +48,10 @@ public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
     
     [Theory]
     [MemberData(nameof(FilterValues))]
-    [TestMethodName("Ok_FiltersAreSet")]
+    [TestFileName("Ok_FiltersAreSet")]
     public async Task ShouldReturnOk_WhenFiltersAreSet(int skip, int take, string orderBy, string? search)
     {
         // Arrange
-        await _postgresFixture.CategoryManagementDbContext.Categories.ExecuteDeleteAsync();
-
         int index = 0;
         var categories = _categoryFixture
             .Clone()
@@ -83,5 +78,11 @@ public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
         yield return [0, 20, "name:desc", null];
         yield return [10, 10, "name:asc", null];
         yield return [0, 10, "name:asc", "Category-1"];
+    }
+    
+    public override async Task DisposeAsync()
+    {
+        await base.DisposeAsync();
+        await _postgresFixture.ResetAsync();
     }
 }

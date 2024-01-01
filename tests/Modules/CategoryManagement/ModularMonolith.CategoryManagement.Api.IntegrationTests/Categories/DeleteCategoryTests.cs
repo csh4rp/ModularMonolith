@@ -13,7 +13,9 @@ public class DeleteCategoryTests : BaseIntegrationTest<DeleteCategoryTests>
     private readonly CategoryFixture _categoryFixture;
     private readonly HttpClient _client;
 
-    public DeleteCategoryTests(PostgresFixture postgresFixture, CategoryFixture categoryFixture, CategoryManagementFixture categoryManagementFixture)
+    public DeleteCategoryTests(PostgresFixture postgresFixture,
+        CategoryFixture categoryFixture,
+        CategoryManagementFixture categoryManagementFixture)
     {
         _postgresFixture = postgresFixture;
         _categoryFixture = categoryFixture;
@@ -36,7 +38,7 @@ public class DeleteCategoryTests : BaseIntegrationTest<DeleteCategoryTests>
     }
     
     [Fact]
-    [TestMethodName("NotFound_CategoryDoesNotExist")]
+    [TestFileName("NotFound_CategoryDoesNotExist")]
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()
     {
         // Arrange & Act
@@ -44,5 +46,11 @@ public class DeleteCategoryTests : BaseIntegrationTest<DeleteCategoryTests>
         
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    public override async Task DisposeAsync()
+    {
+        await base.DisposeAsync();
+        await _postgresFixture.ResetAsync();
     }
 }

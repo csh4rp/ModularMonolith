@@ -23,7 +23,7 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
     }
 
     [Fact]
-    [TestMethodName("Ok_CategoryExists")]
+    [TestFileName("Ok_CategoryExists")]
     public async Task ShouldReturnOk_WhenCategoryExists()
     {
         // Arrange
@@ -43,7 +43,7 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
     }
     
     [Fact]
-    [TestMethodName("NotFound_CategoryDoesNotExist")]
+    [TestFileName("NotFound_CategoryDoesNotExist")]
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()
     {
         // Arrange & Act

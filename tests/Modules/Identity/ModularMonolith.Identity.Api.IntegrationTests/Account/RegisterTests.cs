@@ -33,7 +33,7 @@ public class RegisterTests : BaseIntegrationTest<RegisterTests>
 
     public override async Task DisposeAsync()
     {
-        _client.Dispose();
+        await base.DisposeAsync();
         await _postgresFixture.ResetAsync();
     }
 }

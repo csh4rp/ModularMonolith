@@ -23,7 +23,7 @@ public class SignInTests : BaseIntegrationTest<SignInTests>
     }
     
     [Fact]
-    [TestMethodName("Ok_CredentialsAreValid")]
+    [TestFileName("Ok_CredentialsAreValid")]
     public async Task ShouldReturnOk_WhenCredentialsAreValid()
     {
         // Arrange
@@ -42,7 +42,7 @@ public class SignInTests : BaseIntegrationTest<SignInTests>
     }
     
     [Fact]
-    [TestMethodName("BadRequest_PasswordIsIncorrect")]
+    [TestFileName("BadRequest_PasswordIsIncorrect")]
     public async Task ShouldReturnBadRequest_WhenPasswordIsIncorrect()
     {
         // Arrange

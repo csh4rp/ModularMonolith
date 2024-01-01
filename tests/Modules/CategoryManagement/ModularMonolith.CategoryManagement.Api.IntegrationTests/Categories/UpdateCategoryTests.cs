@@ -41,7 +41,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
     }
     
     [Fact]
-    [TestMethodName("BadRequest_CategoryNameIsEmpty")]
+    [TestFileName("BadRequest_CategoryNameIsEmpty")]
     public async Task ShouldReturnBadRequest_WhenCategoryNameIsEmpty()
     {
         // Arrange
@@ -56,7 +56,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
     }
     
     [Fact]
-    [TestMethodName("NotFound_CategoryDoesNotExist")]
+    [TestFileName("NotFound_CategoryDoesNotExist")]
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()
     {
         // Arrange
@@ -71,7 +71,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
     }
     
     [Fact]
-    [TestMethodName("Conflict_WhenCategoryNameIsAlreadyUsed")]
+    [TestFileName("Conflict_WhenCategoryNameIsAlreadyUsed")]
     public async Task ShouldReturnConflict_WhenCategoryNameIsAlreadyUsed()
     {
         // Arrange
@@ -95,4 +95,11 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
         await VerifyResponse(response);
     }
+    
+    public override async Task DisposeAsync()
+    {
+        await base.DisposeAsync();
+        await _postgresFixture.ResetAsync();
+    }
+
 }

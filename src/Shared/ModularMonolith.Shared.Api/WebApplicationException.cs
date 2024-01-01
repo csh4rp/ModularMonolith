@@ -11,20 +11,7 @@ public static class WebApplicationException
             .ReportApiVersions()
             .Build();
         
-        app.UseExceptionHandler(o =>
-        {
-            o.Use(async (c, d) =>
-            {
-                await d();
-            });
-        });
-
         var modules = app.Services.GetServices<AppModule>().ToList();
-     
-        foreach (var module in modules)
-        {
-            module.RegisterEndpoints(app);
-        }
         
         if (app.Environment.IsDevelopment())
         {
@@ -39,6 +26,30 @@ public static class WebApplicationException
                     module.SwaggerUIAction(options);
                 }
             });
+        }
+        
+        app.UseExceptionHandler(o =>
+        {
+            o.Use(async (c, d) =>
+            {
+                await d();
+            });
+        });
+
+        app.UseRouting();
+
+        
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.UseEndpoints(e =>
+        {
+            
+        });
+        
+        foreach (var module in modules)
+        {
+            module.RegisterEndpoints(app);
         }
         
         return app;

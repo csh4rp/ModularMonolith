@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using ModularMonolith.CategoryManagement.Infrastructure.Common.DataAccess;
 using ModularMonolith.CategoryManagement.Migrations;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
-using ModularMonolith.Shared.IntegrationTests.Common;
 using ModularMonolith.Shared.Migrations;
 using Npgsql;
 using Respawn;
@@ -10,7 +10,7 @@ using Testcontainers.PostgreSql;
 
 namespace ModularMonolith.CategoryManagement.Api.IntegrationTests.Fixtures;
 
-public class PostgresFixture : IAsyncLifetime, IDatabaseFixture
+public class PostgresFixture : IAsyncLifetime
 {
     private NpgsqlConnection? _connection;
     private PostgreSqlContainer? _container;
@@ -63,6 +63,13 @@ public class PostgresFixture : IAsyncLifetime, IDatabaseFixture
 
         await SharedDbContext.DisposeAsync();
         await CategoryManagementDbContext.DisposeAsync();
-        
+    }
+    
+    public Task ResetAsync()
+    {
+        Debug.Assert(_connection is not null);
+        Debug.Assert(_respawner is not null);
+
+        return _respawner.ResetAsync(_connection);
     }
 }
