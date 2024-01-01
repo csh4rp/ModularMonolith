@@ -3,7 +3,7 @@ using ModularMonolith.Shared.Contracts;
 
 namespace ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
 
-public record UpdateCategoryCommand(Guid Id, Guid? ParentId, string Name) : ICommand
+public sealed record UpdateCategoryCommand(Guid Id, Guid? ParentId, string Name) : ICommand
 {
     [JsonIgnore]
     public Guid Id { get; set; } = Id;

@@ -1,8 +1,10 @@
-﻿using ModularMonolith.Shared.Contracts;
+﻿using System.Text.Json.Serialization;
+using ModularMonolith.Shared.Contracts;
 
 namespace ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
 
-public class DeleteCategoryCommand(Guid id) : ICommand
+public sealed record DeleteCategoryCommand(Guid Id) : ICommand
 {
-    public Guid Id { get; } = id;
+    [JsonIgnore]
+    public Guid Id { get; } = Id;
 }

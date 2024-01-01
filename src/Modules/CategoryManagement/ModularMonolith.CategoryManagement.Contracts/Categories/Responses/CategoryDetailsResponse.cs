@@ -1,6 +1,6 @@
 ﻿namespace ModularMonolith.CategoryManagement.Contracts.Categories.Responses;
 
-public class CategoryDetailsResponse
+public sealed record CategoryDetailsResponse
 {
     public required Guid Id { get; init; }
 
