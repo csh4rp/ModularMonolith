@@ -8,14 +8,13 @@ namespace ModularMonolith.Identity.Api.IntegrationTests.Account;
 [Collection("Account")]
 public class RegisterTests : BaseIntegrationTest<RegisterTests>
 {
-    private readonly PostgresFixture _postgresFixture;
+    private readonly IdentityFixture _identityFixture;
     private readonly HttpClient _client;
     
-    public RegisterTests(PostgresFixture postgresFixture,
-        IdentityFixture identityFixture)
+    public RegisterTests(IdentityFixture identityFixture)
     {
-        _postgresFixture = postgresFixture;
-        _client = identityFixture.CreateClient(_postgresFixture.ConnectionString);
+        _identityFixture = identityFixture;
+        _client = identityFixture.CreateClient();
     }
     
     [Fact]
@@ -33,7 +32,6 @@ public class RegisterTests : BaseIntegrationTest<RegisterTests>
 
     public override async Task DisposeAsync()
     {
-        await base.DisposeAsync();
-        await _postgresFixture.ResetAsync();
+        await _identityFixture.ResetAsync();
     }
 }

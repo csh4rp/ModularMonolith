@@ -9,17 +9,15 @@ namespace ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories;
 [Collection("Categories")]
 public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
 {
-    private readonly PostgresFixture _postgresFixture;
+    private readonly CategoryManagementFixture _categoryManagementFixture;
     private readonly CategoryFixture _categoryFixture;
     private readonly HttpClient _client;
 
-    public FindCategoriesTests(PostgresFixture postgresFixture,
-        CategoryFixture categoryFixture,
-        CategoryManagementFixture categoryManagementFixture)
+    public FindCategoriesTests(CategoryManagementFixture categoryManagementFixture, CategoryFixture categoryFixture)
     {
-        _postgresFixture = postgresFixture;
+        _categoryManagementFixture = categoryManagementFixture;
         _categoryFixture = categoryFixture;
-        _client = categoryManagementFixture.CreateClient(_postgresFixture.ConnectionString);
+        _client = categoryManagementFixture.CreateClientWithAuthToken();
     }
 
     [Fact]
@@ -35,8 +33,8 @@ public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
             .Take(20)
             .ToList();
         
-        _postgresFixture.CategoryManagementDbContext.AddRange(categories);
-        await _postgresFixture.CategoryManagementDbContext.SaveChangesAsync();
+        _categoryManagementFixture.CategoryManagementDbContext.AddRange(categories);
+        await _categoryManagementFixture.CategoryManagementDbContext.SaveChangesAsync();
         
         // Act
         using var response = await _client.GetAsync("api/category-management/categories");
@@ -60,8 +58,8 @@ public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
             .Take(20)
             .ToList();
         
-        _postgresFixture.CategoryManagementDbContext.AddRange(categories);
-        await _postgresFixture.CategoryManagementDbContext.SaveChangesAsync();
+        _categoryManagementFixture.CategoryManagementDbContext.AddRange(categories);
+        await _categoryManagementFixture.CategoryManagementDbContext.SaveChangesAsync();
         
         // Act
         using var response = await _client.GetAsync($"api/category-management/categories?skip={skip}&take={take}&orderBy={orderBy}&search={search}");
@@ -82,7 +80,6 @@ public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
     
     public override async Task DisposeAsync()
     {
-        await base.DisposeAsync();
-        await _postgresFixture.ResetAsync();
+        await _categoryManagementFixture.ResetAsync();
     }
 }

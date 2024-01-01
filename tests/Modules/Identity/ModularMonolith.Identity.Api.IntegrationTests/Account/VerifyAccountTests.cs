@@ -14,28 +14,26 @@ namespace ModularMonolith.Identity.Api.IntegrationTests.Account;
 [Collection("Account")]
 public class VerifyAccountTests : BaseIntegrationTest<VerifyAccountTests>
 {
-    private readonly PostgresFixture _postgresFixture;
+    private readonly IdentityFixture _identityFixture;
     private readonly AccountFixture _accountFixture;
-    private readonly AsyncServiceScope _serviceScope;
     private readonly HttpClient _client;
+    private readonly AsyncServiceScope _serviceScope;
     
-    public VerifyAccountTests(PostgresFixture postgresFixture,
-        AccountFixture accountFixture,
-        IdentityFixture identityFixture)
+    public VerifyAccountTests(IdentityFixture identityFixture, AccountFixture accountFixture)
     {
-        _postgresFixture = postgresFixture;
+        _identityFixture = identityFixture;
         _accountFixture = accountFixture;
-        _serviceScope = identityFixture.CreateServiceScope(_postgresFixture.ConnectionString);
-        _client = identityFixture.CreateClient(_postgresFixture.ConnectionString);
+        _client = identityFixture.CreateClient();
+        _serviceScope = identityFixture.CreateServiceScope();
     }
-
+    
     [Fact]
     public async Task ShouldReturnNoContent_WhenUserIdAndTokenAreValid()
     {
         // Arrange
         var user = _accountFixture.AUnverifiedUser();
-        _postgresFixture.IdentityDbContext.Users.Add(user);
-        await _postgresFixture.IdentityDbContext.SaveChangesAsync();
+        _identityFixture.IdentityDbContext.Users.Add(user);
+        await _identityFixture.IdentityDbContext.SaveChangesAsync();
 
         var manager = _serviceScope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var token = await manager.GenerateEmailConfirmationTokenAsync(user);
@@ -57,8 +55,8 @@ public class VerifyAccountTests : BaseIntegrationTest<VerifyAccountTests>
     {
         // Arrange
         var user = _accountFixture.AUnverifiedUser();
-        _postgresFixture.IdentityDbContext.Users.Add(user);
-        await _postgresFixture.IdentityDbContext.SaveChangesAsync();
+        _identityFixture.IdentityDbContext.Users.Add(user);
+        await _identityFixture.IdentityDbContext.SaveChangesAsync();
 
         var manager = _serviceScope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var token = await manager.GenerateEmailConfirmationTokenAsync(user);
@@ -81,8 +79,8 @@ public class VerifyAccountTests : BaseIntegrationTest<VerifyAccountTests>
     {
         // Arrange
         var user = _accountFixture.AUnverifiedUser();
-        _postgresFixture.IdentityDbContext.Users.Add(user);
-        await _postgresFixture.IdentityDbContext.SaveChangesAsync();
+        _identityFixture.IdentityDbContext.Users.Add(user);
+        await _identityFixture.IdentityDbContext.SaveChangesAsync();
         
         var payload = new { UserId = user.Id, VerificationToken = "123" };
         
@@ -98,7 +96,6 @@ public class VerifyAccountTests : BaseIntegrationTest<VerifyAccountTests>
     
     public override async Task DisposeAsync()
     {
-        _client.Dispose();
-        await _postgresFixture.ResetAsync();
+        await _identityFixture.ResetAsync();
     }
 }

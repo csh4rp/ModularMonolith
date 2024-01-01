@@ -9,17 +9,15 @@ namespace ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories;
 [Collection("Categories")]
 public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
 {
-    private readonly PostgresFixture _postgresFixture;
+    private readonly CategoryManagementFixture _categoryManagementFixture;
     private readonly CategoryFixture _categoryFixture;
     private readonly HttpClient _client;
-
-    public CreateCategoryTests(PostgresFixture postgresFixture,
-        CategoryFixture categoryFixture,
-        CategoryManagementFixture categoryManagementFixture)
+    
+    public CreateCategoryTests(CategoryManagementFixture categoryManagementFixture, CategoryFixture categoryFixture)
     {
-        _postgresFixture = postgresFixture;
+        _categoryManagementFixture = categoryManagementFixture;
         _categoryFixture = categoryFixture;
-        _client = categoryManagementFixture.CreateClient(_postgresFixture.ConnectionString);
+        _client = categoryManagementFixture.CreateClientWithAuthToken();
     }
 
     [Fact]
@@ -46,8 +44,8 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
             .RuleFor(x => x.Name, "Created-Category-Duplicate")
             .Generate();
         
-        _postgresFixture.CategoryManagementDbContext.Categories.Add(category);
-        await _postgresFixture.CategoryManagementDbContext.SaveChangesAsync();
+        _categoryManagementFixture.CategoryManagementDbContext.Categories.Add(category);
+        await _categoryManagementFixture.CategoryManagementDbContext.SaveChangesAsync();
         
         using var request = GetResource("CreateCategory.DuplicateName.json");
         
@@ -76,8 +74,7 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
 
     public override async Task DisposeAsync()
     {
-        _client.Dispose();
-        await _postgresFixture.ResetAsync();
+        await _categoryManagementFixture.ResetAsync();
     }
 }
 

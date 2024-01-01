@@ -9,17 +9,15 @@ namespace ModularMonolith.Identity.Api.IntegrationTests.Account;
 [Collection("Account")]
 public class SignInTests : BaseIntegrationTest<SignInTests>
 {
-    private readonly PostgresFixture _postgresFixture;
+    private readonly IdentityFixture _identityFixture;
     private readonly AccountFixture _accountFixture;
     private readonly HttpClient _client;
 
-    public SignInTests(PostgresFixture postgresFixture,
-        AccountFixture accountFixture,
-        IdentityFixture identityFixture)
+    public SignInTests(IdentityFixture identityFixture, AccountFixture accountFixture)
     {
-        _postgresFixture = postgresFixture;
+        _identityFixture = identityFixture;
         _accountFixture = accountFixture;
-        _client = identityFixture.CreateClient(_postgresFixture.ConnectionString);
+        _client = identityFixture.CreateClient();
     }
     
     [Fact]
@@ -28,8 +26,8 @@ public class SignInTests : BaseIntegrationTest<SignInTests>
     {
         // Arrange
         var user = _accountFixture.AActiveUser();
-        _postgresFixture.IdentityDbContext.Users.Add(user);
-        await _postgresFixture.IdentityDbContext.SaveChangesAsync();
+        _identityFixture.IdentityDbContext.Users.Add(user);
+        await _identityFixture.IdentityDbContext.SaveChangesAsync();
         
         using var request = GetResource("SignIn.Valid.json");
 
@@ -47,8 +45,8 @@ public class SignInTests : BaseIntegrationTest<SignInTests>
     {
         // Arrange
         var user = _accountFixture.AActiveUser();
-        _postgresFixture.IdentityDbContext.Users.Add(user);
-        await _postgresFixture.IdentityDbContext.SaveChangesAsync();
+        _identityFixture.IdentityDbContext.Users.Add(user);
+        await _identityFixture.IdentityDbContext.SaveChangesAsync();
         
         using var request = GetResource("SignIn.InvalidPassword.json");
 
@@ -62,7 +60,6 @@ public class SignInTests : BaseIntegrationTest<SignInTests>
     
     public override async Task DisposeAsync()
     {
-        _client.Dispose();
-        await _postgresFixture.ResetAsync();
+        await _identityFixture.ResetAsync();
     }
 }

@@ -9,17 +9,15 @@ namespace ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories;
 [Collection("Categories")]
 public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
 {
-    private readonly PostgresFixture _postgresFixture;
+    private readonly CategoryManagementFixture _categoryManagementFixture;
     private readonly CategoryFixture _categoryFixture;
     private readonly HttpClient _client;
-
-    public GetCategoryTests(PostgresFixture postgresFixture,
-        CategoryFixture categoryFixture,
-        CategoryManagementFixture categoryManagementFixture)
+    
+    public GetCategoryTests(CategoryManagementFixture categoryManagementFixture, CategoryFixture categoryFixture)
     {
-        _postgresFixture = postgresFixture;
+        _categoryManagementFixture = categoryManagementFixture;
         _categoryFixture = categoryFixture;
-        _client = categoryManagementFixture.CreateClient(_postgresFixture.ConnectionString);
+        _client = categoryManagementFixture.CreateClientWithAuthToken();
     }
 
     [Fact]
@@ -31,8 +29,8 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
             .RuleFor(x => x.Name, "Category-Name-1")
             .Generate();
         
-        _postgresFixture.CategoryManagementDbContext.Categories.Add(category);
-        await _postgresFixture.CategoryManagementDbContext.SaveChangesAsync();
+        _categoryManagementFixture.CategoryManagementDbContext.Categories.Add(category);
+        await _categoryManagementFixture.CategoryManagementDbContext.SaveChangesAsync();
         
         // Act
         using var response = await _client.GetAsync($"api/category-management/categories/{category.Id}");

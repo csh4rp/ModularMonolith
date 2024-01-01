@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using ModularMonolith.Shared.Api.Middlewares;
 
 namespace ModularMonolith.Shared.Api;
 
@@ -41,6 +42,8 @@ public static class WebApplicationException
         
         app.UseAuthentication();
         app.UseAuthorization();
+
+        app.UseMiddleware<IdentityMiddleware>();
 
         app.UseEndpoints(e =>
         {

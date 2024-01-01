@@ -3,6 +3,4 @@
 namespace ModularMonolith.Identity.Api.IntegrationTests.Account.Fixtures;
 
 [CollectionDefinition("Account")]
-public class AccountPostgresFixtureCollection : ICollectionFixture<PostgresFixture>,
-    ICollectionFixture<IdentityFixture>,
-    ICollectionFixture<AccountFixture>;
+public class AccountPostgresFixtureCollection : ICollectionFixture<IdentityFixture>, ICollectionFixture<AccountFixture>;

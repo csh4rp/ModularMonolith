@@ -4,6 +4,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using ModularMonolith.Shared.Api.Exceptions;
+using ModularMonolith.Shared.Api.Middlewares;
 using ModularMonolith.Shared.Application;
 using ModularMonolith.Shared.Infrastructure.AuditLogs;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
@@ -50,11 +51,11 @@ public static class WebApplicationBuilderExtensions
                         ValidAudience = audience,
                         ValidIssuer = issuer,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
-                        // RequireAudience = true,
-                        // RequireSignedTokens = true,
-                        // ValidateAudience = true,
-                        // ValidateIssuer = true,
-                        // ValidateIssuerSigningKey = true
+                        RequireAudience = true,
+                        RequireSignedTokens = true,
+                        ValidateAudience = true,
+                        ValidateIssuer = true,
+                        ValidateIssuerSigningKey = true
                     };
                 });
         }
@@ -63,8 +64,9 @@ public static class WebApplicationBuilderExtensions
             throw new NotSupportedException("Other auth types are not supported yet");
         }
 
-
-        builder.Services.AddAuthorization(c =>
+        builder.Services.AddScoped<IdentityMiddleware>();
+        
+        builder.Services.AddAuthorization(options =>
         {
 
         });

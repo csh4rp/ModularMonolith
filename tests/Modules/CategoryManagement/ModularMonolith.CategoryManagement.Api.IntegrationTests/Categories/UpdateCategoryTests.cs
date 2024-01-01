@@ -9,27 +9,25 @@ namespace ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories;
 [Collection("Categories")]
 public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
 {
-    private readonly PostgresFixture _postgresFixture;
+    private readonly CategoryManagementFixture _categoryManagementFixture;
     private readonly CategoryFixture _categoryFixture;
     private readonly HttpClient _client;
-
-    public UpdateCategoryTests(PostgresFixture postgresFixture,
-        CategoryFixture categoryFixture,
-        CategoryManagementFixture categoryManagementFixture)
+    
+    public UpdateCategoryTests(CategoryManagementFixture categoryManagementFixture, CategoryFixture categoryFixture)
     {
-        _postgresFixture = postgresFixture;
+        _categoryManagementFixture = categoryManagementFixture;
         _categoryFixture = categoryFixture;
-        _client = categoryManagementFixture.CreateClient(_postgresFixture.ConnectionString);
+        _client = categoryManagementFixture.CreateClientWithAuthToken();
     }
-
+    
     [Fact]
     public async Task ShouldReturnNoContent_WhenCategoryExists()
     {
         // Arrange
         var category = _categoryFixture.Generate();
 
-        _postgresFixture.CategoryManagementDbContext.Categories.Add(category);
-        await _postgresFixture.CategoryManagementDbContext.SaveChangesAsync();
+        _categoryManagementFixture.CategoryManagementDbContext.Categories.Add(category);
+        await _categoryManagementFixture.CategoryManagementDbContext.SaveChangesAsync();
         
         using var request = GetResource("UpdateCategory.Valid.json");
         
@@ -83,8 +81,8 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
             .RuleFor(x => x.Name, "Updated-Category-Duplicate")
             .Generate();
 
-        await _postgresFixture.CategoryManagementDbContext.Categories.AddRangeAsync(currentCategory, otherCategory);
-        await _postgresFixture.CategoryManagementDbContext.SaveChangesAsync();
+        await _categoryManagementFixture.CategoryManagementDbContext.Categories.AddRangeAsync(currentCategory, otherCategory);
+        await _categoryManagementFixture.CategoryManagementDbContext.SaveChangesAsync();
         
         using var request = GetResource("UpdateCategory.DuplicateName.json");
         
@@ -98,8 +96,6 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
     
     public override async Task DisposeAsync()
     {
-        await base.DisposeAsync();
-        await _postgresFixture.ResetAsync();
+        await _categoryManagementFixture.ResetAsync();
     }
-
 }

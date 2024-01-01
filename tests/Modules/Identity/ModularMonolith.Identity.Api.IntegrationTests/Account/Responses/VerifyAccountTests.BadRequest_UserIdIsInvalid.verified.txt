@@ -8,7 +8,7 @@
   timestamp: DateTimeOffset_1,
   errors: [
     {
-      target: UserId,
+      target: userId,
       code: INVALID_ARGUMENT,
       message: Value is invalid
     }
