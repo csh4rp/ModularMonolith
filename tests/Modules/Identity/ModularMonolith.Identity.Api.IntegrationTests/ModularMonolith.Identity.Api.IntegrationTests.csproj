@@ -24,6 +24,7 @@
       <EmbeddedResource Include="Account\Resources\ChangePassword.InvalidCurrentPassword.json" />
       <EmbeddedResource Include="Account\Resources\ChangePassword.NewPasswordNotMatchingPolicy.json" />
       <EmbeddedResource Include="Account\Resources\ChangePassword.Valid.json" />
+      <EmbeddedResource Include="Account\Resources\InitializePasswordReset.Valid.json" />
       <EmbeddedResource Include="Account\Resources\Register.Valid.json" />
       <EmbeddedResource Include="Account\Resources\SignIn.InvalidPassword.json" />
       <EmbeddedResource Include="Account\Resources\SignIn.Valid.json" />

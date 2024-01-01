@@ -62,7 +62,7 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
     
     [Fact]
     [TestFileName("BadRequest_NewPasswordDoesNotMatchPolicy")]
-    public async Task ShouldReturnNoContent_NewPasswordDoesNotMatchPolicy()
+    public async Task ShouldReturnNoContent_WhenNewPasswordDoesNotMatchPolicy()
     {
         // Arrange
         var user = _accountFixture.AActiveUser();
@@ -79,6 +79,20 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         await VerifyResponse(response);
+    }
+    
+    [Fact]
+    public async Task ShouldReturnUnauthorized_WhenRequestIsMissingToken()
+    {
+        // Arrange
+        using var client = _identityFixture.CreateClient();
+        using var request = GetResource("ChangePassword.Valid.json");
+    
+        // Act
+        using var response = await client.PostAsync("/api/identity/account/change-password", request);
+    
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
     
     public override async Task DisposeAsync()

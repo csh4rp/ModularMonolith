@@ -33,7 +33,7 @@ internal sealed class ResetPasswordCommandHandler : ICommandHandler<ResetPasswor
             return MemberError.InvalidValue(nameof(request.UserId));
         }
 
-        var result = await _userManager.ResetPasswordAsync(user, request.ResetPasswordToken, request.Password);
+        var result = await _userManager.ResetPasswordAsync(user, request.ResetPasswordToken, request.NewPassword);
         
         if (result.Succeeded)
         {
@@ -50,6 +50,6 @@ internal sealed class ResetPasswordCommandHandler : ICommandHandler<ResetPasswor
             return MemberError.InvalidValue(nameof(request.ResetPasswordToken));
         }
         
-        return MemberError.InvalidValue(nameof(request.Password));
+        return MemberError.InvalidValue(nameof(request.NewPassword));
     }
 }
