@@ -292,7 +292,7 @@ internal sealed class EventReader : IEventReader
              """;
 
         var releaseCorrelationLocksCommand = batch.CreateBatchCommand();
-        releaseEventLocksCommand.Parameters.AddWithValue("@max_lock_time_in_seconds",
+        releaseCorrelationLocksCommand.Parameters.AddWithValue("@max_lock_time_in_seconds",
             _optionsMonitor.CurrentValue.MaxLockTime.TotalSeconds);
 
         releaseCorrelationLocksCommand.CommandText =
