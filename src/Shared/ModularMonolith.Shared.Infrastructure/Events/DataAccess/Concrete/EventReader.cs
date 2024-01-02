@@ -14,16 +14,14 @@ internal sealed class EventReader : IEventReader
     private readonly EventMetaDataProvider _eventMetaDataProvider;
     private readonly DbConnectionFactory _dbConnectionFactory;
     private readonly IOptionsMonitor<EventOptions> _optionsMonitor;
-    private readonly TimeProvider _timeProvider;
 
     public EventReader(DbConnectionFactory dbConnectionFactory,
         EventMetaDataProvider eventMetaDataProvider,
-        IOptionsMonitor<EventOptions> optionsMonitor, TimeProvider timeProvider)
+        IOptionsMonitor<EventOptions> optionsMonitor)
     {
         _dbConnectionFactory = dbConnectionFactory;
         _eventMetaDataProvider = eventMetaDataProvider;
         _optionsMonitor = optionsMonitor;
-        _timeProvider = timeProvider;
     }
 
     public async Task<(bool WasAcquired, EventLog? EventLog)> TryAcquireLockAsync(EventInfo eventInfo,

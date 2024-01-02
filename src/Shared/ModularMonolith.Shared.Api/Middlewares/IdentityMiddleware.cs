@@ -3,7 +3,7 @@ using ModularMonolith.Shared.Application.Identity;
 
 namespace ModularMonolith.Shared.Api.Middlewares;
 
-public class IdentityMiddleware : IMiddleware
+internal sealed class IdentityMiddleware : IMiddleware
 {
     private readonly IIdentityContextSetter _identityContextSetter;
 

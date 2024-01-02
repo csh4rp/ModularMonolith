@@ -9,13 +9,13 @@ using ModularMonolith.Shared.Domain.ValueObjects;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.Factories;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.Interceptors;
 using ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs.Entities;
-using ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs.Fixtures;
+using ModularMonolith.Shared.Infrastructure.IntegrationTests.Fixtures;
 using NSubstitute;
 using EntityState = ModularMonolith.Shared.Domain.Enums.EntityState;
 
 namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs;
 
-[Collection("Postgres")]
+[Collection("AuditLogs")]
 public class AuditLogInterceptorTests : IAsyncDisposable
 {
     private static readonly DateTimeOffset Now = new(2023, 11, 3, 15, 30, 0, TimeSpan.Zero);
@@ -160,7 +160,7 @@ public class AuditLogInterceptorTests : IAsyncDisposable
         });
     }
 
-    private TestDbContext CreateDbContext()
+    private AuditLogTestDbContext CreateDbContext()
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddTransient<AuditLogFactory>();
@@ -169,13 +169,13 @@ public class AuditLogInterceptorTests : IAsyncDisposable
             new HttpContextAccessor { HttpContext = new DefaultHttpContext() });
         serviceCollection.AddTransient<TimeProvider>(_ => _dateTimeProvider);
 
-        var builder = new DbContextOptionsBuilder<TestDbContext>();
+        var builder = new DbContextOptionsBuilder<AuditLogTestDbContext>();
         builder.UseApplicationServiceProvider(serviceCollection.BuildServiceProvider());
         builder.AddInterceptors(new AuditLogInterceptor());
         builder.UseNpgsql(_postgresFixture.ConnectionString)
             .UseSnakeCaseNamingConvention();
 
-        return new TestDbContext(builder.Options);
+        return new AuditLogTestDbContext(builder.Options);
     }
 
     public async ValueTask DisposeAsync() => await _postgresFixture.ResetAsync();

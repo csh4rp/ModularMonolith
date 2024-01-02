@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Shared.Infrastructure.AuditLogs.EntityConfigurations;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs.Entities;
 
 namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs;
 
-public class TestDbContext : BaseDbContext
+public class AuditLogTestDbContext : BaseDbContext
 {
-    public TestDbContext(DbContextOptions<TestDbContext> options) : base(options)
+    public AuditLogTestDbContext(DbContextOptions<AuditLogTestDbContext> options) : base(options)
     {
     }
 
@@ -18,6 +17,8 @@ public class TestDbContext : BaseDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        
         modelBuilder.Entity<FirstTestEntity>()
             .ToTable("first_test_entity")
             .HasKey(b => b.Id);
@@ -47,7 +48,6 @@ public class TestDbContext : BaseDbContext
         modelBuilder.Entity<SecondTestEntity>()
             .ToTable("second_test_entity")
             .AuditIgnore();
-
-        modelBuilder.ApplyConfiguration(new AuditLogEntityTypeConfiguration(false));
+        
     }
 }
