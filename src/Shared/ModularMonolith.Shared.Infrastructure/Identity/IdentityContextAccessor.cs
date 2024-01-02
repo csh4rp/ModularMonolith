@@ -4,7 +4,7 @@ namespace ModularMonolith.Shared.Infrastructure.Identity;
 
 internal sealed class IdentityContextAccessor : IIdentityContextAccessor, IIdentityContextSetter
 {
-    public IdentityContext? Context { get; private set; }
+    public IdentityContext? Context { get; set; }
 
     public void Set(IdentityContext identityContext)
     {

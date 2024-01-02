@@ -2,13 +2,16 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.Application.Identity;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Factories;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Options;
 using ModularMonolith.Shared.Infrastructure.Events.BackgroundServices;
+using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
+using ModularMonolith.Shared.Infrastructure.Events.MetaData;
 using ModularMonolith.Shared.Infrastructure.Events.Options;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;
 using ModularMonolith.Shared.Infrastructure.Identity;
@@ -19,7 +22,7 @@ using NSubstitute;
 namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.Events;
 
 [Collection("Events")]
-public class EventNotificationFetchingBackgroundServiceTests
+public class EventPollingBackgroundServiceTests
 {
     private readonly IOptionsMonitor<DatabaseOptions> _databaseOptionsMonitor =
         Substitute.For<IOptionsMonitor<DatabaseOptions>>();
@@ -27,8 +30,8 @@ public class EventNotificationFetchingBackgroundServiceTests
     private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor =
         Substitute.For<IOptionsMonitor<EventOptions>>();
 
-    private readonly ILogger<EventNotificationFetchingBackgroundService> _logger =
-        Substitute.For<ILogger<EventNotificationFetchingBackgroundService>>();
+    private readonly ILogger<EventPollingBackgroundService> _logger =
+        Substitute.For<ILogger<EventPollingBackgroundService>>();
 
     private readonly IHttpContextAccessor _httpContextAccessor = new HttpContextAccessor();
 
@@ -48,8 +51,8 @@ public class EventNotificationFetchingBackgroundServiceTests
         ActivityStopped = _ => { },
         Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
     };
-
-    public EventNotificationFetchingBackgroundServiceTests(PostgresFixture postgresFixture)
+    
+    public EventPollingBackgroundServiceTests(PostgresFixture postgresFixture)
     {
         _postgresFixture = postgresFixture;
         
@@ -58,7 +61,11 @@ public class EventNotificationFetchingBackgroundServiceTests
             ConnectionString = _postgresFixture.ConnectionString
         });
 
-        _eventOptionsMonitor.CurrentValue.Returns(new EventOptions { Assemblies = [GetType().Assembly] });
+        _eventOptionsMonitor.CurrentValue.Returns(new EventOptions
+        {
+            Assemblies = [GetType().Assembly],
+            PollInterval = TimeSpan.FromSeconds(1)
+        });
         
         _dbConnectionFactory = new DbConnectionFactory(_databaseOptionsMonitor);
         
@@ -66,7 +73,7 @@ public class EventNotificationFetchingBackgroundServiceTests
     }
 
     [Fact]
-    public async Task ShouldSendEventToChannel_WhenSingleEventIsPublished()
+    public async Task Should()
     {
         // Arrange
         using var cts = new CancellationTokenSource();
@@ -74,7 +81,15 @@ public class EventNotificationFetchingBackgroundServiceTests
         using var activity = activitySource.StartActivity();
         var channel = new EventChannel();
 
-        var service = new EventNotificationFetchingBackgroundService(_dbConnectionFactory, channel, _logger);
+        var sc = new ServiceCollection();
+        var cnx = _postgresFixture.SharedDbContext;
+        sc.AddSingleton<IEventLogDbContext>(_ => cnx);
+
+        var reader = new EventReader(_dbConnectionFactory, 
+            new EventMetaDataProvider(sc.BuildServiceProvider()),
+            _eventOptionsMonitor);
+
+        var service = new EventPollingBackgroundService(_eventOptionsMonitor, _logger, reader, channel);
 
         var eventBus = new OutboxEventBus(_postgresFixture.SharedDbContext,
             new EventSerializer(_eventOptionsMonitor),
@@ -82,10 +97,10 @@ public class EventNotificationFetchingBackgroundServiceTests
             _timeProvider,
             _httpContextAccessor);
 
-        var serviceTask = service.StartAsync(cts.Token);
-        
         // Act
         await eventBus.PublishAsync(new DomainEvent("Event"), default);
+        
+        var serviceTask = service.StartAsync(cts.Token);
 
         // Assert
         await using var enumerator = channel.ReadAllAsync(cts.Token).GetAsyncEnumerator(cts.Token);
@@ -97,51 +112,6 @@ public class EventNotificationFetchingBackgroundServiceTests
             .FirstOrDefaultAsync(e => e.Id == eventInfo.EventLogId, cts.Token);
 
         eventLog.Should().NotBeNull();
-
-        await cts.CancelAsync();
-        await serviceTask;
-    }
-
-    [Fact]
-    public async Task ShouldSendEventsToChannel_WhenMultipleEventsArePublished()
-    {
-        // Arrange
-        using var cts = new CancellationTokenSource();
-        using var activitySource = new ActivitySource("Source");
-        using var activity = activitySource.StartActivity();
-        var channel = new EventChannel();
-
-        using var service = new EventNotificationFetchingBackgroundService(_dbConnectionFactory, channel, _logger);
-
-        var eventBus = new OutboxEventBus(_postgresFixture.SharedDbContext,
-            new EventSerializer(_eventOptionsMonitor),
-            _identityContextAccessor,
-            _timeProvider,
-            _httpContextAccessor);
-        
-        var batch = new[] { new DomainEvent("1"), new DomainEvent("2"), new DomainEvent("3"), new DomainEvent("4") };
-
-        var serviceTask = service.StartAsync(cts.Token);
-        
-        // Acy
-        await eventBus.PublishAsync(batch, default);
-
-        // Assert
-        await using var enumerator = channel.ReadAllAsync(cts.Token).GetAsyncEnumerator(cts.Token);
-
-        var eventLogIds = new List<Guid>();
-
-        for (var i = 0; i < batch.Length; i++)
-        {
-            await enumerator.MoveNextAsync();
-            eventLogIds.Add(enumerator.Current.EventLogId);
-        }
-        
-        var eventLogs = await _postgresFixture.SharedDbContext.EventLogs.Where(e =>
-            eventLogIds.Contains(e.Id)).ToListAsync(cts.Token);
-
-        eventLogs.Should().NotBeEmpty();
-        eventLogs.Should().HaveCount(batch.Length);
 
         await cts.CancelAsync();
         await serviceTask;

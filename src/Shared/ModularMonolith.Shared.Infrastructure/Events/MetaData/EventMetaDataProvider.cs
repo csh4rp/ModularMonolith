@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using ModularMonolith.Shared.Domain.Entities;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 
@@ -24,14 +25,14 @@ internal sealed class EventMetaDataProvider
 
     private static EventLogMetaData CreateEventLogMetaData(IServiceProvider serviceProvider)
     {
-        using var dbContext = serviceProvider.GetRequiredService<IEventLogDbContext>();
+        var dbContext = serviceProvider.GetRequiredService<IEventLogDbContext>();
         var model = dbContext.Model;
 
         var entity = model.FindEntityType(typeof(EventLog))!;
 
         return new EventLogMetaData
         {
-            TableName = entity.GetTableName()!,
+            TableName = GetFullTableName(entity),
             IdColumnName = entity.FindProperty(nameof(EventLog.Id))!.GetColumnName(),
             EventNameColumnName = entity.FindProperty(nameof(EventLog.EventName))!.GetColumnName(),
             OperationNameColumnName = entity.FindProperty(nameof(EventLog.OperationName))!.GetColumnName(),
@@ -52,14 +53,14 @@ internal sealed class EventMetaDataProvider
 
     private static EventLogLockMetaData CreateEventLockMetaData(IServiceProvider serviceProvider)
     {
-        using var dbContext = serviceProvider.GetRequiredService<IEventLogDbContext>();
+        var dbContext = serviceProvider.GetRequiredService<IEventLogDbContext>();
         var model = dbContext.Model;
 
         var entity = model.FindEntityType(typeof(EventLogLock))!;
 
         return new EventLogLockMetaData
         {
-            TableName = entity.GetTableName()!,
+            TableName = GetFullTableName(entity),
             IdColumnName = entity.FindProperty(nameof(EventLogLock.EventLogId))!.GetColumnName(),
             AcquiredAtColumnName = entity.FindProperty(nameof(EventLogLock.AcquiredAt))!.GetColumnName()
         };
@@ -67,14 +68,14 @@ internal sealed class EventMetaDataProvider
 
     private static EventLogCorrelationLockMetaData CreateEventCorrelationLockMetaData(IServiceProvider serviceProvider)
     {
-        using var dbContext = serviceProvider.GetRequiredService<IEventLogDbContext>();
+        var dbContext = serviceProvider.GetRequiredService<IEventLogDbContext>();
         var model = dbContext.Model;
 
         var entity = model.FindEntityType(typeof(EventCorrelationLock))!;
-
+        
         return new EventLogCorrelationLockMetaData
         {
-            TableName = entity.GetTableName()!,
+            TableName = GetFullTableName(entity),
             CorrelationIdColumnName =
                 entity.FindProperty(nameof(EventCorrelationLock.CorrelationId))!.GetColumnName(),
             AcquiredAtColumnName = entity.FindProperty(nameof(EventCorrelationLock.AcquiredAt))!.GetColumnName()
@@ -83,19 +84,27 @@ internal sealed class EventMetaDataProvider
 
     private static EventLogPublishAttemptMetaData CreateEventLogPublishAttemptMetaData(IServiceProvider serviceProvider)
     {
-        using var dbContext = serviceProvider.GetRequiredService<IEventLogDbContext>();
+        var dbContext = serviceProvider.GetRequiredService<IEventLogDbContext>();
         var model = dbContext.Model;
 
         var entity = model.FindEntityType(typeof(EventLogPublishAttempt))!;
 
         return new EventLogPublishAttemptMetaData
         {
-            TableName = entity.GetTableName()!,
+            TableName = GetFullTableName(entity),
             EventLogIdColumnName = entity.FindProperty(nameof(EventLogPublishAttempt.EventLogId))!.GetColumnName(),
             AttemptNumberColumnName =
                 entity.FindProperty(nameof(EventLogPublishAttempt.AttemptNumber))!.GetColumnName(),
             NextAttemptAtColumnName =
                 entity.FindProperty(nameof(EventLogPublishAttempt.NextAttemptAt))!.GetColumnName()
         };
+    }
+
+    private static string GetFullTableName(IEntityType entityType)
+    {
+        var schema = entityType.GetSchema();
+        var table = entityType.GetTableName()!;
+        
+        return string.IsNullOrEmpty(schema) ? table : $"{schema}.{table}";
     }
 }

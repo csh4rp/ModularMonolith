@@ -280,7 +280,7 @@ internal sealed class EventReader : IEventReader
         await connection.OpenAsync(cancellationToken);
 
         await using var batch = connection.CreateBatch();
-
+        
         var releaseEventLocksCommand = batch.CreateBatchCommand();
         releaseEventLocksCommand.Parameters.AddWithValue("@max_lock_time_in_seconds",
             _optionsMonitor.CurrentValue.MaxLockTime.TotalSeconds);
@@ -295,12 +295,12 @@ internal sealed class EventReader : IEventReader
         releaseEventLocksCommand.Parameters.AddWithValue("@max_lock_time_in_seconds",
             _optionsMonitor.CurrentValue.MaxLockTime.TotalSeconds);
 
-        releaseEventLocksCommand.CommandText =
+        releaseCorrelationLocksCommand.CommandText =
             $"""
              DELETE FROM {eventLogCorrelationLockMetaData.TableName}
              WHERE ({eventLogCorrelationLockMetaData.AcquiredAtColumnName} + INTERVAL '1 second' * @max_lock_time_in_seconds) < CURRENT_TIMESTAMP
              """;
-
+        
         var selectCommand = batch.CreateBatchCommand();
         selectCommand.Parameters.AddWithValue("@max_retry_attempts", _optionsMonitor.CurrentValue.MaxRetryAttempts);
         selectCommand.CommandText =
@@ -338,27 +338,38 @@ internal sealed class EventReader : IEventReader
              LIMIT 10 OFFSET 0
              """;
 
-        await using var reader = await batch.ExecuteReaderAsync(cancellationToken);
-
-        // Move to the SELECT query result
-        _ = await reader.NextResultAsync(cancellationToken);
-        _ = await reader.NextResultAsync(cancellationToken);
-
-        if (!reader.HasRows)
+        batch.BatchCommands.Add(releaseEventLocksCommand);
+        batch.BatchCommands.Add(releaseCorrelationLocksCommand);
+        batch.BatchCommands.Add(selectCommand);
+        try
         {
-            return Array.Empty<EventInfo>();
+            await using var reader = await batch.ExecuteReaderAsync(cancellationToken);
+
+            // Move to the SELECT query result
+            var x = await reader.NextResultAsync(cancellationToken);
+            var y = await reader.NextResultAsync(cancellationToken);
+
+            if (!reader.HasRows)
+            {
+                return Array.Empty<EventInfo>();
+            }
+
+            var events = new List<EventInfo>(10);
+
+            while (await reader.ReadAsync(cancellationToken))
+            {
+                var eventLogId = reader.GetGuid(0);
+                var correlationId = await reader.IsDBNullAsync(1, cancellationToken) ? (Guid?)null : reader.GetGuid(1);
+
+                events.Add(new EventInfo(eventLogId, correlationId));
+            }
+
+            return events;
         }
-
-        var events = new List<EventInfo>(10);
-
-        while (await reader.ReadAsync(cancellationToken))
+        catch (Exception ex)
         {
-            var eventLogId = reader.GetGuid(0);
-            var correlationId = await reader.IsDBNullAsync(1, cancellationToken) ? (Guid?)null : reader.GetGuid(1);
-
-            events.Add(new EventInfo(eventLogId, correlationId));
+            Console.WriteLine(ex);
+            return new List<EventInfo>();
         }
-
-        return events;
     }
 }

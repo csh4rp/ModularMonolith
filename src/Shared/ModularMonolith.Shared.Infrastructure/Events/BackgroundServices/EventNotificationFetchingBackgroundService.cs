@@ -111,11 +111,11 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
         var index = args.Payload.IndexOf('/');
         var payload = args.Payload.AsSpan();
 
-        Guid? correlationId = index != 0
-            ? Guid.Parse(payload[..index])
+        Guid? correlationId = index != args.Payload.Length - 1
+            ? Guid.Parse(payload[(index + 1)..])
             : null;
 
-        var id = Guid.Parse(payload[index..]);
+        var id = Guid.Parse(payload[..index]);
         return (id, correlationId);
     }
 }
