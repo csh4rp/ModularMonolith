@@ -13,6 +13,7 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
     private static readonly ResiliencePipeline EventReceiverPipeline = CreateReceiverPipeline();
     private static readonly ResiliencePipeline EventLockReleasePipeline = CreateLockReleasePipeline();
     private static readonly ResiliencePipeline EventPublicationPipeline = CreatePublicationPipeline();
+    
     private readonly Task[] _tasks;
     private readonly IEventReader _eventReader;
     private readonly EventChannel _eventChannel;
@@ -23,13 +24,13 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
         EventChannel eventChannel,
         EventPublisher eventPublisher,
         ILogger<EventPublisherBackgroundService> logger,
-        IOptions<EventOptions> options)
+        IOptionsMonitor<EventOptions> options)
     {
         _eventReader = eventReader;
         _eventChannel = eventChannel;
         _eventPublisher = eventPublisher;
         _logger = logger;
-        _tasks = new Task[options.Value.MaxParallelWorkers];
+        _tasks = new Task[options.CurrentValue.MaxParallelWorkers];
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -78,6 +79,7 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
             try
             {
                 var (wasAcquired, eventLog) = await _eventReader.TryAcquireLockAsync(eventInfo, cancellationToken);
+                
                 if (!wasAcquired)
                 {
                     _logger.EventAlreadyTaken(eventInfo.EventLogId);

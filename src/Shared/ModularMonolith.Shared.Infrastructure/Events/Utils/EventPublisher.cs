@@ -11,12 +11,12 @@ internal sealed class EventPublisher
     private static readonly ActivitySource EventPublisherActivitySource = new(nameof(EventPublisher));
 
     private readonly EventSerializer _eventSerializer;
-    private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly IServiceProvider _serviceScopeFactory;
     private readonly EventMapper _eventMapper;
     private readonly ILogger<EventPublisher> _logger;
 
     public EventPublisher(EventSerializer eventSerializer,
-        IServiceScopeFactory serviceScopeFactory,
+        IServiceProvider serviceScopeFactory,
         EventMapper eventMapper,
         ILogger<EventPublisher> logger)
     {
@@ -39,8 +39,8 @@ internal sealed class EventPublisher
             }
 
             using var activity = EventPublisherActivitySource.CreateActivity(eventLog.EventName, ActivityKind.Internal);
-            activity?.SetParentId(eventLog.TraceId);
-            activity?.Start();
+            activity!.SetParentId(eventLog.TraceId);
+            activity.Start();
 
             var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 

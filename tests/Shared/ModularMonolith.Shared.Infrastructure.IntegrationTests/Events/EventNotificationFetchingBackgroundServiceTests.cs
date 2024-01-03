@@ -19,8 +19,17 @@ using NSubstitute;
 namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.Events;
 
 [Collection("Events")]
-public class EventNotificationFetchingBackgroundServiceTests
+public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
 {
+    private static readonly ActivitySource CurrentActivitySource = new(nameof(EventNotificationFetchingBackgroundServiceTests));
+    private static readonly ActivityListener ActivityListener = new()
+    {
+        ShouldListenTo = _ => true,
+        ActivityStarted = _ => { },
+        ActivityStopped = _ => { },
+        Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
+    };
+    
     private readonly IOptionsMonitor<DatabaseOptions> _databaseOptionsMonitor =
         Substitute.For<IOptionsMonitor<DatabaseOptions>>();
 
@@ -40,14 +49,6 @@ public class EventNotificationFetchingBackgroundServiceTests
     private readonly TimeProvider _timeProvider = Substitute.For<TimeProvider>();
     private readonly PostgresFixture _postgresFixture;
     private readonly DbConnectionFactory _dbConnectionFactory;
-
-    private static readonly ActivityListener ActivityListener = new()
-    {
-        ShouldListenTo = _ => true,
-        ActivityStarted = _ => { },
-        ActivityStopped = _ => { },
-        Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
-    };
 
     public EventNotificationFetchingBackgroundServiceTests(PostgresFixture postgresFixture)
     {
@@ -76,11 +77,7 @@ public class EventNotificationFetchingBackgroundServiceTests
 
         var service = new EventNotificationFetchingBackgroundService(_dbConnectionFactory, channel, _logger);
 
-        var eventBus = new OutboxEventBus(_postgresFixture.SharedDbContext,
-            new EventSerializer(_eventOptionsMonitor),
-            _identityContextAccessor,
-            _timeProvider,
-            _httpContextAccessor);
+        var eventBus = CreateEventBus();
 
         var serviceTask = service.StartAsync(cts.Token);
         
@@ -102,22 +99,27 @@ public class EventNotificationFetchingBackgroundServiceTests
         await serviceTask;
     }
 
-    [Fact]
-    public async Task ShouldSendEventsToChannel_WhenMultipleEventsArePublished()
+    private OutboxEventBus CreateEventBus()
     {
-        // Arrange
-        using var cts = new CancellationTokenSource();
-        using var activitySource = new ActivitySource("Source");
-        using var activity = activitySource.StartActivity();
-        var channel = new EventChannel();
-
-        using var service = new EventNotificationFetchingBackgroundService(_dbConnectionFactory, channel, _logger);
-
         var eventBus = new OutboxEventBus(_postgresFixture.SharedDbContext,
             new EventSerializer(_eventOptionsMonitor),
             _identityContextAccessor,
             _timeProvider,
             _httpContextAccessor);
+        return eventBus;
+    }
+
+    [Fact]
+    public async Task ShouldSendEventsToChannel_WhenMultipleEventsArePublished()
+    {
+        // Arrange
+        using var cts = new CancellationTokenSource();
+        using var activity = CurrentActivitySource.StartActivity();
+        var channel = new EventChannel();
+
+        using var service = new EventNotificationFetchingBackgroundService(_dbConnectionFactory, channel, _logger);
+
+        var eventBus = CreateEventBus();
         
         var batch = new[] { new DomainEvent("1"), new DomainEvent("2"), new DomainEvent("3"), new DomainEvent("4") };
 
@@ -145,5 +147,12 @@ public class EventNotificationFetchingBackgroundServiceTests
 
         await cts.CancelAsync();
         await serviceTask;
+    }
+
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public async Task DisposeAsync()
+    {
+        await _postgresFixture.ResetAsync();
     }
 }

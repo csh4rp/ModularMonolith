@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using FluentAssertions;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,9 +22,9 @@ using NSubstitute;
 namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.Events;
 
 [Collection("Events")]
-public class EventPollingBackgroundServiceTests : IAsyncLifetime
+public class EventPublisherBackgroundServiceTests
 {
-    private static readonly ActivitySource CurrentActivitySource = new(nameof(EventPollingBackgroundServiceTests));
+    private static readonly ActivitySource CurrentActivitySource = new(nameof(EventPublisherBackgroundServiceTests));
     private static readonly ActivityListener ActivityListener = new()
     {
         ShouldListenTo = _ => true,
@@ -39,21 +39,26 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
     private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor =
         Substitute.For<IOptionsMonitor<EventOptions>>();
 
-    private readonly ILogger<EventPollingBackgroundService> _logger =
-        Substitute.For<ILogger<EventPollingBackgroundService>>();
-
+    private readonly ILogger<EventPublisherBackgroundService> _logger =
+        Substitute.For<ILogger<EventPublisherBackgroundService>>();
+    
+    private readonly ILogger<EventPublisher> _eventPublisherLogger =
+        Substitute.For<ILogger<EventPublisher>>();
+    
+    private readonly INotificationHandler<DomainEvent> _notificationHandler = Substitute.For<INotificationHandler<DomainEvent>>();
+    
     private readonly IHttpContextAccessor _httpContextAccessor = new HttpContextAccessor();
 
     private readonly IIdentityContextAccessor _identityContextAccessor = new IdentityContextAccessor
     {
         Context = new IdentityContext(Guid.Parse("5FA82375-60E6-4C57-9E00-C36EA4F954E9"), "mail@mail.com")
     };
-
+    
     private readonly TimeProvider _timeProvider = Substitute.For<TimeProvider>();
     private readonly PostgresFixture _postgresFixture;
     private readonly DbConnectionFactory _dbConnectionFactory;
     
-    public EventPollingBackgroundServiceTests(PostgresFixture postgresFixture)
+    public EventPublisherBackgroundServiceTests(PostgresFixture postgresFixture)
     {
         _postgresFixture = postgresFixture;
         
@@ -75,77 +80,42 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task ShouldSendEventToChannel_WhenSingleEventIsPublished()
+    public async Task Should()
     {
-        // Arrange
         using var cts = new CancellationTokenSource();
-        using var activity = CurrentActivitySource.StartActivity();
         var channel = new EventChannel();
-        
         var reader = CreateEventReader();
-        var eventBus = CreateEventBus();
 
-        var service = new EventPollingBackgroundService(_eventOptionsMonitor, _logger, reader, channel);
+        var scopeFactory = new ServiceCollection()
+            .AddMediatR(c =>
+            {
+                c.Lifetime = ServiceLifetime.Singleton;
+                c.RegisterServicesFromAssembly(GetType().Assembly);
+            })
+            .BuildServiceProvider();
+        
+        var publisher = new EventPublisher(new EventSerializer(_eventOptionsMonitor), scopeFactory,
+            new EventMapper(_eventOptionsMonitor), _eventPublisherLogger);
+
+        var service = new EventPublisherBackgroundService(reader, channel, publisher, _logger, _eventOptionsMonitor);
+
+        var eventBus = CreateEventBus();
+        
+        await eventBus.PublishAsync(new DomainEvent("1"), cts.Token);
+
+        var eventLog = await _postgresFixture.SharedDbContext.EventLogs.SingleAsync(cts.Token);
+        
+        var task = service.StartAsync(cts.Token);
         
         // Act
-        await eventBus.PublishAsync(new DomainEvent("Event"), default);
+        await channel.WriteAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId), cts.Token);
         
-        var serviceTask = service.StartAsync(cts.Token);
-
         // Assert
-        await using var enumerator = channel.ReadAllAsync(cts.Token).GetAsyncEnumerator(cts.Token);
-        await enumerator.MoveNextAsync();
-
-        var eventInfo = enumerator.Current;
-
-        var eventLog = await _postgresFixture.SharedDbContext.EventLogs
-            .FirstOrDefaultAsync(e => e.Id == eventInfo.EventLogId, cts.Token);
-
-        eventLog.Should().NotBeNull();
 
         await cts.CancelAsync();
-        await serviceTask;
+        await task;
     }
     
-    [Fact]
-    public async Task ShouldSendEventsToChannel_WhenMultipleEventsArePublished()
-    {
-        // Arrange
-        using var cts = new CancellationTokenSource();
-        using var activity = CurrentActivitySource.StartActivity();
-        var channel = new EventChannel();
-        
-        var reader = CreateEventReader();
-        var eventBus = CreateEventBus();
-
-        var batch = new[] { new DomainEvent("1"), new DomainEvent("2"), new DomainEvent("3"), new DomainEvent("4") };
-        
-        var service = new EventPollingBackgroundService(_eventOptionsMonitor, _logger, reader, channel);
-        
-        // Act
-        await eventBus.PublishAsync(batch, default);
-        
-        var serviceTask = service.StartAsync(cts.Token);
-
-        // Assert
-        await using var enumerator = channel.ReadAllAsync(cts.Token).GetAsyncEnumerator(cts.Token);
-        var eventLogIds = new List<Guid>();
-
-        for (var i = 0; i < batch.Length; i++)
-        {
-            await enumerator.MoveNextAsync();
-            eventLogIds.Add(enumerator.Current.EventLogId);
-        }
-
-        var eventLog = await _postgresFixture.SharedDbContext.EventLogs
-            .FirstOrDefaultAsync(e => eventLogIds.Contains(e.Id), cts.Token);
-
-        eventLog.Should().NotBeNull();
-
-        await cts.CancelAsync();
-        await serviceTask;
-    }
-
     private OutboxEventBus CreateEventBus()
     {
         var eventBus = new OutboxEventBus(_postgresFixture.SharedDbContext,
@@ -164,12 +134,5 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
 
         var reader = new EventReader(_dbConnectionFactory, new EventMetaDataProvider(provider), _eventOptionsMonitor);
         return reader;
-    }
-    
-    public Task InitializeAsync() => Task.CompletedTask;
-
-    public async Task DisposeAsync()
-    {
-        await _postgresFixture.ResetAsync();
     }
 }

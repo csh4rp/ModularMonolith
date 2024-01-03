@@ -275,6 +275,7 @@ internal sealed class EventReader : IEventReader
         var eventLogMetaData = _eventMetaDataProvider.EventLogMetaData;
         var eventLogLockMetaData = _eventMetaDataProvider.EventLogLockMetaData;
         var eventLogCorrelationLockMetaData = _eventMetaDataProvider.EventLogCorrelationLockMetaData;
+        var publishAttemptMetaData = _eventMetaDataProvider.EventLogPublishAttemptMetaData;
 
         await using var connection = _dbConnectionFactory.Create();
         await connection.OpenAsync(cancellationToken);
@@ -286,27 +287,29 @@ internal sealed class EventReader : IEventReader
             _optionsMonitor.CurrentValue.MaxLockTime.TotalSeconds);
 
         releaseEventLocksCommand.CommandText =
-            $"""
-             DELETE FROM {eventLogLockMetaData.TableName}
-             WHERE ({eventLogLockMetaData.AcquiredAtColumnName} + INTERVAL '1 second' * @max_lock_time_in_seconds) < CURRENT_TIMESTAMP
-             """;
+            "SELECT 1";
+//             $"""
+//              DELETE FROM {eventLogLockMetaData.TableName}
+//              WHERE ({eventLogLockMetaData.AcquiredAtColumnName} + INTERVAL '1 second' * @max_lock_time_in_seconds) < CURRENT_TIMESTAMP
+//              """;
 
         var releaseCorrelationLocksCommand = batch.CreateBatchCommand();
         releaseCorrelationLocksCommand.Parameters.AddWithValue("@max_lock_time_in_seconds",
             _optionsMonitor.CurrentValue.MaxLockTime.TotalSeconds);
 
         releaseCorrelationLocksCommand.CommandText =
-            $"""
-             DELETE FROM {eventLogCorrelationLockMetaData.TableName}
-             WHERE ({eventLogCorrelationLockMetaData.AcquiredAtColumnName} + INTERVAL '1 second' * @max_lock_time_in_seconds) < CURRENT_TIMESTAMP
-             """;
+            "SELECT 1";
+//             $"""
+//              DELETE FROM {eventLogCorrelationLockMetaData.TableName}
+//              WHERE ({eventLogCorrelationLockMetaData.AcquiredAtColumnName} + INTERVAL '1 second' * @max_lock_time_in_seconds) < CURRENT_TIMESTAMP
+//              """;
         
         var selectCommand = batch.CreateBatchCommand();
         selectCommand.Parameters.AddWithValue("@max_retry_attempts", _optionsMonitor.CurrentValue.MaxRetryAttempts);
         selectCommand.CommandText =
             $"""
              SELECT
-             {eventLogMetaData.IdColumnName}
+             {eventLogMetaData.IdColumnName},
              {eventLogMetaData.CorrelationIdColumnName}
              FROM {eventLogMetaData.TableName} AS el
              WHERE {eventLogMetaData.PublishedAtColumnName} IS NULL
@@ -319,21 +322,22 @@ internal sealed class EventReader : IEventReader
              )
              AND NOT EXISTS
              (
-                 SELECT 1
-                 FROM {eventLogMetaData.TableName}
-                 WHERE {eventLogMetaData.CorrelationIdColumnName} = el.{eventLogMetaData.CorrelationIdColumnName}
-                 AND {eventLogMetaData.CreatedAtColumnName} < el.{eventLogMetaData.CreatedAtColumnName}
-                 AND {eventLogMetaData.PublishedAtColumnName} IS NULL
-                 AND {eventLogMetaData.IpAddressColumnName} < @max_retry_attempts
-             )
-             AND NOT EXISTS
-             (
                 SELECT 1
                 FROM {eventLogLockMetaData.TableName}
-                AND {eventLogMetaData.IdColumnName} = el.{eventLogMetaData.IdColumnName}
+                WHERE {eventLogMetaData.IdColumnName} = el.{eventLogMetaData.IdColumnName}
              )
-             AND ({eventLogMetaData.UserAgentColumnName} IS NULL OR {eventLogMetaData.UserAgentColumnName} < CURRENT_TIMESTAMP)
-             AND {eventLogMetaData.IpAddressColumnName} < @max_retry_attempts
+             AND
+             (
+                 SELECT COALESCE(MAX({publishAttemptMetaData.AttemptNumberColumnName}), 0)
+                 FROM {publishAttemptMetaData.TableName}
+                 WHERE {publishAttemptMetaData.EventLogIdColumnName} = el.{eventLogMetaData.IdColumnName}
+             ) < @max_retry_attempts
+             AND 
+             (
+                 SELECT COALESCE(MAX({publishAttemptMetaData.NextAttemptAtColumnName}), CURRENT_TIMESTAMP)
+                 FROM {publishAttemptMetaData.TableName}
+                 WHERE {publishAttemptMetaData.EventLogIdColumnName} = el.{eventLogMetaData.IdColumnName}
+             ) <= CURRENT_TIMESTAMP
              ORDER BY {eventLogMetaData.CreatedAtColumnName}
              LIMIT 10 OFFSET 0
              """;
@@ -344,10 +348,10 @@ internal sealed class EventReader : IEventReader
         try
         {
             await using var reader = await batch.ExecuteReaderAsync(cancellationToken);
-
+            
             // Move to the SELECT query result
-            var x = await reader.NextResultAsync(cancellationToken);
-            var y = await reader.NextResultAsync(cancellationToken);
+            _ = await reader.NextResultAsync(cancellationToken);
+            _ = await reader.NextResultAsync(cancellationToken);
 
             if (!reader.HasRows)
             {
