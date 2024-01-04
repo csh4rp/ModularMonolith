@@ -162,7 +162,8 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
             .AddSingleton<IEventLogDbContext>(_ => _postgresFixture.SharedDbContext)
             .BuildServiceProvider();
 
-        var reader = new EventReader(_dbConnectionFactory, new EventMetaDataProvider(provider), _eventOptionsMonitor);
+        var reader = new EventReader(_dbConnectionFactory, new EventMetaDataProvider(provider), _eventOptionsMonitor,
+            _timeProvider);
         return reader;
     }
     

@@ -6,7 +6,7 @@ using EventLog = ModularMonolith.Shared.Domain.Entities.EventLog;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.Utils;
 
-internal sealed class EventPublisher
+internal sealed class EventPublisher : IEventPublisher
 {
     private static readonly ActivitySource EventPublisherActivitySource = new(nameof(EventPublisher));
 

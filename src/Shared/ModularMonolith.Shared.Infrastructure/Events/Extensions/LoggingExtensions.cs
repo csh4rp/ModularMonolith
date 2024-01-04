@@ -32,4 +32,10 @@ internal static partial class LoggingExtensions
         Level = LogLevel.Debug,
         Message = "IntegrationEvent with id: {EventId} was published")]
     public static partial void IntegrationEventPublished(this ILogger logger, Guid eventId);
+
+    [LoggerMessage(
+        EventId = 2030,
+        Level = LogLevel.Debug,
+        Message = "Awaiting for next event to arrive")]
+    public static partial void AwaitingNextEvent(this ILogger logger);
 }

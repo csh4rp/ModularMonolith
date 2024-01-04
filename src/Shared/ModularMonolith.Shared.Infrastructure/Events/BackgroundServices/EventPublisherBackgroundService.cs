@@ -17,12 +17,12 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
     private readonly Task[] _tasks;
     private readonly IEventReader _eventReader;
     private readonly EventChannel _eventChannel;
-    private readonly EventPublisher _eventPublisher;
+    private readonly IEventPublisher _eventPublisher;
     private readonly ILogger<EventPublisherBackgroundService> _logger;
 
     public EventPublisherBackgroundService(IEventReader eventReader,
         EventChannel eventChannel,
-        EventPublisher eventPublisher,
+        IEventPublisher eventPublisher,
         ILogger<EventPublisherBackgroundService> logger,
         IOptionsMonitor<EventOptions> options)
     {
@@ -35,7 +35,7 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        for (var i = 0; i < Environment.ProcessorCount; i++)
+        for (var i = 0; i < _tasks.Length; i++)
         {
             _tasks[i] = Task.Factory.StartNew(async () =>
             {
@@ -78,9 +78,9 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
         {
             try
             {
-                var (wasAcquired, eventLog) = await _eventReader.TryAcquireLockAsync(eventInfo, cancellationToken);
+                var (wasLockAcquired, eventLog) = await _eventReader.TryAcquireLockAsync(eventInfo, cancellationToken);
                 
-                if (!wasAcquired)
+                if (!wasLockAcquired)
                 {
                     _logger.EventAlreadyTaken(eventInfo.EventLogId);
                     continue;
@@ -103,6 +103,8 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
                     async (ev, cts) => await _eventReader.IncrementFailedAttemptNumberAsync(ev, cts),
                     eventInfo, cancellationToken);
             }
+            
+            _logger.AwaitingNextEvent();
         }
     }
 }
