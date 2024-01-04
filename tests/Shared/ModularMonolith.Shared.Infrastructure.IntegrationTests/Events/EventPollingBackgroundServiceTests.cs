@@ -24,6 +24,7 @@ namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.Events;
 [Collection("Events")]
 public class EventPollingBackgroundServiceTests : IAsyncLifetime
 {
+    private static readonly DateTimeOffset Now = new(2024, 1, 1, 12, 0, 0, TimeSpan.Zero);
     private static readonly ActivitySource CurrentActivitySource = new(nameof(EventPollingBackgroundServiceTests));
     private static readonly ActivityListener ActivityListener = new()
     {
@@ -66,10 +67,12 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
         {
             Assemblies = [GetType().Assembly],
             PollInterval = TimeSpan.FromSeconds(1),
-            MaxRetryAttempts = 10
+            MaxRetryAttempts = 10,
+            MaxLockTime = TimeSpan.FromSeconds(1)
         });
         
         _dbConnectionFactory = new DbConnectionFactory(_databaseOptionsMonitor);
+        _timeProvider.GetUtcNow().Returns(Now);
         
         ActivitySource.AddActivityListener(ActivityListener);
     }
@@ -78,7 +81,6 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
     public async Task ShouldSendEventToChannel_WhenSingleEventIsPublished()
     {
         // Arrange
-        using var cts = new CancellationTokenSource();
         using var activity = CurrentActivitySource.StartActivity();
         var channel = new EventChannel();
         
@@ -89,29 +91,27 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
         
         // Act
         await eventBus.PublishAsync(new DomainEvent("Event"), default);
-        
-        var serviceTask = service.StartAsync(cts.Token);
+
+        await service.StartAsync(default);
 
         // Assert
-        await using var enumerator = channel.ReadAllAsync(cts.Token).GetAsyncEnumerator(cts.Token);
+        await using var enumerator = channel.Reader.ReadAllAsync().GetAsyncEnumerator();
         await enumerator.MoveNextAsync();
 
         var eventInfo = enumerator.Current;
 
         var eventLog = await _postgresFixture.SharedDbContext.EventLogs
-            .FirstOrDefaultAsync(e => e.Id == eventInfo.EventLogId, cts.Token);
+            .FirstOrDefaultAsync(e => e.Id == eventInfo.EventLogId);
 
         eventLog.Should().NotBeNull();
-
-        await cts.CancelAsync();
-        await serviceTask;
+        
+        await service.StopAsync(default);
     }
     
     [Fact]
     public async Task ShouldSendEventsToChannel_WhenMultipleEventsArePublished()
     {
         // Arrange
-        using var cts = new CancellationTokenSource();
         using var activity = CurrentActivitySource.StartActivity();
         var channel = new EventChannel();
         
@@ -125,10 +125,10 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
         // Act
         await eventBus.PublishAsync(batch, default);
         
-        var serviceTask = service.StartAsync(cts.Token);
+        await service.StartAsync(default);
 
         // Assert
-        await using var enumerator = channel.ReadAllAsync(cts.Token).GetAsyncEnumerator(cts.Token);
+        await using var enumerator = channel.Reader.ReadAllAsync().GetAsyncEnumerator();
         var eventLogIds = new List<Guid>();
 
         for (var i = 0; i < batch.Length; i++)
@@ -137,13 +137,13 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
             eventLogIds.Add(enumerator.Current.EventLogId);
         }
 
-        var eventLog = await _postgresFixture.SharedDbContext.EventLogs
-            .FirstOrDefaultAsync(e => eventLogIds.Contains(e.Id), cts.Token);
+        var eventLogs = await _postgresFixture.SharedDbContext.EventLogs
+            .Where(e => eventLogIds.Contains(e.Id))
+            .ToListAsync();
 
-        eventLog.Should().NotBeNull();
+        eventLogs.Should().HaveCount(eventLogIds.Count);
 
-        await cts.CancelAsync();
-        await serviceTask;
+        await service.StopAsync(default);
     }
 
     private OutboxEventBus CreateEventBus()
@@ -169,8 +169,8 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
     
     public Task InitializeAsync() => Task.CompletedTask;
 
-    public async Task DisposeAsync()
+    public Task DisposeAsync()
     {
-        await _postgresFixture.ResetAsync();
+        return _postgresFixture.ResetAsync();
     }
 }

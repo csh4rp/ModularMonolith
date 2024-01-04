@@ -70,7 +70,6 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
     public async Task ShouldSendEventToChannel_WhenSingleEventIsPublished()
     {
         // Arrange
-        using var cts = new CancellationTokenSource();
         using var activitySource = new ActivitySource("Source");
         using var activity = activitySource.StartActivity();
         var channel = new EventChannel();
@@ -79,24 +78,23 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
 
         var eventBus = CreateEventBus();
 
-        var serviceTask = service.StartAsync(cts.Token);
+        await service.StartAsync(default);
         
         // Act
         await eventBus.PublishAsync(new DomainEvent("Event"), default);
 
         // Assert
-        await using var enumerator = channel.ReadAllAsync(cts.Token).GetAsyncEnumerator(cts.Token);
+        await using var enumerator = channel.Reader.ReadAllAsync().GetAsyncEnumerator();
         await enumerator.MoveNextAsync();
 
         var eventInfo = enumerator.Current;
 
         var eventLog = await _postgresFixture.SharedDbContext.EventLogs
-            .FirstOrDefaultAsync(e => e.Id == eventInfo.EventLogId, cts.Token);
+            .FirstOrDefaultAsync(e => e.Id == eventInfo.EventLogId);
 
         eventLog.Should().NotBeNull();
-
-        await cts.CancelAsync();
-        await serviceTask;
+        
+        await service.StopAsync(default);
     }
 
     private OutboxEventBus CreateEventBus()
@@ -113,7 +111,6 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
     public async Task ShouldSendEventsToChannel_WhenMultipleEventsArePublished()
     {
         // Arrange
-        using var cts = new CancellationTokenSource();
         using var activity = CurrentActivitySource.StartActivity();
         var channel = new EventChannel();
 
@@ -123,13 +120,13 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
         
         var batch = new[] { new DomainEvent("1"), new DomainEvent("2"), new DomainEvent("3"), new DomainEvent("4") };
 
-        var serviceTask = service.StartAsync(cts.Token);
+        await service.StartAsync(default);
         
         // Acy
         await eventBus.PublishAsync(batch, default);
 
         // Assert
-        await using var enumerator = channel.ReadAllAsync(cts.Token).GetAsyncEnumerator(cts.Token);
+        await using var enumerator = channel.Reader.ReadAllAsync().GetAsyncEnumerator();
 
         var eventLogIds = new List<Guid>();
 
@@ -140,13 +137,12 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
         }
         
         var eventLogs = await _postgresFixture.SharedDbContext.EventLogs.Where(e =>
-            eventLogIds.Contains(e.Id)).ToListAsync(cts.Token);
+            eventLogIds.Contains(e.Id)).ToListAsync();
 
         eventLogs.Should().NotBeEmpty();
         eventLogs.Should().HaveCount(batch.Length);
-
-        await cts.CancelAsync();
-        await serviceTask;
+        
+        await service.StopAsync(default);
     }
 
     public Task InitializeAsync() => Task.CompletedTask;

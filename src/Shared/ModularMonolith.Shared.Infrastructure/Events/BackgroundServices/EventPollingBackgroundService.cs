@@ -44,16 +44,16 @@ internal sealed class EventPollingBackgroundService : BackgroundService
         try
         {
             using var timer = new PeriodicTimer(_optionsMonitor.CurrentValue.PollInterval);
-
+            
             while (!cancellationToken.IsCancellationRequested)
             {
                 var events = await _eventReader.GetUnpublishedEventsAsync(cancellationToken);
 
                 foreach (var eventInfo in events)
                 {
-                    await _eventChannel.WriteAsync(eventInfo, cancellationToken);
+                    await _eventChannel.Writer.WriteAsync(eventInfo, cancellationToken);
                 }
-
+                
                 await timer.WaitForNextTickAsync(cancellationToken);
             }
         }

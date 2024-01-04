@@ -74,7 +74,7 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
 
     private async ValueTask RunAsync(CancellationToken cancellationToken)
     {
-        await foreach (var eventInfo in _eventChannel.ReadAllAsync(cancellationToken))
+        await foreach (var eventInfo in _eventChannel.Reader.ReadAllAsync(cancellationToken))
         {
             try
             {
@@ -106,5 +106,6 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
             
             _logger.AwaitingNextEvent();
         }
+        
     }
 }

@@ -79,7 +79,7 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
 
             _logger.NotificationReceived(id, correlationId);
 
-            if (_channel.TryWrite(eventInfo))
+            if (_channel.Writer.TryWrite(eventInfo))
             {
                 return;
             }
@@ -88,7 +88,7 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
 
             var spinWait = new SpinWait();
 
-            while (!_channel.TryWrite(eventInfo))
+            while (!_channel.Writer.TryWrite(eventInfo))
             {
                 if (spinWait.NextSpinWillYield)
                 {

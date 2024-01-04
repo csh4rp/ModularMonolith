@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using FluentAssertions;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +11,6 @@ using ModularMonolith.Shared.Infrastructure.DataAccess.Options;
 using ModularMonolith.Shared.Infrastructure.Events.BackgroundServices;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
-using ModularMonolith.Shared.Infrastructure.Events.Extensions;
 using ModularMonolith.Shared.Infrastructure.Events.MetaData;
 using ModularMonolith.Shared.Infrastructure.Events.Options;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;
@@ -24,8 +22,9 @@ using NSubstitute;
 namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.Events;
 
 [Collection("Events")]
-public class EventPublisherBackgroundServiceTests
+public class EventPublisherBackgroundServiceTests : IAsyncLifetime
 {
+    private static readonly DateTimeOffset Now = new(2024, 1, 1, 12, 0, 0, TimeSpan.Zero);
     private static readonly ActivitySource CurrentActivitySource = new(nameof(EventPublisherBackgroundServiceTests));
     private static readonly ActivityListener ActivityListener = new()
     {
@@ -35,22 +34,11 @@ public class EventPublisherBackgroundServiceTests
         Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
     };
     
-    private readonly IOptionsMonitor<DatabaseOptions> _databaseOptionsMonitor =
-        Substitute.For<IOptionsMonitor<DatabaseOptions>>();
-
-    private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor =
-        Substitute.For<IOptionsMonitor<EventOptions>>();
-
-    private readonly ILogger<EventPublisherBackgroundService> _logger =
-        Substitute.For<ILogger<EventPublisherBackgroundService>>();
-    
-    private readonly ILogger<EventPublisher> _eventPublisherLogger =
-        Substitute.For<ILogger<EventPublisher>>();
-    
-    private readonly INotificationHandler<DomainEvent> _notificationHandler = Substitute.For<INotificationHandler<DomainEvent>>();
-    
+    private readonly IOptionsMonitor<DatabaseOptions> _databaseOptionsMonitor = Substitute.For<IOptionsMonitor<DatabaseOptions>>();
+    private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor = Substitute.For<IOptionsMonitor<EventOptions>>();
+    private readonly ILogger<EventPublisherBackgroundService> _logger = Substitute.For<ILogger<EventPublisherBackgroundService>>();
+    private readonly IEventPublisher _eventPublisher = Substitute.For<IEventPublisher>();
     private readonly IHttpContextAccessor _httpContextAccessor = new HttpContextAccessor();
-
     private readonly IIdentityContextAccessor _identityContextAccessor = new IdentityContextAccessor
     {
         Context = new IdentityContext(Guid.Parse("5FA82375-60E6-4C57-9E00-C36EA4F954E9"), "mail@mail.com")
@@ -78,62 +66,85 @@ public class EventPublisherBackgroundServiceTests
         });
         
         _dbConnectionFactory = new DbConnectionFactory(_databaseOptionsMonitor);
+
+        _timeProvider.GetUtcNow().Returns(Now);
         
         ActivitySource.AddActivityListener(ActivityListener);
     }
 
     [Fact]
-    public async Task Should()
+    public async Task ShouldMarkEventAsPublished_WhenEventIsPublishedSuccessfully()
     {
-        using var cts = new CancellationTokenSource();
         using var activity = CurrentActivitySource.StartActivity();
         var channel = new EventChannel();
         var reader = CreateEventReader();
-
-        _logger.When(l => l.AwaitingNextEvent())
-#pragma warning disable VSTHRD101
-            .Do(c =>cts.Cancel());
-#pragma warning restore VSTHRD101
-
-        var scopeFactory = new ServiceCollection()
-            .AddMediatR(c =>
-            {
-                c.Lifetime = ServiceLifetime.Singleton;
-                c.RegisterServicesFromAssembly(GetType().Assembly);
-            })
-            .BuildServiceProvider();
-
-        var publisher = Substitute.For<IEventPublisher>();
         
-        var service = new EventPublisherBackgroundService(reader, channel, publisher, _logger, _eventOptionsMonitor);
-
+        var service = new EventPublisherBackgroundService(reader, channel, _eventPublisher, _logger, _eventOptionsMonitor);
         var eventBus = CreateEventBus();
         
-        await eventBus.PublishAsync(new DomainEvent("1"), cts.Token);
+        await eventBus.PublishAsync(new DomainEvent("1"), default);
 
-        var eventLog = await _postgresFixture.SharedDbContext.EventLogs.SingleAsync(cts.Token);
+        var eventLog = await _postgresFixture.SharedDbContext.EventLogs.SingleAsync();
         
-        await service.StartAsync(cts.Token);
+        await service.StartAsync(default);
         
         // Act
-        await channel.WriteAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId), cts.Token);
+        await channel.Writer.WriteAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId));
         
+        // Complete the writer, so the background worker will finish 
+        channel.Writer.Complete();
+        await service.ExecuteTask!;
+
         // Assert
-        await service.StopAsync();
+        eventLog = await _postgresFixture.SharedDbContext.EventLogs
+            .AsNoTracking()
+            .SingleAsync(e => e.Id == eventLog.Id);
         
-       eventLog = await _postgresFixture.SharedDbContext.EventLogs.SingleAsync(cts.Token);
        eventLog.PublishedAt.Should().NotBeNull();
     }
     
-    private OutboxEventBus CreateEventBus()
+    [Fact]
+    public async Task ShouldMarkEventsAsPublished_WhenEventsArePublishedSuccessfully()
     {
-        var eventBus = new OutboxEventBus(_postgresFixture.SharedDbContext,
+        using var activity = CurrentActivitySource.StartActivity();
+        var channel = new EventChannel();
+        var reader = CreateEventReader();
+        
+        var service = new EventPublisherBackgroundService(reader, channel, _eventPublisher, _logger, _eventOptionsMonitor);
+        var eventBus = CreateEventBus();
+
+        var batch = new[] { new DomainEvent("1"), new DomainEvent("2"), new DomainEvent("3"), new DomainEvent("4") };
+        
+        await eventBus.PublishAsync(batch, default);
+
+        var eventLogs = await _postgresFixture.SharedDbContext.EventLogs.ToListAsync();
+        
+        await service.StartAsync(default);
+        
+        // Act
+        foreach (var eventLog in eventLogs)
+        {
+            await channel.Writer.WriteAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId));
+        }
+        
+        // Complete the writer, so the background worker will finish 
+        channel.Writer.Complete();
+        await service.ExecuteTask!;
+
+        // Assert
+        eventLogs = await _postgresFixture.SharedDbContext.EventLogs
+            .AsNoTracking()
+            .ToListAsync();
+
+        eventLogs.Should().AllSatisfy(e => e.PublishedAt.Should().NotBeNull());
+    }
+    
+    private OutboxEventBus CreateEventBus() =>
+        new(_postgresFixture.SharedDbContext,
             new EventSerializer(_eventOptionsMonitor),
             _identityContextAccessor,
             _timeProvider,
             _httpContextAccessor);
-        return eventBus;
-    }
 
     private EventReader CreateEventReader()
     {
@@ -141,7 +152,13 @@ public class EventPublisherBackgroundServiceTests
             .AddSingleton<IEventLogDbContext>(_ => _postgresFixture.SharedDbContext)
             .BuildServiceProvider();
 
-        var reader = new EventReader(_dbConnectionFactory, new EventMetaDataProvider(provider), _eventOptionsMonitor, _timeProvider);
-        return reader;
+        return new EventReader(_dbConnectionFactory, new EventMetaDataProvider(provider), _eventOptionsMonitor, _timeProvider);
+    }
+    
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public Task DisposeAsync()
+    {
+        return _postgresFixture.ResetAsync();
     }
 }

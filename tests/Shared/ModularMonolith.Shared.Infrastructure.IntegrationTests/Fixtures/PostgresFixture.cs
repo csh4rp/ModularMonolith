@@ -21,7 +21,6 @@ public class PostgresFixture : IAsyncLifetime
     {
         _container = new PostgreSqlBuilder()
             .WithDatabase("shared_automated_tests")
-            .WithName("shared_automated_tests")
             .WithUsername("testuser")
             .WithPassword("testuser123")
             .WithPortBinding("5432", true)

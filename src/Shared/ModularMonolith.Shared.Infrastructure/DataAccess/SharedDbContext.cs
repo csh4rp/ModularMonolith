@@ -18,6 +18,8 @@ public sealed class SharedDbContext : BaseDbContext, IEventLogDbContext
 
     public DbSet<EventCorrelationLock> EventCorrelationLocks { get; set; } = default!;
 
+    public DbSet<EventLogPublishAttempt> EventLogPublishAttempts { get; set; } = default!;
+
     public DbSet<AuditLog> AuditLogs { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
