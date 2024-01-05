@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.Application.Identity;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Factories;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Options;
+using ModularMonolith.Shared.Infrastructure.Events;
 using ModularMonolith.Shared.Infrastructure.Events.BackgroundServices;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
@@ -18,6 +19,8 @@ using ModularMonolith.Shared.Infrastructure.Identity;
 using ModularMonolith.Shared.Infrastructure.IntegrationTests.Events.Events;
 using ModularMonolith.Shared.Infrastructure.IntegrationTests.Fixtures;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
+using Polly.Registry;
 
 namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.Events;
 
@@ -62,7 +65,9 @@ public class EventPublisherBackgroundServiceTests : IAsyncLifetime
             Assemblies = [GetType().Assembly],
             PollInterval = TimeSpan.FromSeconds(1),
             MaxRetryAttempts = 10,
-            MaxParallelWorkers = 1
+            MaxParallelWorkers = 1,
+            MaxPollBatchSize = 10,
+            TimeBetweenAttempts = TimeSpan.FromSeconds(5)
         });
         
         _dbConnectionFactory = new DbConnectionFactory(_databaseOptionsMonitor);
@@ -73,44 +78,13 @@ public class EventPublisherBackgroundServiceTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task ShouldMarkEventAsPublished_WhenEventIsPublishedSuccessfully()
-    {
-        using var activity = CurrentActivitySource.StartActivity();
-        var channel = new EventChannel();
-        var reader = CreateEventReader();
-        
-        var service = new EventPublisherBackgroundService(reader, channel, _eventPublisher, _logger, _eventOptionsMonitor);
-        var eventBus = CreateEventBus();
-        
-        await eventBus.PublishAsync(new DomainEvent("1"), default);
-
-        var eventLog = await _postgresFixture.SharedDbContext.EventLogs.SingleAsync();
-        
-        await service.StartAsync(default);
-        
-        // Act
-        await channel.Writer.WriteAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId));
-        
-        // Complete the writer, so the background worker will finish 
-        channel.Writer.Complete();
-        await service.ExecuteTask!;
-
-        // Assert
-        eventLog = await _postgresFixture.SharedDbContext.EventLogs
-            .AsNoTracking()
-            .SingleAsync(e => e.Id == eventLog.Id);
-        
-       eventLog.PublishedAt.Should().NotBeNull();
-    }
-    
-    [Fact]
     public async Task ShouldMarkEventsAsPublished_WhenEventsArePublishedSuccessfully()
     {
         using var activity = CurrentActivitySource.StartActivity();
         var channel = new EventChannel();
         var reader = CreateEventReader();
         
-        var service = new EventPublisherBackgroundService(reader, channel, _eventPublisher, _logger, _eventOptionsMonitor);
+        var service = new EventPublisherBackgroundService(reader, channel, _eventPublisher, _logger, _eventOptionsMonitor, GetPipelineProvider());
         var eventBus = CreateEventBus();
 
         var batch = new[] { new DomainEvent("1"), new DomainEvent("2"), new DomainEvent("3"), new DomainEvent("4") };
@@ -138,7 +112,7 @@ public class EventPublisherBackgroundServiceTests : IAsyncLifetime
 
         eventLogs.Should().AllSatisfy(e => e.PublishedAt.Should().NotBeNull());
     }
-    
+
     private OutboxEventBus CreateEventBus() =>
         new(_postgresFixture.SharedDbContext,
             new EventSerializer(_eventOptionsMonitor),
@@ -146,13 +120,103 @@ public class EventPublisherBackgroundServiceTests : IAsyncLifetime
             _timeProvider,
             _httpContextAccessor);
 
-    private EventReader CreateEventReader()
+    [Fact]
+    public async Task ShouldMarkEventAsPublished_WhenEventIsPublishedSuccessfully()
+    {
+        using var activity = CurrentActivitySource.StartActivity();
+        var channel = new EventChannel();
+        var reader = CreateEventReader();
+        
+        var service = new EventPublisherBackgroundService(reader, channel, _eventPublisher, _logger, _eventOptionsMonitor, GetPipelineProvider());
+        var eventBus = CreateEventBus();
+        
+        await eventBus.PublishAsync(new DomainEvent("1"), default);
+
+        var eventLog = await _postgresFixture.SharedDbContext.EventLogs.SingleAsync();
+        
+        await service.StartAsync(default);
+        
+        // Act
+        await channel.Writer.WriteAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId));
+        
+        // Complete the writer, so the background worker will finish 
+        channel.Writer.Complete();
+        await service.ExecuteTask!;
+
+        // Assert
+        eventLog = await _postgresFixture.SharedDbContext.EventLogs
+            .AsNoTracking()
+            .SingleAsync(e => e.Id == eventLog.Id);
+        
+        eventLog.PublishedAt.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task ShouldAddFailedAttempt_WhenEventPublicationFails()
+    {
+        using var activity = CurrentActivitySource.StartActivity();
+        var channel = new EventChannel();
+        var reader = CreateEventReader();
+        _eventPublisher.PublishAsync(default!, default)
+            .ThrowsAsyncForAnyArgs<InvalidOperationException>();
+        
+        var service = new EventPublisherBackgroundService(reader, channel, _eventPublisher, _logger, _eventOptionsMonitor, GetPipelineProvider());
+        var eventBus = CreateEventBus();
+        
+        await eventBus.PublishAsync(new DomainEvent("1"), default);
+
+        var eventLog = await _postgresFixture.SharedDbContext.EventLogs.SingleAsync();
+        
+        await service.StartAsync(default);
+        
+        // Act
+        await channel.Writer.WriteAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId));
+        
+        // Complete the writer, so the background worker will finish 
+        channel.Writer.Complete();
+        await service.ExecuteTask!;
+
+        // Assert
+        eventLog = await _postgresFixture.SharedDbContext.EventLogs
+            .AsNoTracking()
+            .SingleAsync(e => e.Id == eventLog.Id);
+
+        var attempt = await _postgresFixture.SharedDbContext.EventLogPublishAttempts
+            .AsNoTracking()
+            .SingleOrDefaultAsync(e => e.EventLogId == eventLog.Id);
+        
+        eventLog.PublishedAt.Should().BeNull();
+        
+        attempt.Should().NotBeNull();
+        attempt!.AttemptNumber.Should().Be(1);
+    }
+    
+    private EventStore CreateEventReader()
     {
         var provider = new ServiceCollection()
             .AddSingleton<IEventLogDbContext>(_ => _postgresFixture.SharedDbContext)
             .BuildServiceProvider();
 
-        return new EventReader(_dbConnectionFactory, new EventMetaDataProvider(provider), _eventOptionsMonitor, _timeProvider);
+        return new EventStore(_dbConnectionFactory, new EventMetaDataProvider(provider), _eventOptionsMonitor, _timeProvider);
+    }
+
+    private ResiliencePipelineProvider<string> GetPipelineProvider()
+    {
+        var registry = new ResiliencePipelineRegistry<string>();
+        
+        registry.TryAddBuilder(EventConstants.ReceiverPipelineName, (b , c) =>
+        {
+        });
+        
+        registry.TryAddBuilder(EventConstants.EventLockReleasePipelineName, (b , c) =>
+        {
+        });
+
+        registry.TryAddBuilder(EventConstants.EventPublicationPipelineName, (b, c) =>
+        {
+        });
+
+        return registry;
     }
     
     public Task InitializeAsync() => Task.CompletedTask;

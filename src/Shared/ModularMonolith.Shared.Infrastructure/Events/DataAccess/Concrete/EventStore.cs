@@ -9,14 +9,14 @@ using Npgsql;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
 
-internal sealed class EventReader : IEventReader
+internal sealed class EventStore : IEventStore
 {
     private readonly EventMetaDataProvider _eventMetaDataProvider;
     private readonly DbConnectionFactory _dbConnectionFactory;
     private readonly IOptionsMonitor<EventOptions> _optionsMonitor;
     private readonly TimeProvider _timeProvider;
 
-    public EventReader(DbConnectionFactory dbConnectionFactory,
+    public EventStore(DbConnectionFactory dbConnectionFactory,
         EventMetaDataProvider eventMetaDataProvider,
         IOptionsMonitor<EventOptions> optionsMonitor, TimeProvider timeProvider)
     {
@@ -26,7 +26,7 @@ internal sealed class EventReader : IEventReader
         _timeProvider = timeProvider;
     }
 
-    public async Task<(bool WasAcquired, EventLog? EventLog)> TryAcquireLockAsync(EventInfo eventInfo,
+    public async Task<(bool WasLockAcquired, EventLog? EventLog)> TryAcquireLockAsync(EventInfo eventInfo,
         CancellationToken cancellationToken)
     {
         var retryAttempts = _optionsMonitor.CurrentValue.MaxRetryAttempts;
@@ -259,7 +259,7 @@ internal sealed class EventReader : IEventReader
         _ = await batch.ExecuteNonQueryAsync(cancellationToken);
     }
 
-    public async Task IncrementFailedAttemptNumberAsync(EventInfo eventInfo, CancellationToken cancellationToken)
+    public async Task AddFailedAttemptAsync(EventInfo eventInfo, CancellationToken cancellationToken)
     {
         var eventLogPublishAttemptMetaData = _eventMetaDataProvider.EventLogPublishAttemptMetaData;
         var eventLockMetaData = _eventMetaDataProvider.EventLogLockMetaData;
@@ -295,21 +295,23 @@ internal sealed class EventReader : IEventReader
             batch.BatchCommands.Add(releaseLockCommand);
         }
 
+        var nextAttemptAt = _timeProvider.GetUtcNow().Add(_optionsMonitor.CurrentValue.TimeBetweenAttempts).UtcDateTime;
+
         var insertFailedAttemptCommand = batch.CreateBatchCommand();
         insertFailedAttemptCommand.Parameters.AddWithValue("@event_log_id", eventInfo.EventLogId);
-        insertFailedAttemptCommand.Parameters.AddWithValue("@next_attempt_at", _timeProvider.GetUtcNow().AddMinutes(1));
+        insertFailedAttemptCommand.Parameters.AddWithValue("@next_attempt_at", nextAttemptAt);
         insertFailedAttemptCommand.CommandText =
             $"""
              INSERT INTO {eventLogPublishAttemptMetaData.TableName}
              ({eventLogPublishAttemptMetaData.EventLogIdColumnName},
               {eventLogPublishAttemptMetaData.NextAttemptAtColumnName},
               {eventLogPublishAttemptMetaData.AttemptNumberColumnName})
-              VALUES (@event_lod_id, @next_attempt_at,
+              VALUES (@event_log_id, @next_attempt_at,
                      COALESCE
                      (
-                         SELECT MAX({eventLogPublishAttemptMetaData.NextAttemptAtColumnName}) + 1
+                         (SELECT MAX({eventLogPublishAttemptMetaData.AttemptNumberColumnName}) + 1
                          FROM {eventLogPublishAttemptMetaData.TableName} AS epa
-                         WHERE epa.{eventLogPublishAttemptMetaData.EventLogIdColumnName} = @event_log_id,
+                         WHERE epa.{eventLogPublishAttemptMetaData.EventLogIdColumnName} = @event_log_id),
                      1))
              """;
         
@@ -318,7 +320,7 @@ internal sealed class EventReader : IEventReader
         _ = await batch.ExecuteNonQueryAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyList<EventInfo>> GetUnpublishedEventsAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<EventInfo>> GetUnpublishedEventsAsync(int take, CancellationToken cancellationToken)
     {
         var eventLogMetaData = _eventMetaDataProvider.EventLogMetaData;
         var eventLogLockMetaData = _eventMetaDataProvider.EventLogLockMetaData;
@@ -353,6 +355,7 @@ internal sealed class EventReader : IEventReader
         var selectCommand = batch.CreateBatchCommand();
         selectCommand.Parameters.AddWithValue("@max_retry_attempts", _optionsMonitor.CurrentValue.MaxRetryAttempts);
         selectCommand.Parameters.AddWithValue("@now", now.UtcDateTime);
+        selectCommand.Parameters.AddWithValue("@take", take);
         selectCommand.CommandText =
             $"""
              SELECT
@@ -385,7 +388,7 @@ internal sealed class EventReader : IEventReader
                  WHERE {publishAttemptMetaData.EventLogIdColumnName} = el.{eventLogMetaData.IdColumnName}
              ) <= @now
              ORDER BY {eventLogMetaData.CreatedAtColumnName}
-             LIMIT 10 OFFSET 0
+             LIMIT @take OFFSET 0
              """;
 
         batch.BatchCommands.Add(releaseEventLocksCommand);

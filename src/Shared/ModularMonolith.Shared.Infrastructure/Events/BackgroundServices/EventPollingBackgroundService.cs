@@ -11,15 +11,15 @@ internal sealed class EventPollingBackgroundService : BackgroundService
 {
     private readonly IOptionsMonitor<EventOptions> _optionsMonitor;
     private readonly ILogger<EventPollingBackgroundService> _logger;
-    private readonly IEventReader _eventReader;
-    private readonly EventChannel _eventChannel;
+    private readonly IEventStore _eventStore;
+    private readonly IEventChannel _eventChannel;
 
     public EventPollingBackgroundService(IOptionsMonitor<EventOptions> optionsMonitor,
-        ILogger<EventPollingBackgroundService> logger, IEventReader eventReader, EventChannel eventChannel)
+        ILogger<EventPollingBackgroundService> logger, IEventStore eventStore, IEventChannel eventChannel)
     {
         _optionsMonitor = optionsMonitor;
         _logger = logger;
-        _eventReader = eventReader;
+        _eventStore = eventStore;
         _eventChannel = eventChannel;
     }
 
@@ -40,14 +40,15 @@ internal sealed class EventPollingBackgroundService : BackgroundService
     private async ValueTask RunAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Starting event polling");
-
+        
         try
         {
             using var timer = new PeriodicTimer(_optionsMonitor.CurrentValue.PollInterval);
             
             while (!cancellationToken.IsCancellationRequested)
             {
-                var events = await _eventReader.GetUnpublishedEventsAsync(cancellationToken);
+                var take = _optionsMonitor.CurrentValue.MaxPollBatchSize;
+                var events = await _eventStore.GetUnpublishedEventsAsync(take, cancellationToken);
 
                 foreach (var eventInfo in events)
                 {

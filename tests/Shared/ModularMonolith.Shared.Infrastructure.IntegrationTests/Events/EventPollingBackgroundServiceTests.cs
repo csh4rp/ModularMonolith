@@ -68,6 +68,7 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
             Assemblies = [GetType().Assembly],
             PollInterval = TimeSpan.FromSeconds(1),
             MaxRetryAttempts = 10,
+            MaxPollBatchSize = 10,
             MaxLockTime = TimeSpan.FromSeconds(1)
         });
         
@@ -156,13 +157,13 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
         return eventBus;
     }
 
-    private EventReader CreateEventReader()
+    private EventStore CreateEventReader()
     {
         var provider = new ServiceCollection()
             .AddSingleton<IEventLogDbContext>(_ => _postgresFixture.SharedDbContext)
             .BuildServiceProvider();
 
-        var reader = new EventReader(_dbConnectionFactory, new EventMetaDataProvider(provider), _eventOptionsMonitor,
+        var reader = new EventStore(_dbConnectionFactory, new EventMetaDataProvider(provider), _eventOptionsMonitor,
             _timeProvider);
         return reader;
     }

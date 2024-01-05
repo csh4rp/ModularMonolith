@@ -75,6 +75,7 @@ public class IdentityFixture : IAsyncLifetime
             builder.UseSetting("Authentication:Issuer", AuthIssuer);
             builder.UseSetting("Authentication:SigningKey", AuthSigningKey);
             builder.UseSetting("Logging:LogLevel:Default", "Warning");
+            builder.UseSetting("Events:RunBackgroundWorkers", "false");
 
             builder.ConfigureServices(s =>
             {

@@ -3,14 +3,14 @@ using ModularMonolith.Shared.Infrastructure.Events.MetaData;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 
-internal interface IEventReader
+internal interface IEventStore
 {
-    Task<(bool WasAcquired, EventLog? EventLog)> TryAcquireLockAsync(EventInfo eventInfo,
+    Task<(bool WasLockAcquired, EventLog? EventLog)> TryAcquireLockAsync(EventInfo eventInfo,
         CancellationToken cancellationToken);
 
     Task MarkAsPublishedAsync(EventInfo eventInfo, CancellationToken cancellationToken);
 
-    Task IncrementFailedAttemptNumberAsync(EventInfo eventInfo, CancellationToken cancellationToken);
+    Task AddFailedAttemptAsync(EventInfo eventInfo, CancellationToken cancellationToken);
 
-    Task<IReadOnlyList<EventInfo>> GetUnpublishedEventsAsync(CancellationToken cancellationToken);
+    Task<IReadOnlyList<EventInfo>> GetUnpublishedEventsAsync(int take, CancellationToken cancellationToken);
 }

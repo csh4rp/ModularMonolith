@@ -13,11 +13,11 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
     private static readonly ResiliencePipeline RetryPipeline = CreatePipeline();
 
     private readonly DbConnectionFactory _dbConnectionFactory;
-    private readonly EventChannel _channel;
+    private readonly IEventChannel _channel;
     private readonly ILogger<EventNotificationFetchingBackgroundService> _logger;
 
     public EventNotificationFetchingBackgroundService(DbConnectionFactory dbConnectionFactory,
-        EventChannel channel,
+        IEventChannel channel,
         ILogger<EventNotificationFetchingBackgroundService> logger)
     {
         _dbConnectionFactory = dbConnectionFactory;

@@ -116,6 +116,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddEvents(e =>
         {
             e.Assemblies = [.. assemblies];
+            e.RunBackgroundWorkers = builder.Configuration.GetSection("Events:RunBackgroundWorkers").Get<bool>();
         });
 
         builder.Services

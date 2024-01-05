@@ -20,11 +20,16 @@ public static class ServiceCollectionExtensions
             .Configure(o =>
             {
                 o.PollInterval = TimeSpan.FromSeconds(30);
+                o.MaxLockTime = TimeSpan.FromSeconds(30);
+                o.TimeBetweenAttempts = TimeSpan.FromSeconds(30);
                 o.MaxParallelWorkers = Environment.ProcessorCount * 2;
                 o.MaxRetryAttempts = 10;
-                o.MaxLockTime = TimeSpan.FromSeconds(30);
+                o.MaxPollBatchSize = 20;
+                o.RunBackgroundWorkers = true;
             })
-            .PostConfigure(action);
+            .PostConfigure(action)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         return serviceCollection;
     }
