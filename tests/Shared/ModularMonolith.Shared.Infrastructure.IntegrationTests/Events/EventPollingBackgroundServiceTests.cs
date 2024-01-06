@@ -26,7 +26,6 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
 {
     private static readonly DateTimeOffset Now = new(2024, 1, 1, 12, 0, 0, TimeSpan.Zero);
     private static readonly ActivitySource CurrentActivitySource = new(nameof(EventPollingBackgroundServiceTests));
-
     private static readonly ActivityListener ActivityListener = new()
     {
         ShouldListenTo = _ => true,
@@ -35,45 +34,43 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
         Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
     };
 
-    private readonly IOptionsMonitor<DatabaseOptions> _databaseOptionsMonitor =
-        Substitute.For<IOptionsMonitor<DatabaseOptions>>();
-
-    private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor =
-        Substitute.For<IOptionsMonitor<EventOptions>>();
-
-    private readonly ILogger<EventPollingBackgroundService> _logger =
-        Substitute.For<ILogger<EventPollingBackgroundService>>();
-
-    private readonly IHttpContextAccessor _httpContextAccessor = new HttpContextAccessor();
-
-    private readonly IIdentityContextAccessor _identityContextAccessor = new IdentityContextAccessor
-    {
-        Context = new IdentityContext(Guid.Parse("5FA82375-60E6-4C57-9E00-C36EA4F954E9"), "mail@mail.com")
-    };
-
-    private readonly TimeProvider _timeProvider = Substitute.For<TimeProvider>();
     private readonly PostgresFixture _postgresFixture;
+    private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor;
+    private readonly ILogger<EventPollingBackgroundService> _logger;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IIdentityContextAccessor _identityContextAccessor;
+    private readonly TimeProvider _timeProvider;
     private readonly DbConnectionFactory _dbConnectionFactory;
 
     public EventPollingBackgroundServiceTests(PostgresFixture postgresFixture)
     {
         _postgresFixture = postgresFixture;
-
-        _databaseOptionsMonitor.CurrentValue.Returns(new DatabaseOptions
+        _timeProvider = Substitute.For<TimeProvider>();
+        _eventOptionsMonitor = Substitute.For<IOptionsMonitor<EventOptions>>();
+        _logger = Substitute.For<ILogger<EventPollingBackgroundService>>();
+        _httpContextAccessor = new HttpContextAccessor();
+        _identityContextAccessor = new IdentityContextAccessor
         {
-            ConnectionString = _postgresFixture.ConnectionString
-        });
-
+            Context = new IdentityContext(Guid.Parse("5FA82375-60E6-4C57-9E00-C36EA4F954E9"), "mail@mail.com")
+        };
+        
         _eventOptionsMonitor.CurrentValue.Returns(new EventOptions
         {
             Assemblies = [GetType().Assembly],
             PollInterval = TimeSpan.FromSeconds(1),
             MaxRetryAttempts = 10,
             MaxPollBatchSize = 10,
+            MaxEventChannelSize = 10,
             MaxLockTime = TimeSpan.FromSeconds(1)
         });
 
-        _dbConnectionFactory = new DbConnectionFactory(_databaseOptionsMonitor);
+        var databaseOptionsMonitor = Substitute.For<IOptionsMonitor<DatabaseOptions>>();
+        databaseOptionsMonitor.CurrentValue.Returns(new DatabaseOptions
+        {
+            ConnectionString = _postgresFixture.ConnectionString
+        });
+        
+        _dbConnectionFactory = new DbConnectionFactory(databaseOptionsMonitor);
         _timeProvider.GetUtcNow().Returns(Now);
 
         ActivitySource.AddActivityListener(ActivityListener);
@@ -84,13 +81,11 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
     {
         // Arrange
         using var activity = CurrentActivitySource.StartActivity();
-        var channel = new EventChannel();
-
-        var reader = CreateEventReader();
+        var channel = new EventChannel(_eventOptionsMonitor);
+        var store = CreateEventStore();
         var eventBus = CreateEventBus();
-
-        var service = new EventPollingBackgroundService(_eventOptionsMonitor, _logger, reader, channel);
-
+        var service = new EventPollingBackgroundService(_eventOptionsMonitor, _logger, store, channel);
+        
         // Act
         await eventBus.PublishAsync(new DomainEvent("Event"), default);
 
@@ -115,14 +110,11 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
     {
         // Arrange
         using var activity = CurrentActivitySource.StartActivity();
-        var channel = new EventChannel();
-
-        var reader = CreateEventReader();
+        var channel = new EventChannel(_eventOptionsMonitor);
+        var store = CreateEventStore();
         var eventBus = CreateEventBus();
-
+        var service = new EventPollingBackgroundService(_eventOptionsMonitor, _logger, store, channel);
         var batch = new[] { new DomainEvent("1"), new DomainEvent("2"), new DomainEvent("3"), new DomainEvent("4") };
-
-        var service = new EventPollingBackgroundService(_eventOptionsMonitor, _logger, reader, channel);
 
         // Act
         await eventBus.PublishAsync(batch, default);
@@ -148,31 +140,26 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
         await service.StopAsync(default);
     }
 
-    private OutboxEventBus CreateEventBus()
-    {
-        var eventBus = new OutboxEventBus(_postgresFixture.SharedDbContext,
+    private OutboxEventBus CreateEventBus() =>
+        new(_postgresFixture.SharedDbContext,
             new EventSerializer(_eventOptionsMonitor),
             _identityContextAccessor,
             _timeProvider,
             _httpContextAccessor);
-        return eventBus;
-    }
 
-    private EventStore CreateEventReader()
+    private EventStore CreateEventStore()
     {
         var provider = new ServiceCollection()
             .AddSingleton<IEventLogDbContext>(_ => _postgresFixture.SharedDbContext)
             .BuildServiceProvider();
 
-        var reader = new EventStore(_dbConnectionFactory, new EventMetaDataProvider(provider), _eventOptionsMonitor,
+        return new EventStore(_dbConnectionFactory,
+            new EventMetaDataProvider(provider), 
+            _eventOptionsMonitor,
             _timeProvider);
-        return reader;
     }
 
     public Task InitializeAsync() => Task.CompletedTask;
 
-    public Task DisposeAsync()
-    {
-        return _postgresFixture.ResetAsync();
-    }
+    public Task DisposeAsync() => _postgresFixture.ResetAsync();
 }

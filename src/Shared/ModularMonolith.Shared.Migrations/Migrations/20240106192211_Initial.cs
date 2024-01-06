@@ -62,6 +62,7 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                     published_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     user_id = table.Column<Guid>(type: "uuid", nullable: true),
                     user_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    topic = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     correlation_id = table.Column<Guid>(type: "uuid", nullable: true),
                     event_type = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     event_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),

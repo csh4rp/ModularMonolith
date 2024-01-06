@@ -9,7 +9,7 @@ namespace ModularMonolith.Shared.Infrastructure.DataAccess;
 
 public static class ServiceCollectionExtensions
 {
-    public static DataAccessBuilder AddDataAccess(this IServiceCollection serviceCollection,
+    public static IServiceCollection AddDataAccess(this IServiceCollection serviceCollection,
         Action<DatabaseOptions> action)
     {
         var options = new DatabaseOptions();
@@ -27,6 +27,6 @@ public static class ServiceCollectionExtensions
                 b.UseApplicationServiceProvider(sp);
             }).AddScoped<IEventLogDbContext>(sp => sp.GetRequiredService<SharedDbContext>());
 
-        return new DataAccessBuilder(serviceCollection, options);
+        return serviceCollection;
     }
 }

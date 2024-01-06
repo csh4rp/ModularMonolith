@@ -46,6 +46,17 @@ internal static class ServiceCollectionExtensions
                     MaxRetryAttempts = 3
                 });
         });
+        
+        serviceCollection.AddResiliencePipeline(EventConstants.EventNotificationFetchingPipelineName, builder =>
+        {
+            builder
+                .AddRetry(new RetryStrategyOptions
+                {
+                    Delay = TimeSpan.FromSeconds(3),
+                    BackoffType = DelayBackoffType.Constant,
+                    MaxRetryAttempts = int.MaxValue
+                });
+        });
 
         return serviceCollection;
     }

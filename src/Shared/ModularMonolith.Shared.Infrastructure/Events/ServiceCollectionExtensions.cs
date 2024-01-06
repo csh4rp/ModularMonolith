@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
                 o.MaxParallelWorkers = Environment.ProcessorCount * 2;
                 o.MaxRetryAttempts = 10;
                 o.MaxPollBatchSize = 20;
+                o.MaxEventChannelSize = 100;
                 o.RunBackgroundWorkers = true;
             })
             .PostConfigure(action)

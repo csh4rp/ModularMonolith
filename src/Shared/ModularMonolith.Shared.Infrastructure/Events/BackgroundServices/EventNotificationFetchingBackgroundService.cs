@@ -4,39 +4,30 @@ using ModularMonolith.Shared.Infrastructure.Events.MetaData;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;
 using Npgsql;
 using Polly;
-using Polly.Retry;
+using Polly.Registry;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.BackgroundServices;
 
 internal sealed class EventNotificationFetchingBackgroundService : BackgroundService
 {
-    private static readonly ResiliencePipeline RetryPipeline = CreatePipeline();
-
+    private readonly ResiliencePipeline _retryPipeline;
     private readonly DbConnectionFactory _dbConnectionFactory;
     private readonly IEventChannel _channel;
     private readonly ILogger<EventNotificationFetchingBackgroundService> _logger;
 
-    public EventNotificationFetchingBackgroundService(DbConnectionFactory dbConnectionFactory,
+    public EventNotificationFetchingBackgroundService(ResiliencePipelineProvider<string> pipelineProvider,
+        DbConnectionFactory dbConnectionFactory,
         IEventChannel channel,
         ILogger<EventNotificationFetchingBackgroundService> logger)
     {
+        _retryPipeline = pipelineProvider.GetPipeline(EventConstants.EventNotificationFetchingPipelineName);
         _dbConnectionFactory = dbConnectionFactory;
         _channel = channel;
         _logger = logger;
     }
-
-    private static ResiliencePipeline CreatePipeline() =>
-        new ResiliencePipelineBuilder()
-            .AddRetry(new RetryStrategyOptions
-            {
-                Delay = TimeSpan.FromSeconds(5),
-                BackoffType = DelayBackoffType.Constant,
-                MaxRetryAttempts = int.MaxValue
-            })
-            .Build();
-
+    
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) =>
-        await RetryPipeline.ExecuteAsync(RunAsync, stoppingToken);
+        await _retryPipeline.ExecuteAsync(RunAsync, stoppingToken);
 
     private async ValueTask RunAsync(CancellationToken stoppingToken)
     {
@@ -59,8 +50,6 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
             {
                 await connection.WaitAsync(stoppingToken);
             }
-
-            connection.Notification -= OnNotificationEventHandler;
         }
         catch (Exception ex)
         {
@@ -77,22 +66,15 @@ internal sealed class EventNotificationFetchingBackgroundService : BackgroundSer
 
             var eventInfo = new EventInfo(id, correlationId);
 
-            _logger.NotificationReceived(id, correlationId);
-
-            if (_channel.Writer.TryWrite(eventInfo))
-            {
-                return;
-            }
-
-            _logger.NotificationBlocked(id, correlationId);
+            _logger.EventLogReceived(id, correlationId);
 
             var spinWait = new SpinWait();
-
+            
             while (!_channel.Writer.TryWrite(eventInfo))
             {
                 if (spinWait.NextSpinWillYield)
                 {
-                    _logger.NotificationBlocked(id, correlationId);
+                    _logger.EventLogBlocked(id, correlationId);
                 }
 
                 spinWait.SpinOnce();

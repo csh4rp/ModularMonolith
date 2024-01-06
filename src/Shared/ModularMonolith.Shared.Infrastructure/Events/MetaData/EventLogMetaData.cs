@@ -33,4 +33,6 @@ internal sealed class EventLogMetaData
     public required string IpAddressColumnName { get; init; }
 
     public required string UserAgentColumnName { get; init; }
+    
+    public required string TopicColumnName { get; init; }
 }

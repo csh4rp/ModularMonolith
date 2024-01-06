@@ -181,6 +181,9 @@ internal sealed class EventStore : IEventStore
             CorrelationId = reader.IsDBNull(eventLogMetaData.CorrelationIdColumnName)
                 ? null
                 : reader.GetGuid(eventLogMetaData.CorrelationIdColumnName),
+            Topic = reader.IsDBNull(eventLogMetaData.TopicColumnName)
+                ? null
+                : reader.GetString(eventLogMetaData.TopicColumnName),
             CreatedAt = new DateTimeOffset(reader.GetDateTime(eventLogMetaData.CreatedAtColumnName), TimeSpan.Zero),
             PublishedAt = null,
             OperationName = reader.GetString(eventLogMetaData.OperationNameColumnName),

@@ -26,6 +26,9 @@ public class EventOptions
 
     [Range(1, int.MaxValue)]
     public int MaxPollBatchSize { get; set; }
+    
+    [Range(1, int.MaxValue)]
+    public int MaxEventChannelSize { get; set; }
 
     [DefaultValue(true)]
     public bool RunBackgroundWorkers { get; set; }

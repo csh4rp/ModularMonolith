@@ -174,6 +174,11 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                         .HasColumnType("character varying(16)")
                         .HasColumnName("span_id");
 
+                    b.Property<string>("Topic")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("topic");
+
                     b.Property<string>("TraceId")
                         .IsRequired()
                         .HasMaxLength(32)

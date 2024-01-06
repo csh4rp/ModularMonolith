@@ -116,7 +116,7 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
 
         if (!wasLockAcquired)
         {
-            _logger.EventAlreadyTaken(eventInfo.EventLogId);
+            _logger.EventLogAlreadyTaken(eventInfo.EventLogId);
             return false;
         }
 

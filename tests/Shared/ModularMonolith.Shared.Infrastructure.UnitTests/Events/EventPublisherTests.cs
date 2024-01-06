@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.Application.Abstract;
+using ModularMonolith.Shared.Application.Identity;
 using ModularMonolith.Shared.Domain.Abstractions;
 using ModularMonolith.Shared.Infrastructure.Events.Options;
 using ModularMonolith.Shared.Infrastructure.Events.Utils;
@@ -23,19 +24,25 @@ public class EventPublisherTests
         Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
     };
 
-    private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor = Substitute.For<IOptionsMonitor<EventOptions>>();
-    private readonly ILogger<EventPublisher> _logger = Substitute.For<ILogger<EventPublisher>>();
-    private readonly IEventHandler<DomainEvent> _eventHandler = Substitute.For<IEventHandler<DomainEvent>>();
-    private readonly IEventMapping<DomainEvent> _eventMapping = Substitute.For<IEventMapping<DomainEvent>>();
-    private readonly IEventHandler<IntegrationEvent> _integrationEventHandler = Substitute.For<IEventHandler<IntegrationEvent>>();
-
+    private readonly ILogger<EventPublisher> _logger;
+    private readonly IEventHandler<DomainEvent> _eventHandler;
+    private readonly IEventMapping<DomainEvent> _eventMapping;
+    private readonly IEventHandler<IntegrationEvent> _integrationEventHandler;
+    private readonly IIdentityContextSetter _identityContextSetter;
     private readonly EventSerializer _eventSerializer;
 
     public EventPublisherTests()
     {
-        _eventOptionsMonitor.CurrentValue.Returns(new EventOptions { Assemblies = [GetType().Assembly] });
+        _logger = Substitute.For<ILogger<EventPublisher>>();
+        _eventHandler = Substitute.For<IEventHandler<DomainEvent>>();
+        _eventMapping = Substitute.For<IEventMapping<DomainEvent>>();
+        _integrationEventHandler = Substitute.For<IEventHandler<IntegrationEvent>>();
+        _identityContextSetter = Substitute.For<IIdentityContextSetter>();
 
-        _eventSerializer = new EventSerializer(_eventOptionsMonitor);
+        var eventOptionsMonitor = Substitute.For<IOptionsMonitor<EventOptions>>();
+        eventOptionsMonitor.CurrentValue.Returns(new EventOptions { Assemblies = [GetType().Assembly] });
+
+        _eventSerializer = new EventSerializer(eventOptionsMonitor);
 
         _eventMapping.Map(Arg.Any<DomainEvent>())
             .Returns(c => new IntegrationEvent(c.Arg<DomainEvent>().Name));
@@ -47,30 +54,20 @@ public class EventPublisherTests
     public async Task ShouldPublishEventToHandler_WhenHandlerIsRegistered()
     {
         // Arrange
+        var @event = new DomainEvent("1");
+
         var provider = new ServiceCollection()
             .AddMediatR(e =>
             {
                 e.RegisterServicesFromAssemblies(GetType().Assembly);
             })
             .AddSingleton<INotificationHandler<DomainEvent>>(_ => _eventHandler)
+            .AddSingleton<IIdentityContextSetter>(_ => _identityContextSetter)
             .BuildServiceProvider();
 
         var publisher = new EventPublisher(_eventSerializer, provider, _logger);
 
-        var @event = new DomainEvent("1");
-
-        var eventLog = new EventLog
-        {
-            Id = Guid.NewGuid(),
-            EventType = typeof(DomainEvent).FullName!,
-            EventName = nameof(DomainEvent),
-            EventPayload = JsonSerializer.Serialize(@event),
-            OperationName = "Sample operation",
-            TraceId = "",
-            SpanId = "",
-            CreatedAt = DateTimeOffset.UtcNow,
-            CorrelationId = null,
-        };
+        var eventLog = CreateEventLog(@event);
 
         // Act
         await publisher.PublishAsync(eventLog, default);
@@ -84,29 +81,19 @@ public class EventPublisherTests
     public async Task ShouldNotPublishEventToHandler_WhenHandlerIsNotRegistered()
     {
         // Arrange
+        var @event = new DomainEvent("1");
+
         var provider = new ServiceCollection()
             .AddMediatR(e =>
             {
                 e.RegisterServicesFromAssemblies(GetType().Assembly);
             })
+            .AddSingleton<IIdentityContextSetter>(_ => _identityContextSetter)
             .BuildServiceProvider();
 
         var publisher = new EventPublisher(_eventSerializer, provider, _logger);
 
-        var @event = new DomainEvent("1");
-
-        var eventLog = new EventLog
-        {
-            Id = Guid.NewGuid(),
-            EventType = typeof(DomainEvent).FullName!,
-            EventName = nameof(DomainEvent),
-            EventPayload = JsonSerializer.Serialize(@event),
-            OperationName = "Sample operation",
-            TraceId = "",
-            SpanId = "",
-            CreatedAt = DateTimeOffset.UtcNow,
-            CorrelationId = null,
-        };
+        var eventLog = CreateEventLog(@event);
 
         // Act
         await publisher.PublishAsync(eventLog, default);
@@ -119,6 +106,8 @@ public class EventPublisherTests
     public async Task ShouldPublishMappedEventToHandler_WhenHandlerIsRegisteredAndMappingExists()
     {
         // Arrange
+        var @event = new DomainEvent("1");
+
         var provider = new ServiceCollection()
             .AddMediatR(e =>
             {
@@ -127,24 +116,12 @@ public class EventPublisherTests
             .AddSingleton<INotificationHandler<DomainEvent>>(_ => _eventHandler)
             .AddSingleton<INotificationHandler<IntegrationEvent>>(_ => _integrationEventHandler)
             .AddSingleton<IEventMapping<DomainEvent>>(_ => _eventMapping)
+            .AddSingleton<IIdentityContextSetter>(_ => _identityContextSetter)
             .BuildServiceProvider();
 
         var publisher = new EventPublisher(_eventSerializer, provider, _logger);
 
-        var @event = new DomainEvent("1");
-
-        var eventLog = new EventLog
-        {
-            Id = Guid.NewGuid(),
-            EventType = typeof(DomainEvent).FullName!,
-            EventName = nameof(DomainEvent),
-            EventPayload = JsonSerializer.Serialize(@event),
-            OperationName = "Sample operation",
-            TraceId = "",
-            SpanId = "",
-            CreatedAt = DateTimeOffset.UtcNow,
-            CorrelationId = null,
-        };
+        var eventLog = CreateEventLog(@event);
 
         // Act
         await publisher.PublishAsync(eventLog, default);
@@ -155,4 +132,21 @@ public class EventPublisherTests
 
         await _integrationEventHandler.ReceivedWithAnyArgs(1).Handle(default!, default);
     }
+
+    private static EventLog CreateEventLog(DomainEvent @event) =>
+        new()
+        {
+            Id = Guid.NewGuid(),
+            EventType = typeof(DomainEvent).FullName!,
+            EventName = nameof(DomainEvent),
+            EventPayload = JsonSerializer.Serialize(@event),
+            OperationName = "Sample operation",
+            TraceId = "",
+            SpanId = "",
+            Topic = null,
+            UserId = Guid.Parse("C77E20AB-A51F-4E86-84D1-E4E13A2D1462"),
+            UserName = "mail@mail.com",
+            CreatedAt = DateTimeOffset.UtcNow,
+            CorrelationId = null,
+        };
 }

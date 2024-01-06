@@ -43,6 +43,7 @@ internal sealed class EventMetaDataProvider
             SpanIdColumnName = entity.FindProperty(nameof(EventLog.SpanId))!.GetColumnName(),
             ParentSpanIdColumnName = entity.FindProperty(nameof(EventLog.ParentSpanId))!.GetColumnName(),
             CorrelationIdColumnName = entity.FindProperty(nameof(EventLog.CorrelationId))!.GetColumnName(),
+            TopicColumnName = entity.FindProperty(nameof(EventLog.Topic))!.GetColumnName(),
             CreatedAtColumnName = entity.FindProperty(nameof(EventLog.CreatedAt))!.GetColumnName(),
             UserIdColumnName = entity.FindProperty(nameof(EventLog.UserId))!.GetColumnName(),
             UserNameColumnName = entity.FindProperty(nameof(EventLog.UserName))!.GetColumnName(),

@@ -30,7 +30,6 @@ public class EventPublisherBackgroundServiceTests : IAsyncLifetime
 {
     private static readonly DateTimeOffset Now = new(2024, 1, 1, 12, 0, 0, TimeSpan.Zero);
     private static readonly ActivitySource CurrentActivitySource = new(nameof(EventPublisherBackgroundServiceTests));
-
     private static readonly ActivityListener ActivityListener = new()
     {
         ShouldListenTo = _ => true,
@@ -39,35 +38,27 @@ public class EventPublisherBackgroundServiceTests : IAsyncLifetime
         Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
     };
 
-    private readonly IOptionsMonitor<DatabaseOptions> _databaseOptionsMonitor =
-        Substitute.For<IOptionsMonitor<DatabaseOptions>>();
-
-    private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor =
-        Substitute.For<IOptionsMonitor<EventOptions>>();
-
-    private readonly ILogger<EventPublisherBackgroundService> _logger =
-        Substitute.For<ILogger<EventPublisherBackgroundService>>();
-
-    private readonly IEventPublisher _eventPublisher = Substitute.For<IEventPublisher>();
-    private readonly IHttpContextAccessor _httpContextAccessor = new HttpContextAccessor();
-
-    private readonly IIdentityContextAccessor _identityContextAccessor = new IdentityContextAccessor
-    {
-        Context = new IdentityContext(Guid.Parse("5FA82375-60E6-4C57-9E00-C36EA4F954E9"), "mail@mail.com")
-    };
-
-    private readonly TimeProvider _timeProvider = Substitute.For<TimeProvider>();
+    private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor;
+    private readonly ILogger<EventPublisherBackgroundService> _logger;
+    private readonly IEventPublisher _eventPublisher;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IIdentityContextAccessor _identityContextAccessor;
+    private readonly TimeProvider _timeProvider;
     private readonly PostgresFixture _postgresFixture;
     private readonly DbConnectionFactory _dbConnectionFactory;
 
     public EventPublisherBackgroundServiceTests(PostgresFixture postgresFixture)
     {
         _postgresFixture = postgresFixture;
-
-        _databaseOptionsMonitor.CurrentValue.Returns(new DatabaseOptions
+        _timeProvider = Substitute.For<TimeProvider>();
+        _eventOptionsMonitor = Substitute.For<IOptionsMonitor<EventOptions>>();
+        _logger = Substitute.For<ILogger<EventPublisherBackgroundService>>();
+        _eventPublisher = Substitute.For<IEventPublisher>();
+        _httpContextAccessor = new HttpContextAccessor();
+        _identityContextAccessor = new IdentityContextAccessor
         {
-            ConnectionString = _postgresFixture.ConnectionString
-        });
+            Context = new IdentityContext(Guid.Parse("5FA82375-60E6-4C57-9E00-C36EA4F954E9"), "mail@mail.com")
+        };
 
         _eventOptionsMonitor.CurrentValue.Returns(new EventOptions
         {
@@ -76,10 +67,17 @@ public class EventPublisherBackgroundServiceTests : IAsyncLifetime
             MaxRetryAttempts = 10,
             MaxParallelWorkers = 1,
             MaxPollBatchSize = 10,
+            MaxEventChannelSize = 10,
             TimeBetweenAttempts = TimeSpan.FromSeconds(5)
         });
 
-        _dbConnectionFactory = new DbConnectionFactory(_databaseOptionsMonitor);
+        var databaseOptionsMonitor = Substitute.For<IOptionsMonitor<DatabaseOptions>>();
+        databaseOptionsMonitor.CurrentValue.Returns(new DatabaseOptions
+        {
+            ConnectionString = _postgresFixture.ConnectionString
+        });
+
+        _dbConnectionFactory = new DbConnectionFactory(databaseOptionsMonitor);
 
         _timeProvider.GetUtcNow().Returns(Now);
 
@@ -90,12 +88,10 @@ public class EventPublisherBackgroundServiceTests : IAsyncLifetime
     public async Task ShouldMarkEventAsPublished_WhenEventIsPublishedSuccessfully()
     {
         using var activity = CurrentActivitySource.StartActivity();
-        var channel = new EventChannel();
+        var channel = new EventChannel(_eventOptionsMonitor);
         var store = CreateEventStore();
-
-        var service = new EventPublisherBackgroundService(store, channel, _eventPublisher, _logger,
-            _eventOptionsMonitor, GetPipelineProvider());
         var eventBus = CreateEventBus();
+        var service = CreateService(store, channel);
 
         await eventBus.PublishAsync(new DomainEvent("1"), default);
 
@@ -125,13 +121,10 @@ public class EventPublisherBackgroundServiceTests : IAsyncLifetime
     public async Task ShouldMarkEventsAsPublished_WhenEventsArePublishedSuccessfully()
     {
         using var activity = CurrentActivitySource.StartActivity();
-        var channel = new EventChannel();
+        var channel = new EventChannel(_eventOptionsMonitor);
         var store = CreateEventStore();
-
-        var service = new EventPublisherBackgroundService(store, channel, _eventPublisher, _logger,
-            _eventOptionsMonitor, GetPipelineProvider());
         var eventBus = CreateEventBus();
-
+        var service = CreateService(store, channel);
         var batch = new[] { new DomainEvent("1"), new DomainEvent("2"), new DomainEvent("3"), new DomainEvent("4") };
 
         await eventBus.PublishAsync(batch, default);
@@ -168,13 +161,13 @@ public class EventPublisherBackgroundServiceTests : IAsyncLifetime
     public async Task ShouldAddFailedAttempt_WhenEventPublicationFails()
     {
         using var activity = CurrentActivitySource.StartActivity();
-        var channel = new EventChannel();
+        var channel = new EventChannel(_eventOptionsMonitor);
         var store = CreateEventStore();
-        _eventPublisher.PublishAsync(default!, default).ThrowsAsyncForAnyArgs<InvalidOperationException>();
-
-        var service = new EventPublisherBackgroundService(store, channel, _eventPublisher, _logger,
-            _eventOptionsMonitor, GetPipelineProvider());
         var eventBus = CreateEventBus();
+        var service = CreateService(store, channel);
+
+        _eventPublisher.PublishAsync(default!, default)
+            .ThrowsAsyncForAnyArgs<InvalidOperationException>();
 
         await eventBus.PublishAsync(new DomainEvent("1"), default);
 
@@ -211,16 +204,13 @@ public class EventPublisherBackgroundServiceTests : IAsyncLifetime
     public async Task ShouldAddFailedAttempts_WhenEventsPublicationFails()
     {
         using var activity = CurrentActivitySource.StartActivity();
-        var channel = new EventChannel();
+        var channel = new EventChannel(_eventOptionsMonitor);
         var store = CreateEventStore();
-        _eventPublisher.PublishAsync(default!, default).ThrowsAsyncForAnyArgs<InvalidOperationException>();
-
-        var service = new EventPublisherBackgroundService(store, channel, _eventPublisher, _logger,
-            _eventOptionsMonitor, GetPipelineProvider());
         var eventBus = CreateEventBus();
-
+        var service = CreateService(store, channel);
         var batch = new[] { new DomainEvent("1"), new DomainEvent("2"), new DomainEvent("3"), new DomainEvent("4") };
 
+        _eventPublisher.PublishAsync(default!, default).ThrowsAsyncForAnyArgs<InvalidOperationException>();
         await eventBus.PublishAsync(batch, default);
 
         var eventLogs = await _postgresFixture.SharedDbContext.EventLogs.ToListAsync();
@@ -265,7 +255,9 @@ public class EventPublisherBackgroundServiceTests : IAsyncLifetime
             .AddSingleton<IEventLogDbContext>(_ => _postgresFixture.SharedDbContext)
             .BuildServiceProvider();
 
-        return new EventStore(_dbConnectionFactory, new EventMetaDataProvider(provider), _eventOptionsMonitor,
+        return new EventStore(_dbConnectionFactory,
+            new EventMetaDataProvider(provider),
+            _eventOptionsMonitor,
             _timeProvider);
     }
 
@@ -279,7 +271,6 @@ public class EventPublisherBackgroundServiceTests : IAsyncLifetime
     private static ResiliencePipelineProvider<string> GetPipelineProvider()
     {
         var registry = new ResiliencePipelineRegistry<string>();
-
         registry.TryAddBuilder(EventConstants.ReceiverPipelineName, (_, _) => { });
         registry.TryAddBuilder(EventConstants.EventLockReleasePipelineName, (_, _) => { });
         registry.TryAddBuilder(EventConstants.EventPublicationPipelineName, (_, _) => { });
@@ -287,10 +278,11 @@ public class EventPublisherBackgroundServiceTests : IAsyncLifetime
         return registry;
     }
 
+    private EventPublisherBackgroundService CreateService(EventStore store, EventChannel channel) =>
+        new(store, channel, _eventPublisher, _logger,
+            _eventOptionsMonitor, GetPipelineProvider());
+
     public Task InitializeAsync() => Task.CompletedTask;
 
-    public Task DisposeAsync()
-    {
-        return _postgresFixture.ResetAsync();
-    }
+    public Task DisposeAsync() => _postgresFixture.ResetAsync();
 }

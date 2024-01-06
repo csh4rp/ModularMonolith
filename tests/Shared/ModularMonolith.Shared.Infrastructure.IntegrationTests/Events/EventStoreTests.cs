@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Bogus;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,24 +22,26 @@ public class EventStoreTests : IAsyncLifetime
 {
     private static readonly DateTimeOffset Now = new(2024, 1, 1, 12, 0, 0, TimeSpan.Zero);
 
-    private readonly IOptionsMonitor<DatabaseOptions> _databaseOptionsMonitor =
-        Substitute.For<IOptionsMonitor<DatabaseOptions>>();
-
-    private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor =
-        Substitute.For<IOptionsMonitor<EventOptions>>();
-
-    private readonly TimeProvider _timeProvider = Substitute.For<TimeProvider>();
-    private readonly DbConnectionFactory _dbConnectionFactory;
     private readonly PostgresFixture _postgresFixture;
+    private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor;
+    private readonly TimeProvider _timeProvider;
+    private readonly DbConnectionFactory _dbConnectionFactory;
+    private readonly Faker<EventLog> _eventLogFaker;
 
     public EventStoreTests(PostgresFixture postgresFixture)
     {
         _postgresFixture = postgresFixture;
-
-        _databaseOptionsMonitor.CurrentValue.Returns(new DatabaseOptions
-        {
-            ConnectionString = _postgresFixture.ConnectionString
-        });
+        _timeProvider = Substitute.For<TimeProvider>();
+        _eventOptionsMonitor = Substitute.For<IOptionsMonitor<EventOptions>>();
+        _eventLogFaker = new Faker<EventLog>()
+            .RuleFor(x => x.Id, f => f.Random.Guid())
+            .RuleFor(x => x.EventType, typeof(DomainEvent).FullName!)
+            .RuleFor(x => x.EventName, nameof(DomainEvent))
+            .RuleFor(x => x.CreatedAt, Now)
+            .RuleFor(x => x.TraceId, f => f.Random.String2(32))
+            .RuleFor(x => x.SpanId, f => f.Random.String2(16))
+            .RuleFor(x => x.OperationName, "Event Creation")
+            .RuleFor(x => x.EventPayload, JsonSerializer.Serialize(new DomainEvent("1")));
 
         _eventOptionsMonitor.CurrentValue.Returns(new EventOptions
         {
@@ -50,8 +53,13 @@ public class EventStoreTests : IAsyncLifetime
             TimeBetweenAttempts = TimeSpan.FromSeconds(5)
         });
 
-        _dbConnectionFactory = new DbConnectionFactory(_databaseOptionsMonitor);
+        var databaseOptionsMonitor = Substitute.For<IOptionsMonitor<DatabaseOptions>>();
+        databaseOptionsMonitor.CurrentValue.Returns(new DatabaseOptions
+        {
+            ConnectionString = _postgresFixture.ConnectionString
+        });
 
+        _dbConnectionFactory = new DbConnectionFactory(databaseOptionsMonitor);
         _timeProvider.GetUtcNow().Returns(Now);
     }
 
@@ -60,19 +68,7 @@ public class EventStoreTests : IAsyncLifetime
     {
         // Arrange
         var store = CreateEventStore();
-
-        var eventLog = new EventLog
-        {
-            Id = Guid.NewGuid(),
-            CreatedAt = _timeProvider.GetUtcNow(),
-            EventName = nameof(DomainEvent),
-            EventPayload = JsonSerializer.Serialize(new DomainEvent("1")),
-            EventType = typeof(DomainEvent).FullName!,
-            TraceId = "1",
-            SpanId = "1",
-            OperationName = "Event Creation",
-            CorrelationId = null
-        };
+        var eventLog = _eventLogFaker.Generate();
 
         _postgresFixture.SharedDbContext.EventLogs.Add(eventLog);
         await _postgresFixture.SharedDbContext.SaveChangesAsync();
@@ -90,19 +86,7 @@ public class EventStoreTests : IAsyncLifetime
     {
         // Arrange
         var store = CreateEventStore();
-
-        var eventLog = new EventLog
-        {
-            Id = Guid.NewGuid(),
-            CreatedAt = _timeProvider.GetUtcNow(),
-            EventName = nameof(DomainEvent),
-            EventPayload = JsonSerializer.Serialize(new DomainEvent("1")),
-            EventType = typeof(DomainEvent).FullName!,
-            TraceId = "1",
-            SpanId = "1",
-            OperationName = "Event Creation",
-            CorrelationId = null
-        };
+        var eventLog = _eventLogFaker.Generate();
 
         _postgresFixture.SharedDbContext.EventLogs.Add(eventLog);
         await _postgresFixture.SharedDbContext.SaveChangesAsync();
@@ -123,19 +107,7 @@ public class EventStoreTests : IAsyncLifetime
     {
         // Arrange
         var store = CreateEventStore();
-
-        var eventLog = new EventLog
-        {
-            Id = Guid.NewGuid(),
-            CreatedAt = _timeProvider.GetUtcNow(),
-            EventName = nameof(DomainEvent),
-            EventPayload = JsonSerializer.Serialize(new DomainEvent("1")),
-            EventType = typeof(DomainEvent).FullName!,
-            TraceId = "1",
-            SpanId = "1",
-            OperationName = "Event Creation",
-            CorrelationId = null
-        };
+        var eventLog = _eventLogFaker.Generate();
 
         _postgresFixture.SharedDbContext.EventLogs.Add(eventLog);
         await _postgresFixture.SharedDbContext.SaveChangesAsync();
@@ -159,19 +131,7 @@ public class EventStoreTests : IAsyncLifetime
     {
         // Arrange
         var store = CreateEventStore();
-
-        var eventLog = new EventLog
-        {
-            Id = Guid.NewGuid(),
-            CreatedAt = _timeProvider.GetUtcNow(),
-            EventName = nameof(DomainEvent),
-            EventPayload = JsonSerializer.Serialize(new DomainEvent("1")),
-            EventType = typeof(DomainEvent).FullName!,
-            TraceId = "1",
-            SpanId = "1",
-            OperationName = "Event Creation",
-            CorrelationId = null
-        };
+        var eventLog = _eventLogFaker.Generate();
 
         _postgresFixture.SharedDbContext.EventLogs.Add(eventLog);
         await _postgresFixture.SharedDbContext.SaveChangesAsync();
@@ -193,19 +153,7 @@ public class EventStoreTests : IAsyncLifetime
     {
         // Arrange
         var store = CreateEventStore();
-
-        var eventLog = new EventLog
-        {
-            Id = Guid.NewGuid(),
-            CreatedAt = _timeProvider.GetUtcNow(),
-            EventName = nameof(DomainEvent),
-            EventPayload = JsonSerializer.Serialize(new DomainEvent("1")),
-            EventType = typeof(DomainEvent).FullName!,
-            TraceId = "1",
-            SpanId = "1",
-            OperationName = "Event Creation",
-            CorrelationId = null
-        };
+        var eventLog = _eventLogFaker.Generate();
 
         _postgresFixture.SharedDbContext.EventLogs.Add(eventLog);
         await _postgresFixture.SharedDbContext.SaveChangesAsync();
@@ -231,19 +179,7 @@ public class EventStoreTests : IAsyncLifetime
     {
         // Arrange
         var store = CreateEventStore();
-
-        var eventLog = new EventLog
-        {
-            Id = Guid.NewGuid(),
-            CreatedAt = _timeProvider.GetUtcNow(),
-            EventName = nameof(DomainEvent),
-            EventPayload = JsonSerializer.Serialize(new DomainEvent("1")),
-            EventType = typeof(DomainEvent).FullName!,
-            TraceId = "1",
-            SpanId = "1",
-            OperationName = "Event Creation",
-            CorrelationId = null
-        };
+        var eventLog = _eventLogFaker.Generate();
 
         _postgresFixture.SharedDbContext.EventLogs.Add(eventLog);
         _postgresFixture.SharedDbContext.EventLogLocks.Add(new EventLogLock
@@ -265,19 +201,9 @@ public class EventStoreTests : IAsyncLifetime
     {
         // Arrange
         var store = CreateEventStore();
-
-        var eventLog = new EventLog
-        {
-            Id = Guid.NewGuid(),
-            CreatedAt = _timeProvider.GetUtcNow(),
-            EventName = nameof(DomainEvent),
-            EventPayload = JsonSerializer.Serialize(new DomainEvent("1")),
-            EventType = typeof(DomainEvent).FullName!,
-            TraceId = "1",
-            SpanId = "1",
-            OperationName = "Event Creation",
-            CorrelationId = Guid.NewGuid()
-        };
+        var eventLog = _eventLogFaker.Clone()
+            .RuleFor(x => x.CorrelationId, f => f.Random.Guid())
+            .Generate();
 
         _postgresFixture.SharedDbContext.EventLogs.Add(eventLog);
         await _postgresFixture.SharedDbContext.SaveChangesAsync();
@@ -295,7 +221,7 @@ public class EventStoreTests : IAsyncLifetime
         eventLock.Should().BeNull();
 
         correlationLock.Should().NotBeNull();
-        correlationLock!.CorrelationId.Should().Be(eventLog.CorrelationId.Value);
+        correlationLock!.CorrelationId.Should().Be(eventLog.CorrelationId!.Value);
     }
 
     [Fact]
@@ -303,24 +229,14 @@ public class EventStoreTests : IAsyncLifetime
     {
         // Arrange
         var store = CreateEventStore();
-
-        var eventLog = new EventLog
-        {
-            Id = Guid.NewGuid(),
-            CreatedAt = _timeProvider.GetUtcNow(),
-            EventName = nameof(DomainEvent),
-            EventPayload = JsonSerializer.Serialize(new DomainEvent("1")),
-            EventType = typeof(DomainEvent).FullName!,
-            TraceId = "1",
-            SpanId = "1",
-            OperationName = "Event Creation",
-            CorrelationId = Guid.NewGuid()
-        };
+        var eventLog = _eventLogFaker.Clone()
+            .RuleFor(x => x.CorrelationId, f => f.Random.Guid())
+            .Generate();
 
         _postgresFixture.SharedDbContext.EventLogs.Add(eventLog);
         _postgresFixture.SharedDbContext.EventCorrelationLocks.Add(new EventCorrelationLock
         {
-            CorrelationId = eventLog.CorrelationId.Value, AcquiredAt = Now
+            CorrelationId = eventLog.CorrelationId!.Value, AcquiredAt = Now
         });
         await _postgresFixture.SharedDbContext.SaveChangesAsync();
 
@@ -338,14 +254,13 @@ public class EventStoreTests : IAsyncLifetime
             .AddSingleton<IEventLogDbContext>(_ => _postgresFixture.SharedDbContext)
             .BuildServiceProvider();
 
-        return new EventStore(_dbConnectionFactory, new EventMetaDataProvider(provider), _eventOptionsMonitor,
+        return new EventStore(_dbConnectionFactory,
+            new EventMetaDataProvider(provider),
+            _eventOptionsMonitor,
             _timeProvider);
     }
 
     public Task InitializeAsync() => Task.CompletedTask;
 
-    public Task DisposeAsync()
-    {
-        return _postgresFixture.ResetAsync();
-    }
+    public Task DisposeAsync() => _postgresFixture.ResetAsync();
 }

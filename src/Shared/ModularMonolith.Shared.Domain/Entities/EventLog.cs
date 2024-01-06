@@ -12,6 +12,8 @@ public sealed class EventLog
 
     public string? UserName { get; init; }
 
+    public required string? Topic { get; init; }
+    
     public required Guid? CorrelationId { get; init; }
 
     public required string EventType { get; init; }

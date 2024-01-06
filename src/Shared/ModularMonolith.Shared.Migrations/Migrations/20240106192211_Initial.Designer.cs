@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ModularMonolith.Shared.Migrations.Migrations
 {
     [DbContext(typeof(SharedDbContext))]
-    [Migration("20240101084342_Initial")]
+    [Migration("20240106192211_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -176,6 +176,11 @@ namespace ModularMonolith.Shared.Migrations.Migrations
                         .IsUnicode(false)
                         .HasColumnType("character varying(16)")
                         .HasColumnName("span_id");
+
+                    b.Property<string>("Topic")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("topic");
 
                     b.Property<string>("TraceId")
                         .IsRequired()

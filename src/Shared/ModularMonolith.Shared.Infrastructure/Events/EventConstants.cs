@@ -7,4 +7,6 @@ internal static class EventConstants
     public const string EventLockReleasePipelineName = nameof(EventLockReleasePipelineName);
 
     public const string EventPublicationPipelineName = nameof(EventPublicationPipelineName);
+
+    public const string EventNotificationFetchingPipelineName = nameof(EventNotificationFetchingPipelineName);
 }

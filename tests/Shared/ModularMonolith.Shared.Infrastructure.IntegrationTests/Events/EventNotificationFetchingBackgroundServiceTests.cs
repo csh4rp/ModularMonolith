@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.Application.Identity;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Factories;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Options;
+using ModularMonolith.Shared.Infrastructure.Events;
 using ModularMonolith.Shared.Infrastructure.Events.BackgroundServices;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
 using ModularMonolith.Shared.Infrastructure.Events.Options;
@@ -15,6 +16,7 @@ using ModularMonolith.Shared.Infrastructure.Identity;
 using ModularMonolith.Shared.Infrastructure.IntegrationTests.Events.Events;
 using ModularMonolith.Shared.Infrastructure.IntegrationTests.Fixtures;
 using NSubstitute;
+using Polly.Registry;
 
 namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.Events;
 
@@ -32,38 +34,39 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
         Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
     };
 
-    private readonly IOptionsMonitor<DatabaseOptions> _databaseOptionsMonitor =
-        Substitute.For<IOptionsMonitor<DatabaseOptions>>();
-
-    private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor =
-        Substitute.For<IOptionsMonitor<EventOptions>>();
-
-    private readonly ILogger<EventNotificationFetchingBackgroundService> _logger =
-        Substitute.For<ILogger<EventNotificationFetchingBackgroundService>>();
-
-    private readonly IHttpContextAccessor _httpContextAccessor = new HttpContextAccessor();
-
-    private readonly IIdentityContextAccessor _identityContextAccessor = new IdentityContextAccessor
-    {
-        Context = new IdentityContext(Guid.Parse("5FA82375-60E6-4C57-9E00-C36EA4F954E9"), "mail@mail.com")
-    };
-
-    private readonly TimeProvider _timeProvider = Substitute.For<TimeProvider>();
+    private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor;
+    private readonly ILogger<EventNotificationFetchingBackgroundService> _logger;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IIdentityContextAccessor _identityContextAccessor;
+    private readonly TimeProvider _timeProvider;
     private readonly PostgresFixture _postgresFixture;
     private readonly DbConnectionFactory _dbConnectionFactory;
 
     public EventNotificationFetchingBackgroundServiceTests(PostgresFixture postgresFixture)
     {
         _postgresFixture = postgresFixture;
+        _timeProvider = Substitute.For<TimeProvider>();
+        _eventOptionsMonitor = Substitute.For<IOptionsMonitor<EventOptions>>();
+        _logger = Substitute.For<ILogger<EventNotificationFetchingBackgroundService>>();
+        _httpContextAccessor = new HttpContextAccessor();
+        _identityContextAccessor = new IdentityContextAccessor
+        {
+            Context = new IdentityContext(Guid.Parse("5FA82375-60E6-4C57-9E00-C36EA4F954E9"), "mail@mail.com")
+        };
+        
+        _eventOptionsMonitor.CurrentValue.Returns(new EventOptions
+        {
+            Assemblies = [GetType().Assembly],
+            MaxEventChannelSize = 100,
+        });
 
-        _databaseOptionsMonitor.CurrentValue.Returns(new DatabaseOptions
+        var databaseOptionsMonitor = Substitute.For<IOptionsMonitor<DatabaseOptions>>();
+        databaseOptionsMonitor.CurrentValue.Returns(new DatabaseOptions
         {
             ConnectionString = _postgresFixture.ConnectionString
         });
-
-        _eventOptionsMonitor.CurrentValue.Returns(new EventOptions { Assemblies = [GetType().Assembly] });
-
-        _dbConnectionFactory = new DbConnectionFactory(_databaseOptionsMonitor);
+        
+        _dbConnectionFactory = new DbConnectionFactory(databaseOptionsMonitor);
 
         ActivitySource.AddActivityListener(ActivityListener);
     }
@@ -72,14 +75,11 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
     public async Task ShouldSendEventToChannel_WhenSingleEventIsPublished()
     {
         // Arrange
-        using var activitySource = new ActivitySource("Source");
-        using var activity = activitySource.StartActivity();
-        var channel = new EventChannel();
-
-        var service = new EventNotificationFetchingBackgroundService(_dbConnectionFactory, channel, _logger);
-
+        using var activity = CurrentActivitySource.StartActivity();
+        var channel = new EventChannel(_eventOptionsMonitor);
         var eventBus = CreateEventBus();
-
+        using var service = CreateService(channel);
+        
         await service.StartAsync(default);
 
         // Act
@@ -88,7 +88,6 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
         // Assert
         await using var enumerator = channel.Reader.ReadAllAsync().GetAsyncEnumerator();
         await enumerator.MoveNextAsync();
-
         var eventInfo = enumerator.Current;
 
         var eventLog = await _postgresFixture.SharedDbContext.EventLogs
@@ -99,28 +98,15 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
         await service.StopAsync(default);
     }
 
-    private OutboxEventBus CreateEventBus()
-    {
-        var eventBus = new OutboxEventBus(_postgresFixture.SharedDbContext,
-            new EventSerializer(_eventOptionsMonitor),
-            _identityContextAccessor,
-            _timeProvider,
-            _httpContextAccessor);
-        return eventBus;
-    }
-
     [Fact]
     public async Task ShouldSendEventsToChannel_WhenMultipleEventsArePublished()
     {
         // Arrange
         using var activity = CurrentActivitySource.StartActivity();
-        var channel = new EventChannel();
-
-        using var service = new EventNotificationFetchingBackgroundService(_dbConnectionFactory, channel, _logger);
-
+        var channel = new EventChannel(_eventOptionsMonitor);
         var eventBus = CreateEventBus();
-
         var batch = new[] { new DomainEvent("1"), new DomainEvent("2"), new DomainEvent("3"), new DomainEvent("4") };
+        using var service = CreateService(channel);
 
         await service.StartAsync(default);
 
@@ -128,10 +114,9 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
         await eventBus.PublishAsync(batch, default);
 
         // Assert
-        await using var enumerator = channel.Reader.ReadAllAsync().GetAsyncEnumerator();
-
         var eventLogIds = new List<Guid>();
-
+        await using var enumerator = channel.Reader.ReadAllAsync().GetAsyncEnumerator();
+        
         for (var i = 0; i < batch.Length; i++)
         {
             await enumerator.MoveNextAsync();
@@ -147,10 +132,24 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
         await service.StopAsync(default);
     }
 
+    private EventNotificationFetchingBackgroundService CreateService(EventChannel channel) => new(GetPipelineProvider(), _dbConnectionFactory, channel, _logger);
+
+    private OutboxEventBus CreateEventBus() =>
+        new(_postgresFixture.SharedDbContext,
+            new EventSerializer(_eventOptionsMonitor),
+            _identityContextAccessor,
+            _timeProvider,
+            _httpContextAccessor);
+    
+    private static ResiliencePipelineProvider<string> GetPipelineProvider()
+    {
+        var registry = new ResiliencePipelineRegistry<string>();
+        registry.TryAddBuilder(EventConstants.EventNotificationFetchingPipelineName, (_, _) => { });
+
+        return registry;
+    }
+
     public Task InitializeAsync() => Task.CompletedTask;
 
-    public async Task DisposeAsync()
-    {
-        await _postgresFixture.ResetAsync();
-    }
+    public Task DisposeAsync() => _postgresFixture.ResetAsync();
 }

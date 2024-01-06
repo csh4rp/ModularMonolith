@@ -65,6 +65,9 @@ public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<E
             .IsUnicode(false)
             .HasMaxLength(16);
 
+        builder.Property(b => b.Topic)
+            .HasMaxLength(128);
+        
         builder.Property(b => b.UserName)
             .HasMaxLength(128);
 
