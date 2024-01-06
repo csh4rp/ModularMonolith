@@ -102,7 +102,6 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
             _logger.LogError(ex, "An error occured while publishing events");
             throw;
         }
-
     }
 
     private async Task AddFailedPublicationAttemptAsync(EventInfo eventInfo, CancellationToken cancellationToken) =>
@@ -128,7 +127,7 @@ internal sealed class EventPublisherBackgroundService : BackgroundService
         // Try to mark as published up to ten times before going for re-publish
         await _lockReleasePipeline.ExecuteAsync(async (ev, cts) =>
             await _eventStore.MarkAsPublishedAsync(ev, cts), eventInfo, cancellationToken);
-        
+
         return true;
     }
 }

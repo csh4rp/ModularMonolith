@@ -26,6 +26,7 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
 {
     private static readonly DateTimeOffset Now = new(2024, 1, 1, 12, 0, 0, TimeSpan.Zero);
     private static readonly ActivitySource CurrentActivitySource = new(nameof(EventPollingBackgroundServiceTests));
+
     private static readonly ActivityListener ActivityListener = new()
     {
         ShouldListenTo = _ => true,
@@ -33,7 +34,7 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
         ActivityStopped = _ => { },
         Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
     };
-    
+
     private readonly IOptionsMonitor<DatabaseOptions> _databaseOptionsMonitor =
         Substitute.For<IOptionsMonitor<DatabaseOptions>>();
 
@@ -53,11 +54,11 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
     private readonly TimeProvider _timeProvider = Substitute.For<TimeProvider>();
     private readonly PostgresFixture _postgresFixture;
     private readonly DbConnectionFactory _dbConnectionFactory;
-    
+
     public EventPollingBackgroundServiceTests(PostgresFixture postgresFixture)
     {
         _postgresFixture = postgresFixture;
-        
+
         _databaseOptionsMonitor.CurrentValue.Returns(new DatabaseOptions
         {
             ConnectionString = _postgresFixture.ConnectionString
@@ -71,10 +72,10 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
             MaxPollBatchSize = 10,
             MaxLockTime = TimeSpan.FromSeconds(1)
         });
-        
+
         _dbConnectionFactory = new DbConnectionFactory(_databaseOptionsMonitor);
         _timeProvider.GetUtcNow().Returns(Now);
-        
+
         ActivitySource.AddActivityListener(ActivityListener);
     }
 
@@ -84,12 +85,12 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
         // Arrange
         using var activity = CurrentActivitySource.StartActivity();
         var channel = new EventChannel();
-        
+
         var reader = CreateEventReader();
         var eventBus = CreateEventBus();
 
         var service = new EventPollingBackgroundService(_eventOptionsMonitor, _logger, reader, channel);
-        
+
         // Act
         await eventBus.PublishAsync(new DomainEvent("Event"), default);
 
@@ -105,27 +106,27 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
             .FirstOrDefaultAsync(e => e.Id == eventInfo.EventLogId);
 
         eventLog.Should().NotBeNull();
-        
+
         await service.StopAsync(default);
     }
-    
+
     [Fact]
     public async Task ShouldSendEventsToChannel_WhenMultipleEventsArePublished()
     {
         // Arrange
         using var activity = CurrentActivitySource.StartActivity();
         var channel = new EventChannel();
-        
+
         var reader = CreateEventReader();
         var eventBus = CreateEventBus();
 
         var batch = new[] { new DomainEvent("1"), new DomainEvent("2"), new DomainEvent("3"), new DomainEvent("4") };
-        
+
         var service = new EventPollingBackgroundService(_eventOptionsMonitor, _logger, reader, channel);
-        
+
         // Act
         await eventBus.PublishAsync(batch, default);
-        
+
         await service.StartAsync(default);
 
         // Assert
@@ -167,7 +168,7 @@ public class EventPollingBackgroundServiceTests : IAsyncLifetime
             _timeProvider);
         return reader;
     }
-    
+
     public Task InitializeAsync() => Task.CompletedTask;
 
     public Task DisposeAsync()

@@ -21,7 +21,9 @@ namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.Events;
 [Collection("Events")]
 public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
 {
-    private static readonly ActivitySource CurrentActivitySource = new(nameof(EventNotificationFetchingBackgroundServiceTests));
+    private static readonly ActivitySource CurrentActivitySource =
+        new(nameof(EventNotificationFetchingBackgroundServiceTests));
+
     private static readonly ActivityListener ActivityListener = new()
     {
         ShouldListenTo = _ => true,
@@ -29,7 +31,7 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
         ActivityStopped = _ => { },
         Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
     };
-    
+
     private readonly IOptionsMonitor<DatabaseOptions> _databaseOptionsMonitor =
         Substitute.For<IOptionsMonitor<DatabaseOptions>>();
 
@@ -53,16 +55,16 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
     public EventNotificationFetchingBackgroundServiceTests(PostgresFixture postgresFixture)
     {
         _postgresFixture = postgresFixture;
-        
+
         _databaseOptionsMonitor.CurrentValue.Returns(new DatabaseOptions
         {
             ConnectionString = _postgresFixture.ConnectionString
         });
 
         _eventOptionsMonitor.CurrentValue.Returns(new EventOptions { Assemblies = [GetType().Assembly] });
-        
+
         _dbConnectionFactory = new DbConnectionFactory(_databaseOptionsMonitor);
-        
+
         ActivitySource.AddActivityListener(ActivityListener);
     }
 
@@ -79,7 +81,7 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
         var eventBus = CreateEventBus();
 
         await service.StartAsync(default);
-        
+
         // Act
         await eventBus.PublishAsync(new DomainEvent("Event"), default);
 
@@ -93,7 +95,7 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
             .FirstOrDefaultAsync(e => e.Id == eventInfo.EventLogId);
 
         eventLog.Should().NotBeNull();
-        
+
         await service.StopAsync(default);
     }
 
@@ -117,11 +119,11 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
         using var service = new EventNotificationFetchingBackgroundService(_dbConnectionFactory, channel, _logger);
 
         var eventBus = CreateEventBus();
-        
+
         var batch = new[] { new DomainEvent("1"), new DomainEvent("2"), new DomainEvent("3"), new DomainEvent("4") };
 
         await service.StartAsync(default);
-        
+
         // Acy
         await eventBus.PublishAsync(batch, default);
 
@@ -135,13 +137,13 @@ public class EventNotificationFetchingBackgroundServiceTests : IAsyncLifetime
             await enumerator.MoveNextAsync();
             eventLogIds.Add(enumerator.Current.EventLogId);
         }
-        
+
         var eventLogs = await _postgresFixture.SharedDbContext.EventLogs.Where(e =>
             eventLogIds.Contains(e.Id)).ToListAsync();
 
         eventLogs.Should().NotBeEmpty();
         eventLogs.Should().HaveCount(batch.Length);
-        
+
         await service.StopAsync(default);
     }
 

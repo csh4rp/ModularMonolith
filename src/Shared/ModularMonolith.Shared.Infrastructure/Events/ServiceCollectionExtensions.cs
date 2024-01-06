@@ -1,4 +1,5 @@
-﻿using ModularMonolith.Shared.Infrastructure.Events.BackgroundServices;
+﻿using ModularMonolith.Shared.Application.Abstract;
+using ModularMonolith.Shared.Infrastructure.Events.BackgroundServices;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Events.MetaData;
 using ModularMonolith.Shared.Infrastructure.Events.Options;
@@ -30,6 +31,26 @@ public static class ServiceCollectionExtensions
             .PostConfigure(action)
             .ValidateDataAnnotations()
             .ValidateOnStart();
+
+        var options = new EventOptions();
+        action(options);
+
+        var assembliesToScan = options.Assemblies;
+
+        foreach (var assembly in assembliesToScan)
+        {
+            var mappings = assembly.GetExportedTypes()
+                .Where(t => t.IsGenericType && t.GetGenericTypeDefinition().IsAssignableTo(typeof(IEventMapping<>)));
+
+            foreach (var mapping in mappings)
+            {
+                var interfaces = mapping.GetInterfaces();
+                foreach (var @interface in interfaces)
+                {
+                    serviceCollection.Add(new ServiceDescriptor(@interface, mapping, ServiceLifetime.Scoped));
+                }
+            }
+        }
 
         return serviceCollection;
     }

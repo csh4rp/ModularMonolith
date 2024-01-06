@@ -8,10 +8,10 @@ namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 public interface IEventLogDbContext : IDisposable, IAsyncDisposable
 {
     DbSet<EventLog> EventLogs { get; }
-    
+
     DbSet<EventLogLock> EventLogLocks { get; }
     DbSet<EventCorrelationLock> EventCorrelationLocks { get; }
-    
+
     DbSet<EventLogPublishAttempt> EventLogPublishAttempts { get; }
 
     IModel Model { get; }

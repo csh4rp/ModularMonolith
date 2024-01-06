@@ -71,7 +71,7 @@ internal sealed class EventStore : IEventStore
                      FROM {publishAttemptMetaData.TableName}
                      WHERE {publishAttemptMetaData.EventLogIdColumnName} = el.{eventLogMetaData.IdColumnName}
                  ) < @max_retry_attempts
-                 AND 
+                 AND
                  (
                      SELECT COALESCE(MAX({publishAttemptMetaData.NextAttemptAtColumnName}), CURRENT_TIMESTAMP)
                      FROM {publishAttemptMetaData.TableName}
@@ -80,7 +80,7 @@ internal sealed class EventStore : IEventStore
                  ORDER BY {eventLogMetaData.CreatedAtColumnName}
                  LIMIT 1 OFFSET 0
                  """;
-            
+
             var insertCommand = batch.CreateBatchCommand();
             insertCommand.Parameters.AddWithValue("@correlation_id", correlationId.Value);
             insertCommand.Parameters.AddWithValue("@now", now.UtcDateTime);
@@ -92,7 +92,7 @@ internal sealed class EventStore : IEventStore
                  ON CONFLICT DO NOTHING
                  RETURNING 1;
                  """;
-            
+
             batch.BatchCommands.Add(selectCommand);
             batch.BatchCommands.Add(insertCommand);
         }
@@ -120,7 +120,7 @@ internal sealed class EventStore : IEventStore
                      FROM {publishAttemptMetaData.TableName}
                      WHERE {publishAttemptMetaData.EventLogIdColumnName} = el.{eventLogMetaData.IdColumnName}
                  ) < @max_retry_attempts
-                 AND 
+                 AND
                  (
                      SELECT COALESCE(MAX({publishAttemptMetaData.NextAttemptAtColumnName}), @now)
                      FROM {publishAttemptMetaData.TableName}
@@ -129,7 +129,7 @@ internal sealed class EventStore : IEventStore
                  ORDER BY {eventLogMetaData.CreatedAtColumnName}
                  LIMIT 1 OFFSET 0
                  """;
-            
+
             var insertCommand = batch.CreateBatchCommand();
             insertCommand.Parameters.AddWithValue("@id", id);
             insertCommand.Parameters.AddWithValue("@max_retry_attempts", retryAttempts);
@@ -142,7 +142,7 @@ internal sealed class EventStore : IEventStore
                  ON CONFLICT DO NOTHING
                  RETURNING 1;
                  """;
-            
+
             batch.BatchCommands.Add(selectCommand);
             batch.BatchCommands.Add(insertCommand);
         }
@@ -212,36 +212,36 @@ internal sealed class EventStore : IEventStore
 
         if (eventInfo.CorrelationId.HasValue)
         {
-             var releaseLockCommand = batch.CreateBatchCommand();
-             releaseLockCommand.Parameters.AddWithValue("@correlation_id", eventInfo.CorrelationId.Value);
-             releaseLockCommand.CommandText =
-                 $"""
-                  DELETE FROM {eventCorrelationLockMetaData.TableName}
-                  WHERE {eventCorrelationLockMetaData.CorrelationIdColumnName} = @correlation_id;
-                  """;
-             
-             batch.BatchCommands.Add(releaseLockCommand);
+            var releaseLockCommand = batch.CreateBatchCommand();
+            releaseLockCommand.Parameters.AddWithValue("@correlation_id", eventInfo.CorrelationId.Value);
+            releaseLockCommand.CommandText =
+                $"""
+                 DELETE FROM {eventCorrelationLockMetaData.TableName}
+                 WHERE {eventCorrelationLockMetaData.CorrelationIdColumnName} = @correlation_id;
+                 """;
+
+            batch.BatchCommands.Add(releaseLockCommand);
         }
         else
         {
-             var releaseLockCommand = batch.CreateBatchCommand();
-             releaseLockCommand.Parameters.AddWithValue("@id", eventInfo.EventLogId);
-             releaseLockCommand.CommandText =
-                 $"""
-                  DELETE FROM {eventLockMetaData.TableName}
-                  WHERE {eventLockMetaData.IdColumnName} = @id;
-                  """;
-             
-             batch.BatchCommands.Add(releaseLockCommand);
+            var releaseLockCommand = batch.CreateBatchCommand();
+            releaseLockCommand.Parameters.AddWithValue("@id", eventInfo.EventLogId);
+            releaseLockCommand.CommandText =
+                $"""
+                 DELETE FROM {eventLockMetaData.TableName}
+                 WHERE {eventLockMetaData.IdColumnName} = @id;
+                 """;
+
+            batch.BatchCommands.Add(releaseLockCommand);
         }
 
-         var deleteAttemptsCommand = batch.CreateBatchCommand();
-         deleteAttemptsCommand.Parameters.AddWithValue("@event_log_id", eventInfo.EventLogId);
-         deleteAttemptsCommand.CommandText =
-             $"""
-              DELETE FROM {eventLogPublishAttemptMetaData.TableName}
-              WHERE {eventLogPublishAttemptMetaData.EventLogIdColumnName} = @event_log_id;
-              """;
+        var deleteAttemptsCommand = batch.CreateBatchCommand();
+        deleteAttemptsCommand.Parameters.AddWithValue("@event_log_id", eventInfo.EventLogId);
+        deleteAttemptsCommand.CommandText =
+            $"""
+             DELETE FROM {eventLogPublishAttemptMetaData.TableName}
+             WHERE {eventLogPublishAttemptMetaData.EventLogIdColumnName} = @event_log_id;
+             """;
 
         var markAsPublishedCommand = batch.CreateBatchCommand();
         markAsPublishedCommand.Parameters.AddWithValue("@id", eventInfo.EventLogId);
@@ -279,7 +279,7 @@ internal sealed class EventStore : IEventStore
                  DELETE FROM {eventCorrelationLockMetaData.TableName}
                  WHERE {eventCorrelationLockMetaData.CorrelationIdColumnName} = @correlation_id;
                  """;
-            
+
             batch.BatchCommands.Add(releaseLockCommand);
         }
         else
@@ -291,7 +291,7 @@ internal sealed class EventStore : IEventStore
                  DELETE FROM {eventLockMetaData.TableName}
                  WHERE {eventLockMetaData.IdColumnName} = @id;
                  """;
-            
+
             batch.BatchCommands.Add(releaseLockCommand);
         }
 
@@ -314,7 +314,7 @@ internal sealed class EventStore : IEventStore
                          WHERE epa.{eventLogPublishAttemptMetaData.EventLogIdColumnName} = @event_log_id),
                      1))
              """;
-        
+
         batch.BatchCommands.Add(insertFailedAttemptCommand);
 
         _ = await batch.ExecuteNonQueryAsync(cancellationToken);
@@ -335,23 +335,23 @@ internal sealed class EventStore : IEventStore
         await connection.OpenAsync(cancellationToken);
 
         await using var batch = connection.CreateBatch();
-        
+
         var releaseEventLocksCommand = batch.CreateBatchCommand();
         releaseEventLocksCommand.Parameters.AddWithValue("@releaseLockDate", releaseLockDate);
         releaseEventLocksCommand.CommandText =
-             $"""
-              DELETE FROM {eventLogLockMetaData.TableName}
-              WHERE {eventLogLockMetaData.AcquiredAtColumnName} < @releaseLockDate
-              """;
+            $"""
+             DELETE FROM {eventLogLockMetaData.TableName}
+             WHERE {eventLogLockMetaData.AcquiredAtColumnName} < @releaseLockDate
+             """;
 
         var releaseCorrelationLocksCommand = batch.CreateBatchCommand();
         releaseCorrelationLocksCommand.Parameters.AddWithValue("@releaseLockDate", releaseLockDate);
         releaseCorrelationLocksCommand.CommandText =
-             $"""
-              DELETE FROM {eventLogCorrelationLockMetaData.TableName}
-              WHERE {eventLogCorrelationLockMetaData.AcquiredAtColumnName} <= @releaseLockDate
-              """;
-        
+            $"""
+             DELETE FROM {eventLogCorrelationLockMetaData.TableName}
+             WHERE {eventLogCorrelationLockMetaData.AcquiredAtColumnName} <= @releaseLockDate
+             """;
+
         var selectCommand = batch.CreateBatchCommand();
         selectCommand.Parameters.AddWithValue("@max_retry_attempts", _optionsMonitor.CurrentValue.MaxRetryAttempts);
         selectCommand.Parameters.AddWithValue("@now", now.UtcDateTime);
@@ -362,7 +362,7 @@ internal sealed class EventStore : IEventStore
              {eventLogMetaData.IdColumnName},
              {eventLogMetaData.CorrelationIdColumnName}
              FROM {eventLogMetaData.TableName} AS el
-             WHERE {eventLogMetaData.PublishedAtColumnName} IS NULL             
+             WHERE {eventLogMetaData.PublishedAtColumnName} IS NULL
              AND NOT EXISTS
              (
                 SELECT 1
@@ -381,7 +381,7 @@ internal sealed class EventStore : IEventStore
                  FROM {publishAttemptMetaData.TableName}
                  WHERE {publishAttemptMetaData.EventLogIdColumnName} = el.{eventLogMetaData.IdColumnName}
              ) < @max_retry_attempts
-             AND 
+             AND
              (
                  SELECT COALESCE(MAX({publishAttemptMetaData.NextAttemptAtColumnName}), @now)
                  FROM {publishAttemptMetaData.TableName}
@@ -394,7 +394,7 @@ internal sealed class EventStore : IEventStore
         batch.BatchCommands.Add(releaseEventLocksCommand);
         batch.BatchCommands.Add(releaseCorrelationLocksCommand);
         batch.BatchCommands.Add(selectCommand);
-        
+
         try
         {
             await using var reader = await batch.ExecuteReaderAsync(cancellationToken);

@@ -17,11 +17,16 @@ using NSubstitute;
 namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.Events;
 
 [Collection("Events")]
-public class EventStoreTests
+public class EventStoreTests : IAsyncLifetime
 {
     private static readonly DateTimeOffset Now = new(2024, 1, 1, 12, 0, 0, TimeSpan.Zero);
-    private readonly IOptionsMonitor<DatabaseOptions> _databaseOptionsMonitor = Substitute.For<IOptionsMonitor<DatabaseOptions>>();
-    private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor = Substitute.For<IOptionsMonitor<EventOptions>>();
+
+    private readonly IOptionsMonitor<DatabaseOptions> _databaseOptionsMonitor =
+        Substitute.For<IOptionsMonitor<DatabaseOptions>>();
+
+    private readonly IOptionsMonitor<EventOptions> _eventOptionsMonitor =
+        Substitute.For<IOptionsMonitor<EventOptions>>();
+
     private readonly TimeProvider _timeProvider = Substitute.For<TimeProvider>();
     private readonly DbConnectionFactory _dbConnectionFactory;
     private readonly PostgresFixture _postgresFixture;
@@ -29,12 +34,12 @@ public class EventStoreTests
     public EventStoreTests(PostgresFixture postgresFixture)
     {
         _postgresFixture = postgresFixture;
-        
+
         _databaseOptionsMonitor.CurrentValue.Returns(new DatabaseOptions
         {
             ConnectionString = _postgresFixture.ConnectionString
         });
-        
+
         _eventOptionsMonitor.CurrentValue.Returns(new EventOptions
         {
             Assemblies = [GetType().Assembly],
@@ -44,7 +49,7 @@ public class EventStoreTests
             MaxPollBatchSize = 10,
             TimeBetweenAttempts = TimeSpan.FromSeconds(5)
         });
-        
+
         _dbConnectionFactory = new DbConnectionFactory(_databaseOptionsMonitor);
 
         _timeProvider.GetUtcNow().Returns(Now);
@@ -74,12 +79,12 @@ public class EventStoreTests
 
         // Act
         var events = await store.GetUnpublishedEventsAsync(int.MaxValue, default);
-        
+
         // Assert
         events.Should().HaveCount(1);
         events[0].EventLogId.Should().Be(eventLog.Id);
     }
-    
+
     [Fact]
     public async Task ShouldAddFirstFailedAttempt_WhenFailedAttemptDoesNotExist()
     {
@@ -104,7 +109,7 @@ public class EventStoreTests
 
         // Act
         await store.AddFailedAttemptAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId), default);
-        
+
         // Assert
         var attempt = await _postgresFixture.SharedDbContext.EventLogPublishAttempts.SingleOrDefaultAsync();
 
@@ -112,7 +117,7 @@ public class EventStoreTests
         attempt!.AttemptNumber.Should().Be(1);
         attempt.EventLogId.Should().Be(eventLog.Id);
     }
-    
+
     [Fact]
     public async Task ShouldAddSecondFailedAttempt_WhenFailedAttemptExists()
     {
@@ -138,7 +143,7 @@ public class EventStoreTests
         // Act
         await store.AddFailedAttemptAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId), default);
         await store.AddFailedAttemptAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId), default);
-        
+
         // Assert
         var attempt = await _postgresFixture.SharedDbContext.EventLogPublishAttempts
             .AsNoTracking()
@@ -148,13 +153,199 @@ public class EventStoreTests
         attempt!.AttemptNumber.Should().Be(2);
         attempt.EventLogId.Should().Be(eventLog.Id);
     }
-    
+
+    [Fact]
+    public async Task ShouldMarkAsPublished_WhenEventIsNotPublished()
+    {
+        // Arrange
+        var store = CreateEventStore();
+
+        var eventLog = new EventLog
+        {
+            Id = Guid.NewGuid(),
+            CreatedAt = _timeProvider.GetUtcNow(),
+            EventName = nameof(DomainEvent),
+            EventPayload = JsonSerializer.Serialize(new DomainEvent("1")),
+            EventType = typeof(DomainEvent).FullName!,
+            TraceId = "1",
+            SpanId = "1",
+            OperationName = "Event Creation",
+            CorrelationId = null
+        };
+
+        _postgresFixture.SharedDbContext.EventLogs.Add(eventLog);
+        await _postgresFixture.SharedDbContext.SaveChangesAsync();
+
+        // Act
+        await store.MarkAsPublishedAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId), default);
+
+        // Assert
+        eventLog = await _postgresFixture.SharedDbContext.EventLogs
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == eventLog.Id);
+
+        eventLog.Should().NotBeNull();
+        eventLog!.PublishedAt.Should().Be(Now);
+    }
+
+    [Fact]
+    public async Task ShouldAcquireLock_WhenNoLockIsTaken()
+    {
+        // Arrange
+        var store = CreateEventStore();
+
+        var eventLog = new EventLog
+        {
+            Id = Guid.NewGuid(),
+            CreatedAt = _timeProvider.GetUtcNow(),
+            EventName = nameof(DomainEvent),
+            EventPayload = JsonSerializer.Serialize(new DomainEvent("1")),
+            EventType = typeof(DomainEvent).FullName!,
+            TraceId = "1",
+            SpanId = "1",
+            OperationName = "Event Creation",
+            CorrelationId = null
+        };
+
+        _postgresFixture.SharedDbContext.EventLogs.Add(eventLog);
+        await _postgresFixture.SharedDbContext.SaveChangesAsync();
+
+        // Act
+        var (acquired, _) =
+            await store.TryAcquireLockAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId), default);
+
+        // Assert
+        acquired.Should().BeTrue();
+
+        var eventLock = await _postgresFixture.SharedDbContext.EventLogLocks.SingleOrDefaultAsync();
+        var correlationLock = await _postgresFixture.SharedDbContext.EventCorrelationLocks.SingleOrDefaultAsync();
+
+        eventLock.Should().NotBeNull();
+        eventLock!.EventLogId.Should().Be(eventLog.Id);
+
+        correlationLock.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task ShouldNotAcquireLock_WhenLockIsTaken()
+    {
+        // Arrange
+        var store = CreateEventStore();
+
+        var eventLog = new EventLog
+        {
+            Id = Guid.NewGuid(),
+            CreatedAt = _timeProvider.GetUtcNow(),
+            EventName = nameof(DomainEvent),
+            EventPayload = JsonSerializer.Serialize(new DomainEvent("1")),
+            EventType = typeof(DomainEvent).FullName!,
+            TraceId = "1",
+            SpanId = "1",
+            OperationName = "Event Creation",
+            CorrelationId = null
+        };
+
+        _postgresFixture.SharedDbContext.EventLogs.Add(eventLog);
+        _postgresFixture.SharedDbContext.EventLogLocks.Add(new EventLogLock
+        {
+            EventLogId = eventLog.Id, AcquiredAt = Now
+        });
+        await _postgresFixture.SharedDbContext.SaveChangesAsync();
+
+        // Act
+        var (acquired, _) =
+            await store.TryAcquireLockAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId), default);
+
+        // Assert
+        acquired.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task ShouldAcquireCorrelationLock_WhenNoLockIsTaken()
+    {
+        // Arrange
+        var store = CreateEventStore();
+
+        var eventLog = new EventLog
+        {
+            Id = Guid.NewGuid(),
+            CreatedAt = _timeProvider.GetUtcNow(),
+            EventName = nameof(DomainEvent),
+            EventPayload = JsonSerializer.Serialize(new DomainEvent("1")),
+            EventType = typeof(DomainEvent).FullName!,
+            TraceId = "1",
+            SpanId = "1",
+            OperationName = "Event Creation",
+            CorrelationId = Guid.NewGuid()
+        };
+
+        _postgresFixture.SharedDbContext.EventLogs.Add(eventLog);
+        await _postgresFixture.SharedDbContext.SaveChangesAsync();
+
+        // Act
+        var (acquired, _) =
+            await store.TryAcquireLockAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId), default);
+
+        // Assert
+        acquired.Should().BeTrue();
+
+        var eventLock = await _postgresFixture.SharedDbContext.EventLogLocks.SingleOrDefaultAsync();
+        var correlationLock = await _postgresFixture.SharedDbContext.EventCorrelationLocks.SingleOrDefaultAsync();
+
+        eventLock.Should().BeNull();
+
+        correlationLock.Should().NotBeNull();
+        correlationLock!.CorrelationId.Should().Be(eventLog.CorrelationId.Value);
+    }
+
+    [Fact]
+    public async Task ShouldNotAcquireCorrelationLock_WhenCorrelationLockIsTaken()
+    {
+        // Arrange
+        var store = CreateEventStore();
+
+        var eventLog = new EventLog
+        {
+            Id = Guid.NewGuid(),
+            CreatedAt = _timeProvider.GetUtcNow(),
+            EventName = nameof(DomainEvent),
+            EventPayload = JsonSerializer.Serialize(new DomainEvent("1")),
+            EventType = typeof(DomainEvent).FullName!,
+            TraceId = "1",
+            SpanId = "1",
+            OperationName = "Event Creation",
+            CorrelationId = Guid.NewGuid()
+        };
+
+        _postgresFixture.SharedDbContext.EventLogs.Add(eventLog);
+        _postgresFixture.SharedDbContext.EventCorrelationLocks.Add(new EventCorrelationLock
+        {
+            CorrelationId = eventLog.CorrelationId.Value, AcquiredAt = Now
+        });
+        await _postgresFixture.SharedDbContext.SaveChangesAsync();
+
+        // Act
+        var (acquired, _) =
+            await store.TryAcquireLockAsync(new EventInfo(eventLog.Id, eventLog.CorrelationId), default);
+
+        // Assert
+        acquired.Should().BeFalse();
+    }
+
     private EventStore CreateEventStore()
     {
         var provider = new ServiceCollection()
             .AddSingleton<IEventLogDbContext>(_ => _postgresFixture.SharedDbContext)
             .BuildServiceProvider();
 
-        return new EventStore(_dbConnectionFactory, new EventMetaDataProvider(provider), _eventOptionsMonitor, _timeProvider);
+        return new EventStore(_dbConnectionFactory, new EventMetaDataProvider(provider), _eventOptionsMonitor,
+            _timeProvider);
+    }
+
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public Task DisposeAsync()
+    {
+        return _postgresFixture.ResetAsync();
     }
 }

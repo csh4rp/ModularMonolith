@@ -1,3 +1,5 @@
-﻿namespace ModularMonolith.Shared.Contracts;
+﻿using ModularMonolith.Shared.Domain.Abstractions;
 
-public interface IIntegrationEvent;
+namespace ModularMonolith.Shared.Contracts;
+
+public interface IIntegrationEvent : IEvent;

@@ -24,7 +24,7 @@ internal static class ServiceCollectionExtensions
                     MaxRetryAttempts = int.MaxValue
                 });
         });
-        
+
         serviceCollection.AddResiliencePipeline(EventConstants.EventLockReleasePipelineName, builder =>
         {
             builder
@@ -35,7 +35,7 @@ internal static class ServiceCollectionExtensions
                     MaxRetryAttempts = 3
                 });
         });
-        
+
         serviceCollection.AddResiliencePipeline(EventConstants.EventPublicationPipelineName, builder =>
         {
             builder
@@ -46,7 +46,7 @@ internal static class ServiceCollectionExtensions
                     MaxRetryAttempts = 3
                 });
         });
-        
+
         return serviceCollection;
     }
 }

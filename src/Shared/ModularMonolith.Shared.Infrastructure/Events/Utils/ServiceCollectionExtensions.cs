@@ -3,8 +3,7 @@
 internal static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddEventUtils(this IServiceCollection serviceCollection) =>
-        serviceCollection.AddSingleton<EventMapper>()
-            .AddSingleton<IEventChannel, EventChannel>()
+        serviceCollection.AddSingleton<IEventChannel, EventChannel>()
             .AddSingleton<IEventPublisher, EventPublisher>()
             .AddSingleton<EventSerializer>();
 }

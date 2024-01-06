@@ -40,11 +40,11 @@ internal sealed class EventPollingBackgroundService : BackgroundService
     private async ValueTask RunAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Starting event polling");
-        
+
         try
         {
             using var timer = new PeriodicTimer(_optionsMonitor.CurrentValue.PollInterval);
-            
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 var take = _optionsMonitor.CurrentValue.MaxPollBatchSize;
@@ -54,7 +54,7 @@ internal sealed class EventPollingBackgroundService : BackgroundService
                 {
                     await _eventChannel.Writer.WriteAsync(eventInfo, cancellationToken);
                 }
-                
+
                 await timer.WaitForNextTickAsync(cancellationToken);
             }
         }

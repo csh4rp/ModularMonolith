@@ -14,7 +14,7 @@ public class InfrastructureTests
         Assembly.Load("ModularMonolith.CategoryManagement.Infrastructure"),
         Assembly.Load("ModularMonolith.Identity.Infrastructure")
     ).Build();
-    
+
     [Fact]
     public void ShouldAllQueryHandlersBeInternalAndSealed()
     {

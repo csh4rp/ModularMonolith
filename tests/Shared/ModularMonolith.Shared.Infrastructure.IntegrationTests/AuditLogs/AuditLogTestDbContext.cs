@@ -18,7 +18,7 @@ public class AuditLogTestDbContext : BaseDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         modelBuilder.Entity<FirstTestEntity>()
             .ToTable("first_test_entity")
             .HasKey(b => b.Id);
@@ -48,6 +48,5 @@ public class AuditLogTestDbContext : BaseDbContext
         modelBuilder.Entity<SecondTestEntity>()
             .ToTable("second_test_entity")
             .AuditIgnore();
-        
     }
 }

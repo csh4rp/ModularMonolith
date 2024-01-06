@@ -11,7 +11,7 @@ public class EventOptions
 
     [Range(typeof(TimeSpan), "00:00:01", "01:00:00")]
     public TimeSpan MaxLockTime { get; set; }
-    
+
     [Range(typeof(TimeSpan), "00:00:01", "01:00:00")]
     public TimeSpan TimeBetweenAttempts { get; set; }
 
@@ -23,10 +23,10 @@ public class EventOptions
 
     [Range(1, int.MaxValue)]
     public int MaxRetryAttempts { get; set; }
-    
+
     [Range(1, int.MaxValue)]
     public int MaxPollBatchSize { get; set; }
-    
+
     [DefaultValue(true)]
     public bool RunBackgroundWorkers { get; set; }
 }

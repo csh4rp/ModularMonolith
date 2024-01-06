@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics;
 using MediatR;
+using ModularMonolith.Shared.Application.Abstract;
 using ModularMonolith.Shared.Application.Identity;
+using ModularMonolith.Shared.Contracts;
+using ModularMonolith.Shared.Domain.Abstractions;
 using ModularMonolith.Shared.Infrastructure.Events.Extensions;
 using EventLog = ModularMonolith.Shared.Domain.Entities.EventLog;
 
@@ -12,17 +15,14 @@ internal sealed class EventPublisher : IEventPublisher
 
     private readonly EventSerializer _eventSerializer;
     private readonly IServiceProvider _serviceScopeFactory;
-    private readonly EventMapper _eventMapper;
     private readonly ILogger<EventPublisher> _logger;
 
     public EventPublisher(EventSerializer eventSerializer,
         IServiceProvider serviceScopeFactory,
-        EventMapper eventMapper,
         ILogger<EventPublisher> logger)
     {
         _eventSerializer = eventSerializer;
         _serviceScopeFactory = serviceScopeFactory;
-        _eventMapper = eventMapper;
         _logger = logger;
     }
 
@@ -49,27 +49,35 @@ internal sealed class EventPublisher : IEventPublisher
 
         _logger.EventPublished(eventLog.Id);
 
-        if (_eventMapper.TryMap(@event, out var integrationEvent))
+        var mappingType = typeof(IEventMapping<>).MakeGenericType(@event.GetType());
+        var eventMapping = _serviceScopeFactory.GetService(mappingType);
+
+        if (eventMapping is null)
         {
-            await using (var scope = _serviceScopeFactory.CreateAsyncScope())
+            return;
+        }
+
+        var method = mappingType.GetMethod(nameof(IEventMapping<IEvent>.Map))!;
+        var integrationEvent = (IIntegrationEvent)method.Invoke(eventMapping, [@event])!;
+
+        await using (var scope = _serviceScopeFactory.CreateAsyncScope())
+        {
+            if (eventLog.UserId.HasValue)
             {
-                if (eventLog.UserId.HasValue)
-                {
-                    var identitySetter = scope.ServiceProvider.GetRequiredService<IIdentityContextSetter>();
-                    identitySetter.Set(new IdentityContext(eventLog.UserId.Value, eventLog.UserName!));
-                }
-
-                using var activity =
-                    EventPublisherActivitySource.CreateActivity(eventLog.EventName, ActivityKind.Internal);
-                activity?.SetParentId(eventLog.TraceId);
-                activity?.Start();
-
-                var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-
-                await mediator.Publish(integrationEvent, cancellationToken);
+                var identitySetter = scope.ServiceProvider.GetRequiredService<IIdentityContextSetter>();
+                identitySetter.Set(new IdentityContext(eventLog.UserId.Value, eventLog.UserName!));
             }
 
-            _logger.IntegrationEventPublished(eventLog.Id);
+            using var activity =
+                EventPublisherActivitySource.CreateActivity(eventLog.EventName, ActivityKind.Internal);
+            activity?.SetParentId(eventLog.TraceId);
+            activity?.Start();
+
+            var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+            await mediator.Publish(integrationEvent, cancellationToken);
         }
+
+        _logger.IntegrationEventPublished(eventLog.Id);
     }
 }

@@ -5,25 +5,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj" />
-    <ProjectReference Include="..\ModularMonolith.Shared.Core\ModularMonolith.Shared.Core.csproj" />
+    <ProjectReference Include="..\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Shared.Core\ModularMonolith.Shared.Core.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EFCore.NamingConventions" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
-    <PackageReference Include="Microsoft.Extensions.Options" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
-    <PackageReference Include="Npgsql" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
-    <PackageReference Include="Polly" />
-    <PackageReference Include="Polly.Extensions" />
-    <PackageReference Include="Serilog" />
-    <PackageReference Include="Serilog.Extensions.Logging" />
-    <PackageReference Include="Z.EntityFramework.Plus.EFCore" />
+    <PackageReference Include="EFCore.NamingConventions"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational"/>
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions"/>
+    <PackageReference Include="Microsoft.Extensions.Options"/>
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions"/>
+    <PackageReference Include="Npgsql"/>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
+    <PackageReference Include="Polly"/>
+    <PackageReference Include="Polly.Extensions"/>
+    <PackageReference Include="Serilog"/>
+    <PackageReference Include="Serilog.Extensions.Logging"/>
+    <PackageReference Include="Z.EntityFramework.Plus.EFCore"/>
   </ItemGroup>
 
 </Project>

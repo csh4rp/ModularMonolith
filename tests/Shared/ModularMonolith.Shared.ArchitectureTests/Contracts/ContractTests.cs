@@ -30,13 +30,13 @@ public class ContractTests
 
         Architecture.CheckRule(rule);
     }
-    
+
     [Fact]
     public void ShouldAllQueriesBePublicAndSealed()
     {
         var rule = Classes()
             .That()
-            .AreAssignableTo( typeof(IQuery<>))
+            .AreAssignableTo(typeof(IQuery<>))
             .Should()
             .BePublic()
             .AndShould()

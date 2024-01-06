@@ -28,10 +28,10 @@ public class ApplicationTests
             .BeSealed()
             .AndShould()
             .HaveNameEndingWith("Handler");
-        
+
         Architecture.CheckRule(rule);
     }
-    
+
     [Fact]
     public void ShouldAllCommandValidatorsBeInternalAndSealed()
     {
@@ -44,7 +44,7 @@ public class ApplicationTests
             .BeSealed()
             .AndShould()
             .HaveNameEndingWith("Validator");
-        
+
         Architecture.CheckRule(rule);
     }
 }

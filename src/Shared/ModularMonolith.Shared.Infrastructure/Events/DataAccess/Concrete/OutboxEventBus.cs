@@ -118,7 +118,7 @@ internal sealed class OutboxEventBus : IEventBus
             scope.DbContext.Set<EventLog>().AddRange(eventLogs);
             return scope.DbContext.SaveChangesAsync(cancellationToken);
         }
-        
+
         _dbContext.EventLogs.AddRange(eventLogs);
         return _dbContext.SaveChangesAsync(cancellationToken);
     }

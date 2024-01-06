@@ -72,7 +72,7 @@ internal sealed class EventMetaDataProvider
         var model = dbContext.Model;
 
         var entity = model.FindEntityType(typeof(EventCorrelationLock))!;
-        
+
         return new EventLogCorrelationLockMetaData
         {
             TableName = GetFullTableName(entity),
@@ -104,7 +104,7 @@ internal sealed class EventMetaDataProvider
     {
         var schema = entityType.GetSchema();
         var table = entityType.GetTableName()!;
-        
+
         return string.IsNullOrEmpty(schema) ? table : $"{schema}.{table}";
     }
 }

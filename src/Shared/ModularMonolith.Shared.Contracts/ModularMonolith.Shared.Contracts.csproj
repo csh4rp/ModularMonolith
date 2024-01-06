@@ -8,4 +8,8 @@
     <PackageReference Include="FluentValidation"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
+  </ItemGroup>
+
 </Project>
