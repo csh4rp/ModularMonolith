@@ -5,31 +5,18 @@ namespace ModularMonolith.Shared.Contracts;
 
 public readonly record struct Result
 {
-    private enum ResultState : byte
+    public static readonly Result Successful = new();
+    
+    public Result()
     {
-        Undefined,
-        Success,
-        Failure
     }
 
-    public static readonly Result Successful = new(true);
-
-    private readonly ResultState _resultState;
-
-    public Result() => _resultState = ResultState.Undefined;
-
-    private Result(bool isSuccessful) => _resultState = isSuccessful ? ResultState.Success : ResultState.Undefined;
-
-    private Result(Error error)
-    {
-        Error = error;
-        _resultState = ResultState.Failure;
-    }
+    private Result(Error error) => Error = error;
 
     public Error? Error { get; private init; }
 
     [MemberNotNullWhen(false, nameof(Error))]
-    public bool IsSuccessful => _resultState == ResultState.Success;
+    public bool IsSuccessful => Error is null;
 
     public static implicit operator Error?(Result result) => result.Error;
 
@@ -40,28 +27,9 @@ public readonly record struct Result
 
 public readonly record struct Result<T>
 {
-    private enum ResultState : byte
-    {
-        Undefined,
-        Success,
-        Failure
-    }
+    public Result(T value) => Value = value;
 
-    private readonly ResultState _resultState;
-
-    public Result() => _resultState = ResultState.Undefined;
-
-    public Result(T value)
-    {
-        Value = value;
-        _resultState = ResultState.Success;
-    }
-
-    public Result(Error error)
-    {
-        Error = error;
-        _resultState = ResultState.Failure;
-    }
+    public Result(Error error) => Error = error;
 
     public T? Value { get; private init; }
 
@@ -69,7 +37,7 @@ public readonly record struct Result<T>
 
     [MemberNotNullWhen(false, nameof(Error))]
     [MemberNotNullWhen(true, nameof(Value))]
-    public bool IsSuccessful => _resultState == ResultState.Success;
+    public bool IsSuccessful => Error is null;
 
     public static implicit operator Error?(Result<T> result) => result.Error;
 

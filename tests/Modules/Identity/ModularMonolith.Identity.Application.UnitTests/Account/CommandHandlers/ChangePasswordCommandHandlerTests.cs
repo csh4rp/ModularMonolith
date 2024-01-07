@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using ModularMonolith.Identity.Application.Account.CommandHandlers;
 using ModularMonolith.Identity.Application.UnitTests.Account.Fakes;
 using ModularMonolith.Identity.Contracts.Account.Commands;
