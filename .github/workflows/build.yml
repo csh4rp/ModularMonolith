@@ -15,5 +15,7 @@ jobs:
       run: dotnet restore ModularMonolith.sln
     - name: Build
       run: dotnet build ModularMonolith.sln
+    - name: Run Architecture-Tests
+      run: dotnet test --filter "FullyQualifiedName~.Architecture"
     - name: Run Unit-Tests
       run: dotnet test --filter "FullyQualifiedName~.UnitTests"
