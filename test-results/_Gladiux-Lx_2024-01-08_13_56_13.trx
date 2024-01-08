@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="9b94f3e4-9520-4f35-9c2d-6e42423cc38e" name="@Gladiux-Lx 2024-01-08 13:56:13" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2024-01-08T13:56:13.4922344+01:00" queuing="2024-01-08T13:56:13.4922345+01:00" start="2024-01-08T13:56:11.6247705+01:00" finish="2024-01-08T13:56:13.4927895+01:00" />
+  <TestSettings name="default" id="1e129949-0a8b-4148-a75d-95ddced47c11">
+    <Deployment runDeploymentRoot="_Gladiux-Lx_2024-01-08_13_56_13" />
+  </TestSettings>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="0" executed="0" passed="0" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.5.6+bf9b858c26 (64-bit .NET 8.0.0)
+[xUnit.net 00:00:00.08]   Discovering: ModularMonolith.Shared.ArchitectureTests
+[xUnit.net 00:00:00.11]   Discovered:  ModularMonolith.Shared.ArchitectureTests
+[xUnit.net 00:00:00.11]   Starting:    ModularMonolith.Shared.ArchitectureTests
+[xUnit.net 00:00:00.13]   Finished:    ModularMonolith.Shared.ArchitectureTests
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="Gladiux-Lx" outcome="Warning" timestamp="2024-01-08T13:56:13.0554956+01:00">
+        <Text>No test matches the given testcase filter `FullyQualifiedName~.UnitTests` in /home/kambie/Projects/dotnet/ModularMonolith/tests/Shared/ModularMonolith.Shared.ArchitectureTests/bin/Debug/net8.0/ModularMonolith.Shared.ArchitectureTests.dll</Text>
+      </RunInfo>
+    </RunInfos>
+    <CollectorDataEntries>
+      <Collector agentName="Gladiux-Lx" uri="datacollector://microsoft/CoverletCodeCoverage/1.0" collectorDisplayName="XPlat code coverage">
+        <UriAttachments>
+          <UriAttachment>
+            <A href="Gladiux-Lx/coverage.cobertura.xml"></A>
+          </UriAttachment>
+        </UriAttachments>
+      </Collector>
+    </CollectorDataEntries>
+  </ResultSummary>
+</TestRun>
