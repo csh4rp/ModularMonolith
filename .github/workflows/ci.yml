@@ -30,13 +30,13 @@ jobs:
     - name: Upload Unit-Test results
       uses: actions/upload-artifact@v3
       with:
-        name: dotnet-results-8.x
+        name: dotnet-test-results
         path: TestResults
       if: always()
     - name: Test Reporter
       uses: dorny/test-reporter@v1.7.0
       with:
-        artifact: dotnet-results-8.x
+        artifact: dotnet-test-results
         name: dotnet tests
         path: '*.trx'
         reporter: dotnet-trx
