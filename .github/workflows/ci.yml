@@ -38,6 +38,6 @@ jobs:
       with:
         artifact: (.*)
         name: dotnet tests
-        path: ''
+        path: '*.trx'
         reporter: dotnet-trx
       if: always()
