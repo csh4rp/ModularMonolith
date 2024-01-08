@@ -9,10 +9,11 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      actions: read
+      statuses: write
       checks: write
-      packages: read
+      contents: write
+      pull-requests: write
+      actions: write
 
     steps:
     - uses: actions/checkout@v4
