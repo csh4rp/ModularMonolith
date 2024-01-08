@@ -38,8 +38,7 @@ jobs:
     - name: Test Reporter
       uses: dorny/test-reporter@v1
       with:
-        artifact: test-results
         name: dotnet tests
-        path: '*.trx'
+        path: 'test-results/*.trx'
         reporter: dotnet-trx
       if: always()
