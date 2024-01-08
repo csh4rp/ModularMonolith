@@ -22,7 +22,7 @@ jobs:
     - name: Run Architecture-Tests
       run: dotnet test --filter "FullyQualifiedName~.ArchitectureTests"
     - name: Run Unit-Tests
-      run: dotnet test -logger trx --results-directory "TestResults" --filter "FullyQualifiedName~.UnitTests"
+      run: dotnet test --logger trx --results-directory "TestResults" --filter "FullyQualifiedName~.UnitTests"
     - name: Upload Unit-Test results
       uses: actions/upload-artifact@v3
       with:
