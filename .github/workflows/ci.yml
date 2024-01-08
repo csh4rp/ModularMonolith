@@ -1,4 +1,4 @@
-name: Build & Test Project
+name: Continous Integration
 on:
   push:
     branches:
@@ -6,7 +6,7 @@ on:
       - develop
 
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,4 +28,12 @@ jobs:
       with:
         name: dotnet-results-8.x
         path: TestResults
-      if: ${{ always() }}
+      if: always()
+    - name: Test Reporter
+      uses: dorny/test-reporter@v1.7.0
+      with:
+        name: dotnet tests
+        path: TestResults/*.trx
+        reporter: dotnet-trx
+      if: always()
+  
