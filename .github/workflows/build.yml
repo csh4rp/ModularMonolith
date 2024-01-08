@@ -1,5 +1,9 @@
-name: build-project
-on: [push]
+name: Build & Test Project
+on:
+  push:
+    branches:
+      - master
+      - develop
 
 jobs:
   build:
@@ -16,6 +20,12 @@ jobs:
     - name: Build
       run: dotnet build ModularMonolith.sln
     - name: Run Architecture-Tests
-      run: dotnet test --filter "FullyQualifiedName~.Architecture"
+      run: dotnet test --filter "FullyQualifiedName~.ArchitectureTests"
     - name: Run Unit-Tests
-      run: dotnet test --filter "FullyQualifiedName~.UnitTests"
+      run: dotnet test -logger trx --results-directory "TestResults" --filter "FullyQualifiedName~.UnitTests"
+    - name: Upload Unit-Test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: dotnet-results-8.x
+        path: TestResults
+      if: ${{ always() }}
