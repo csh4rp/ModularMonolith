@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using FluentAssertions;
 using ModularMonolith.Identity.Api.IntegrationTests.Fixtures;
-using ModularMonolith.Shared.IntegrationTests.Common;
+using ModularMonolith.Shared.TestUtils.Abstractions;
 
 namespace ModularMonolith.Identity.Api.IntegrationTests.Account;
 

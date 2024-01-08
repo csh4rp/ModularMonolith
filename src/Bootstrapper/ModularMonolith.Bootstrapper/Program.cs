@@ -1,9 +1,20 @@
-﻿using ModularMonolith.Shared.Api;
+﻿using System.Diagnostics.CodeAnalysis;
+using ModularMonolith.Shared.Api;
 
-var builder = WebApplication.CreateBuilder(args)
-    .RegisterModules();
+[assembly: ExcludeFromCodeCoverage]
 
-var app = builder.Build()
-    .PreparePipeline();
+namespace ModularMonolith.Bootstrapper;
 
-await app.RunAsync();
+public class Program
+{
+    public static async Task Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args)
+            .RegisterModules();
+
+        var app = builder.Build()
+            .PreparePipeline();
+
+        await app.RunAsync();
+    }
+}

@@ -6,7 +6,6 @@ using ModularMonolith.CategoryManagement.Domain.Entities;
 using ModularMonolith.CategoryManagement.Infrastructure.Common.DataAccess;
 using ModularMonolith.Shared.TestUtils.Assertions;
 using ModularMonolith.Shared.Contracts.Errors;
-using Xunit;
 
 namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.CommandHandlers;
 

@@ -21,7 +21,6 @@
     <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Migrations\ModularMonolith.CategoryManagement.Migrations.csproj"/>
     <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Migrations\ModularMonolith.Identity.Migrations.csproj"/>
     <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.Migrations\ModularMonolith.Shared.Migrations.csproj"/>
-    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.IntegrationTests.Common\ModularMonolith.Shared.IntegrationTests.Common.csproj"/>
   </ItemGroup>
 
   <ItemGroup>

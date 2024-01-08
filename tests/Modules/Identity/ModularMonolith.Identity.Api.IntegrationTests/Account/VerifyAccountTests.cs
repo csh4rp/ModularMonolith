@@ -8,6 +8,7 @@ using ModularMonolith.Identity.Api.IntegrationTests.Account.Fixtures;
 using ModularMonolith.Identity.Api.IntegrationTests.Fixtures;
 using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Shared.IntegrationTests.Common;
+using ModularMonolith.Shared.TestUtils.Abstractions;
 
 namespace ModularMonolith.Identity.Api.IntegrationTests.Account;
 

@@ -8,7 +8,6 @@ using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Events;
 using ModularMonolith.Shared.TestUtils.Assertions;
 using NSubstitute;
-using Xunit;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.CommandHandlers;
 

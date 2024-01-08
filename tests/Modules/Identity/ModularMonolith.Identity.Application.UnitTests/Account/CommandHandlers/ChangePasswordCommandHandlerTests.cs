@@ -9,7 +9,6 @@ using ModularMonolith.Shared.Application.Identity;
 using ModularMonolith.Shared.Contracts.Errors;
 using ModularMonolith.Shared.TestUtils.Assertions;
 using NSubstitute;
-using Xunit;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.CommandHandlers;
 

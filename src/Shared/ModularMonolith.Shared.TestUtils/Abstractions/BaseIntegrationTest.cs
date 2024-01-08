@@ -1,9 +1,13 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using ModularMonolith.Shared.IntegrationTests.Common;
 
-namespace ModularMonolith.Shared.IntegrationTests.Common;
+[assembly: ExcludeFromCodeCoverage]
+
+namespace ModularMonolith.Shared.TestUtils.Abstractions;
 
 [UsesVerify]
 public abstract class BaseIntegrationTest<TClass> : IAsyncLifetime

@@ -3,6 +3,7 @@ using FluentAssertions;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories.Fixtures;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Fixtures;
 using ModularMonolith.Shared.IntegrationTests.Common;
+using ModularMonolith.Shared.TestUtils.Abstractions;
 
 namespace ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories;
 

@@ -2,7 +2,6 @@
 using FluentValidation.TestHelper;
 using ModularMonolith.CategoryManagement.Application.Categories.Validators;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
-using Xunit;
 
 namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.Validators;
 
