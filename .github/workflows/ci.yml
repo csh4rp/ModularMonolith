@@ -52,9 +52,9 @@ jobs:
         fail_below_min: false
         format: markdown
         hide_branch_rate: false
-        hide_complexity: true
+        hide_complexity: false
         indicators: true
-        output: file
+        output: both
         thresholds: '60 80'
     - name: Upload Code Coverage
       uses: actions/upload-artifact@v4
