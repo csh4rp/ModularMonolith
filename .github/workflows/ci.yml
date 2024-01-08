@@ -26,18 +26,18 @@ jobs:
     - name: Run Architecture-Tests
       run: dotnet test --filter "FullyQualifiedName~.ArchitectureTests"
     - name: Run Unit-Tests
-      run: dotnet test --logger trx --results-directory "TestResults" --filter "FullyQualifiedName~.UnitTests"
+      run: dotnet test --logger trx --results-directory "test-results" --filter "FullyQualifiedName~.UnitTests"
     - name: Upload Unit-Test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: dotnet-test-results
-        path: TestResults
+        path: test-results
       if: always()
     - name: Test Reporter
       uses: dorny/test-reporter@v1.7.0
       with:
-        artifact: /dotnet-test-results/
+        artifact: /test-results/
         name: dotnet tests
-        path: '/*.trx'
+        path: '*.trx'
         reporter: dotnet-trx
       if: always()
