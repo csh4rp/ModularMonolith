@@ -1,12 +1,9 @@
-﻿using System.Diagnostics;
-using System.Reflection;
+﻿using System.Text.Json;
+using MassTransit;
 using ModularMonolith.Shared.Application.Events;
 using ModularMonolith.Shared.Application.Identity;
 using ModularMonolith.Shared.Domain.Abstractions;
-using ModularMonolith.Shared.Domain.Attributes;
-using ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
-using ModularMonolith.Shared.Infrastructure.Events.Utils;
 using EventLog = ModularMonolith.Shared.Domain.Entities.EventLog;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
@@ -14,114 +11,83 @@ namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
 internal sealed class OutboxEventBus : IEventBus
 {
     private static readonly EventPublishOptions DefaultOptions = new();
-    private readonly IEventLogDbContext _dbContext;
-    private readonly EventSerializer _eventSerializer;
+    
+    private readonly IEventLogDatabase _database;
     private readonly IIdentityContextAccessor _identityContextAccessor;
     private readonly TimeProvider _timeProvider;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IPublishEndpoint _bus;
 
-    public OutboxEventBus(IEventLogDbContext dbContext,
-        EventSerializer eventSerializer,
+    public OutboxEventBus(IEventLogDatabase database,
         IIdentityContextAccessor identityContextAccessor,
-        TimeProvider timeProvider, IHttpContextAccessor httpContextAccessor)
+        TimeProvider timeProvider,
+        IPublishEndpoint bus)
     {
-        _dbContext = dbContext;
-        _eventSerializer = eventSerializer;
+        _database = database;
         _identityContextAccessor = identityContextAccessor;
         _timeProvider = timeProvider;
-        _httpContextAccessor = httpContextAccessor;
+        _bus = bus;
     }
 
     public Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : IEvent
         => PublishAsync(@event, DefaultOptions, cancellationToken);
 
-    public Task PublishAsync<TEvent>(TEvent @event, EventPublishOptions options, CancellationToken cancellationToken)
+    public async Task PublishAsync<TEvent>(TEvent @event, EventPublishOptions options, CancellationToken cancellationToken)
         where TEvent : IEvent
     {
-        var currentActivity = Activity.Current;
-        Debug.Assert(currentActivity is not null);
-
-        var eventType = typeof(TEvent);
-        var attribute = eventType.GetCustomAttribute<EventAttribute>();
-
         var identityContext = _identityContextAccessor.Context;
-        var remoteIpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
-        var userAgent = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent;
-
-        var eventLog = new EventLog
+        var messageId = Guid.NewGuid();
+        
+        await _bus.Publish(@event, a =>
         {
+            a.MessageId = messageId;
+            a.CorrelationId = options.CorrelationId;
+        }, cancellationToken);
+
+        var log = new EventLog
+        {
+            Id = messageId,
             CreatedAt = _timeProvider.GetUtcNow(),
-            EventName = attribute?.Name ?? eventType.Name,
-            EventType = eventType.FullName!,
-            EventPayload = _eventSerializer.Serialize(@event),
-            Topic = attribute?.Topic,
-            CorrelationId = options.CorrelationId,
-            UserId = identityContext?.UserId,
-            UserName = identityContext?.UserName,
-            OperationName = currentActivity.OperationName,
-            TraceId = currentActivity.TraceId.ToString(),
-            SpanId = currentActivity.SpanId.ToString(),
-            ParentSpanId = currentActivity.Parent is null ? null : currentActivity.ParentSpanId.ToString(),
-            IpAddress = remoteIpAddress?.ToString(),
-            UserAgent = userAgent
+            EventPayload = JsonSerializer.Serialize(@event),
+            EventType = typeof(TEvent).FullName!,
+            UserId = identityContext?.UserId
         };
 
-        var scope = TransactionalScope.Current.Value;
-        if (scope?.DbContext is not null)
-        {
-            scope.DbContext.Set<EventLog>().Add(eventLog);
-            return scope.DbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        _dbContext.EventLogs.Add(eventLog);
-        return _dbContext.SaveChangesAsync(cancellationToken);
+        _database.EventLogs.Add(log);
+        await _database.SaveChangesAsync(cancellationToken);
     }
 
     public Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken)
         => PublishAsync(events, DefaultOptions, cancellationToken);
 
-    public Task PublishAsync(IEnumerable<IEvent> events, EventPublishOptions options,
+    public async Task PublishAsync(IEnumerable<IEvent> events, EventPublishOptions options,
         CancellationToken cancellationToken)
     {
-        var currentActivity = Activity.Current;
-        Debug.Assert(currentActivity is not null);
-
         var identityContext = _identityContextAccessor.Context;
-        var remoteIpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
-        var userAgent = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent;
-
-        var eventLogs = events.Select(e =>
+        var eventLogs = new List<EventLog>();
+        
+        foreach (var @event in events)
         {
-            var eventType = e.GetType();
-            var attribute = eventType.GetCustomAttribute<EventAttribute>();
-
-            return new EventLog
+            var messageId = Guid.NewGuid();
+            
+            await _bus.Publish(@event, a =>
             {
-                CreatedAt = _timeProvider.GetUtcNow(),
-                EventName = attribute?.Name ?? eventType.Name,
-                EventType = eventType.FullName!,
-                EventPayload = _eventSerializer.Serialize(e),
-                Topic = attribute?.Topic,
-                CorrelationId = options.CorrelationId,
-                UserId = identityContext?.UserId,
-                UserName = identityContext?.UserName,
-                OperationName = currentActivity.OperationName,
-                TraceId = currentActivity.TraceId.ToString(),
-                SpanId = currentActivity.SpanId.ToString(),
-                ParentSpanId = currentActivity.Parent is null ? null : currentActivity.ParentSpanId.ToString(),
-                IpAddress = remoteIpAddress?.ToString(),
-                UserAgent = userAgent
-            };
-        });
+                a.MessageId = messageId;
+                a.CorrelationId = options.CorrelationId;
+            }, cancellationToken);
 
-        var scope = TransactionalScope.Current.Value;
-        if (scope?.DbContext is not null)
-        {
-            scope.DbContext.Set<EventLog>().AddRange(eventLogs);
-            return scope.DbContext.SaveChangesAsync(cancellationToken);
+            var eventLog = new EventLog
+            {
+                Id = messageId,
+                CreatedAt = _timeProvider.GetUtcNow(),
+                EventPayload = JsonSerializer.Serialize(@event),
+                EventType = @event.GetType().FullName!,
+                UserId = identityContext?.UserId
+            };
+
+            eventLogs.Add(eventLog);
         }
 
-        _dbContext.EventLogs.AddRange(eventLogs);
-        return _dbContext.SaveChangesAsync(cancellationToken);
+        _database.EventLogs.AddRange(eventLogs);
+        await _database.SaveChangesAsync(cancellationToken);
     }
 }

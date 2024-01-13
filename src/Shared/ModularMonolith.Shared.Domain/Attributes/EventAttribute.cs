@@ -14,4 +14,6 @@ public class EventAttribute : Attribute
     public string Name { get; }
 
     public string? Topic { get; }
+    
+    public bool IsPersisted { get; init; }
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ModularMonolith.CategoryManagement.Application.Categories.Abstract;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Queries;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Responses;
-using ModularMonolith.CategoryManagement.Infrastructure.Common.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Queries;
 
 namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.DataAccess.QueryHandlers;
@@ -9,13 +9,13 @@ namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.DataAcces
 internal sealed class GetCategoryDetailsByIdQueryHandler
     : IQueryHandler<GetCategoryDetailsByIdQuery, CategoryDetailsResponse?>
 {
-    private readonly CategoryManagementDbContext _dbContext;
+    private readonly ICategoryDatabase _database;
 
-    public GetCategoryDetailsByIdQueryHandler(CategoryManagementDbContext dbContext) => _dbContext = dbContext;
+    public GetCategoryDetailsByIdQueryHandler(ICategoryDatabase database) => _database = database;
 
     public Task<CategoryDetailsResponse?> Handle(GetCategoryDetailsByIdQuery request,
         CancellationToken cancellationToken) =>
-        _dbContext.Categories.Where(c => c.Id == request.Id)
+        _database.Categories.Where(c => c.Id == request.Id)
             .Select(c => new CategoryDetailsResponse { Id = c.Id, ParentId = c.ParentId, Name = c.Name })
             .FirstOrDefaultAsync(cancellationToken);
 }

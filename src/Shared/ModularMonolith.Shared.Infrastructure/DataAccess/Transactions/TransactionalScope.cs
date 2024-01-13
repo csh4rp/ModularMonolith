@@ -17,7 +17,7 @@ public sealed class TransactionalScope : ITransactionalScope
         {
             return;
         }
-
+        
         await DbContext.Database.CurrentTransaction.CommitAsync(cancellationToken);
         DbContext = null;
     }

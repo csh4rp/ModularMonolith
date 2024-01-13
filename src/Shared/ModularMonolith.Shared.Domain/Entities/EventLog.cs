@@ -2,35 +2,13 @@
 
 public sealed class EventLog
 {
-    public Guid Id { get; init; }
+    public required Guid Id { get; init; }
 
     public required DateTimeOffset CreatedAt { get; init; }
 
-    public DateTimeOffset? PublishedAt { get; init; }
-
     public Guid? UserId { get; init; }
 
-    public string? UserName { get; init; }
-
-    public required string? Topic { get; init; }
-    
-    public required Guid? CorrelationId { get; init; }
-
     public required string EventType { get; init; }
-
-    public required string EventName { get; init; }
-
+    
     public required string EventPayload { get; init; }
-
-    public required string OperationName { get; init; }
-
-    public required string TraceId { get; init; }
-
-    public required string SpanId { get; init; }
-
-    public string? ParentSpanId { get; init; }
-
-    public string? IpAddress { get; init; }
-
-    public string? UserAgent { get; init; }
 }

@@ -1,12 +1,16 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
 using Asp.Versioning;
 using FluentValidation;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using ModularMonolith.Bootstrapper.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Api.Exceptions;
 using ModularMonolith.Shared.Api.Middlewares;
 using ModularMonolith.Shared.Application;
+using ModularMonolith.Shared.Infrastructure;
 using ModularMonolith.Shared.Infrastructure.AuditLogs;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Events;
@@ -71,6 +75,51 @@ public static class WebApplicationBuilderExtensions
         {
         });
 
+        builder.Services.AddOptions<SqlTransportOptions>().Configure(options =>
+        {
+            options.Host =  "localhost";
+            options.Database = "modular_monolith";
+            options.Schema = "shared";
+            options.Role = "shared";
+            options.Username = "postgres";
+            options.Password = "Admin123!@#";
+            options.AdminUsername = "postgres";
+            options.AdminPassword = "Admin123!@#";
+        });
+
+        builder.Services.AddPostgresMigrationHostedService(true, false);
+        
+        builder.Services.AddMassTransit(c =>
+        {
+            c.AddEntityFrameworkOutbox<ApplicationDbContext>(o =>
+            {
+                o.UsePostgres();
+                
+                o.UseBusOutbox(a =>
+                {
+                    a.MessageDeliveryLimit = 10;
+                });
+            });
+            
+            c.AddConsumers(Assembly.Load("ModularMonolith.CategoryManagement.Application"));
+
+            c.AddConfigureEndpointsCallback((context, _, cfg) =>
+            {
+                cfg.UseEntityFrameworkOutbox<ApplicationDbContext>(context);
+            });
+            
+                        
+            c.UsingPostgres((context, cfg) =>
+            {
+                cfg.UseDbMessageScheduler();
+
+                cfg.AutoStart = true;
+
+                cfg.ConfigureEndpoints(context);
+            });
+            
+        });
+        
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(opt =>
         {
@@ -123,7 +172,8 @@ public static class WebApplicationBuilderExtensions
             .AddSingleton(TimeProvider.System)
             .AddIdentityServices()
             .AddHttpContextAccessor()
-            .AddExceptionHandlers();
+            .AddExceptionHandlers()
+            .AddMass();
 
         builder.Services.AddDataAccess(c =>
         {

@@ -1,7 +1,7 @@
-﻿using ModularMonolith.CategoryManagement.Contracts.Categories.Models;
+﻿using ModularMonolith.CategoryManagement.Application.Categories.Abstract;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Models;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Queries;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Responses;
-using ModularMonolith.CategoryManagement.Infrastructure.Common.DataAccess;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Extensions;
 using ModularMonolith.Shared.Infrastructure.Queries;
 using Z.EntityFramework.Plus;
@@ -10,13 +10,13 @@ namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.DataAcces
 
 internal sealed class FindCategoriesQueryHandler : IQueryHandler<FindCategoriesQuery, CategoriesResponse>
 {
-    private readonly CategoryManagementDbContext _dbContext;
+    private readonly ICategoryDatabase _database;
 
-    public FindCategoriesQueryHandler(CategoryManagementDbContext dbContext) => _dbContext = dbContext;
+    public FindCategoriesQueryHandler(ICategoryDatabase database) => _database = database;
 
     public async Task<CategoriesResponse> Handle(FindCategoriesQuery request, CancellationToken cancellationToken)
     {
-        var query = _dbContext.Categories.AsQueryable();
+        var query = _database.Categories.AsQueryable();
 
         if (!string.IsNullOrEmpty(request.Search))
         {

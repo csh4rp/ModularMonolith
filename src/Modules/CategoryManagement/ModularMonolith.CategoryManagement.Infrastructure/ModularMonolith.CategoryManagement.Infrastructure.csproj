@@ -16,4 +16,8 @@
     <PackageReference Include="Z.EntityFramework.Plus.EFCore"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Common\" />
+  </ItemGroup>
+
 </Project>

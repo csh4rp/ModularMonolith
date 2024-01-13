@@ -1,9 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Shared.Application.Abstract;
-using ModularMonolith.Shared.Infrastructure.DataAccess.Factories;
-using ModularMonolith.Shared.Infrastructure.DataAccess.Options;
-using ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
-using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
+﻿using ModularMonolith.Shared.Infrastructure.DataAccess.Options;
 
 namespace ModularMonolith.Shared.Infrastructure.DataAccess;
 
@@ -17,15 +12,6 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddOptions<DatabaseOptions>()
             .PostConfigure(action);
-
-        serviceCollection.AddSingleton<DbConnectionFactory>()
-            .AddSingleton<ITransactionalScopeFactory, TransactionalScopeFactory>()
-            .AddDbContextFactory<SharedDbContext>((sp, b) =>
-            {
-                b.UseNpgsql(options.ConnectionString);
-                b.UseSnakeCaseNamingConvention();
-                b.UseApplicationServiceProvider(sp);
-            }).AddScoped<IEventLogDbContext>(sp => sp.GetRequiredService<SharedDbContext>());
 
         return serviceCollection;
     }

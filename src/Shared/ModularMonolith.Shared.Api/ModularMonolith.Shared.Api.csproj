@@ -14,7 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Bootstrapper\ModularMonolith.Bootstrapper.Infrastructure\ModularMonolith.Bootstrapper.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Application\ModularMonolith.CategoryManagement.Application.csproj"/>
+    <ProjectReference Include="..\..\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Infrastructure\ModularMonolith.CategoryManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
     <ProjectReference Include="..\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj"/>
   </ItemGroup>

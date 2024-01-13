@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using ModularMonolith.Identity.Domain.Common.Entities;
-using ModularMonolith.Identity.Infrastructure.Common.DataAccess;
-using ModularMonolith.Shared.Infrastructure.DataAccess.Options;
+using ModularMonolith.Identity.Infrastructure.Common.Concrete;
 
 namespace ModularMonolith.Identity.Infrastructure;
 
@@ -28,14 +25,6 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddScoped<IRoleStore<Role>, RoleStore>();
         serviceCollection.AddScoped<IUserStore<User>, UserStore>();
-
-        serviceCollection.AddDbContextFactory<IdentityDbContext>((sp, b) =>
-        {
-            var options = sp.GetRequiredService<IOptions<DatabaseOptions>>();
-
-            b.UseNpgsql(options.Value.ConnectionString);
-            b.UseSnakeCaseNamingConvention();
-        });
 
         return serviceCollection;
     }

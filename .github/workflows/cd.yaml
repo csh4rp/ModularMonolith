@@ -1,0 +1,13 @@
+name: Continous Deployment
+on:
+  push:
+    branches:
+      - master
+      - develop
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4

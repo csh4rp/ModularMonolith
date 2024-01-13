@@ -7,6 +7,13 @@
 
 namespace ModularMonolith.Shared.Infrastructure;
 
-public class Extensions
+public static class Extensions
 {
+    public static IServiceCollection AddMass(this IServiceCollection serviceCollection)
+    {
+
+
+
+        return serviceCollection;
+    }
 }

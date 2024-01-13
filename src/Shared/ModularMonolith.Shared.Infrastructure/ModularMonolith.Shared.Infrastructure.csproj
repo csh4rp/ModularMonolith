@@ -6,11 +6,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
-    <ProjectReference Include="..\ModularMonolith.Shared.Core\ModularMonolith.Shared.Core.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="EFCore.NamingConventions"/>
+    <PackageReference Include="MassTransit.EntityFrameworkCore" />
+    <PackageReference Include="MassTransit.SqlTransport.PostgreSQL" />
     <PackageReference Include="Microsoft.EntityFrameworkCore"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational"/>
@@ -24,6 +25,10 @@
     <PackageReference Include="Serilog"/>
     <PackageReference Include="Serilog.Extensions.Logging"/>
     <PackageReference Include="Z.EntityFramework.Plus.EFCore"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Events\Utils\" />
   </ItemGroup>
 
 </Project>
