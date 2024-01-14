@@ -4,7 +4,7 @@ using ModularMonolith.CategoryManagement.Domain.Entities;
 
 namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.DataAccess.Concrete;
 
-internal sealed class CategoryDatabase : ICategoryDatabase
+public sealed class CategoryDatabase : ICategoryDatabase
 {
     private readonly DbContext _dbContext;
 

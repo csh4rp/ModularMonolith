@@ -1,9 +1,11 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using ModularMonolith.Bootstrapper.Infrastructure.DataAccess;
+using ModularMonolith.CategoryManagement.Application.Categories.Abstract;
 using ModularMonolith.CategoryManagement.Application.Categories.CommandHandlers;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
 using ModularMonolith.CategoryManagement.Domain.Entities;
-using ModularMonolith.CategoryManagement.Infrastructure.Common.DataAccess;
+using ModularMonolith.CategoryManagement.Infrastructure.Categories.DataAccess.Concrete;
 using ModularMonolith.Shared.TestUtils.Assertions;
 using ModularMonolith.Shared.Contracts.Errors;
 
@@ -15,12 +17,12 @@ public class UpdateCategoryCommandHandlerTests
     public async Task ShouldUpdateCategory_WhenNameIsUnique()
     {
         // Arrange
-        await using var context = CreateDbContext();
+        var context = CreateDatabase();
 
         var category = new Category { Id = Guid.NewGuid(), Name = "Category 1" };
 
         context.Categories.Add(category);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(default);
 
         var command = new UpdateCategoryCommand(category.Id, null, "Category 1-1");
 
@@ -43,7 +45,7 @@ public class UpdateCategoryCommandHandlerTests
     public async Task ShouldReturnNotFoundError_WhenCategoryDoesNotExist()
     {
         // Arrange
-        await using var context = CreateDbContext();
+        var context = CreateDatabase();
 
         var command = new UpdateCategoryCommand(Guid.NewGuid(), null, "Category 1");
 
@@ -61,14 +63,14 @@ public class UpdateCategoryCommandHandlerTests
     public async Task ShouldReturnConflictError_WhenCategoryWithNameAlreadyExists()
     {
         // Arrange
-        await using var context = CreateDbContext();
+        var context = CreateDatabase();
 
         var category = new Category { Id = Guid.NewGuid(), Name = "Category 1" };
         var existingCategoryWithName = new Category { Id = Guid.NewGuid(), Name = "Category 1-1" };
 
         context.Categories.Add(category);
         context.Categories.Add(existingCategoryWithName);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(default);
 
         var command = new UpdateCategoryCommand(category.Id, null, "Category 1-1");
 
@@ -87,12 +89,12 @@ public class UpdateCategoryCommandHandlerTests
     public async Task ShouldReturnInvalidValueError_WhenParentDoesNotExist()
     {
         // Arrange
-        await using var context = CreateDbContext();
+        var context = CreateDatabase();
 
         var category = new Category { Id = Guid.NewGuid(), Name = "Category 1" };
 
         context.Categories.Add(category);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(default);
 
         var command = new UpdateCategoryCommand(category.Id, Guid.NewGuid(), "Category 1-1");
 
@@ -108,15 +110,15 @@ public class UpdateCategoryCommandHandlerTests
             .And.HaveTarget(nameof(command.ParentId));
     }
 
-    private static CategoryManagementDbContext CreateDbContext()
+    private static ICategoryDatabase CreateDatabase()
     {
-        var optionsBuilder = new DbContextOptionsBuilder<CategoryManagementDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
         optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString(), opt =>
         {
             opt.EnableNullChecks();
         });
 
-        return new CategoryManagementDbContext(optionsBuilder.Options);
+        return new CategoryDatabase(new ApplicationDbContext(optionsBuilder.Options));
     }
 }

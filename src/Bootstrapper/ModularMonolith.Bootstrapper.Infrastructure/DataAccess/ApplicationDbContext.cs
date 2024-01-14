@@ -1,7 +1,6 @@
 using System.Reflection;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Shared.Domain.Entities;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.EntityConfigurations;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.EntityConfigurations;
@@ -13,9 +12,7 @@ public sealed class ApplicationDbContext : DbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
-    
-    public DbSet<EventLog> EventLogs { get; set; } = default!;
-    
+
     public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
         CancellationToken cancellationToken = new())
     {
@@ -41,8 +38,8 @@ public sealed class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new EventLogEntityTypeConfiguration(true, schema: "shared"))
-            .ApplyConfiguration(new AuditLogEntityTypeConfiguration(true, schema: "shared"));
+        modelBuilder.ApplyConfiguration(new EventLogEntityTypeConfiguration())
+            .ApplyConfiguration(new AuditLogEntityTypeConfiguration());
 
         modelBuilder.AddInboxStateEntity(c => c.ToTable("inbox_state", "shared"));
         modelBuilder.AddOutboxStateEntity(c => c.ToTable("outbox_state", "shared"));

@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bogus"/>
+    <PackageReference Include="FluentAssertions"/>
     <PackageReference Include="EFCore.NamingConventions"/>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
     <PackageReference Include="Respawn"/>
@@ -17,10 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Bootstrapper\ModularMonolith.Bootstrapper.Migrations\ModularMonolith.Bootstrapper.Migrations.csproj" />
     <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Api\ModularMonolith.CategoryManagement.Api.csproj"/>
-    <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Migrations\ModularMonolith.CategoryManagement.Migrations.csproj"/>
-    <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Migrations\ModularMonolith.Identity.Migrations.csproj"/>
-    <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.Migrations\ModularMonolith.Shared.Migrations.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.TestUtils\ModularMonolith.Shared.TestUtils.csproj" />
   </ItemGroup>
 
   <ItemGroup>

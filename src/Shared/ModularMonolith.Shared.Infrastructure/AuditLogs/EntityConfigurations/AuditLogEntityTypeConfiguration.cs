@@ -8,30 +8,10 @@ namespace ModularMonolith.Shared.Infrastructure.AuditLogs.EntityConfigurations;
 
 public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<AuditLog>
 {
-    private readonly bool _excludeFromMigrations;
-    private readonly string _table;
-    private readonly string? _schema;
-
-    public AuditLogEntityTypeConfiguration(bool excludeFromMigrations,
-        string table = "audit_log",
-        string? schema = null)
-    {
-        _excludeFromMigrations = excludeFromMigrations;
-        _table = table;
-        _schema = schema;
-    }
-
     public void Configure(EntityTypeBuilder<AuditLog> builder)
     {
-        if (_excludeFromMigrations)
-        {
-            builder.ToTable(_table, _schema, t => t.ExcludeFromMigrations());
-        }
-        else
-        {
-            builder.ToTable(_table, _schema);
-        }
-
+        builder.ToTable("audit_log", "shared");
+        
         builder.HasKey(b => b.Id);
 
         builder.Property(b => b.Id)
@@ -44,13 +24,13 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
 
         builder.OwnsMany(b => b.EntityPropertyChanges, b =>
         {
-            b.ToTable(_table);
+            b.ToTable("audit_log", "shared");
             b.ToJson("entity_property_changes");
         });
 
         builder.OwnsMany(b => b.EntityKeys, b =>
         {
-            b.ToTable(_table);
+            b.ToTable("audit_log", "shared");
             b.ToJson("entity_keys");
         });
 

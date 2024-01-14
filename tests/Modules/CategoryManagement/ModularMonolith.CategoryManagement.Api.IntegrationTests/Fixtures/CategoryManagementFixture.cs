@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using ModularMonolith.CategoryManagement.Infrastructure.Common.DataAccess;
-using ModularMonolith.CategoryManagement.Migrations;
-using ModularMonolith.Shared.Infrastructure.DataAccess;
-using ModularMonolith.Shared.Migrations;
+using ModularMonolith.Bootstrapper.Infrastructure.DataAccess;
+using ModularMonolith.Bootstrapper.Migrations;
+using ModularMonolith.CategoryManagement.Application.Categories.Abstract;
+using ModularMonolith.CategoryManagement.Infrastructure.Categories.DataAccess.Concrete;
 using Npgsql;
 using Respawn;
 using Testcontainers.PostgreSql;
@@ -29,10 +29,10 @@ public class CategoryManagementFixture : IAsyncLifetime
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
 
-    public SharedDbContext SharedDbContext { get; private set; } = default!;
+    public ApplicationDbContext DbContext { get; private set; } = default!;
 
-    public CategoryManagementDbContext CategoryManagementDbContext { get; private set; } = default!;
-
+    public ICategoryDatabase Database { get; private set; } = default!;
+    
     public async Task InitializeAsync()
     {
         _container = new PostgreSqlBuilder()
@@ -51,11 +51,10 @@ public class CategoryManagementFixture : IAsyncLifetime
         _connection = new NpgsqlConnection(connectionString);
         await _connection.OpenAsync();
 
-        SharedDbContext = new SharedDbContextFactory().CreateDbContext([connectionString]);
-        await SharedDbContext.Database.MigrateAsync();
+        DbContext = new ApplicationDbContextFactory().CreateDbContext([connectionString]);
+        await DbContext.Database.MigrateAsync();
 
-        CategoryManagementDbContext = new CategoryManagementDbContextFactory().CreateDbContext([connectionString]);
-        await CategoryManagementDbContext.Database.MigrateAsync();
+        Database = new CategoryDatabase(DbContext);
 
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
 
@@ -119,8 +118,7 @@ public class CategoryManagementFixture : IAsyncLifetime
             await _container.DisposeAsync();
         }
 
-        await SharedDbContext.DisposeAsync();
-        await CategoryManagementDbContext.DisposeAsync();
+        await DbContext.DisposeAsync();
         await _factory.DisposeAsync();
     }
 

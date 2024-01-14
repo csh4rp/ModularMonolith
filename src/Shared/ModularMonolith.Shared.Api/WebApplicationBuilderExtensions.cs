@@ -1,9 +1,9 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using Asp.Versioning;
 using FluentValidation;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ModularMonolith.Bootstrapper.Infrastructure.DataAccess;
@@ -12,9 +12,11 @@ using ModularMonolith.Shared.Api.Middlewares;
 using ModularMonolith.Shared.Application;
 using ModularMonolith.Shared.Infrastructure;
 using ModularMonolith.Shared.Infrastructure.AuditLogs;
+using ModularMonolith.Shared.Infrastructure.AuditLogs.Interceptors;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Events;
 using ModularMonolith.Shared.Infrastructure.Identity;
+using Npgsql;
 
 namespace ModularMonolith.Shared.Api;
 
@@ -75,17 +77,28 @@ public static class WebApplicationBuilderExtensions
         {
         });
 
+        var connectionString = builder.Configuration.GetConnectionString("Database");
+        var connectionStringBuilder = new NpgsqlConnectionStringBuilder(connectionString);
+        
         builder.Services.AddOptions<SqlTransportOptions>().Configure(options =>
         {
-            options.Host =  "localhost";
-            options.Database = "modular_monolith";
+            options.Host = connectionStringBuilder.Host;
+            options.Database = connectionStringBuilder.Database;
             options.Schema = "shared";
             options.Role = "shared";
-            options.Username = "postgres";
-            options.Password = "Admin123!@#";
-            options.AdminUsername = "postgres";
-            options.AdminPassword = "Admin123!@#";
+            options.Username = connectionStringBuilder.Username;
+            options.Password = connectionStringBuilder.Password;
         });
+
+        builder.Services.AddDbContextFactory<ApplicationDbContext>((sp, optionsBuilder) =>
+        {
+            optionsBuilder.UseNpgsql(connectionString);
+            optionsBuilder.UseSnakeCaseNamingConvention();
+            optionsBuilder.AddInterceptors(new AuditLogInterceptor());
+            optionsBuilder.UseApplicationServiceProvider(sp);
+        }, ServiceLifetime.Transient);
+
+        builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 
         builder.Services.AddPostgresMigrationHostedService(true, false);
         
@@ -101,7 +114,7 @@ public static class WebApplicationBuilderExtensions
                 });
             });
             
-            c.AddConsumers(Assembly.Load("ModularMonolith.CategoryManagement.Application"));
+            c.AddConsumers(modules.SelectMany(m => m.Assemblies).ToArray());
 
             c.AddConfigureEndpointsCallback((context, _, cfg) =>
             {
@@ -111,10 +124,8 @@ public static class WebApplicationBuilderExtensions
                         
             c.UsingPostgres((context, cfg) =>
             {
-                cfg.UseDbMessageScheduler();
-
                 cfg.AutoStart = true;
-
+                cfg.UseDbMessageScheduler();
                 cfg.ConfigureEndpoints(context);
             });
             
@@ -162,11 +173,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddMediator(assemblies);
         builder.Services.AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true);
 
-        builder.Services.AddEvents(e =>
-        {
-            e.Assemblies = [.. assemblies];
-            e.RunBackgroundWorkers = builder.Configuration.GetSection("Events:RunBackgroundWorkers").Get<bool>();
-        });
+        builder.Services.AddEvents(assemblies);
 
         builder.Services
             .AddSingleton(TimeProvider.System)

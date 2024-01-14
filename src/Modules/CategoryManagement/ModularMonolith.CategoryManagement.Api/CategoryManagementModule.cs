@@ -2,7 +2,7 @@
 using System.Reflection;
 using Microsoft.OpenApi.Models;
 using ModularMonolith.CategoryManagement.Api.Categories;
-using ModularMonolith.Identity.Infrastructure;
+using ModularMonolith.CategoryManagement.Infrastructure;
 using ModularMonolith.Shared.Api;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;

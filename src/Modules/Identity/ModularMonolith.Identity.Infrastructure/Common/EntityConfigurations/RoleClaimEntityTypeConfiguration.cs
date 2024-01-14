@@ -8,7 +8,7 @@ internal sealed class RoleClaimEntityTypeConfiguration : IEntityTypeConfiguratio
 {
     public void Configure(EntityTypeBuilder<RoleClaim> builder)
     {
-        builder.ToTable("role_claim");
+        builder.ToTable("role_claim", "identity");
 
         builder.HasKey(b => b.Id);
 

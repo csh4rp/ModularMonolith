@@ -13,8 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Bootstrapper\ModularMonolith.Bootstrapper.Infrastructure\ModularMonolith.Bootstrapper.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Bootstrapper\ModularMonolith.Bootstrapper.Migrations\ModularMonolith.Bootstrapper.Migrations.csproj" />
     <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj"/>
-    <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Migrations\ModularMonolith.Shared.Migrations.csproj"/>
   </ItemGroup>
 
   <ItemGroup>

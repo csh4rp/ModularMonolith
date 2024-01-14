@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\tests\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Application.UnitTests\ModularMonolith.CategoryManagement.Application.UnitTests.csproj"/>
     <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Api\ModularMonolith.Shared.Api.csproj"/>
     <ProjectReference Include="..\ModularMonolith.CategoryManagement.Application\ModularMonolith.CategoryManagement.Application.csproj"/>
     <ProjectReference Include="..\ModularMonolith.CategoryManagement.Domain\ModularMonolith.CategoryManagement.Domain.csproj"/>

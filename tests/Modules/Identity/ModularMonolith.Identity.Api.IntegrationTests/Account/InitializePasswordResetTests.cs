@@ -25,8 +25,8 @@ public class InitializePasswordResetTests : BaseIntegrationTest<InitializePasswo
     {
         // Arrange
         var user = _accountFixture.AActiveUser();
-        _identityFixture.IdentityDbContext.Users.Add(user);
-        await _identityFixture.IdentityDbContext.SaveChangesAsync();
+        _identityFixture.Database.Users.Add(user);
+        await _identityFixture.Database.SaveChangesAsync(default);
 
         using var request = GetResource("InitializePasswordReset.Valid.json");
 

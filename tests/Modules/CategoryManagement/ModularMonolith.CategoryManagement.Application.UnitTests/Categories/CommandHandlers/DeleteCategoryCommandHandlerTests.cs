@@ -1,9 +1,11 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using ModularMonolith.Bootstrapper.Infrastructure.DataAccess;
+using ModularMonolith.CategoryManagement.Application.Categories.Abstract;
 using ModularMonolith.CategoryManagement.Application.Categories.CommandHandlers;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
 using ModularMonolith.CategoryManagement.Domain.Entities;
-using ModularMonolith.CategoryManagement.Infrastructure.Common.DataAccess;
+using ModularMonolith.CategoryManagement.Infrastructure.Categories.DataAccess.Concrete;
 using ModularMonolith.Shared.Contracts.Errors;
 using ModularMonolith.Shared.TestUtils.Assertions;
 
@@ -15,16 +17,16 @@ public class DeleteCategoryCommandHandlerTests
     public async Task ShouldDeleteCategory_WhenCategoryExists()
     {
         // Arrange
-        await using var context = CreateDbContext();
+        var database = CreateDatabase();
 
         var existingCategory = new Category { Id = Guid.NewGuid(), Name = "Category 1" };
 
-        context.Categories.Add(existingCategory);
-        await context.SaveChangesAsync();
+        database.Categories.Add(existingCategory);
+        await database.SaveChangesAsync(default);
 
         var command = new DeleteCategoryCommand(existingCategory.Id);
 
-        var handler = new DeleteCategoryCommandHandler(context);
+        var handler = new DeleteCategoryCommandHandler(database);
 
         // Act
         var result = await handler.Handle(command, default);
@@ -32,7 +34,7 @@ public class DeleteCategoryCommandHandlerTests
         // Assert
         result.Should().BeSuccessful();
 
-        var category = await context.Categories.FindAsync(existingCategory.Id);
+        var category = await database.Categories.FindAsync(existingCategory.Id);
 
         category.Should().BeNull();
     }
@@ -41,11 +43,11 @@ public class DeleteCategoryCommandHandlerTests
     public async Task ShouldReturnNotFoundError_WhenCategoryDoesNotExist()
     {
         // Arrange
-        await using var context = CreateDbContext();
+        var database = CreateDatabase();
 
         var command = new DeleteCategoryCommand(Guid.NewGuid());
 
-        var handler = new DeleteCategoryCommandHandler(context);
+        var handler = new DeleteCategoryCommandHandler(database);
 
         // Act
         var result = await handler.Handle(command, default);
@@ -55,15 +57,15 @@ public class DeleteCategoryCommandHandlerTests
         result.Error.Should().BeOfType<EntityNotFoundError>();
     }
 
-    private static CategoryManagementDbContext CreateDbContext()
+    private static ICategoryDatabase CreateDatabase()
     {
-        var optionsBuilder = new DbContextOptionsBuilder<CategoryManagementDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
         optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString(), opt =>
         {
             opt.EnableNullChecks();
         });
 
-        return new CategoryManagementDbContext(optionsBuilder.Options);
+        return new CategoryDatabase(new ApplicationDbContext(optionsBuilder.Options));
     }
 }

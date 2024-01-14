@@ -8,7 +8,7 @@ internal sealed class UserRoleEntityTypeConfiguration : IEntityTypeConfiguration
 {
     public void Configure(EntityTypeBuilder<UserRole> builder)
     {
-        builder.ToTable("user_role");
+        builder.ToTable("user_role", "identity");
 
         builder.HasKey(b => new { b.UserId, b.RoleId });
 

@@ -1,4 +1,6 @@
-﻿using ModularMonolith.Shared.Infrastructure.DataAccess.Options;
+﻿using ModularMonolith.Shared.Application.Abstract;
+using ModularMonolith.Shared.Infrastructure.DataAccess.Options;
+using ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
 
 namespace ModularMonolith.Shared.Infrastructure.DataAccess;
 
@@ -12,6 +14,8 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddOptions<DatabaseOptions>()
             .PostConfigure(action);
+
+        serviceCollection.AddSingleton<ITransactionalScopeFactory, TransactionalScopeFactory>();
 
         return serviceCollection;
     }

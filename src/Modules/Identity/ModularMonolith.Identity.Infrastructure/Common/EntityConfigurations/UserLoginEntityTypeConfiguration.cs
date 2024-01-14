@@ -8,7 +8,7 @@ internal sealed class UserLoginEntityTypeConfiguration : IEntityTypeConfiguratio
 {
     public void Configure(EntityTypeBuilder<UserLogin> builder)
     {
-        builder.ToTable("user_login");
+        builder.ToTable("user_login", "identity");
 
         builder.HasKey(b => new { b.UserId, b.LoginProvider, b.ProviderKey });
 

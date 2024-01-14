@@ -9,10 +9,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
-using ModularMonolith.Identity.Infrastructure.Common.DataAccess;
-using ModularMonolith.Identity.Migrations;
-using ModularMonolith.Shared.Infrastructure.DataAccess;
-using ModularMonolith.Shared.Migrations;
+using ModularMonolith.Bootstrapper.Infrastructure.DataAccess;
+using ModularMonolith.Bootstrapper.Migrations;
+using ModularMonolith.Identity.Infrastructure.Common.Abstract;
+using ModularMonolith.Identity.Infrastructure.Common.Concrete;
 using ModularMonolith.Shared.TestUtils.Fakes;
 using Npgsql;
 using Respawn;
@@ -32,10 +32,10 @@ public class IdentityFixture : IAsyncLifetime
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
 
-    public SharedDbContext SharedDbContext { get; private set; } = default!;
+    public ApplicationDbContext DbContext { get; private set; } = default!;
 
-    public IdentityDbContext IdentityDbContext { get; private set; } = default!;
-
+    public IIdentityDatabase Database { get; private set; } = default!;
+    
     public async Task InitializeAsync()
     {
         _container = new PostgreSqlBuilder()
@@ -54,11 +54,10 @@ public class IdentityFixture : IAsyncLifetime
         _connection = new NpgsqlConnection(connectionString);
         await _connection.OpenAsync();
 
-        SharedDbContext = new SharedDbContextFactory().CreateDbContext([connectionString]);
-        await SharedDbContext.Database.MigrateAsync();
+        DbContext = new ApplicationDbContextFactory().CreateDbContext([connectionString]);
+        await DbContext.Database.MigrateAsync();
 
-        IdentityDbContext = new IdentityDbContextFactory().CreateDbContext([connectionString]);
-        await IdentityDbContext.Database.MigrateAsync();
+        Database = new IdentityDatabase(DbContext);
 
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
 
@@ -138,8 +137,7 @@ public class IdentityFixture : IAsyncLifetime
             await _container.DisposeAsync();
         }
 
-        await SharedDbContext.DisposeAsync();
-        await IdentityDbContext.DisposeAsync();
+        await DbContext.DisposeAsync();
         await _factory.DisposeAsync();
     }
 
@@ -148,7 +146,7 @@ public class IdentityFixture : IAsyncLifetime
         Debug.Assert(_connection is not null);
         Debug.Assert(_respawner is not null);
 
-        IdentityDbContext.ChangeTracker.Clear();
+        DbContext.ChangeTracker.Clear();
         return _respawner.ResetAsync(_connection);
     }
 }

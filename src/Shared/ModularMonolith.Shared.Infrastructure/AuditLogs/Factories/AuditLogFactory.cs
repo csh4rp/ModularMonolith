@@ -8,13 +8,14 @@ using EntityState = ModularMonolith.Shared.Domain.Enums.EntityState;
 
 namespace ModularMonolith.Shared.Infrastructure.AuditLogs.Factories;
 
-internal sealed class AuditLogFactory
+public sealed class AuditLogFactory
 {
     private readonly IIdentityContextAccessor _identityContextAccessor;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly TimeProvider _timeProvider;
 
-    public AuditLogFactory(IIdentityContextAccessor identityContextAccessor, TimeProvider timeProvider,
+    public AuditLogFactory(IIdentityContextAccessor identityContextAccessor,
+        TimeProvider timeProvider,
         IHttpContextAccessor httpContextAccessor)
     {
         _identityContextAccessor = identityContextAccessor;

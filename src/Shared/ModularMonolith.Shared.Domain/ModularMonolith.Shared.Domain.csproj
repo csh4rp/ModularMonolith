@@ -1,13 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="MediatR.Contracts"/>
+    <PackageReference Include="MediatR"/>
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="MediatR">
-      <HintPath>..\..\..\..\..\..\.nuget\packages\mediatr\12.2.0\lib\net6.0\MediatR.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
+  
 </Project>

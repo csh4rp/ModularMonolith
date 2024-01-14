@@ -8,7 +8,7 @@ internal sealed class UserTokenEntityTypeConfiguration : IEntityTypeConfiguratio
 {
     public void Configure(EntityTypeBuilder<UserToken> builder)
     {
-        builder.ToTable("user_token");
+        builder.ToTable("user_token", "identity");
 
         builder.HasKey(b => new { b.UserId, b.LoginProvider, b.Name });
 

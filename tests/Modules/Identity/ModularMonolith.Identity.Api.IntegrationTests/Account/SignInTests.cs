@@ -27,8 +27,8 @@ public class SignInTests : BaseIntegrationTest<SignInTests>
     {
         // Arrange
         var user = _accountFixture.AActiveUser();
-        _identityFixture.IdentityDbContext.Users.Add(user);
-        await _identityFixture.IdentityDbContext.SaveChangesAsync();
+        _identityFixture.Database.Users.Add(user);
+        await _identityFixture.Database.SaveChangesAsync(default);
 
         using var request = GetResource("SignIn.Valid.json");
 
@@ -46,8 +46,8 @@ public class SignInTests : BaseIntegrationTest<SignInTests>
     {
         // Arrange
         var user = _accountFixture.AActiveUser();
-        _identityFixture.IdentityDbContext.Users.Add(user);
-        await _identityFixture.IdentityDbContext.SaveChangesAsync();
+        _identityFixture.Database.Users.Add(user);
+        await _identityFixture.Database.SaveChangesAsync(default);
 
         using var request = GetResource("SignIn.InvalidPassword.json");
 

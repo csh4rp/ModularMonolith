@@ -34,8 +34,8 @@ public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
             .Take(20)
             .ToList();
 
-        _categoryManagementFixture.CategoryManagementDbContext.AddRange(categories);
-        await _categoryManagementFixture.CategoryManagementDbContext.SaveChangesAsync();
+        _categoryManagementFixture.Database.Categories.AddRange(categories);
+        await _categoryManagementFixture.Database.SaveChangesAsync(default);
 
         // Act
         using var response = await _client.GetAsync("api/category-management/categories");
@@ -59,8 +59,8 @@ public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
             .Take(20)
             .ToList();
 
-        _categoryManagementFixture.CategoryManagementDbContext.AddRange(categories);
-        await _categoryManagementFixture.CategoryManagementDbContext.SaveChangesAsync();
+        _categoryManagementFixture.Database.Categories.AddRange(categories);
+        await _categoryManagementFixture.Database.SaveChangesAsync(default);
 
         // Act
         using var response =

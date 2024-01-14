@@ -1,16 +1,10 @@
 #!/bin/bash
 
-contexts=("SharedDbContext" "CategoryManagementDbContext" "IdentityDbContext")
+contexts=("ApplicationDbContext")
 
-connection_strings=("User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;" \
-  "User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;"
-  "User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;"
-)
+connection_strings=("User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;")
 
-projects=("../../src/Shared/ModularMonolith.Shared.Migrations" \
-  "../../src/Modules/CategoryManagement/ModularMonolith.CategoryManagement.Migrations"
-  "../../src/Modules/Identity/ModularMonolith.Identity.Migrations"
-)
+projects=("../../src/Bootstrapper/ModularMonolith.Bootstrapper.Migrations" )
 
 for (( i=0; i < "${#contexts[@]}"; i++ ));
 do

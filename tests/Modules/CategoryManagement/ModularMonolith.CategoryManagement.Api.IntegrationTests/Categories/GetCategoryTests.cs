@@ -30,8 +30,8 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
             .RuleFor(x => x.Name, "Category-Name-1")
             .Generate();
 
-        _categoryManagementFixture.CategoryManagementDbContext.Categories.Add(category);
-        await _categoryManagementFixture.CategoryManagementDbContext.SaveChangesAsync();
+        _categoryManagementFixture.Database.Categories.Add(category);
+        await _categoryManagementFixture.Database.SaveChangesAsync(default);
 
         // Act
         using var response = await _client.GetAsync($"api/category-management/categories/{category.Id}");

@@ -45,8 +45,8 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
             .RuleFor(x => x.Name, "Created-Category-Duplicate")
             .Generate();
 
-        _categoryManagementFixture.CategoryManagementDbContext.Categories.Add(category);
-        await _categoryManagementFixture.CategoryManagementDbContext.SaveChangesAsync();
+        _categoryManagementFixture.Database.Categories.Add(category);
+        await _categoryManagementFixture.Database.SaveChangesAsync(default);
 
         using var request = GetResource("CreateCategory.DuplicateName.json");
 

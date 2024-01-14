@@ -8,7 +8,7 @@ internal sealed class CategoryEntityTypeConfiguration : IEntityTypeConfiguration
 {
     public void Configure(EntityTypeBuilder<Category> builder)
     {
-        builder.ToTable("category");
+        builder.ToTable("category", "category_management");
 
         builder.HasKey(b => b.Id);
 

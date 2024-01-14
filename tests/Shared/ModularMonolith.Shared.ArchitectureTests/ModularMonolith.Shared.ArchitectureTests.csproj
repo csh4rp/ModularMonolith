@@ -23,7 +23,6 @@
     <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Api\ModularMonolith.Shared.Api.csproj"/>
     <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
     <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
-    <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Core\ModularMonolith.Shared.Core.csproj"/>
     <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
     <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj"/>
   </ItemGroup>

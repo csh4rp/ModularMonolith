@@ -8,7 +8,7 @@ internal sealed class UserClaimEntityTypeConfiguration : IEntityTypeConfiguratio
 {
     public void Configure(EntityTypeBuilder<UserClaim> builder)
     {
-        builder.ToTable("user_claim");
+        builder.ToTable("user_claim", "identity");
 
         builder.HasKey(b => b.Id);
 

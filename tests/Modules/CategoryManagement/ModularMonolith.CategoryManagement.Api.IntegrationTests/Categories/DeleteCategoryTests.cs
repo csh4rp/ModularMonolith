@@ -26,8 +26,8 @@ public class DeleteCategoryTests : BaseIntegrationTest<DeleteCategoryTests>
     {
         // Arrange
         var category = _categoryFixture.Generate();
-        _categoryManagementFixture.CategoryManagementDbContext.Categories.Add(category);
-        await _categoryManagementFixture.CategoryManagementDbContext.SaveChangesAsync();
+        _categoryManagementFixture.Database.Categories.Add(category);
+        await _categoryManagementFixture.Database.SaveChangesAsync(default);
 
         // Act
         using var response = await _client.DeleteAsync($"api/category-management/categories/{category.Id}");

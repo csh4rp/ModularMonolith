@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ModularMonolith.Shared.Infrastructure.AuditLogs.EntityConfigurations;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
-using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs.Entities;
 
 namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs;
 
-public class AuditLogTestDbContext : BaseDbContext
+public class AuditLogTestDbContext : DbContext
 {
     public AuditLogTestDbContext(DbContextOptions<AuditLogTestDbContext> options) : base(options)
     {
@@ -48,5 +48,7 @@ public class AuditLogTestDbContext : BaseDbContext
         modelBuilder.Entity<SecondTestEntity>()
             .ToTable("second_test_entity")
             .AuditIgnore();
+
+        modelBuilder.ApplyConfiguration(new AuditLogEntityTypeConfiguration());
     }
 }

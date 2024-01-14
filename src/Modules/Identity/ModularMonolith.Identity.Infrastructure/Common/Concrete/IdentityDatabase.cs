@@ -4,7 +4,7 @@ using ModularMonolith.Identity.Infrastructure.Common.Abstract;
 
 namespace ModularMonolith.Identity.Infrastructure.Common.Concrete;
 
-internal sealed class IdentityDatabase : IIdentityDatabase
+public sealed class IdentityDatabase : IIdentityDatabase
 {
     private readonly DbContext _dbContext;
 

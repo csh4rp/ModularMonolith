@@ -27,8 +27,4 @@
     <PackageReference Include="Z.EntityFramework.Plus.EFCore"/>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Events\Utils\" />
-  </ItemGroup>
-
 </Project>

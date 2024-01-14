@@ -7,32 +7,32 @@ public sealed class TransactionalScope : ITransactionalScope
 {
     public static readonly AsyncLocal<TransactionalScope?> Current = new();
 
-    public DbContext? DbContext { get; private set; }
+    private DbContext? _dbContext;
 
     public TransactionalScope() => Current.Value = this;
 
     public async Task CompleteAsync(CancellationToken cancellationToken)
     {
-        if (DbContext?.Database.CurrentTransaction is null)
+        if (_dbContext?.Database.CurrentTransaction is null)
         {
             return;
         }
         
-        await DbContext.Database.CurrentTransaction.CommitAsync(cancellationToken);
-        DbContext = null;
+        await _dbContext.Database.CurrentTransaction.CommitAsync(cancellationToken);
+        _dbContext = null;
     }
 
-    public ValueTask DisposeAsync() => Current.Value?.DbContext?.Database.CurrentTransaction is null
+    public ValueTask DisposeAsync() => Current.Value?._dbContext?.Database.CurrentTransaction is null
         ? ValueTask.CompletedTask
-        : Current.Value.DbContext.Database.CurrentTransaction.DisposeAsync();
+        : Current.Value._dbContext.Database.CurrentTransaction.DisposeAsync();
 
     public void EnlistTransaction(DbContext dbContext)
     {
-        if (DbContext is not null)
+        if (_dbContext is not null)
         {
             throw new InvalidOperationException("Transaction was already enlisted");
         }
 
-        DbContext = dbContext;
+        _dbContext = dbContext;
     }
 }

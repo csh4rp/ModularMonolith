@@ -1,5 +1,3 @@
-﻿using MediatR;
+﻿namespace ModularMonolith.Shared.Domain.Abstractions;
 
-namespace ModularMonolith.Shared.Domain.Abstractions;
-
-public interface IEvent : INotification;
+public interface IEvent;

@@ -7,30 +7,10 @@ namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.EntityConfigur
 
 public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<EventLog>
 {
-    private readonly bool _excludeFromMigrations;
-    private readonly string _table;
-    private readonly string? _schema;
-
-    public EventLogEntityTypeConfiguration(bool excludeFromMigrations,
-        string table = "event_log",
-        string? schema = null)
-    {
-        _excludeFromMigrations = excludeFromMigrations;
-        _table = table;
-        _schema = schema;
-    }
-
     public void Configure(EntityTypeBuilder<EventLog> builder)
     {
-        if (_excludeFromMigrations)
-        {
-            builder.ToTable(_table, _schema, t => t.ExcludeFromMigrations());
-        }
-        else
-        {
-            builder.ToTable(_table, _schema);
-        }
-
+        builder.ToTable("event_log", "shared");
+        
         builder.HasKey(b => b.Id);
 
         builder.Property(b => b.Id)

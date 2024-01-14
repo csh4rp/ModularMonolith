@@ -1,35 +1,27 @@
-﻿using ModularMonolith.Shared.Application.Abstract;
-using ModularMonolith.Shared.Infrastructure.Events.Options;
+﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
+using ModularMonolith.Shared.Application.Abstract;
+using ModularMonolith.Shared.Application.Events;
+using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
+using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
+
 
 namespace ModularMonolith.Shared.Infrastructure.Events;
 
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddEvents(this IServiceCollection serviceCollection,
-        Action<EventOptions> action)
+        params Assembly[] assemblies)
     {
-        serviceCollection.AddOptions<EventOptions>()
-            .Configure(o =>
+        serviceCollection.AddScoped<IEventBus, OutboxEventBus>()
+            .AddScoped<IEventLogStore, EventLogStore>()
+            .AddScoped<IEventLogDatabase>(sp =>
             {
-                o.PollInterval = TimeSpan.FromSeconds(30);
-                o.MaxLockTime = TimeSpan.FromSeconds(30);
-                o.TimeBetweenAttempts = TimeSpan.FromSeconds(30);
-                o.MaxParallelWorkers = Environment.ProcessorCount * 2;
-                o.MaxRetryAttempts = 10;
-                o.MaxPollBatchSize = 20;
-                o.MaxEventChannelSize = 100;
-                o.RunBackgroundWorkers = true;
-            })
-            .PostConfigure(action)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        var options = new EventOptions();
-        action(options);
-
-        var assembliesToScan = options.Assemblies;
-
-        foreach (var assembly in assembliesToScan)
+                var context = sp.GetRequiredService<DbContext>();
+                return new EventLogDatabase(context);
+            });
+        
+        foreach (var assembly in assemblies)
         {
             var mappings = assembly.GetExportedTypes()
                 .Where(t => t.IsGenericType && t.GetGenericTypeDefinition().IsAssignableTo(typeof(IEventMapping<>)));

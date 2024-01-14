@@ -27,8 +27,8 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
         // Arrange
         var user = _accountFixture.AActiveUser();
         user.Id = UserId;
-        _identityFixture.IdentityDbContext.Users.Add(user);
-        await _identityFixture.IdentityDbContext.SaveChangesAsync();
+        _identityFixture.Database.Users.Add(user);
+        await _identityFixture.Database.SaveChangesAsync(default);
 
         using var client = _identityFixture.CreateClientWithAuthToken(UserId);
         using var request = GetResource("ChangePassword.Valid.json");
@@ -47,8 +47,8 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
         // Arrange
         var user = _accountFixture.AActiveUser();
         user.Id = UserId;
-        _identityFixture.IdentityDbContext.Users.Add(user);
-        await _identityFixture.IdentityDbContext.SaveChangesAsync();
+        _identityFixture.Database.Users.Add(user);
+        await _identityFixture.Database.SaveChangesAsync(default);
 
         using var client = _identityFixture.CreateClientWithAuthToken(UserId);
         using var request = GetResource("ChangePassword.InvalidCurrentPassword.json");
@@ -68,8 +68,8 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
         // Arrange
         var user = _accountFixture.AActiveUser();
         user.Id = UserId;
-        _identityFixture.IdentityDbContext.Users.Add(user);
-        await _identityFixture.IdentityDbContext.SaveChangesAsync();
+        _identityFixture.Database.Users.Add(user);
+        await _identityFixture.Database.SaveChangesAsync(default);
 
         using var client = _identityFixture.CreateClientWithAuthToken(UserId);
         using var request = GetResource("ChangePassword.NewPasswordNotMatchingPolicy.json");
