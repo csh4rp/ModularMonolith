@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ModularMonolith.Identity.Domain.Common.Entities;
+using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
 
 namespace ModularMonolith.Identity.Infrastructure.Common.EntityConfigurations;
 
@@ -22,7 +23,8 @@ internal sealed class RoleEntityTypeConfiguration : IEntityTypeConfiguration<Rol
 
         builder.Property(b => b.ConcurrencyStamp)
             .IsRequired()
-            .HasMaxLength(64);
+            .HasMaxLength(64)
+            .AuditIgnore();
 
         builder.HasIndex(b => b.NormalizedName).IsUnique();
     }

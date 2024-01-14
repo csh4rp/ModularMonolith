@@ -56,6 +56,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{1655
 		tools\Scripts\add-migration.sh = tools\Scripts\add-migration.sh
 		tools\Scripts\create-database.sql = tools\Scripts\create-database.sql
 		tools\Scripts\update-databases.sh = tools\Scripts\update-databases.sh
+		tools\Scripts\add-user.sql = tools\Scripts\add-user.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{FAC7DF74-47D5-4F61-8446-5940C54A2BBE}"

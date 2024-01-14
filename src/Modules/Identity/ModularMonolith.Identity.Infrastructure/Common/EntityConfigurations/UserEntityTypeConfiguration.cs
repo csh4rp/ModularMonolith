@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ModularMonolith.Identity.Domain.Common.Entities;
+using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
 
 namespace ModularMonolith.Identity.Infrastructure.Common.EntityConfigurations;
 
@@ -31,19 +32,21 @@ internal sealed class UserEntityTypeConfiguration : IEntityTypeConfiguration<Use
         builder.Property(b => b.ConcurrencyStamp)
             .IsRequired()
             .HasMaxLength(64)
-            .IsConcurrencyToken();
+            .IsConcurrencyToken()
+            .AuditIgnore();
 
         builder.Property(b => b.SecurityStamp)
             .IsRequired()
             .HasMaxLength(64)
-            .IsConcurrencyToken();
-
-
+            .IsConcurrencyToken()
+            .AuditIgnore();
+        
         builder.Property(b => b.PhoneNumber)
             .HasMaxLength(64);
 
         builder.Property(b => b.PasswordHash)
-            .HasMaxLength(256);
+            .HasMaxLength(256)
+            .AuditIgnore();
 
         builder.HasIndex(b => b.NormalizedEmail).IsUnique();
 

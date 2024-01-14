@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
 using Asp.Versioning;
 using FluentValidation;
 using MassTransit;
@@ -10,13 +11,17 @@ using ModularMonolith.Bootstrapper.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Api.Exceptions;
 using ModularMonolith.Shared.Api.Middlewares;
 using ModularMonolith.Shared.Application;
-using ModularMonolith.Shared.Infrastructure;
+using ModularMonolith.Shared.Domain.Attributes;
 using ModularMonolith.Shared.Infrastructure.AuditLogs;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.Interceptors;
 using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Events;
 using ModularMonolith.Shared.Infrastructure.Identity;
+using ModularMonolith.Shared.Infrastructure.Messaging;
 using Npgsql;
+using IConsumer = MassTransit.IConsumer;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 namespace ModularMonolith.Shared.Api;
 
@@ -96,7 +101,7 @@ public static class WebApplicationBuilderExtensions
             optionsBuilder.UseSnakeCaseNamingConvention();
             optionsBuilder.AddInterceptors(new AuditLogInterceptor());
             optionsBuilder.UseApplicationServiceProvider(sp);
-        }, ServiceLifetime.Transient);
+        }, ServiceLifetime.Scoped);
 
         builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 
@@ -121,12 +126,56 @@ public static class WebApplicationBuilderExtensions
                 cfg.UseEntityFrameworkOutbox<ApplicationDbContext>(context);
             });
             
-                        
+            
             c.UsingPostgres((context, cfg) =>
             {
                 cfg.AutoStart = true;
                 cfg.UseDbMessageScheduler();
-                cfg.ConfigureEndpoints(context);
+                
+                cfg.MessageTopology.SetEntityNameFormatter(new EventAttributeEntityNameFormatter());
+                
+                var consumerMessages = modules.SelectMany(m => m.Assemblies)
+                    .SelectMany(a => a.GetTypes())
+                    .Where(t => t.IsAssignableTo(typeof(IConsumer)))
+                    .GroupBy(t =>
+                    {
+                        var @interface = t.GetInterfaces()
+                            .Single(i => i.IsGenericType && i.IsAssignableTo(typeof(IConsumer)));
+                        
+                        return @interface.GenericTypeArguments[0];
+                    })
+                    .ToDictionary(t => t.Key, t => t.ToList());
+                
+                foreach (var messageType in consumerMessages.Keys)
+                {
+                    cfg.Publish(messageType, msg =>
+                    {
+                        
+                    });
+                }
+
+                foreach (var (messageType, _) in consumerMessages)
+                {
+                    var eventAttribute = messageType.GetCustomAttribute<EventAttribute>()!;
+                    var topic = eventAttribute.Topic ?? messageType.Name;
+
+                    var groupedConsumers = consumerMessages.Values.SelectMany(s => s)
+                        .GroupBy(t => t.GetCustomAttribute<EventConsumerAttribute>()?.Queue ?? topic)
+                        .ToDictionary(t => t.Key, t => t.ToList());
+
+                    foreach (var (queue, consumerTypes) in groupedConsumers)
+                    {
+                        cfg.ReceiveEndpoint(queue, cf =>
+                        {
+                            foreach (var consumerType in consumerTypes)
+                            {
+                                cf.ConfigureConsumer(context, consumerType);
+                            }
+                            
+                            cf.Subscribe(topic);
+                        });
+                    }
+                }
             });
             
         });
@@ -179,8 +228,23 @@ public static class WebApplicationBuilderExtensions
             .AddSingleton(TimeProvider.System)
             .AddIdentityServices()
             .AddHttpContextAccessor()
-            .AddExceptionHandlers()
-            .AddMass();
+            .AddExceptionHandlers();
+        
+        builder.Services.AddOpenTelemetry()
+            .WithTracing(b =>
+            {
+                b.AddSource("ModularMonolith")
+                    .ConfigureResource(resource =>
+                        resource.AddService(
+                            serviceName: "ModularMonolith",
+                            serviceVersion: "1.0.0"))
+                    .AddAspNetCoreInstrumentation();
+
+                if (builder.Environment.IsDevelopment())
+                {
+                    b.AddConsoleExporter();
+                }
+            });
 
         builder.Services.AddDataAccess(c =>
         {

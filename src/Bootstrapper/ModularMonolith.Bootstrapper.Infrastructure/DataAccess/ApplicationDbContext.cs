@@ -2,6 +2,7 @@ using System.Reflection;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.Infrastructure.AuditLogs.EntityConfigurations;
+using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.EntityConfigurations;
 
@@ -41,9 +42,21 @@ public sealed class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new EventLogEntityTypeConfiguration())
             .ApplyConfiguration(new AuditLogEntityTypeConfiguration());
 
-        modelBuilder.AddInboxStateEntity(c => c.ToTable("inbox_state", "shared"));
-        modelBuilder.AddOutboxStateEntity(c => c.ToTable("outbox_state", "shared"));
-        modelBuilder.AddOutboxMessageEntity(c => c.ToTable("outbox_message", "shared"));
+        modelBuilder.AddInboxStateEntity(c =>
+        {
+            c.ToTable("inbox_state", "shared");
+            c.AuditIgnore();
+        });
+        modelBuilder.AddOutboxStateEntity(c =>
+        {
+            c.ToTable("outbox_state", "shared");
+            c.AuditIgnore();
+        });
+        modelBuilder.AddOutboxMessageEntity(c =>
+        {
+            c.ToTable("outbox_message", "shared");
+            c.AuditIgnore();
+        });
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.Load("ModularMonolith.CategoryManagement.Infrastructure"));
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.Load("ModularMonolith.Identity.Infrastructure"));
