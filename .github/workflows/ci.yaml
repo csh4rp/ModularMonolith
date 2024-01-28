@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-test:
     runs-on: self-hosted
+    env:
+      DOTNET_INSTALL_DIR: "~/.dotnet"
     permissions:
       statuses: write
       checks: write
