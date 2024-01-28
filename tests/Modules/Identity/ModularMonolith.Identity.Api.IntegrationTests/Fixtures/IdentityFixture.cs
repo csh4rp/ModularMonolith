@@ -42,9 +42,6 @@ public class IdentityFixture : IAsyncLifetime
             .WithImage("postgres:16.1")
             .WithName("identity_automated_tests")
             .WithDatabase("tests_database")
-            .WithUsername("postgres")
-            .WithPassword("Admin123!@#")
-            .WithPortBinding("5432", true)
             .Build();
 
         await _container.StartAsync();
