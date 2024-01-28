@@ -88,6 +88,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddOptions<SqlTransportOptions>().Configure(options =>
         {
             options.Host = connectionStringBuilder.Host;
+            options.Port = connectionStringBuilder.Port;
             options.Database = connectionStringBuilder.Database;
             options.Schema = "shared";
             options.Role = "shared";
