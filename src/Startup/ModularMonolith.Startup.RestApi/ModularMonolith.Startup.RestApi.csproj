@@ -9,7 +9,7 @@
     <ProjectReference Include="..\..\Modules\Identity\ModularMonolith.Identity.Domain\ModularMonolith.Identity.Domain.csproj"/>
     <ProjectReference Include="..\..\Modules\Identity\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj"/>
     <ProjectReference Include="..\..\Shared\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
-    <ProjectReference Include="..\ModularMonolith.Bootstrapper.Infrastructure\ModularMonolith.Bootstrapper.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj" />
   </ItemGroup>
 
   <ItemGroup>

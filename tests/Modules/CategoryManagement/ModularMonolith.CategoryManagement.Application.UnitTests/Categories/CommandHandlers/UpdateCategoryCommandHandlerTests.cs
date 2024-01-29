@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Bootstrapper.Infrastructure.DataAccess;
+using ModularMonolith.Bootstrapper.Infrastructure;
 using ModularMonolith.CategoryManagement.Application.Categories.Abstract;
 using ModularMonolith.CategoryManagement.Application.Categories.CommandHandlers;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;

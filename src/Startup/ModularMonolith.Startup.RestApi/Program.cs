@@ -3,7 +3,7 @@ using ModularMonolith.Shared.Api;
 
 [assembly: ExcludeFromCodeCoverage]
 
-namespace ModularMonolith.Bootstrapper.RestApi;
+namespace ModularMonolith.Startup.RestApi;
 
 public class Program
 {

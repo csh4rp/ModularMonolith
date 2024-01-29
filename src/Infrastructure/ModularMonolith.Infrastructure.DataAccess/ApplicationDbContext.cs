@@ -6,7 +6,7 @@ using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Transactions;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.EntityConfigurations;
 
-namespace ModularMonolith.Bootstrapper.Infrastructure.DataAccess;
+namespace ModularMonolith.Bootstrapper.Infrastructure;
 
 public sealed class ApplicationDbContext : DbContext
 {

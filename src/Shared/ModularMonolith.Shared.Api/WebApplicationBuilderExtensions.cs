@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using ModularMonolith.Bootstrapper.Infrastructure.DataAccess;
+using ModularMonolith.Bootstrapper.Infrastructure;
 using ModularMonolith.Shared.Api.Exceptions;
 using ModularMonolith.Shared.Api.Middlewares;
 using ModularMonolith.Shared.Application;

@@ -16,8 +16,4 @@
     <ProjectReference Include="..\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
-  </ItemGroup>
-
 </Project>

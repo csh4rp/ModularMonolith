@@ -1,21 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
-
     <ItemGroup>
-      <Reference Include="Microsoft.EntityFrameworkCore">
-        <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.entityframeworkcore\8.0.0\lib\net8.0\Microsoft.EntityFrameworkCore.dll</HintPath>
-      </Reference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore"/>
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Infrastructure\ModularMonolith.CategoryManagement.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Modules\Identity\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="DataAccess\" />
     </ItemGroup>
 
 </Project>

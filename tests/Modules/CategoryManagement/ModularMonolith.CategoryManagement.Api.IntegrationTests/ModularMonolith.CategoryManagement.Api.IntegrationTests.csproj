@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\Bootstrapper\ModularMonolith.Bootstrapper.Migrations\ModularMonolith.Bootstrapper.Migrations.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Infrastructure\ModularMonolith.Infrastructure.Migrations\ModularMonolith.Infrastructure.Migrations.csproj" />
     <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Api\ModularMonolith.CategoryManagement.Api.csproj"/>
     <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.TestUtils\ModularMonolith.Shared.TestUtils.csproj" />
   </ItemGroup>

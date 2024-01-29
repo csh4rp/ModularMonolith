@@ -10,7 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ModularMonolith.Bootstrapper.Infrastructure\ModularMonolith.Bootstrapper.Infrastructure.csproj" />
+      <ProjectReference Include="..\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj" />
     </ItemGroup>
 
 </Project>

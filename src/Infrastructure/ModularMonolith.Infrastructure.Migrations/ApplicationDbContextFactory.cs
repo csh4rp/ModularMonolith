@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using ModularMonolith.Bootstrapper.Infrastructure.DataAccess;
+using ModularMonolith.Bootstrapper.Infrastructure;
 
-namespace ModularMonolith.Bootstrapper.Migrations;
+namespace ModularMonolith.Infrastructure.Migrations;
 
 public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
 {

@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4DB255EE-857F-4772-A427-B1FB7C5C73C7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bootstrapper", "Bootstrapper", "{495200F9-2EF9-404F-9220-7DBEA311F038}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{495200F9-2EF9-404F-9220-7DBEA311F038}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{D3315BE7-8948-4009-B1CD-7E926584297B}"
 EndProject
@@ -29,8 +29,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Infrastructure.IntegrationTests", "tests\Shared\ModularMonolith.Shared.Infrastructure.IntegrationTests\ModularMonolith.Shared.Infrastructure.IntegrationTests.csproj", "{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Api", "src\Shared\ModularMonolith.Shared.Api\ModularMonolith.Shared.Api.csproj", "{298E5F9B-3D46-4A00-8D54-2FBD5B0B2E97}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Bootstrapper.RestApi", "src\Bootstrapper\ModularMonolith.Bootstrapper.RestApi\ModularMonolith.Bootstrapper.RestApi.csproj", "{385F96E4-6FA3-49F4-97B5-CF2B47DF4BD8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.CategoryManagement.Contracts", "src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Contracts\ModularMonolith.CategoryManagement.Contracts.csproj", "{344DC25C-7360-4D11-B3BF-837446937076}"
 EndProject
@@ -87,9 +85,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Arch
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Infrastructure.UnitTests", "tests\Shared\ModularMonolith.Shared.Infrastructure.UnitTests\ModularMonolith.Shared.Infrastructure.UnitTests.csproj", "{380A45CC-85A9-4D41-8C0C-05EBD2D0CD06}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Bootstrapper.Infrastructure", "src\Bootstrapper\ModularMonolith.Bootstrapper.Infrastructure\ModularMonolith.Bootstrapper.Infrastructure.csproj", "{C2EFB286-828B-4780-B2B3-7F9A4EC3D562}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Infrastructure.DataAccess", "src\Infrastructure\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj", "{C2EFB286-828B-4780-B2B3-7F9A4EC3D562}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Bootstrapper.Migrations", "src\Bootstrapper\ModularMonolith.Bootstrapper.Migrations\ModularMonolith.Bootstrapper.Migrations.csproj", "{ED2119A2-D28C-4B77-BD43-CD89D1F6EDEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Infrastructure.Migrations", "src\Infrastructure\ModularMonolith.Infrastructure.Migrations\ModularMonolith.Infrastructure.Migrations.csproj", "{ED2119A2-D28C-4B77-BD43-CD89D1F6EDEF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Startup", "Startup", "{D1ADAFDE-DA2C-4A16-8AC9-F4F9D61C68E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Startup.RestApi", "src\Startup\ModularMonolith.Startup.RestApi\ModularMonolith.Startup.RestApi.csproj", "{39FB8A53-1FEA-4E3E-932D-B20470CB7C72}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -110,7 +112,6 @@ Global
 		{282304E4-D50F-4AB3-8699-7CD18964EBF0} = {775CE607-1412-4AB7-AC27-6F5983ED2197}
 		{8E1275C1-1A62-4CD0-96D9-B650AEE1E34B} = {282304E4-D50F-4AB3-8699-7CD18964EBF0}
 		{298E5F9B-3D46-4A00-8D54-2FBD5B0B2E97} = {23D97AF7-96F3-49EC-BFE2-CCE1B738FCEE}
-		{385F96E4-6FA3-49F4-97B5-CF2B47DF4BD8} = {495200F9-2EF9-404F-9220-7DBEA311F038}
 		{344DC25C-7360-4D11-B3BF-837446937076} = {2E2598B1-7339-4E03-B452-7B9AF9937631}
 		{075AED8F-5FC1-423B-8BF1-29BE4B1CF52B} = {2E2598B1-7339-4E03-B452-7B9AF9937631}
 		{05CDDFB0-A40B-4CD0-BF60-B3F64F840377} = {2E2598B1-7339-4E03-B452-7B9AF9937631}
@@ -135,6 +136,8 @@ Global
 		{380A45CC-85A9-4D41-8C0C-05EBD2D0CD06} = {282304E4-D50F-4AB3-8699-7CD18964EBF0}
 		{C2EFB286-828B-4780-B2B3-7F9A4EC3D562} = {495200F9-2EF9-404F-9220-7DBEA311F038}
 		{ED2119A2-D28C-4B77-BD43-CD89D1F6EDEF} = {495200F9-2EF9-404F-9220-7DBEA311F038}
+		{D1ADAFDE-DA2C-4A16-8AC9-F4F9D61C68E4} = {4DB255EE-857F-4772-A427-B1FB7C5C73C7}
+		{39FB8A53-1FEA-4E3E-932D-B20470CB7C72} = {D1ADAFDE-DA2C-4A16-8AC9-F4F9D61C68E4}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BBAF6E32-FA5F-4916-9F22-AD58F95D2992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -169,10 +172,6 @@ Global
 		{298E5F9B-3D46-4A00-8D54-2FBD5B0B2E97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{298E5F9B-3D46-4A00-8D54-2FBD5B0B2E97}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{298E5F9B-3D46-4A00-8D54-2FBD5B0B2E97}.Release|Any CPU.Build.0 = Release|Any CPU
-		{385F96E4-6FA3-49F4-97B5-CF2B47DF4BD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{385F96E4-6FA3-49F4-97B5-CF2B47DF4BD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{385F96E4-6FA3-49F4-97B5-CF2B47DF4BD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{385F96E4-6FA3-49F4-97B5-CF2B47DF4BD8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{344DC25C-7360-4D11-B3BF-837446937076}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{344DC25C-7360-4D11-B3BF-837446937076}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{344DC25C-7360-4D11-B3BF-837446937076}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -245,5 +244,9 @@ Global
 		{ED2119A2-D28C-4B77-BD43-CD89D1F6EDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED2119A2-D28C-4B77-BD43-CD89D1F6EDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED2119A2-D28C-4B77-BD43-CD89D1F6EDEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39FB8A53-1FEA-4E3E-932D-B20470CB7C72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39FB8A53-1FEA-4E3E-932D-B20470CB7C72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39FB8A53-1FEA-4E3E-932D-B20470CB7C72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39FB8A53-1FEA-4E3E-932D-B20470CB7C72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

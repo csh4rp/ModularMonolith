@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Bootstrapper.Infrastructure.DataAccess;
-using ModularMonolith.Bootstrapper.Migrations;
+using ModularMonolith.Bootstrapper.Infrastructure;
+using ModularMonolith.Infrastructure.Migrations;
 using Npgsql;
 using Respawn;
 using Testcontainers.PostgreSql;
