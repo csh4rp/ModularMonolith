@@ -9,7 +9,6 @@ using ModularMonolith.Shared.IntegrationTests.Common;
 
 namespace ModularMonolith.Shared.TestUtils.Abstractions;
 
-[UsesVerify]
 public abstract class BaseIntegrationTest<TClass> : IAsyncLifetime
 {
     protected StringContent GetResource(string name)
