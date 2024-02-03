@@ -5,7 +5,7 @@ using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Events;
-using ModularMonolith.Shared.Contracts;
+using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Identity.Application.Account.CommandHandlers;
@@ -24,7 +24,7 @@ internal sealed class VerifyAccountCommandHandler : ICommandHandler<VerifyAccoun
         _logger = logger;
     }
 
-    public async Task<Result> Handle(VerifyAccountCommand request, CancellationToken cancellationToken)
+    public async Task Handle(VerifyAccountCommand request, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByIdAsync(request.UserId.ToString());
 
@@ -33,7 +33,7 @@ internal sealed class VerifyAccountCommandHandler : ICommandHandler<VerifyAccoun
             _logger.LogWarning("An attempt was made to verify an account with ID: {UserId} that does not exist",
                 request.UserId);
 
-            return MemberError.InvalidValue(nameof(request.UserId));
+            throw new ValidationException(MemberError.InvalidValue(nameof(request.UserId)));
         }
 
         var result = await _userManager.ConfirmEmailAsync(user, request.VerificationToken);
@@ -43,11 +43,9 @@ internal sealed class VerifyAccountCommandHandler : ICommandHandler<VerifyAccoun
             _logger.LogWarning("An attempt was made to verify an account with ID: {UserId} with invalid token",
                 user.Id);
 
-            return MemberError.InvalidValue(nameof(request.VerificationToken));
+            throw new ValidationException(MemberError.InvalidValue(nameof(request.VerificationToken)));
         }
 
         await _eventBus.PublishAsync(new AccountVerified(user.Id), cancellationToken);
-
-        return Result.Successful;
     }
 }

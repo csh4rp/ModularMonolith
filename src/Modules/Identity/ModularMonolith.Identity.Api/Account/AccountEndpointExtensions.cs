@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ModularMonolith.Identity.Contracts.Account.Commands;
 using ModularMonolith.Identity.Contracts.Account.Responses;
-using ModularMonolith.Shared.Api.CustomResults;
 using ModularMonolith.Shared.Api.Filters;
 
 namespace ModularMonolith.Identity.Api.Account;
@@ -23,8 +22,9 @@ internal static class AccountEndpointExtensions
                 [FromBody] SignInCommand command,
                 CancellationToken cancellationToken) =>
             {
-                var result = await mediator.Send(command, cancellationToken);
-                return ApiResult.From(result);
+                var response = await mediator.Send(command, cancellationToken);
+
+                return string.IsNullOrEmpty(response.Token) ? Results.BadRequest() : Results.Ok(response);
             })
             .AddValidation<SignInCommand>()
             .Produces<SignInResponse>();
@@ -33,8 +33,8 @@ internal static class AccountEndpointExtensions
                 [FromBody] ChangePasswordCommand command,
                 CancellationToken cancellationToken) =>
             {
-                var result = await mediator.Send(command, cancellationToken);
-                return ApiResult.From(result);
+                await mediator.Send(command, cancellationToken);
+                return Results.NoContent();
             })
             .AddValidation<ChangePasswordCommand>()
             .Produces(StatusCodes.Status204NoContent)
@@ -54,8 +54,8 @@ internal static class AccountEndpointExtensions
                 [FromBody] ResetPasswordCommand command,
                 CancellationToken cancellationToken) =>
             {
-                var result = await mediator.Send(command, cancellationToken);
-                return ApiResult.From(result);
+                await mediator.Send(command, cancellationToken);
+                return Results.NoContent();
             })
             .AddValidation<ResetPasswordCommand>()
             .Produces(StatusCodes.Status204NoContent);
@@ -64,8 +64,8 @@ internal static class AccountEndpointExtensions
                 [FromBody] RegisterCommand command,
                 CancellationToken cancellationToken) =>
             {
-                var result = await mediator.Send(command, cancellationToken);
-                return ApiResult.From(result);
+                await mediator.Send(command, cancellationToken);
+                return Results.NoContent();
             })
             .AddValidation<RegisterCommand>()
             .Produces(StatusCodes.Status204NoContent);
@@ -74,8 +74,8 @@ internal static class AccountEndpointExtensions
                 [FromBody] VerifyAccountCommand command,
                 CancellationToken cancellationToken) =>
             {
-                var result = await mediator.Send(command, cancellationToken);
-                return ApiResult.From(result);
+                await mediator.Send(command, cancellationToken);
+                return Results.NoContent();
             })
             .AddValidation<VerifyAccountCommand>()
             .Produces(StatusCodes.Status204NoContent);

@@ -6,7 +6,7 @@ using ModularMonolith.Identity.Contracts.Account.Commands;
 using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Events;
-using ModularMonolith.Shared.TestUtils.Assertions;
+using ModularMonolith.Shared.Application.Exceptions;
 using NSubstitute;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.CommandHandlers;
@@ -36,11 +36,9 @@ public class InitializePasswordResetCommandHandlerTests
         var handler = new InitializePasswordResetCommandHandler(_userManager, _eventBus, _logger);
 
         // Act
-        var result = await handler.Handle(command, default);
+        await handler.Handle(command, default);
 
         // Assert
-        result.Should().BeSuccessful();
-
         await _eventBus.Received(1)
             .PublishAsync(Arg.Is<PasswordResetInitialized>(e => e.UserId == user.Id), default);
     }
@@ -61,11 +59,9 @@ public class InitializePasswordResetCommandHandlerTests
         var handler = new InitializePasswordResetCommandHandler(_userManager, _eventBus, _logger);
 
         // Act
-        var result = await handler.Handle(command, default);
+        var exception =  await Assert.ThrowsAsync<ValidationException>(() => handler.Handle(command, default));
 
         // Assert
-        result.Should().BeSuccessful();
-
         await _eventBus.DidNotReceiveWithAnyArgs()
             .PublishAsync<PasswordResetInitialized>(default!, default);
     }

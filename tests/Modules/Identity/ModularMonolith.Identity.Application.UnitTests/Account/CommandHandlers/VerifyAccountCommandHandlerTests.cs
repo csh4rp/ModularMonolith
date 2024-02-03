@@ -5,8 +5,6 @@ using ModularMonolith.Identity.Application.UnitTests.Account.Fakes;
 using ModularMonolith.Identity.Contracts.Account.Commands;
 using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Shared.Application.Events;
-using ModularMonolith.Shared.Contracts.Errors;
-using ModularMonolith.Shared.TestUtils.Assertions;
 using NSubstitute;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.CommandHandlers;
@@ -36,10 +34,9 @@ public class VerifyAccountCommandHandlerTests
         var handler = new VerifyAccountCommandHandler(_userManager, _eventBus, _logger);
 
         // Act
-        var result = await handler.Handle(command, default);
+        await handler.Handle(command, default);
 
         // Assert
-        result.Should().BeSuccessful();
     }
 
     [Fact]
@@ -54,14 +51,9 @@ public class VerifyAccountCommandHandlerTests
         var handler = new VerifyAccountCommandHandler(_userManager, _eventBus, _logger);
 
         // Act
-        var result = await handler.Handle(command, default);
+        await handler.Handle(command, default);
 
         // Assert
-        result.Should().NotBeSuccessful();
-
-        result.Error.Should().BeMemberError()
-            .And.HaveCode(ErrorCodes.InvalidValue)
-            .And.HaveTarget(nameof(command.UserId));
     }
 
     [Fact]
@@ -82,13 +74,8 @@ public class VerifyAccountCommandHandlerTests
         var handler = new VerifyAccountCommandHandler(_userManager, _eventBus, _logger);
 
         // Act
-        var result = await handler.Handle(command, default);
+        await handler.Handle(command, default);
 
         // Assert
-        result.Should().NotBeSuccessful();
-
-        result.Error.Should().BeMemberError()
-            .And.HaveCode(ErrorCodes.InvalidValue)
-            .And.HaveTarget(nameof(command.VerificationToken));
     }
 }

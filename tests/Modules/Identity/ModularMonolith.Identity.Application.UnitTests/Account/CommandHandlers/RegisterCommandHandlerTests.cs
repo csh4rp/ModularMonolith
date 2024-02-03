@@ -6,8 +6,7 @@ using ModularMonolith.Identity.Contracts.Account.Commands;
 using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Events;
-using ModularMonolith.Shared.Contracts.Errors;
-using ModularMonolith.Shared.TestUtils.Assertions;
+using ModularMonolith.Shared.Application.Exceptions;
 using NSubstitute;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.CommandHandlers;
@@ -29,11 +28,9 @@ public class RegisterCommandHandlerTests
         var handler = new RegisterCommandHandler(_userManager, _eventBus);
 
         // Act
-        var result = await handler.Handle(command, default);
+        await handler.Handle(command, default);
 
         // Assert
-        result.Should().BeSuccessful();
-
         await _eventBus.Received(1)
             .PublishAsync(Arg.Is<UserRegistered>(e => e.Email == command.Email), default);
     }
@@ -54,13 +51,9 @@ public class RegisterCommandHandlerTests
         var handler = new RegisterCommandHandler(_userManager, _eventBus);
 
         // Act
-        var result = await handler.Handle(command, default);
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => handler.Handle(command, default));
 
         // Assert
-        result.Should().NotBeSuccessful();
-        result.Error.Should().BeConflictError()
-            .And.HaveTarget(nameof(command.Email));
-
         await _eventBus.DidNotReceiveWithAnyArgs().PublishAsync<UserRegistered>(default!, default);
     }
 
@@ -77,14 +70,9 @@ public class RegisterCommandHandlerTests
         var handler = new RegisterCommandHandler(_userManager, _eventBus);
 
         // Act
-        var result = await handler.Handle(command, default);
+        await handler.Handle(command, default);
 
         // Assert
-        result.Should().NotBeSuccessful();
-        result.Error.Should().BeMemberError()
-            .And.HaveCode(ErrorCodes.InvalidValue)
-            .And.HaveTarget(nameof(command.Password));
-
         await _eventBus.DidNotReceiveWithAnyArgs().PublishAsync<UserRegistered>(default!, default);
     }
 }

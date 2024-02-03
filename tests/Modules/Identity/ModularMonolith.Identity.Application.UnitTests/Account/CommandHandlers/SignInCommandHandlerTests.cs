@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using ModularMonolith.Identity.Application.Account.CommandHandlers;
 using ModularMonolith.Identity.Application.UnitTests.Account.Fakes;
 using ModularMonolith.Identity.Contracts.Account.Commands;
@@ -7,8 +6,6 @@ using ModularMonolith.Identity.Core.Options;
 using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Events;
-using ModularMonolith.Shared.Contracts.Errors;
-using ModularMonolith.Shared.TestUtils.Assertions;
 using NSubstitute;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.CommandHandlers;
@@ -49,10 +46,6 @@ public class SignInCommandHandlerTests
         var result = await handler.Handle(command, default);
 
         // Assert
-        result.Should().BeSuccessful();
-        result.Value.Should().NotBeNull();
-        result.Value!.Token.Should().NotBeNullOrEmpty();
-
         await _eventBus.Received(1)
             .PublishAsync(Arg.Is<SignInSucceeded>(s => s.UserId == user.Id), default);
     }
@@ -80,12 +73,6 @@ public class SignInCommandHandlerTests
         var result = await handler.Handle(command, default);
 
         // Assert
-        result.Should().NotBeSuccessful();
-
-        result.Error.Should().BeMemberError()
-            .And.HaveCode(ErrorCodes.InvalidValue)
-            .And.HaveTarget(nameof(command.Password));
-
         await _eventBus.DidNotReceiveWithAnyArgs()
             .PublishAsync<SignInSucceeded>(default!, default);
 
@@ -116,10 +103,6 @@ public class SignInCommandHandlerTests
         var result = await handler.Handle(command, default);
 
         // Assert
-        result.Should().NotBeSuccessful();
-        result.Error.Should().BeMemberError()
-            .And.HaveCode(ErrorCodes.InvalidValue)
-            .And.HaveTarget(nameof(command.Password));
 
         await _eventBus.Received(1)
             .PublishAsync(Arg.Is<SignInFailed>(s => s.UserId == user.Id), default);

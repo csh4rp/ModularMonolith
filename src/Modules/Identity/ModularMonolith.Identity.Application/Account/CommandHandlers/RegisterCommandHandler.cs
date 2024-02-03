@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Identity.Contracts.Account.Commands;
 using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Events;
-using ModularMonolith.Shared.Contracts;
+using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Identity.Application.Account.CommandHandlers;
@@ -21,16 +20,13 @@ internal sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand>
         _eventBus = eventBus;
     }
 
-    public async Task<Result> Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public async Task Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
-        var normalizedEmail = _userManager.NormalizeEmail(request.Email);
+        var userWithGivenEmail = await _userManager.FindByEmailAsync(request.Email);
 
-        var emailExists = await _userManager.Users
-            .AnyAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
-
-        if (emailExists)
+        if (userWithGivenEmail is not null)
         {
-            return new ConflictError(nameof(request.Email));
+
         }
 
         var user = new User(request.Email);
@@ -39,11 +35,9 @@ internal sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand>
 
         if (!result.Succeeded)
         {
-            return MemberError.InvalidValue(nameof(request.Password));
+            throw new ValidationException(MemberError.InvalidValue(nameof(request.Password)));
         }
 
         await _eventBus.PublishAsync(new UserRegistered(user.Id, user.Email), cancellationToken);
-
-        return Result.Successful;
     }
 }

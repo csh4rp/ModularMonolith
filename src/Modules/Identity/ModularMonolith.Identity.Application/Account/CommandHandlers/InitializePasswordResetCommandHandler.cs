@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModularMonolith.Identity.Contracts.Account.Commands;
 using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Events;
-using ModularMonolith.Shared.Contracts;
-
 namespace ModularMonolith.Identity.Application.Account.CommandHandlers;
 
 internal sealed class InitializePasswordResetCommandHandler : ICommandHandler<InitializePasswordResetCommand>
@@ -25,24 +22,16 @@ internal sealed class InitializePasswordResetCommandHandler : ICommandHandler<In
         _logger = logger;
     }
 
-    public async Task<Result> Handle(InitializePasswordResetCommand request, CancellationToken cancellationToken)
+    public async Task Handle(InitializePasswordResetCommand request, CancellationToken cancellationToken)
     {
-        var normalizedEmail = _userManager.NormalizeEmail(request.Email);
+        var user = await _userManager.FindByEmailAsync(request.Email);
 
-        var userId = await _userManager.Users
-            .Where(u => u.NormalizedEmail == normalizedEmail)
-            .Select(u => u.Id)
-            .SingleOrDefaultAsync(cancellationToken);
-
-        if (userId == default)
+        if (user is null)
         {
             _logger.LogWarning("Password reset initialized for not existing user");
-
-            return Result.Successful;
+            return;
         }
 
-        await _eventBus.PublishAsync(new PasswordResetInitialized(userId), cancellationToken);
-
-        return Result.Successful;
+        await _eventBus.PublishAsync(new PasswordResetInitialized(user.Id), cancellationToken);
     }
 }

@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Identity;
 using ModularMonolith.Identity.Application.Account.CommandHandlers;
 using ModularMonolith.Identity.Application.UnitTests.Account.Fakes;
 using ModularMonolith.Identity.Contracts.Account.Commands;
 using ModularMonolith.Identity.Domain.Common.Entities;
 using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Shared.Application.Events;
+using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Application.Identity;
 using ModularMonolith.Shared.Contracts.Errors;
-using ModularMonolith.Shared.TestUtils.Assertions;
 using NSubstitute;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.CommandHandlers;
@@ -39,11 +40,9 @@ public class ChangePasswordCommandHandlerTests
         var handler = new ChangePasswordCommandHandler(_userManager, _identityContextAccessor, _eventBus);
 
         // Act
-        var result = await handler.Handle(command, default);
+        await handler.Handle(command, default);
 
         // Assert
-        result.Should().BeSuccessful();
-
         await _eventBus.Received(1).PublishAsync(Arg.Is<PasswordChanged>(e => e.UserId == user.Id), default);
     }
 
@@ -64,14 +63,14 @@ public class ChangePasswordCommandHandlerTests
         var handler = new ChangePasswordCommandHandler(_userManager, _identityContextAccessor, _eventBus);
 
         // Act
-        var result = await handler.Handle(command, default);
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => handler.Handle(command, default));
 
         // Assert
-        result.Should().NotBeSuccessful();
-        result.Error.Should().BeMemberError()
-            .And.HaveTarget(nameof(command.CurrentPassword))
-            .And.HaveCode(ErrorCodes.InvalidValue);
-
+        exception.Should().NotBeNull();
+        exception.Errors.Should().ContainSingle(e =>
+            e.Code == ErrorCodes.InvalidValue 
+            && e.Reference == nameof(command.CurrentPassword));
+        
         await _eventBus.DidNotReceiveWithAnyArgs().PublishAsync<PasswordChanged>(default!, default);
     }
 }
