@@ -1,5 +1,5 @@
 ﻿using MassTransit;
-using ModularMonolith.CategoryManagement.Domain.Events;
+using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.Domain.Attributes;
 
 namespace ModularMonolith.CategoryManagement.Application.Categories.EventHandlers;

@@ -26,7 +26,7 @@ internal sealed class FindCategoriesQueryHandler : IQueryHandler<FindCategoriesQ
         var countFuture = query.DeferredCount().FutureValue();
 
         var itemsFuture = query
-            .Select(c => new CategoryItemModel { Id = c.Id, Name = c.Name })
+            .Select(c => new CategoryItemModel { Id = c.Id.Value, Name = c.Name })
             .ApplyPagination(request)
             .Future();
 

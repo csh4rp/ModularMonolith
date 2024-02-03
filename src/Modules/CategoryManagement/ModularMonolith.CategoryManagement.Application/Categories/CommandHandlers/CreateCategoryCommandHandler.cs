@@ -1,10 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ModularMonolith.CategoryManagement.Application.Categories.Abstract;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
-using ModularMonolith.CategoryManagement.Domain.Entities;
-using ModularMonolith.CategoryManagement.Domain.Events;
+﻿using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
+using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.Application.Commands;
-using ModularMonolith.Shared.Application.Events;
 using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Contracts.Errors;
 
@@ -12,21 +8,14 @@ namespace ModularMonolith.CategoryManagement.Application.Categories.CommandHandl
 
 internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryCommand, CreatedResponse>
 {
-    private readonly ICategoryDatabase _categoryDatabase;
-    private readonly IEventBus _eventBus;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public CreateCategoryCommandHandler(ICategoryDatabase categoryDatabase, IEventBus eventBus)
-    {
-        _categoryDatabase = categoryDatabase;
-        _eventBus = eventBus;
-    }
+    public CreateCategoryCommandHandler(ICategoryRepository categoryRepository) => _categoryRepository = categoryRepository;
 
     public async Task<Result<CreatedResponse>> Handle(CreateCategoryCommand request,
         CancellationToken cancellationToken)
     {
-        var categoryWithNameExists = await _categoryDatabase.Categories
-            .AnyAsync(c => c.Name == request.Name, cancellationToken);
-
+        var categoryWithNameExists = await _categoryRepository.ExistsByNameAsync(request.Name, cancellationToken);
         if (categoryWithNameExists)
         {
             return new ConflictError(nameof(request.Name));
@@ -34,8 +23,7 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
 
         if (request.ParentId.HasValue)
         {
-            var parentExists = await _categoryDatabase.Categories
-                .AnyAsync(c => c.Id == request.ParentId, cancellationToken);
+            var parentExists = await _categoryRepository.ExistsByIdAsync(new CategoryId(request.ParentId.Value), cancellationToken);
 
             if (!parentExists)
             {
@@ -43,12 +31,11 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
             }
         }
 
-        var category = new Category { ParentId = request.ParentId, Name = request.Name };
+        var category = Category.Create(request.Name,
+            request.ParentId.HasValue ? new CategoryId(request.ParentId.Value) : null);
 
-        _categoryDatabase.Categories.Add(category);
-        await _eventBus.PublishAsync(new CategoryCreated(category.Id, category.Name), cancellationToken);
-        await _categoryDatabase.SaveChangesAsync(cancellationToken);
+        await _categoryRepository.AddAsync(category, cancellationToken);
 
-        return new CreatedResponse(category.Id);
+        return new CreatedResponse(category.Id.Value);
     }
 }

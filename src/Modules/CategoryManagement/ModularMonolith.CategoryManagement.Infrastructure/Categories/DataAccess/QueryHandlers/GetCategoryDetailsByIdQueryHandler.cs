@@ -15,7 +15,7 @@ internal sealed class GetCategoryDetailsByIdQueryHandler
 
     public Task<CategoryDetailsResponse?> Handle(GetCategoryDetailsByIdQuery request,
         CancellationToken cancellationToken) =>
-        _database.Categories.Where(c => c.Id == request.Id)
-            .Select(c => new CategoryDetailsResponse { Id = c.Id, ParentId = c.ParentId, Name = c.Name })
+        _database.Categories.Where(c => c.Id.Value == request.Id)
+            .Select(c => new CategoryDetailsResponse { Id = c.Id.Value, ParentId = c.ParentId.HasValue ? c.ParentId.Value.Value : null , Name = c.Name })
             .FirstOrDefaultAsync(cancellationToken);
 }

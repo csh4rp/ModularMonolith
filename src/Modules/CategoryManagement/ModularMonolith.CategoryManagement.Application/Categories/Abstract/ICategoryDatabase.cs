@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ModularMonolith.CategoryManagement.Domain.Entities;
+using ModularMonolith.CategoryManagement.Domain.Categories;
 
 namespace ModularMonolith.CategoryManagement.Application.Categories.Abstract;
 

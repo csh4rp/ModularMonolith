@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ModularMonolith.CategoryManagement.Domain.Entities;
+using ModularMonolith.CategoryManagement.Domain.Categories;
 
 namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.DataAccess.EntityConfigurations;
 
@@ -11,6 +11,13 @@ internal sealed class CategoryEntityTypeConfiguration : IEntityTypeConfiguration
         builder.ToTable("category", "category_management");
 
         builder.HasKey(b => b.Id);
+
+        builder.Property(b => b.Id)
+            .HasConversion(b => b.Value, b => new CategoryId(b));
+        
+        builder.Property(b => b.ParentId)
+            .HasConversion(b => b == null ? (Guid?)null : b.Value.Value, b => b != null ?
+                new CategoryId(b.Value) : null);
 
         builder.HasMany<Category>()
             .WithOne()

@@ -1,7 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ModularMonolith.CategoryManagement.Application.Categories.Abstract;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
-using ModularMonolith.CategoryManagement.Domain.Entities;
+﻿using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
+using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Contracts.Errors;
@@ -10,43 +8,37 @@ namespace ModularMonolith.CategoryManagement.Application.Categories.CommandHandl
 
 internal sealed class UpdateCategoryCommandHandler : ICommandHandler<UpdateCategoryCommand>
 {
-    private readonly ICategoryDatabase _categoryDatabase;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public UpdateCategoryCommandHandler(ICategoryDatabase categoryDatabase) => _categoryDatabase = categoryDatabase;
+    public UpdateCategoryCommandHandler(ICategoryRepository categoryRepository) => _categoryRepository = categoryRepository;
 
     public async Task<Result> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
     {
-        var category = await _categoryDatabase.Categories
-            .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
-
+        var category = await _categoryRepository.FindByIdAsync(new CategoryId(request.Id), cancellationToken);
         if (category is null)
         {
             return new EntityNotFoundError(nameof(Category), request.Id);
         }
 
-        var categoryWithNameExists = await _categoryDatabase.Categories
-            .AnyAsync(c => c.Id != request.Id && c.Name == request.Name, cancellationToken);
-
-        if (categoryWithNameExists)
+        var categoryWithName = await _categoryRepository.FindByNameAsync(request.Name, cancellationToken);
+        if (categoryWithName is not null && categoryWithName.Id != category.Id)
         {
             return new ConflictError(nameof(request.Name));
         }
 
         if (request.ParentId.HasValue)
         {
-            var parentExists = await _categoryDatabase.Categories
-                .AnyAsync(c => c.Id == request.ParentId, cancellationToken);
-
+            var parentExists = await _categoryRepository.ExistsByNameAsync(request.Name, cancellationToken);
             if (!parentExists)
             {
                 return MemberError.InvalidValue(nameof(UpdateCategoryCommand.ParentId));
             }
         }
+        
+        category.Update(request.ParentId.HasValue ? new CategoryId(request.ParentId.Value) : null,
+            request.Name);
 
-        category.ParentId = request.ParentId;
-        category.Name = request.Name;
-
-        await _categoryDatabase.SaveChangesAsync(cancellationToken);
+        await _categoryRepository.UpdateAsync(category, cancellationToken);
 
         return Result.Successful;
     }

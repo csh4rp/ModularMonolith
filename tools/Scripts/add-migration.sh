@@ -4,7 +4,7 @@ contexts=("ApplicationDbContext")
 
 connection_strings=("User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;")
 
-projects=("../../src/Bootstrapper/ModularMonolith.Bootstrapper.Migrations" )
+projects=("../../src/Infrastructure/ModularMonolith.Infrastructure.Migrations" )
 
 index=-1
 

@@ -2,6 +2,7 @@
 using FluentAssertions;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories.Fixtures;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Fixtures;
+using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.IntegrationTests.Common;
 using ModularMonolith.Shared.TestUtils.Abstractions;
 
@@ -75,7 +76,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
     {
         // Arrange
         var currentCategory = _categoryFixture.Clone()
-            .RuleFor(x => x.Id, Guid.Parse("775DA6BC-13FE-46E9-9D00-55374A95C542"))
+            .RuleFor(x => x.Id, new CategoryId(Guid.Parse("775DA6BC-13FE-46E9-9D00-55374A95C542")))
             .Generate();
 
         var otherCategory = _categoryFixture.Clone()

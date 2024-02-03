@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.CategoryManagement.Application.Categories.Abstract;
-using ModularMonolith.CategoryManagement.Domain.Entities;
+using ModularMonolith.CategoryManagement.Domain.Categories;
 
 namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.DataAccess.Concrete;
 
