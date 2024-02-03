@@ -43,8 +43,8 @@ internal static class CategoryEndpointExtensions
                 CancellationToken cancellationToken) =>
             {
                 command.Id = id;
-                var result = await mediator.Send(command, cancellationToken);
-                return ApiResult.From(result);
+                await mediator.Send(command, cancellationToken);
+                return Results.NoContent();
             })
             .AddValidation<UpdateCategoryCommand>()
             .Produces(StatusCodes.Status204NoContent)
@@ -57,8 +57,8 @@ internal static class CategoryEndpointExtensions
                 CancellationToken cancellationToken) =>
             {
                 var command = new DeleteCategoryCommand(id);
-                var result = await mediator.Send(command, cancellationToken);
-                return ApiResult.From(result);
+                await mediator.Send(command, cancellationToken);
+                return Results.NoContent();
             })
             .Produces(StatusCodes.Status204NoContent)
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound);

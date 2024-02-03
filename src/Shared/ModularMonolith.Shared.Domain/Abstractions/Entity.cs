@@ -2,12 +2,12 @@
 
 public abstract class Entity<TId> where TId : notnull
 {
-    private List<IEvent>? _events;
+    private Queue<IEvent>? _events;
     
     public TId Id { get; init; } = default!;
     public int Version { get; private set; }
 
-    protected void AddEvent(IEvent @event)
+    protected void EnqueueEvent(IEvent @event)
     {
         if (_events is null)
         {
@@ -15,7 +15,7 @@ public abstract class Entity<TId> where TId : notnull
             Version++;
         }
         
-        _events.Add(@event);
+        _events.Enqueue(@event);
         
     }
 
@@ -23,12 +23,12 @@ public abstract class Entity<TId> where TId : notnull
     {
         if (_events is null)
         {
-            return Enumerable.Empty<IEvent>();
+            yield break;
         }
-
-        var events = _events.ToList();
-        _events.Clear();
         
-        return events;
+        while (_events.TryDequeue(out var @event))
+        {
+            yield return @event;
+        }
     }
 }

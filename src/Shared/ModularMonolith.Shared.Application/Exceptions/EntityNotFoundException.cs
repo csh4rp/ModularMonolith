@@ -2,7 +2,7 @@
 
 public class EntityNotFoundException : AppException
 {
-    public EntityNotFoundException(Type entityType, Guid entityId)
+    public EntityNotFoundException(Type entityType, object entityId)
         : base($"Entity of type: '{entityType.Name}' with id: '{entityId}' was not found")
     {
         EntityType = entityType;
@@ -11,7 +11,7 @@ public class EntityNotFoundException : AppException
 
     public Type EntityType { get; }
 
-    public Guid EntityId { get; }
+    public object EntityId { get; }
 
     public override string Code => "ENTITY_NOT_FOUND";
 }

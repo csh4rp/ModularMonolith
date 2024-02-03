@@ -71,8 +71,8 @@ public class MemberErrorAssertions : ReferenceTypeAssertions<MemberError, Member
     {
         Execute.Assertion
             .BecauseOf(because, becauseArgs)
-            .ForCondition(Subject.Target.Equals(target, StringComparison.OrdinalIgnoreCase))
-            .FailWith("Expected {context:Error} to have code {0}{reason}, but it was {1}", target, Subject.Target);
+            .ForCondition(Subject.Reference.Equals(target, StringComparison.OrdinalIgnoreCase))
+            .FailWith("Expected {context:Error} to have code {0}{reason}, but it was {1}", target, Subject.Reference);
 
         return new AndConstraint<MemberErrorAssertions>(this);
     }

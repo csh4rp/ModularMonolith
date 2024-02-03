@@ -24,7 +24,7 @@ internal sealed class ChangePasswordCommandHandler : ICommandHandler<ChangePassw
         _eventBus = eventBus;
     }
 
-    public async Task<Result> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
+    public async Task Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
     {
         var userId = _identityContextAccessor.Context!.UserId;
         var user = await _userManager.FindByIdAsync(userId.ToString());

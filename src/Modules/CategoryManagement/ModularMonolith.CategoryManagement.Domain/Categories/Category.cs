@@ -14,7 +14,7 @@ public class Category : Entity<CategoryId>, IAggregateRoot
         ParentId = parentId;
         Name = name;
         
-        AddEvent(new CategoryCreated(id, parentId, name));
+        EnqueueEvent(new CategoryCreated(id, parentId, name));
     }
     
     public CategoryId? ParentId { get; private set; }
@@ -25,7 +25,6 @@ public class Category : Entity<CategoryId>, IAggregateRoot
         string name)
     {
         var hasChanges = HasChanges(parentId, name);
-
         if (!hasChanges)
         {
             return;
@@ -34,7 +33,7 @@ public class Category : Entity<CategoryId>, IAggregateRoot
         ParentId = parentId;
         Name = name;
         
-        AddEvent(new CategoryUpdated(Id, ParentId, Name));
+        EnqueueEvent(new CategoryUpdated(Id, ParentId, Name));
     }
 
     private bool HasChanges(CategoryId? parentId, string name) =>

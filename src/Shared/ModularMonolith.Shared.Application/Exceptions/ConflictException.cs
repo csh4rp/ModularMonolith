@@ -1,16 +1,11 @@
 ﻿namespace ModularMonolith.Shared.Application.Exceptions;
 
-public sealed class ConflictException : AppException
+public abstract class ConflictException : AppException
 {
-    public ConflictException(string propertyName, string errorCode, string message) : base(message)
+    protected ConflictException(string message, string reference) : base(message)
     {
-        PropertyName = propertyName;
-        ErrorCode = errorCode;
+        Reference = reference;
     }
-
-    public override string Code => "CONFLICT";
-
-    public string PropertyName { get; }
-
-    public string ErrorCode { get; }
+    
+    public string Reference { get; }
 }

@@ -1,6 +1,8 @@
-﻿using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
+﻿using ModularMonolith.CategoryManagement.Application.Categories.Exceptions;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.Application.Commands;
+using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Contracts.Errors;
 
@@ -12,22 +14,21 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
 
     public CreateCategoryCommandHandler(ICategoryRepository categoryRepository) => _categoryRepository = categoryRepository;
 
-    public async Task<Result<CreatedResponse>> Handle(CreateCategoryCommand request,
+    public async Task<CreatedResponse> Handle(CreateCategoryCommand request,
         CancellationToken cancellationToken)
     {
         var categoryWithNameExists = await _categoryRepository.ExistsByNameAsync(request.Name, cancellationToken);
         if (categoryWithNameExists)
         {
-            return new ConflictError(nameof(request.Name));
+            throw new CategoryNameConflictException("Category with given name already exists", nameof(request.Name));
         }
 
         if (request.ParentId.HasValue)
         {
             var parentExists = await _categoryRepository.ExistsByIdAsync(new CategoryId(request.ParentId.Value), cancellationToken);
-
             if (!parentExists)
             {
-                return MemberError.InvalidValue(nameof(CreateCategoryCommand.ParentId));
+                throw new ValidationException(MemberError.InvalidValue(nameof(CreateCategoryCommand.ParentId)));
             }
         }
 

@@ -2,11 +2,14 @@
 
 public sealed class MemberError : Error
 {
-    public MemberError(string code, string message, string target) : base(code, message) =>
-        Target = $"{char.ToLower(target[0])}{target[1..]}";
+    public MemberError(string code, string message, string reference) : base(code, message) =>
+        Reference = $"{char.ToLower(reference[0])}{reference[1..]}";
 
-    public string Target { get; private set; }
+    public string Reference { get; private set; }
 
-    public static MemberError InvalidValue(string target) =>
-        new(ErrorCodes.InvalidValue, "Value is invalid", target);
+    public static MemberError InvalidValue(string reference) =>
+        new(ErrorCodes.InvalidValue, "Value is invalid", reference);
+
+    public static MemberError OutOfRange(string reference) =>
+        new(ErrorCodes.OutOfRange, "Value is out of range", reference);
 }
