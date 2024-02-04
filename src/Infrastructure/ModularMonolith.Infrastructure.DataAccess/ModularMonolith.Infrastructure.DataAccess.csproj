@@ -9,8 +9,4 @@
       <ProjectReference Include="..\..\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="DataAccess\" />
-    </ItemGroup>
-
 </Project>

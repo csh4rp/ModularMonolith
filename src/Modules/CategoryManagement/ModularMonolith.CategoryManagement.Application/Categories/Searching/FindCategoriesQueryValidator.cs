@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Queries;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Searching;
 using ModularMonolith.Shared.Contracts.Validators;
 
-namespace ModularMonolith.CategoryManagement.Application.Categories.Validators;
+namespace ModularMonolith.CategoryManagement.Application.Categories.Searching;
 
 internal sealed class FindCategoriesQueryValidator : PaginatedQueryValidator<FindCategoriesQuery>
 {

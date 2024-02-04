@@ -1,28 +1,13 @@
 ﻿using FluentAssertions;
-using Microsoft.AspNetCore.Identity;
-using ModularMonolith.Identity.Application.Account.CommandHandlers;
-using ModularMonolith.Identity.Application.UnitTests.Account.Fakes;
 using ModularMonolith.Identity.Contracts.Account.Commands;
-using ModularMonolith.Identity.Domain.Common.Entities;
-using ModularMonolith.Identity.Domain.Common.Events;
-using ModularMonolith.Shared.Application.Events;
 using ModularMonolith.Shared.Application.Exceptions;
-using ModularMonolith.Shared.Application.Identity;
 using ModularMonolith.Shared.Contracts.Errors;
-using NSubstitute;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.CommandHandlers;
 
-public class ChangePasswordCommandHandlerTests
+public partial class ChangePasswordCommandHandlerTests
 {
-    private const string UserId = "4F9391D5-E8EE-4DAB-A839-8BADA2C9A45B";
-
-    private readonly FakeUserManager _userManager = Substitute.For<FakeUserManager>();
-    private readonly IIdentityContextAccessor _identityContextAccessor = Substitute.For<IIdentityContextAccessor>();
-    private readonly IEventBus _eventBus = Substitute.For<IEventBus>();
-
-    public ChangePasswordCommandHandlerTests() =>
-        _identityContextAccessor.Context.Returns(new IdentityContext(Guid.Parse(UserId), "User"));
+    private readonly Fixture _fixture = new();
 
     [Fact]
     public async Task ShouldChangePassword_WhenCurrentPasswordIsValid()
@@ -30,20 +15,19 @@ public class ChangePasswordCommandHandlerTests
         // Arrange
         const string currentPassword = "Pa$$word";
         const string newPassword = "Pa$$word123";
-        var user = new User("mail@mail.com") { Id = Guid.Parse(UserId) };
+        var userId = Guid.Parse("4b923b33-187d-465e-8ccc-0b39ad4d713b");
 
-        _userManager.FindByIdAsync(user.Id.ToString()).Returns(user);
-        _userManager.ChangePasswordAsync(user, currentPassword, newPassword).Returns(IdentityResult.Success);
+        _fixture.SetupUser(userId, currentPassword);
 
         var command = new ChangePasswordCommand(currentPassword, newPassword, newPassword);
 
-        var handler = new ChangePasswordCommandHandler(_userManager, _identityContextAccessor, _eventBus);
+        var handler = _fixture.CreateSut();
 
         // Act
         await handler.Handle(command, default);
 
         // Assert
-        await _eventBus.Received(1).PublishAsync(Arg.Is<PasswordChanged>(e => e.UserId == user.Id), default);
+        await _fixture.AssertThatPasswordChangedEventWasPublished();
     }
 
     [Fact]
@@ -52,25 +36,26 @@ public class ChangePasswordCommandHandlerTests
         // Arrange
         const string currentPassword = "Pa$$word";
         const string newPassword = "Pa$$word123";
-        var user = new User("mail@mail.com") { Id = Guid.Parse(UserId) };
+        var userId = Guid.Parse("4b923b33-187d-465e-8ccc-0b39ad4d713b");
 
-        _userManager.FindByIdAsync(user.Id.ToString()).Returns(user);
-        _userManager.ChangePasswordAsync(Arg.Any<User>(), Arg.Any<string>(), Arg.Any<string>())
-            .Returns(IdentityResult.Failed(new IdentityError { Code = "PasswordMismatch" }));
+        _fixture.SetupUser(userId, currentPassword);
 
-        var command = new ChangePasswordCommand(currentPassword, newPassword, newPassword);
+        var command = new ChangePasswordCommand("invalid", newPassword, newPassword);
 
-        var handler = new ChangePasswordCommandHandler(_userManager, _identityContextAccessor, _eventBus);
+        var handler = _fixture.CreateSut();
 
         // Act
         var exception = await Assert.ThrowsAsync<ValidationException>(() => handler.Handle(command, default));
 
         // Assert
         exception.Should().NotBeNull();
-        exception.Errors.Should().ContainSingle(e =>
-            e.Code == ErrorCodes.InvalidValue 
-            && e.Reference == nameof(command.CurrentPassword));
-        
-        await _eventBus.DidNotReceiveWithAnyArgs().PublishAsync<PasswordChanged>(default!, default);
+        exception.Errors.Should()
+            .HaveCount(1)
+            .And
+            .ContainSingle(e =>
+                e.Code == ErrorCodes.InvalidValue
+                && e.Reference.Equals(nameof(command.CurrentPassword), StringComparison.OrdinalIgnoreCase));
+
+        await _fixture.AssertThatNoEventWasPublished();
     }
 }

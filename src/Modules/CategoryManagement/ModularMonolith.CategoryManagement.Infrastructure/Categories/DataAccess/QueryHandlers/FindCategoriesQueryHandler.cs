@@ -1,7 +1,6 @@
 ﻿using ModularMonolith.CategoryManagement.Application.Categories.Abstract;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Models;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Queries;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Responses;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Searching;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Extensions;
 using ModularMonolith.Shared.Infrastructure.Queries;
 using Z.EntityFramework.Plus;

@@ -1,9 +1,9 @@
-﻿using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
+﻿using ModularMonolith.CategoryManagement.Contracts.Categories.Deletion;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Exceptions;
 
-namespace ModularMonolith.CategoryManagement.Application.Categories.CommandHandlers;
+namespace ModularMonolith.CategoryManagement.Application.Categories.Deletion;
 
 internal sealed class DeleteCategoryCommandHandler : ICommandHandler<DeleteCategoryCommand>
 {

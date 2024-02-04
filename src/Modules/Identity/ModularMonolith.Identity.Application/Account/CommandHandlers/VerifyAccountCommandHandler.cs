@@ -27,7 +27,6 @@ internal sealed class VerifyAccountCommandHandler : ICommandHandler<VerifyAccoun
     public async Task Handle(VerifyAccountCommand request, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByIdAsync(request.UserId.ToString());
-
         if (user is null)
         {
             _logger.LogWarning("An attempt was made to verify an account with ID: {UserId} that does not exist",
@@ -37,7 +36,6 @@ internal sealed class VerifyAccountCommandHandler : ICommandHandler<VerifyAccoun
         }
 
         var result = await _userManager.ConfirmEmailAsync(user, request.VerificationToken);
-
         if (!result.Succeeded)
         {
             _logger.LogWarning("An attempt was made to verify an account with ID: {UserId} with invalid token",

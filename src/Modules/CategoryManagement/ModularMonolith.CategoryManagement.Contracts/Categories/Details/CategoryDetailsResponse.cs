@@ -1,4 +1,4 @@
-﻿namespace ModularMonolith.CategoryManagement.Contracts.Categories.Responses;
+﻿namespace ModularMonolith.CategoryManagement.Contracts.Categories.Details;
 
 public sealed record CategoryDetailsResponse
 {

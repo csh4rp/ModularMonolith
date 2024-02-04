@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using FluentValidation.TestHelper;
-using ModularMonolith.CategoryManagement.Application.Categories.Validators;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
+using ModularMonolith.CategoryManagement.Application.Categories.Modification;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Modification;
 
 namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.Validators;
 

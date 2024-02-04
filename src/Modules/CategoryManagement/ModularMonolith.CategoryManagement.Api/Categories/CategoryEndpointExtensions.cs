@@ -1,9 +1,11 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Creation;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Deletion;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Details;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Models;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Queries;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Responses;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Modification;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Searching;
 using ModularMonolith.Shared.Api.CustomResults;
 using ModularMonolith.Shared.Api.Filters;
 using ModularMonolith.Shared.Api.Models.Errors;

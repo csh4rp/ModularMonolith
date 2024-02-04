@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Creation;
 
-namespace ModularMonolith.CategoryManagement.Application.Categories.Validators;
+namespace ModularMonolith.CategoryManagement.Application.Categories.Creation;
 
 internal sealed class CreateCategoryCommandValidator : AbstractValidator<CreateCategoryCommand>
 {

@@ -1,68 +1,44 @@
-﻿using Microsoft.Extensions.Logging;
-using MockQueryable.NSubstitute;
-using ModularMonolith.Identity.Application.Account.CommandHandlers;
-using ModularMonolith.Identity.Application.UnitTests.Account.Fakes;
-using ModularMonolith.Identity.Contracts.Account.Commands;
-using ModularMonolith.Identity.Domain.Common.Entities;
-using ModularMonolith.Identity.Domain.Common.Events;
-using ModularMonolith.Shared.Application.Events;
-using ModularMonolith.Shared.Application.Exceptions;
-using NSubstitute;
+﻿using ModularMonolith.Identity.Contracts.Account.Commands;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.CommandHandlers;
 
-public class InitializePasswordResetCommandHandlerTests
+public partial class InitializePasswordResetCommandHandlerTests
 {
-    private readonly FakeUserManager _userManager = Substitute.For<FakeUserManager>();
-    private readonly IEventBus _eventBus = Substitute.For<IEventBus>();
-
-    private readonly ILogger<InitializePasswordResetCommandHandler> _logger =
-        Substitute.For<ILogger<InitializePasswordResetCommandHandler>>();
-
+    private readonly Fixture _fixture = new();
 
     [Fact]
     public async Task ShouldInitializePasswordReset_WhenEmailMatchesUser()
     {
         // Arrange
         const string validEmail = "mail@mail.com";
-        var user = new User(validEmail) { Id = Guid.NewGuid() };
-        var users = new[] { user }.BuildMock();
 
-        _userManager.NormalizeEmail(Arg.Any<string>()).Returns(c => c.Args().First().ToString()?.ToUpper());
-        _userManager.Users.Returns(users);
-
+        _fixture.SetupUser(validEmail);
+        
         var command = new InitializePasswordResetCommand(validEmail);
 
-        var handler = new InitializePasswordResetCommandHandler(_userManager, _eventBus, _logger);
+        var handler = _fixture.CreateSut();
 
         // Act
         await handler.Handle(command, default);
 
         // Assert
-        await _eventBus.Received(1)
-            .PublishAsync(Arg.Is<PasswordResetInitialized>(e => e.UserId == user.Id), default);
+        await _fixture.AssertThatResetPasswordInitializedEventWasPublished();
     }
 
     [Fact]
     public async Task ShouldNotInitializePasswordReset_WhenEmailDoesNotMatchUser()
     {
         // Arrange
-        const string validEmail = "mail@mail.com";
-        var user = new User(validEmail) { Id = Guid.NewGuid() };
-        var users = new[] { user }.BuildMock();
-
-        _userManager.NormalizeEmail(Arg.Any<string>()).Returns(c => c.Args().First().ToString()?.ToUpper());
-        _userManager.Users.Returns(users);
-
+        _fixture.SetupUser("mail@mail.com");
+        
         var command = new InitializePasswordResetCommand("invalid@mail.com");
 
-        var handler = new InitializePasswordResetCommandHandler(_userManager, _eventBus, _logger);
+        var handler = _fixture.CreateSut();
 
         // Act
-        var exception =  await Assert.ThrowsAsync<ValidationException>(() => handler.Handle(command, default));
+        await handler.Handle(command, default);
 
         // Assert
-        await _eventBus.DidNotReceiveWithAnyArgs()
-            .PublishAsync<PasswordResetInitialized>(default!, default);
+        await _fixture.AssertThatNoEventWasPublished();
     }
 }

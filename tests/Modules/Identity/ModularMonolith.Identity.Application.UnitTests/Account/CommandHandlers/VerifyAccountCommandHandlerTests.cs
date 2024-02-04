@@ -1,81 +1,90 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-using ModularMonolith.Identity.Application.Account.CommandHandlers;
-using ModularMonolith.Identity.Application.UnitTests.Account.Fakes;
+﻿using FluentAssertions;
 using ModularMonolith.Identity.Contracts.Account.Commands;
-using ModularMonolith.Identity.Domain.Common.Entities;
-using ModularMonolith.Shared.Application.Events;
-using NSubstitute;
+using ModularMonolith.Shared.Application.Exceptions;
+using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.CommandHandlers;
 
-public class VerifyAccountCommandHandlerTests
+public partial class VerifyAccountCommandHandlerTests
 {
-    private readonly FakeUserManager _userManager = Substitute.For<FakeUserManager>();
-    private readonly IEventBus _eventBus = Substitute.For<IEventBus>();
-
-    private readonly ILogger<VerifyAccountCommandHandler> _logger =
-        Substitute.For<ILogger<VerifyAccountCommandHandler>>();
-
+    private readonly Fixture _fixture = new();
+    
     [Fact]
     public async Task ShouldVerifyAccount_WhenIdMatchesUser()
     {
         // Arrange
         var userId = Guid.Parse("4B992E53-CA70-4910-BB44-AEE860F084FD");
         const string token = "123";
-
-        var user = new User("mail@mail.com") { Id = userId };
-
-        _userManager.FindByIdAsync(userId.ToString()).Returns(user);
-        _userManager.ConfirmEmailAsync(user, token).Returns(IdentityResult.Success);
-
+        
+        _fixture.SetupUser(userId);
+        _fixture.SetupEmailConfirmation(token);
+        
         var command = new VerifyAccountCommand(userId, token);
 
-        var handler = new VerifyAccountCommandHandler(_userManager, _eventBus, _logger);
+        var handler = _fixture.CreateSut();
 
         // Act
         await handler.Handle(command, default);
 
         // Assert
+        await _fixture.AssertThatAccountVerifiedEventWasPublished();
     }
 
     [Fact]
-    public async Task ShouldReturnIInvalidValueError_WhenUserWithIdDoesNotExist()
+    public async Task ShouldThrowValidationException_WhenUserWithIdDoesNotExist()
     {
         // Arrange
         var userId = Guid.Parse("4B992E53-CA70-4910-BB44-AEE860F084FD");
         const string token = "123";
+        
+        _fixture.SetupUser(userId);
+        _fixture.SetupEmailConfirmation(token);
+        
+        var command = new VerifyAccountCommand(Guid.NewGuid(), token);
 
-        var command = new VerifyAccountCommand(userId, token);
-
-        var handler = new VerifyAccountCommandHandler(_userManager, _eventBus, _logger);
+        var handler = _fixture.CreateSut();
 
         // Act
-        await handler.Handle(command, default);
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => handler.Handle(command, default));
 
         // Assert
+        exception.Should().NotBeNull();
+        exception.Errors.Should()
+            .HaveCount(1)
+            .And
+            .ContainSingle(e =>
+                e.Code == ErrorCodes.InvalidValue
+                && e.Reference.Equals(nameof(command.UserId), StringComparison.OrdinalIgnoreCase));
+        
+        await _fixture.AssertThatNoEventWasPublished();
     }
 
     [Fact]
-    public async Task ShouldReturnIInvalidValueError_WhenTokenIsInvalid()
+    public async Task ShouldThrowValidationException_WhenTokenIsInvalid()
     {
         // Arrange
         var userId = Guid.Parse("4B992E53-CA70-4910-BB44-AEE860F084FD");
         const string token = "123";
+        
+        _fixture.SetupUser(userId);
+        _fixture.SetupEmailConfirmation(token);
+        
+        var command = new VerifyAccountCommand(userId, "1");
 
-        var user = new User("mail@mail.com") { Id = userId };
-
-        _userManager.FindByIdAsync(userId.ToString()).Returns(user);
-        _userManager.ConfirmEmailAsync(user, token)
-            .Returns(IdentityResult.Failed(new IdentityErrorDescriber().InvalidToken()));
-
-        var command = new VerifyAccountCommand(userId, token);
-
-        var handler = new VerifyAccountCommandHandler(_userManager, _eventBus, _logger);
+        var handler = _fixture.CreateSut();
 
         // Act
-        await handler.Handle(command, default);
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => handler.Handle(command, default));
 
         // Assert
+        exception.Should().NotBeNull();
+        exception.Errors.Should()
+            .HaveCount(1)
+            .And
+            .ContainSingle(e =>
+                e.Code == ErrorCodes.InvalidValue
+                && e.Reference.Equals(nameof(command.VerificationToken), StringComparison.OrdinalIgnoreCase));
+        
+        await _fixture.AssertThatNoEventWasPublished();
     }
 }

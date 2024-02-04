@@ -1,8 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Responses;
 using ModularMonolith.Shared.Contracts;
 
-namespace ModularMonolith.CategoryManagement.Contracts.Categories.Queries;
+namespace ModularMonolith.CategoryManagement.Contracts.Categories.Details;
 
 public sealed record GetCategoryDetailsByIdQuery(Guid Id) : IQuery<CategoryDetailsResponse>
 {

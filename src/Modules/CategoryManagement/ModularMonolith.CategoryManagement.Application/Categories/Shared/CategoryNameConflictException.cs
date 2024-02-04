@@ -1,6 +1,6 @@
 ﻿using ModularMonolith.Shared.Application.Exceptions;
 
-namespace ModularMonolith.CategoryManagement.Application.Categories.Exceptions;
+namespace ModularMonolith.CategoryManagement.Application.Categories.Shared;
 
 public sealed class CategoryNameConflictException : ConflictException
 {

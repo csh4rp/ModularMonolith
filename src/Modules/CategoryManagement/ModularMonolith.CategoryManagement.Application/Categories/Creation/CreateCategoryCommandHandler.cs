@@ -1,12 +1,12 @@
-﻿using ModularMonolith.CategoryManagement.Application.Categories.Exceptions;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Commands;
+﻿using ModularMonolith.CategoryManagement.Application.Categories.Shared;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Creation;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Contracts.Errors;
 
-namespace ModularMonolith.CategoryManagement.Application.Categories.CommandHandlers;
+namespace ModularMonolith.CategoryManagement.Application.Categories.Creation;
 
 internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryCommand, CreatedResponse>
 {

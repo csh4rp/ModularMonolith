@@ -1,9 +1,8 @@
 ﻿using ModularMonolith.CategoryManagement.Contracts.Categories.Models;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Responses;
 using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Contracts.Attributes;
 
-namespace ModularMonolith.CategoryManagement.Contracts.Categories.Queries;
+namespace ModularMonolith.CategoryManagement.Contracts.Categories.Searching;
 
 public sealed class FindCategoriesQuery : IQuery<CategoriesResponse>, IPaginatedQuery
 {

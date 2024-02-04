@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.CategoryManagement.Application.Categories.Abstract;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Queries;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Responses;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Details;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Infrastructure.Queries;

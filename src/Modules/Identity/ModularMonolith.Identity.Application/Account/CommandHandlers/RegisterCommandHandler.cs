@@ -23,10 +23,11 @@ internal sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand>
     public async Task Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         var userWithGivenEmail = await _userManager.FindByEmailAsync(request.Email);
-
         if (userWithGivenEmail is not null)
         {
-
+            throw new ValidationException(new MemberError(AccountErrorCodes.EmailConflict, 
+                "Email was already used",
+                nameof(request.Email)));
         }
 
         var user = new User(request.Email);
@@ -35,7 +36,9 @@ internal sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand>
 
         if (!result.Succeeded)
         {
-            throw new ValidationException(MemberError.InvalidValue(nameof(request.Password)));
+            throw new ValidationException(new MemberError(AccountErrorCodes.PasswordNotMatchingPolicy, 
+                "Password does not match current policy",
+                nameof(request.Password)));
         }
 
         await _eventBus.PublishAsync(new UserRegistered(user.Id, user.Email), cancellationToken);
