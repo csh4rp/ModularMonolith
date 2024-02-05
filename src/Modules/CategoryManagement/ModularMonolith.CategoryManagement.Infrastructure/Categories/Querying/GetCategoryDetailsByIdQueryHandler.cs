@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Details;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Querying;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Infrastructure.Queries;
 
-namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.DataAccess.QueryHandlers;
+namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.Querying;
 
 internal sealed class GetCategoryDetailsByIdQueryHandler
     : IQueryHandler<GetCategoryDetailsByIdQuery, CategoryDetailsResponse>

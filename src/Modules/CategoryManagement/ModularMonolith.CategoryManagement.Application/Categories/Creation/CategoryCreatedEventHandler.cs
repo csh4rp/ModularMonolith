@@ -5,9 +5,9 @@ using ModularMonolith.Shared.Domain.Attributes;
 namespace ModularMonolith.CategoryManagement.Application.Categories.Creation;
 
 [EventConsumer("categories")]
-public class CategoryCreatedEventHandler : IConsumer<CategoryCreated>
+public class CategoryCreatedEventHandler : IConsumer<CategoryCreatedEvent>
 {
-    public Task Consume(ConsumeContext<CategoryCreated> context)
+    public Task Consume(ConsumeContext<CategoryCreatedEvent> context)
     {
         return Task.CompletedTask;
     }

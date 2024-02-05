@@ -1,6 +1,6 @@
-﻿namespace ModularMonolith.CategoryManagement.Contracts.Categories.Models;
+﻿namespace ModularMonolith.CategoryManagement.Contracts.Categories.Shared;
 
-public class CategoryItemModel
+public sealed record CategoryItemModel
 {
     public required Guid Id { get; init; }
 

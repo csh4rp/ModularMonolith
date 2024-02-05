@@ -10,7 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using ModularMonolith.Bootstrapper.Infrastructure;
 using ModularMonolith.Infrastructure.Migrations;
 using ModularMonolith.CategoryManagement.Application.Categories.Abstract;
-using ModularMonolith.CategoryManagement.Infrastructure.Categories.DataAccess.Concrete;
 using Npgsql;
 using Respawn;
 using Testcontainers.PostgreSql;

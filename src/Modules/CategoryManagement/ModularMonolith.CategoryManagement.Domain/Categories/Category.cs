@@ -2,7 +2,7 @@
 
 namespace ModularMonolith.CategoryManagement.Domain.Categories;
 
-public class Category : Entity<CategoryId>, IAggregateRoot
+public sealed class Category : Entity<CategoryId>, IAggregateRoot
 {
     private Category()
     {
@@ -13,16 +13,15 @@ public class Category : Entity<CategoryId>, IAggregateRoot
         Id = id;
         ParentId = parentId;
         Name = name;
-        
-        EnqueueEvent(new CategoryCreated(id, parentId, name));
+
+        EnqueueEvent(new CategoryCreatedEvent(id, parentId, name));
     }
-    
+
     public CategoryId? ParentId { get; private set; }
 
     public string Name { get; private set; } = default!;
 
-    public void Update(CategoryId? parentId,
-        string name)
+    public void Update(CategoryId? parentId, string name)
     {
         var hasChanges = HasChanges(parentId, name);
         if (!hasChanges)
@@ -32,13 +31,11 @@ public class Category : Entity<CategoryId>, IAggregateRoot
 
         ParentId = parentId;
         Name = name;
-        
-        EnqueueEvent(new CategoryUpdated(Id, ParentId, Name));
+
+        EnqueueEvent(new CategoryUpdatedEvent(Id, ParentId, Name));
     }
 
-    private bool HasChanges(CategoryId? parentId, string name) =>
-        ParentId != parentId
-        || Name != name;
+    private bool HasChanges(CategoryId? parentId, string name) => ParentId != parentId || Name != name;
 
     public static Category Create(string name, CategoryId? parentId) => new(new CategoryId(), parentId, name);
 

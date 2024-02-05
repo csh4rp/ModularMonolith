@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 
-namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.DataAccess.EntityConfigurations;
+namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.EntityConfigurations;
 
 internal sealed class CategoryEntityTypeConfiguration : IEntityTypeConfiguration<Category>
 {

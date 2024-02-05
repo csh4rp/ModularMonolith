@@ -1,12 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore; 
-using ModularMonolith.CategoryManagement.Contracts.Categories.Models;
-using ModularMonolith.CategoryManagement.Contracts.Categories.Searching;
+﻿using Microsoft.EntityFrameworkCore;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Querying;
+using ModularMonolith.CategoryManagement.Contracts.Categories.Shared;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.Infrastructure.DataAccess.Extensions;
 using ModularMonolith.Shared.Infrastructure.Queries;
 using Z.EntityFramework.Plus;
 
-namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.DataAccess.QueryHandlers;
+namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.Querying;
 
 internal sealed class FindCategoriesQueryHandler : IQueryHandler<FindCategoriesQuery, CategoriesResponse>
 {
@@ -18,9 +18,9 @@ internal sealed class FindCategoriesQueryHandler : IQueryHandler<FindCategoriesQ
     {
         var query = _database.Set<Category>().AsQueryable();
 
-        if (!string.IsNullOrEmpty(request.Search))
+        if (!string.IsNullOrEmpty(request.SearchTerm))
         {
-            query = query.Where(c => c.Name.StartsWith(request.Search));
+            query = query.Where(c => c.Name.StartsWith(request.SearchTerm));
         }
 
         var countFuture = query.DeferredCount().FutureValue();

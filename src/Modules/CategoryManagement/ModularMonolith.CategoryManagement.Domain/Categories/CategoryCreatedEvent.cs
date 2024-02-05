@@ -3,10 +3,10 @@ using ModularMonolith.Shared.Domain.Attributes;
 
 namespace ModularMonolith.CategoryManagement.Domain.Categories;
 
-[Event(nameof(CategoryCreated), "categories", IsPersisted = true)]
-public record CategoryCreated(CategoryId Id, CategoryId? ParentId, string Name) : IEvent
+[Event(nameof(CategoryCreatedEvent), nameof(Category), IsPersisted = true)]
+public record CategoryCreatedEvent(CategoryId Id, CategoryId? ParentId, string Name) : IEvent
 {
-    public CategoryCreated() : this(default!, default, default!)
+    public CategoryCreatedEvent() : this(default!, default, default!)
     { 
     }
     
