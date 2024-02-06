@@ -35,7 +35,7 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
         await _categoryManagementFixture.DbContext.SaveChangesAsync();
 
         // Act
-        using var response = await _client.GetAsync($"api/category-management/categories/{category.Id}");
+        using var response = await _client.GetAsync($"api/category-management/categories/{category.Id.Value}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -47,7 +47,7 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()
     {
         // Arrange & Act
-        using var response = await _client.GetAsync($"api/category-management/categories/{Guid.Empty}");
+        using var response = await _client.GetAsync($"api/category-management/categories/00000000-0000-0000-0000-000000000001");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);

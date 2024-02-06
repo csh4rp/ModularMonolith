@@ -1,11 +1,10 @@
 ﻿{
   type: https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4,
-  title: One or more validation errors occurred,
-  status: 400,
-  detail: One or more validation errors occurred,
-  instance: /api/category-management/categories/00000000-0000-0000-0000-000000000000,
+  title: Entity was not found,
+  status: 404,
+  detail: ModularMonolith.CategoryManagement.Domain.Categories.Category was not found,
+  instance: /api/category-management/categories/00000000-0000-0000-0000-000000000001,
   traceId: Guid_1,
   timestamp: DateTimeOffset_1,
-  entityType: Category,
-  entityId: Guid_Empty
+  entityId: Guid_2
 }

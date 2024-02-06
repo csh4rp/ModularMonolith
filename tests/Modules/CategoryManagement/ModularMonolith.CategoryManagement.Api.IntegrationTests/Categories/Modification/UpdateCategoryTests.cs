@@ -48,7 +48,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
         using var request = GetResource("UpdateCategory.EmptyName.json");
 
         // Act
-        using var response = await _client.PutAsync($"api/category-management/categories/{Guid.Empty}", request);
+        using var response = await _client.PutAsync($"api/category-management/categories/00000000-0000-0000-0000-000000000001", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -63,7 +63,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
         using var request = GetResource("UpdateCategory.Valid.json");
 
         // Act
-        using var response = await _client.PutAsync($"api/category-management/categories/{Guid.Empty}", request);
+        using var response = await _client.PutAsync($"api/category-management/categories/00000000-0000-0000-0000-000000000001", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);

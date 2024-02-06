@@ -3,7 +3,7 @@
   title: One or more validation errors occurred,
   status: 400,
   detail: One or more validation errors occurred,
-  instance: /api/category-management/categories/00000000-0000-0000-0000-000000000000,
+  instance: /api/category-management/categories/00000000-0000-0000-0000-000000000001,
   traceId: Guid_1,
   timestamp: DateTimeOffset_1,
   errors: [
