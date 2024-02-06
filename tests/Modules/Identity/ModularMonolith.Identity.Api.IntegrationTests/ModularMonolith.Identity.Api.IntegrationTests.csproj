@@ -19,14 +19,46 @@
 
 
   <ItemGroup>
+    <EmbeddedResource Include="Account\SigningIn\Requests\SignIn.InvalidPassword.json" />
+    <EmbeddedResource Include="Account\SigningIn\Requests\SignIn.Valid.json" />
     <None Remove="Account\Resources\SignIn.Valid.json"/>
-    <EmbeddedResource Include="Account\Resources\ChangePassword.InvalidCurrentPassword.json"/>
-    <EmbeddedResource Include="Account\Resources\ChangePassword.NewPasswordNotMatchingPolicy.json"/>
-    <EmbeddedResource Include="Account\Resources\ChangePassword.Valid.json"/>
-    <EmbeddedResource Include="Account\Resources\InitializePasswordReset.Valid.json"/>
-    <EmbeddedResource Include="Account\Resources\Register.Valid.json"/>
-    <EmbeddedResource Include="Account\Resources\SignIn.InvalidPassword.json"/>
-    <EmbeddedResource Include="Account\Resources\SignIn.Valid.json"/>
+    <EmbeddedResource Include="Account\PasswordChange\Requests\ChangePassword.InvalidCurrentPassword.json" />
+    <EmbeddedResource Include="Account\PasswordChange\Requests\ChangePassword.NewPasswordNotMatchingPolicy.json" />
+    <EmbeddedResource Include="Account\PasswordChange\Requests\ChangePassword.Valid.json" />
+    <EmbeddedResource Include="Account\PasswordReset\Requests\InitializePasswordReset.Valid.json" />
+    <EmbeddedResource Include="Account\Registration\Requests\Register.Valid.json" />
+    <None Update="Account\PasswordChange\Responses\ChangePasswordTests.BadRequest_CurrentPasswordIsInvalid.verified.txt">
+      <ParentFile>ChangePasswordTests</ParentFile>
+      <DependentUpon>ChangePasswordTests.cs</DependentUpon>
+    </None>
+    <None Update="Account\PasswordChange\Responses\ChangePasswordTests.BadRequest_NewPasswordDoesNotMatchPolicy.verified.txt">
+      <ParentFile>ChangePasswordTests</ParentFile>
+      <DependentUpon>ChangePasswordTests.cs</DependentUpon>
+    </None>
+    <None Update="Account\PasswordReset\Responses\ResetPasswordTests.BadRequest_TokenIsInvalid.verified.txt">
+      <ParentFile>ResetPasswordTests</ParentFile>
+      <DependentUpon>ResetPasswordTests.cs</DependentUpon>
+    </None>
+    <None Update="Account\PasswordReset\Responses\ResetPasswordTests.BadRequest_UserIdIsInvalid.verified.txt">
+      <ParentFile>ResetPasswordTests</ParentFile>
+      <DependentUpon>ResetPasswordTests.cs</DependentUpon>
+    </None>
+    <None Update="Account\SigningIn\Responses\SignInTests.BadRequest.verified.txt">
+      <ParentFile>SignInTests</ParentFile>
+      <DependentUpon>SignInTests.cs</DependentUpon>
+    </None>
+    <None Update="Account\SigningIn\Responses\SignInTests.BadRequest_PasswordIsIncorrect.verified.txt">
+      <ParentFile>SignInTests</ParentFile>
+      <DependentUpon>SignInTests.cs</DependentUpon>
+    </None>
+    <None Update="Account\SigningIn\Responses\SignInTests.Ok.verified.txt">
+      <ParentFile>SignInTests</ParentFile>
+      <DependentUpon>SignInTests.cs</DependentUpon>
+    </None>
+    <None Update="Account\SigningIn\Responses\SignInTests.Ok_CredentialsAreValid.verified.txt">
+      <ParentFile>SignInTests</ParentFile>
+      <DependentUpon>SignInTests.cs</DependentUpon>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

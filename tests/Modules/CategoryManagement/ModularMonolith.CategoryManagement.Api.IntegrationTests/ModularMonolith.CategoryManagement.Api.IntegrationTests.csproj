@@ -24,12 +24,95 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Categories\Resources\CreateCategory.DuplicateName.json"/>
-    <EmbeddedResource Include="Categories\Resources\CreateCategory.EmptyName.json"/>
-    <EmbeddedResource Include="Categories\Resources\CreateCategory.Valid.json"/>
-    <EmbeddedResource Include="Categories\Resources\UpdateCategory.DuplicateName.json"/>
-    <EmbeddedResource Include="Categories\Resources\UpdateCategory.EmptyName.json"/>
-    <EmbeddedResource Include="Categories\Resources\UpdateCategory.Valid.json"/>
+    <EmbeddedResource Include="Categories\Creation\Requests\CreateCategory.DuplicateName.json" />
+    <EmbeddedResource Include="Categories\Creation\Requests\CreateCategory.EmptyName.json" />
+    <EmbeddedResource Include="Categories\Creation\Requests\CreateCategory.Valid.json" />
+    <EmbeddedResource Include="Categories\Modification\Requests\UpdateCategory.DuplicateName.json" />
+    <EmbeddedResource Include="Categories\Modification\Requests\UpdateCategory.EmptyName.json" />
+    <EmbeddedResource Include="Categories\Modification\Requests\UpdateCategory.Valid.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Categories\Creation\Responses\CreateCategoryTests.BadRequest.verified.txt">
+      <ParentFile>CreateCategoryTests</ParentFile>
+      <DependentUpon>CreateCategoryTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Creation\Responses\CreateCategoryTests.BadRequest_CategoryNameIsEmpty.verified.txt">
+      <ParentFile>CreateCategoryTests</ParentFile>
+      <DependentUpon>CreateCategoryTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Creation\Responses\CreateCategoryTests.Conflict.verified.txt">
+      <ParentFile>CreateCategoryTests</ParentFile>
+      <DependentUpon>CreateCategoryTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Creation\Responses\CreateCategoryTests.Conflict_CategoryNameIsAlreadyUsed.verified.txt">
+      <ParentFile>CreateCategoryTests</ParentFile>
+      <DependentUpon>CreateCategoryTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Creation\Responses\CreateCategoryTests.Created.verified.txt">
+      <ParentFile>CreateCategoryTests</ParentFile>
+      <DependentUpon>CreateCategoryTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Creation\Responses\CreateCategoryTests.Created_CategoryNameIsNotUsed.verified.txt">
+      <ParentFile>CreateCategoryTests</ParentFile>
+      <DependentUpon>CreateCategoryTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Searching\Responses\FindCategoriesTests.Ok.NoFilters.verified.txt">
+      <ParentFile>FindCategoriesTests</ParentFile>
+      <DependentUpon>FindCategoriesTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Searching\Responses\FindCategoriesTests.Ok.WithFilters_skip=0_take=10_orderBy=name-asc_search=Category-1.verified.txt">
+      <ParentFile>FindCategoriesTests</ParentFile>
+      <DependentUpon>FindCategoriesTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Searching\Responses\FindCategoriesTests.Ok.WithFilters_skip=0_take=20_orderBy=name-asc_search=null.verified.txt">
+      <ParentFile>FindCategoriesTests</ParentFile>
+      <DependentUpon>FindCategoriesTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Searching\Responses\FindCategoriesTests.Ok.WithFilters_skip=0_take=20_orderBy=name-desc_search=null.verified.txt">
+      <ParentFile>FindCategoriesTests</ParentFile>
+      <DependentUpon>FindCategoriesTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Searching\Responses\FindCategoriesTests.Ok.WithFilters_skip=10_take=10_orderBy=name-asc_search=null.verified.txt">
+      <ParentFile>FindCategoriesTests</ParentFile>
+      <DependentUpon>FindCategoriesTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Searching\Responses\FindCategoriesTests.Ok_FiltersAreNotSet.verified.txt">
+      <ParentFile>FindCategoriesTests</ParentFile>
+      <DependentUpon>FindCategoriesTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Searching\Responses\FindCategoriesTests.Ok_FiltersAreSet_skip=0_take=10_orderBy=name-asc_search=Category-1.verified.txt">
+      <ParentFile>FindCategoriesTests</ParentFile>
+      <DependentUpon>FindCategoriesTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Searching\Responses\FindCategoriesTests.Ok_FiltersAreSet_skip=0_take=20_orderBy=name-asc_search=null.verified.txt">
+      <ParentFile>FindCategoriesTests</ParentFile>
+      <DependentUpon>FindCategoriesTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Searching\Responses\FindCategoriesTests.Ok_FiltersAreSet_skip=0_take=20_orderBy=name-desc_search=null.verified.txt">
+      <ParentFile>FindCategoriesTests</ParentFile>
+      <DependentUpon>FindCategoriesTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Searching\Responses\FindCategoriesTests.Ok_FiltersAreSet_skip=10_take=10_orderBy=name-asc_search=null.verified.txt">
+      <ParentFile>FindCategoriesTests</ParentFile>
+      <DependentUpon>FindCategoriesTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Searching\Responses\GetCategoryTests.NotFound.verified.txt">
+      <ParentFile>GetCategoryTests</ParentFile>
+      <DependentUpon>GetCategoryTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Searching\Responses\GetCategoryTests.NotFound_CategoryDoesNotExist.verified.txt">
+      <ParentFile>GetCategoryTests</ParentFile>
+      <DependentUpon>GetCategoryTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Searching\Responses\GetCategoryTests.Ok.verified.txt">
+      <ParentFile>GetCategoryTests</ParentFile>
+      <DependentUpon>GetCategoryTests.cs</DependentUpon>
+    </None>
+    <None Update="Categories\Searching\Responses\GetCategoryTests.Ok_CategoryExists.verified.txt">
+      <ParentFile>GetCategoryTests</ParentFile>
+      <DependentUpon>GetCategoryTests.cs</DependentUpon>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -72,16 +72,7 @@ internal static class CategoryEndpointExtensions
                 var query = new GetCategoryDetailsByIdQuery(id);
                 var response = await mediator.Send(query, cancellationToken);
 
-                return response is null
-                    ? Results.NotFound(new ProblemDetails
-                    {
-                        Title = "Entity not found",
-                        Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4",
-                        Instance = $"categories/{id}",
-                        Status = StatusCodes.Status404NotFound,
-                        Detail = $"Entity of type: 'Category' with id: '{id}' was not found"
-                    })
-                    : Results.Ok(response);
+                return Results.Ok(response);
             })
             .Produces<CategoryDetailsResponse>()
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound);

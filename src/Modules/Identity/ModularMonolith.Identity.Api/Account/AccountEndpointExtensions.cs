@@ -1,7 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ModularMonolith.Identity.Contracts.Account.Commands;
-using ModularMonolith.Identity.Contracts.Account.Responses;
+using ModularMonolith.Identity.Contracts.Account.ChangePassword;
+using ModularMonolith.Identity.Contracts.Account.PasswordReset;
+using ModularMonolith.Identity.Contracts.Account.Registration;
+using ModularMonolith.Identity.Contracts.Account.SigningIn;
+using ModularMonolith.Identity.Contracts.Account.Verification;
 using ModularMonolith.Shared.Api.Filters;
 
 namespace ModularMonolith.Identity.Api.Account;

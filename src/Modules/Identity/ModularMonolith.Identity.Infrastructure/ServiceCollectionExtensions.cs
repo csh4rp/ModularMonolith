@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using ModularMonolith.Identity.Domain.Common.Entities;
-using ModularMonolith.Identity.Infrastructure.Common.Abstract;
-using ModularMonolith.Identity.Infrastructure.Common.Concrete;
-
+using ModularMonolith.Identity.Domain.Roles;
+using ModularMonolith.Identity.Domain.Users;
+using ModularMonolith.Identity.Infrastructure.Account.Stores;
 namespace ModularMonolith.Identity.Infrastructure;
 
 public static class ServiceCollectionExtensions
@@ -27,11 +25,6 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddScoped<IRoleStore<Role>, RoleStore>();
         serviceCollection.AddScoped<IUserStore<User>, UserStore>();
-        serviceCollection.AddScoped<IIdentityDatabase>(sp =>
-        {
-            var context = sp.GetRequiredService<DbContext>();
-            return new IdentityDatabase(context);
-        });
 
         return serviceCollection;
     }

@@ -13,4 +13,8 @@
     <Reference Include="System.IdentityModel.Tokens.Jwt"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Account\Mappings\" />
+  </ItemGroup>
+
 </Project>

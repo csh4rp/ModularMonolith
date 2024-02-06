@@ -1,0 +1,16 @@
+﻿{
+  type: https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1,
+  title: One or more validation errors occurred,
+  status: 400,
+  detail: One or more validation errors occurred,
+  instance: /api/category-management/categories/775da6bc-13fe-46e9-9d00-55374a95c542,
+  traceId: Guid_1,
+  timestamp: DateTimeOffset_1,
+  errors: [
+    {
+      reference: name,
+      code: CONFLICT,
+      message: Conflict
+    }
+  ]
+}

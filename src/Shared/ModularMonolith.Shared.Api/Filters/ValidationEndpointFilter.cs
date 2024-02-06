@@ -20,7 +20,6 @@ internal sealed class ValidationEndpointFilter<TModel> : IEndpointFilter
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
         var index = GetArgumentIndex(context.Arguments);
-
         if (index == -1)
         {
             throw new InvalidOperationException($"Could not find argument of type: {typeof(TModel)}");
@@ -29,7 +28,6 @@ internal sealed class ValidationEndpointFilter<TModel> : IEndpointFilter
         var argument = context.GetArgument<TModel>(index);
 
         var validationResult = await _validator.ValidateAsync(argument, context.HttpContext.RequestAborted);
-
         if (validationResult.IsValid)
         {
             return await next(context);

@@ -13,7 +13,7 @@ public abstract class BaseIntegrationTest<TClass> : IAsyncLifetime
 {
     protected StringContent GetResource(string name)
     {
-        var @namespace = $"{typeof(TClass).Namespace}.Resources.{name}";
+        var @namespace = $"{typeof(TClass).Namespace}.Requests.{name}";
 
         using var stream = typeof(TClass).Assembly.GetManifestResourceStream(@namespace);
         var buffer = new byte[stream!.Length];

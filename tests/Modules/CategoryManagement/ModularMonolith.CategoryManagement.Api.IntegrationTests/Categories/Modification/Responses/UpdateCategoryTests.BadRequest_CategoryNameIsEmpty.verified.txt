@@ -1,0 +1,16 @@
+﻿{
+  type: https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1,
+  title: One or more validation errors occurred,
+  status: 400,
+  detail: One or more validation errors occurred,
+  instance: /api/category-management/categories/00000000-0000-0000-0000-000000000000,
+  traceId: Guid_1,
+  timestamp: DateTimeOffset_1,
+  errors: [
+    {
+      reference: name,
+      code: REQUIRED,
+      message: 'Name' must not be empty.
+    }
+  ]
+}

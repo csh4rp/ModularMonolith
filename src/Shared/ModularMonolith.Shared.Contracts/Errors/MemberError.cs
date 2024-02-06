@@ -12,4 +12,7 @@ public sealed class MemberError : Error
 
     public static MemberError OutOfRange(string reference) =>
         new(ErrorCodes.OutOfRange, "Value is out of range", reference);
+    
+    public static MemberError Conflict(string reference) =>
+        new(ErrorCodes.Conflict, "Conflict", reference);
 }
