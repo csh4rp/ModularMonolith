@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Diagnostics;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ModularMonolith.Identity.Contracts.Account.ChangePassword;
 using ModularMonolith.Identity.Contracts.Account.PasswordReset;
@@ -6,6 +7,8 @@ using ModularMonolith.Identity.Contracts.Account.Registration;
 using ModularMonolith.Identity.Contracts.Account.SigningIn;
 using ModularMonolith.Identity.Contracts.Account.Verification;
 using ModularMonolith.Shared.Api.Filters;
+using ModularMonolith.Shared.Api.Models.Errors;
+using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Identity.Api.Account;
 
@@ -21,13 +24,23 @@ internal static class AccountEndpointExtensions
             .WithTags("Account")
             .WithGroupName("identity-v1");
 
-        group.MapPost("sign-in", async ([FromServices] IMediator mediator,
+        group.MapPost("sign-in", async (HttpContext httpContext,
+                [FromServices] IMediator mediator,
                 [FromBody] SignInCommand command,
                 CancellationToken cancellationToken) =>
             {
                 var response = await mediator.Send(command, cancellationToken);
 
-                return string.IsNullOrEmpty(response.Token) ? Results.BadRequest() : Results.Ok(response);
+                if (response.IsSuccessful)
+                {
+                    return Results.Ok(response);
+                }
+
+                var errorResponse = new ValidationErrorResponse(httpContext.Request.Path, 
+                    Activity.Current!.TraceId.ToString(),
+                    new[] { MemberError.InvalidValue(nameof(command.Email)) });
+
+                return Results.BadRequest(errorResponse);
             })
             .AddValidation<SignInCommand>()
             .Produces<SignInResponse>();

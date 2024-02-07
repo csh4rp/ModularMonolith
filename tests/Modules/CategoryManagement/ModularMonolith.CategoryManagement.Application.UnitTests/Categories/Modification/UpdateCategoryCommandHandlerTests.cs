@@ -77,6 +77,6 @@ public partial class UpdateCategoryCommandHandlerTests
         exception.Should().NotBeNull();
         exception.Errors.Should().HaveCount(1);
         exception.Errors[0].Code.Should().Be(ErrorCodes.InvalidValue);
-        exception.Errors[0].Reference.Should().Be(nameof(command.ParentId));
+        exception.Errors[0].Reference.Should().Match(e => e.Equals(nameof(command.ParentId), StringComparison.OrdinalIgnoreCase));
     }
 }

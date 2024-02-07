@@ -1,7 +1,10 @@
 ﻿{
   type: https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4,
-  title: Entity not found,
+  title: Entity was not found,
   status: 404,
-  detail: Entity of type: 'Category' with id: '00000000-0000-0000-0000-000000000000' was not found,
-  instance: categories/00000000-0000-0000-0000-000000000000
+  detail: ModularMonolith.CategoryManagement.Domain.Categories.Category was not found,
+  instance: /api/category-management/categories/00000000-0000-0000-0000-000000000001,
+  traceId: Guid_1,
+  timestamp: DateTimeOffset_1,
+  entityId: Guid_2
 }

@@ -15,7 +15,7 @@ internal sealed class GetCategoryDetailsByIdQueryHandler
 
     public async Task<CategoryDetailsResponse> Handle(GetCategoryDetailsByIdQuery request,
         CancellationToken cancellationToken) =>
-        await _database.Set<Category>().Where(c => c.Id.Value == request.Id)
+        await _database.Set<Category>().Where(c => c.Id == new CategoryId(request.Id))
             .Select(c => new CategoryDetailsResponse
             {
                 Id = c.Id.Value,

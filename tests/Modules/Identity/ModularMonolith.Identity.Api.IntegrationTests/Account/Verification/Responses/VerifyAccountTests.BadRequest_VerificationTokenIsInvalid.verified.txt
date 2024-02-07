@@ -8,7 +8,7 @@
   timestamp: DateTimeOffset_1,
   errors: [
     {
-      target: verificationToken,
+      reference: verificationToken,
       code: INVALID_ARGUMENT,
       message: Value is invalid
     }
