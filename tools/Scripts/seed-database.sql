@@ -1,8 +1,7 @@
--- Password is: 123Pa$$word321
-
 DO $$
+   
 DECLARE user_name CONSTANT VARCHAR(128) := 'mail@mail.com';
-DECLARE password_hash VARCHAR(255) := 'AQAAAAIAAYagAAAAEMbO4U0+72DTJTrynS9mX+9SokWZbBi9opL+zLvvgauBIWs6QRwDpUFPaHdEe6e+Mw==';
+DECLARE password_hash CONSTANT VARCHAR(255) := 'AQAAAAIAAYagAAAAEMbO4U0+72DTJTrynS9mX+9SokWZbBi9opL+zLvvgauBIWs6QRwDpUFPaHdEe6e+Mw==';
 
 BEGIN
     

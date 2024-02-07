@@ -51,10 +51,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{E61AF8
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{1655472A-29C3-48F2-B5CA-228591A3D3FA}"
 	ProjectSection(SolutionItems) = preProject
-		tools\Scripts\add-migration.sh = tools\Scripts\add-migration.sh
-		tools\Scripts\create-database.sql = tools\Scripts\create-database.sql
-		tools\Scripts\update-databases.sh = tools\Scripts\update-databases.sh
-		tools\Scripts\add-user.sql = tools\Scripts\add-user.sql
+		tools\Scripts\seed-database.sql = tools\Scripts\seed-database.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{FAC7DF74-47D5-4F61-8446-5940C54A2BBE}"
