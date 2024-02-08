@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  backend:
+    container_name: modular_monolith_backend
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7117:7117"
+      - "5087:5087"
+    profiles:
+      - all
+    networks:
+      - backend_net
+
+  database:
+    container_name: modular_monolith_db
+    image: postgres:16.1
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: Admin123!@#
+    volumes:
+      - database_data
+    networks:
+      - backend_net
+      
+volumes: 
+  database_data:
+    name: modular_monolith_db_data
+    
+networks:
+  backend_net:
+    name: modular_monolith_net
+  
+    
