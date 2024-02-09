@@ -9,7 +9,7 @@ add-migration:
 	--startup-project src/Infrastructure/ModularMonolith.Infrastructure.Migrations \
 	$(migration-name) \
 	-- "User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;"
-	
+
 update-database:
 	dotnet ef database update --context ApplicationDbContext \
 	--startup-project src/Infrastructure/ModularMonolith.Infrastructure.Migrations \
@@ -18,7 +18,6 @@ update-database:
 create-database:
 	$(eval database_image_id := $(shell docker ps --filter name=modular_monolith_db -aq))
 	docker exec ${database_image_id} psql -U postgres -c "CREATE DATABASE modular_monolith;"
-	
 
 seed-database:
 	$(eval seed_script := $(shell cat tools/Scripts/add-user.sql))
