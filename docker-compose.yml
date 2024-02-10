@@ -24,16 +24,14 @@ services:
     environment:
       POSTGRES_PASSWORD: Admin123!@#
     volumes:
-      - database_data
+      - database_data:/var/lib/postgresql/data
     networks:
       - backend_net
       
 volumes: 
   database_data:
-    name: modular_monolith_db_data
     
 networks:
   backend_net:
-    name: modular_monolith_net
   
     

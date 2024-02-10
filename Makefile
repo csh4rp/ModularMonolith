@@ -1,7 +1,7 @@
 migration-name := 'initial'
 
 start-infrastructure:
-	docker-compose -f tools/Docker/docker-compose.yml up -d
+	docker-compose -f docker-compose.yml up -d
 
 add-migration:
 	dotnet ef migrations add --context ApplicationDbContext \
@@ -19,8 +19,8 @@ create-database:
 	$(eval database_image_id := $(shell docker ps --filter name=modular_monolith_db -aq))
 	docker exec ${database_image_id} psql -U postgres -c "CREATE DATABASE modular_monolith;"
 
+database_container_name := "modular_monolith_db"
 seed-database:
 	$(eval seed_script := $(shell cat tools/Scripts/add-user.sql))
-	$(eval database_image_id := $(shell docker ps --filter name=modular_monolith_db -aq))
-	docker cp tools/Scripts/seed-database.sql ${database_image_id}:/tmp/seed-database.sql
-	docker exec ${database_image_id} psql -U postgres -d modular_monolith -f /tmp/add-user.sql
+	docker cp tools/Scripts/seed-database.sql ${database_container_name}:/tmp/seed-database.sql
+	docker exec ${database_container_name} psql -U postgres -d modular_monolith -f /tmp/seed-database.sql
