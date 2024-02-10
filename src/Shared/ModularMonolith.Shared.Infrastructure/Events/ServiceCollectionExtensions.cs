@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
-using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.Application.Abstract;
 using ModularMonolith.Shared.Application.Events;
-using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
 
 
@@ -14,12 +12,7 @@ public static class ServiceCollectionExtensions
         params Assembly[] assemblies)
     {
         serviceCollection.AddScoped<IEventBus, OutboxEventBus>()
-            .AddScoped<IEventLogStore, EventLogStore>()
-            .AddScoped<IEventLogDatabase>(sp =>
-            {
-                var context = sp.GetRequiredService<DbContext>();
-                return new EventLogDatabase(context);
-            });
+            .AddScoped<IEventLogStore, EventLogStore>();
         
         foreach (var assembly in assemblies)
         {

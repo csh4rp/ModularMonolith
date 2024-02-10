@@ -1,13 +1,13 @@
 ﻿using System.Reflection;
 using System.Text.Json;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.Application.Abstract;
 using ModularMonolith.Shared.Application.Events;
 using ModularMonolith.Shared.Application.Identity;
 using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Domain.Abstractions;
 using ModularMonolith.Shared.Domain.Attributes;
-using ModularMonolith.Shared.Infrastructure.Events.DataAccess.Abstract;
 using EventLog = ModularMonolith.Shared.Domain.Entities.EventLog;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
@@ -16,13 +16,13 @@ internal sealed class OutboxEventBus : IEventBus
 {
     private static readonly EventPublishOptions DefaultOptions = new();
     
-    private readonly IEventLogDatabase _database;
+    private readonly DbContext _database;
     private readonly IIdentityContextAccessor _identityContextAccessor;
     private readonly TimeProvider _timeProvider;
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly IServiceProvider _serviceProvider;
 
-    public OutboxEventBus(IEventLogDatabase database,
+    public OutboxEventBus(DbContext database,
         IIdentityContextAccessor identityContextAccessor,
         TimeProvider timeProvider,
         IPublishEndpoint publishEndpoint,
@@ -58,7 +58,7 @@ internal sealed class OutboxEventBus : IEventBus
                 UserId = identityContext?.UserId
             };
 
-            _database.EventLogs.Add(eventLog);
+            _database.Set<EventLog>().Add(eventLog);
         }
         
         await _publishEndpoint.Publish(@event, a =>
@@ -137,7 +137,7 @@ internal sealed class OutboxEventBus : IEventBus
             }
         }
 
-        _database.EventLogs.AddRange(eventLogs);
+        _database.Set<EventLog>().AddRange(eventLogs);
         await _database.SaveChangesAsync(cancellationToken);
     }
 }

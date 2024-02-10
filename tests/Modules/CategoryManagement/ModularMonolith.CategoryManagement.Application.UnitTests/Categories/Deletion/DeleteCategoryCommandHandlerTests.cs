@@ -4,9 +4,9 @@ using ModularMonolith.Shared.Application.Exceptions;
 
 namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.Deletion;
 
-public partial class DeleteCategoryCommandHandlerTests
+public class DeleteCategoryCommandHandlerTests
 {
-    private readonly Fixture _fixture = new();
+    private readonly DeleteCategoryCommandHandlerTestsFixture _fixture = new();
     
     [Fact]
     public async Task ShouldDeleteCategory_WhenCategoryExists()

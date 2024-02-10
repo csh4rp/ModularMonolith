@@ -6,9 +6,9 @@ using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.Creation;
 
-public partial class CreateCategoryCommandHandlerTests
+public class CreateCategoryCommandHandlerTests
 {
-    private readonly Fixture _fixture = new();
+    private readonly CreateCategoryCommandHandlerTestsFixture _fixture = new();
     
     [Fact]
     public async Task ShouldCreateCategory_WhenCategoryNameIsUnique()

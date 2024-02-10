@@ -3,9 +3,9 @@ using ModularMonolith.Identity.Contracts.Account.SigningIn;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.SigningIn;
 
-public partial class SignInCommandHandlerTests
+public class SignInCommandHandlerTests
 {
-    private readonly SignInCommandHandlerTests.Fixture _fixture = new();
+    private readonly SignInCommandHandlerTestsFixture _fixture = new();
 
     [Fact]
     public async Task ShouldSignIn_WhenUserNameAndPasswordIsCorrect()

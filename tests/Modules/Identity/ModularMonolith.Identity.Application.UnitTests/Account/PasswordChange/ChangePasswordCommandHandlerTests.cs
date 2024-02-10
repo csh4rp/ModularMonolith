@@ -5,9 +5,9 @@ using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.PasswordChange;
 
-public partial class ChangePasswordCommandHandlerTests
+public class ChangePasswordCommandHandlerTests
 {
-    private readonly ChangePasswordCommandHandlerTests.Fixture _fixture = new();
+    private readonly ChangePasswordCommandHandlerTestsFixture _fixture = new();
 
     [Fact]
     public async Task ShouldChangePassword_WhenCurrentPasswordIsValid()

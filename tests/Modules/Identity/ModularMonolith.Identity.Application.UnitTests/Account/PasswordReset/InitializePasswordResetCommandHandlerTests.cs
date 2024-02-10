@@ -2,9 +2,9 @@
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.PasswordReset;
 
-public partial class InitializePasswordResetCommandHandlerTests
+public class InitializePasswordResetCommandHandlerTests
 {
-    private readonly InitializePasswordResetCommandHandlerTests.Fixture _fixture = new();
+    private readonly InitializePasswordResetCommandHandlerTestsFixture _fixture = new();
 
     [Fact]
     public async Task ShouldInitializePasswordReset_WhenEmailMatchesUser()

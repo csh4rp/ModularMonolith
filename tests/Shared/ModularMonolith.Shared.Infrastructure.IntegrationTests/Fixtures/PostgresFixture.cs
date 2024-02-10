@@ -14,7 +14,7 @@ public class PostgresFixture : IAsyncLifetime
     private PostgreSqlContainer? _container;
     private Respawner? _respawner;
     
-    public ApplicationDbContext SharedDbContext { get; private set; } = default!;
+    public ApplicationDbContext DbContext { get; private set; } = default!;
 
     public string ConnectionString => _container!.GetConnectionString();
 
@@ -33,8 +33,8 @@ public class PostgresFixture : IAsyncLifetime
         _connection = new NpgsqlConnection(_container.GetConnectionString());
         await _connection.OpenAsync();
 
-        SharedDbContext = new ApplicationDbContextFactory().CreateDbContext([connectionString]);
-        await SharedDbContext.Database.MigrateAsync();
+        DbContext = new ApplicationDbContextFactory().CreateDbContext([connectionString]);
+        await DbContext.Database.MigrateAsync();
 
         await using var cmd = _connection.CreateCommand();
         cmd.CommandText =

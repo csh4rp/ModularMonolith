@@ -5,9 +5,9 @@ using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.Verification;
 
-public partial class VerifyAccountCommandHandlerTests
+public class VerifyAccountCommandHandlerTests
 {
-    private readonly Fixture _fixture = new();
+    private readonly VerifyAccountCommandHandlerTestsFixture _fixture = new();
     
     [Fact]
     public async Task ShouldVerifyAccount_WhenIdMatchesUser()

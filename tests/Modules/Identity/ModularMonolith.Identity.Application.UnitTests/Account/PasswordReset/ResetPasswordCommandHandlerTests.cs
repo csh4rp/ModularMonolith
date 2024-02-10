@@ -6,9 +6,9 @@ using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.PasswordReset;
 
-public partial class ResetPasswordCommandHandlerTests
+public class ResetPasswordCommandHandlerTests
 {
-    private readonly ResetPasswordCommandHandlerTests.Fixture _fixture = new ();
+    private readonly ResetPasswordCommandHandlerTestsFixture _fixture = new ();
     
     [Fact]
     public async Task ShouldResetPassword_WhenPasswordResetTokenIsValid()

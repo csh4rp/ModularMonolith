@@ -6,9 +6,9 @@ using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.Modification;
 
-public partial class UpdateCategoryCommandHandlerTests
+public class UpdateCategoryCommandHandlerTests
 {
-    private readonly Fixture _fixture = new();
+    private readonly UpdateCategoryCommandHandlerTestsFixture _fixture = new();
     
     [Fact]
     public async Task ShouldUpdateCategory_WhenNameIsUnique()

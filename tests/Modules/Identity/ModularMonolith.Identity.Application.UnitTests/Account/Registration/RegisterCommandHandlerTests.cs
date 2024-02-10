@@ -6,9 +6,9 @@ using ModularMonolith.Shared.Application.Exceptions;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.Registration;
 
-public partial class RegisterCommandHandlerTests
+public class RegisterCommandHandlerTests
 {
-    private readonly RegisterCommandHandlerTests.Fixture _fixture = new();
+    private readonly RegisterCommandHandlerTestsFixture _fixture = new();
 
     [Fact]
     public async Task ShouldRegisterUser_WhenEmailIsNotUsed()
