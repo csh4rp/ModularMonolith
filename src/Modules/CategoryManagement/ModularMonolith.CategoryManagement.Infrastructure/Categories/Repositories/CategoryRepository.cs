@@ -27,7 +27,7 @@ internal sealed class CategoryRepository : ICategoryRepository
         {
             _categories.Attach(category);
         }
-        
+
         return _dbContext.SaveChangesAsync(cancellationToken);
     }
 

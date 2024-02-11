@@ -10,7 +10,7 @@ public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<E
     public void Configure(EntityTypeBuilder<EventLog> builder)
     {
         builder.ToTable("event_log", "shared");
-        
+
         builder.HasKey(b => b.Id);
 
         builder.Property(b => b.Id)
@@ -23,7 +23,7 @@ public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<E
         builder.Property(b => b.EventType)
             .IsRequired()
             .HasMaxLength(256);
-        
+
         builder.HasIndex(b => new { b.UserId, b.EventType, b.CreatedAt });
     }
 }

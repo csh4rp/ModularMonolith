@@ -10,9 +10,9 @@ public readonly record struct CategoryId
         {
             throw new ArgumentException("Value can't be empty.", nameof(value));
         }
-        
+
         Value = value;
     }
-    
+
     public Guid Value { get; init; }
 }

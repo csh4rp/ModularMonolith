@@ -27,7 +27,7 @@ internal sealed class EntityNotFountExceptionHandler : IExceptionHandler
             Status = StatusCodes.Status404NotFound,
             Extensions = new Dictionary<string, object?>
             {
-                { "traceId", traceId }, 
+                { "traceId", traceId },
                 { "timestamp", DateTimeOffset.UtcNow },
                 { "entityId", notFoundException.EntityId }
             }

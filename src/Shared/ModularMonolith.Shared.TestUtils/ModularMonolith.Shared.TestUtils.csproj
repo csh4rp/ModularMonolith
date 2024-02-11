@@ -7,7 +7,7 @@
     <PackageReference Include="Verify.Http"/>
     <PackageReference Include="Verify.Xunit"/>
   </ItemGroup>
-  
+
   <PropertyGroup>
     <NoWarn>$(NoWarn);VSTHRD200;CS1591;CS1573</NoWarn>
   </PropertyGroup>

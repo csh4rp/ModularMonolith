@@ -26,7 +26,7 @@ public class SignInCommandHandlerTests
         // Assert
         response.Should().NotBeNull();
         response.Token.Should().NotBeNullOrEmpty();
-        
+
         await _fixture.AssertThatSignInSucceededEventWasPublished();
     }
 
@@ -49,7 +49,7 @@ public class SignInCommandHandlerTests
         // Assert
         response.Should().NotBeNull();
         response.Token.Should().BeNullOrEmpty();
-        
+
         await _fixture.AssertThatNoEventWasPublished();
     }
 
@@ -72,7 +72,7 @@ public class SignInCommandHandlerTests
         // Assert
         response.Should().NotBeNull();
         response.Token.Should().BeNullOrEmpty();
-        
+
         await _fixture.AssertThatSignInFailedEventWasPublished();
     }
 }

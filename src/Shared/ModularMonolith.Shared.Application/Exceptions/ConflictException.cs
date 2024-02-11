@@ -6,6 +6,6 @@ public abstract class ConflictException : AppException
     {
         Reference = reference;
     }
-    
+
     public string Reference { get; }
 }

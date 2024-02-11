@@ -17,7 +17,7 @@ namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs;
 public class AuditLogInterceptorFixture
 {
     private const string UserName = "mail@mail.com";
-    
+
     private static readonly DateTimeOffset Now = new(2023, 11, 3, 15, 30, 0, TimeSpan.Zero);
     private static readonly Guid UserId = Guid.Parse("018C4AA8-3842-43D9-B0C5-236D442787D5");
 
@@ -28,10 +28,10 @@ public class AuditLogInterceptorFixture
         ActivityStopped = _ => { },
         Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
     };
-    
+
     private readonly IIdentityContextAccessor _identityContextAccessor = Substitute.For<IIdentityContextAccessor>();
     private readonly TimeProvider _dateTimeProvider = Substitute.For<TimeProvider>();
-    
+
     private readonly DbContext _dbContext;
     private Activity? _activity;
 
@@ -73,7 +73,7 @@ public class AuditLogInterceptorFixture
             a.EntityState == EntityState.Added
             && a.EntityType == typeof(FirstTestEntity).FullName
             && a.EntityKeys.Any(k => k.Value == entity.Id.ToString()));
-        
+
         auditLog.Should().NotBeNull();
         auditLog!.CreatedAt.Should().Be(Now);
         auditLog.UserName.Should().Be(UserName);
@@ -88,7 +88,7 @@ public class AuditLogInterceptorFixture
             new("Name", entity.Name, null)
         });
     }
-    
+
     public async Task AssertEntityModifiedLogWasNotCreatedAsync(FirstTestEntity entity)
     {
         var auditLog = await _dbContext.Set<AuditLog>().SingleOrDefaultAsync(a =>
@@ -98,7 +98,7 @@ public class AuditLogInterceptorFixture
 
         auditLog.Should().BeNull();
     }
-    
+
     public async Task AssertOwnedEntityAddedLogWasCreatedAsync(Guid parentEntityId, OwnedEntity ownedEntity)
     {
         var ownedEntityAuditLog = await _dbContext.Set<AuditLog>().SingleOrDefaultAsync(a =>
@@ -120,7 +120,7 @@ public class AuditLogInterceptorFixture
             new("Name", ownedEntity.Name, null)
         });
     }
-    
+
     public async Task AssertOwnedEntityModifiedLogWasCreatedAsync(Guid parentEntityId, List<PropertyChange> expectedChanges)
     {
         var ownedEntityAuditLog = await _dbContext.Set<AuditLog>().SingleOrDefaultAsync(a =>
@@ -141,7 +141,7 @@ public class AuditLogInterceptorFixture
     }
 
     public Task SaveDbContextChangesAsync() => _dbContext.SaveChangesAsync();
-    
+
     private AuditLogTestDbContext CreateDbContext(string connectionString)
     {
         var serviceCollection = new ServiceCollection();

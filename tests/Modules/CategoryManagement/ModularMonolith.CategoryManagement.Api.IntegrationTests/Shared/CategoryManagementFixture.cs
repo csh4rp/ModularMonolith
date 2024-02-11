@@ -28,7 +28,7 @@ public class CategoryManagementFixture : IAsyncLifetime
     private TestServer _testServer = default!;
 
     public ApplicationDbContext DbContext { get; private set; } = default!;
-    
+
     public async Task InitializeAsync()
     {
         _container = new PostgreSqlBuilder()

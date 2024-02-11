@@ -15,7 +15,7 @@ namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
 internal sealed class OutboxEventBus : IEventBus
 {
     private static readonly EventPublishOptions DefaultOptions = new();
-    
+
     private readonly DbContext _database;
     private readonly IIdentityContextAccessor _identityContextAccessor;
     private readonly TimeProvider _timeProvider;
@@ -44,7 +44,7 @@ internal sealed class OutboxEventBus : IEventBus
         var identityContext = _identityContextAccessor.Context;
         var type = typeof(TEvent);
         var messageId = Guid.NewGuid();
-        
+
         var attribute = type.GetCustomAttribute<EventAttribute>();
 
         if (attribute?.IsPersisted is true)
@@ -60,7 +60,7 @@ internal sealed class OutboxEventBus : IEventBus
 
             _database.Set<EventLog>().Add(eventLog);
         }
-        
+
         await _publishEndpoint.Publish(@event, a =>
         {
             a.MessageId = messageId;
@@ -81,14 +81,14 @@ internal sealed class OutboxEventBus : IEventBus
                 cnx.InitiatorId = messageId;
             }, cancellationToken);
         }
-        
+
         await _database.SaveChangesAsync(cancellationToken);
     }
 
     public Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken)
         => PublishAsync(events, DefaultOptions, cancellationToken);
 
-    public async Task PublishAsync(IEnumerable<IEvent> events, 
+    public async Task PublishAsync(IEnumerable<IEvent> events,
         EventPublishOptions options,
         CancellationToken cancellationToken)
     {
@@ -100,7 +100,7 @@ internal sealed class OutboxEventBus : IEventBus
             var messageId = Guid.NewGuid();
             var type = @event.GetType();
             var attribute = type.GetCustomAttribute<EventAttribute>();
-            
+
             if (attribute?.IsPersisted is true)
             {
                 var eventLog = new EventLog
@@ -114,13 +114,13 @@ internal sealed class OutboxEventBus : IEventBus
 
                 eventLogs.Add(eventLog);
             }
-            
+
             await _publishEndpoint.Publish(@event, a =>
             {
                 a.MessageId = messageId;
                 a.CorrelationId = options.CorrelationId;
             }, cancellationToken);
-            
+
             var mappingType = typeof(IEventMapping<>).MakeGenericType(type);
             var mapping = _serviceProvider.GetService(mappingType);
 

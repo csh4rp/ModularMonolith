@@ -13,7 +13,7 @@ public class PostgresFixture : IAsyncLifetime
     private NpgsqlConnection? _connection;
     private PostgreSqlContainer? _container;
     private Respawner? _respawner;
-    
+
     public ApplicationDbContext DbContext { get; private set; } = default!;
 
     public string ConnectionString => _container!.GetConnectionString();

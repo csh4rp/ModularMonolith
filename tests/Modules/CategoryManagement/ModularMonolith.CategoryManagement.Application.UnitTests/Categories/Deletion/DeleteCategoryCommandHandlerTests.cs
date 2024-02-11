@@ -7,7 +7,7 @@ namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.De
 public class DeleteCategoryCommandHandlerTests
 {
     private readonly DeleteCategoryCommandHandlerTestsFixture _fixture = new();
-    
+
     [Fact]
     public async Task ShouldDeleteCategory_WhenCategoryExists()
     {

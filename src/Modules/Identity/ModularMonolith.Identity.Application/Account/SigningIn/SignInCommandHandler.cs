@@ -37,7 +37,7 @@ internal sealed class SignInCommandHandler : ICommandHandler<SignInCommand, Sign
         {
             return SignInResponse.InvalidCredentials();
         }
-        
+
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
         if (!isPasswordValid)
         {

@@ -9,7 +9,7 @@ namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.Mo
 public class UpdateCategoryCommandHandlerTests
 {
     private readonly UpdateCategoryCommandHandlerTestsFixture _fixture = new();
-    
+
     [Fact]
     public async Task ShouldUpdateCategory_WhenNameIsUnique()
     {
@@ -48,7 +48,7 @@ public class UpdateCategoryCommandHandlerTests
         // Arrange
         var category = _fixture.SetupCategory();
         var otherCategory = _fixture.SetupOtherCategory();
-        
+
         var command = new UpdateCategoryCommand(category.Id.Value, null, otherCategory.Name);
 
         var handler = _fixture.CreateSut();

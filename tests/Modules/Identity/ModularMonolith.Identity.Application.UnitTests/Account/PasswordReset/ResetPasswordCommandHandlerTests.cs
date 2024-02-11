@@ -9,7 +9,7 @@ namespace ModularMonolith.Identity.Application.UnitTests.Account.PasswordReset;
 public class ResetPasswordCommandHandlerTests
 {
     private readonly ResetPasswordCommandHandlerTestsFixture _fixture = new ();
-    
+
     [Fact]
     public async Task ShouldResetPassword_WhenPasswordResetTokenIsValid()
     {
@@ -17,10 +17,10 @@ public class ResetPasswordCommandHandlerTests
         var userId = Guid.Parse("EAC1106F-A02D-4243-9BEC-A7CEE36D45C1");
         const string token = "123";
         const string password = "Pa$$word123!@#";
-        
+
         _fixture.SetupUser(userId);
         _fixture.SetupPasswordReset(token, new IdentityErrorDescriber().InvalidToken());
-        
+
         var command = new ResetPasswordCommand(userId, token, password, password);
 
         var handler = _fixture.CreateSut();
@@ -56,10 +56,10 @@ public class ResetPasswordCommandHandlerTests
         exception.Errors.Should()
             .HaveCount(1)
             .And
-            .ContainSingle(e => 
+            .ContainSingle(e =>
                 e.Code == ErrorCodes.InvalidValue
                 && e.Reference.Equals(nameof(command.ResetPasswordToken), StringComparison.OrdinalIgnoreCase));
-        
+
         await _fixture.AssertThatNoEventWasPublished();
     }
 }

@@ -13,7 +13,7 @@ public class InitializePasswordResetCommandHandlerTests
         const string validEmail = "mail@mail.com";
 
         _fixture.SetupUser(validEmail);
-        
+
         var command = new InitializePasswordResetCommand(validEmail);
 
         var handler = _fixture.CreateSut();
@@ -30,7 +30,7 @@ public class InitializePasswordResetCommandHandlerTests
     {
         // Arrange
         _fixture.SetupUser("mail@mail.com");
-        
+
         var command = new InitializePasswordResetCommand("invalid@mail.com");
 
         var handler = _fixture.CreateSut();

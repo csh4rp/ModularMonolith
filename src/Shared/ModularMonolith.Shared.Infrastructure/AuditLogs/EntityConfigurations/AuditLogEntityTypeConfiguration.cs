@@ -11,7 +11,7 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
     public void Configure(EntityTypeBuilder<AuditLog> builder)
     {
         builder.ToTable("audit_log", "shared");
-        
+
         builder.HasKey(b => b.Id);
 
         builder.Property(b => b.Id)

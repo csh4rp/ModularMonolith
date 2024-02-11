@@ -25,9 +25,9 @@ internal sealed class ResetPasswordCommandHandler : ICommandHandler<ResetPasswor
 
     public async Task Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userManager.FindByIdAsync(request.UserId.ToString()) 
+        var user = await _userManager.FindByIdAsync(request.UserId.ToString())
                    ?? throw new ValidationException(MemberError.InvalidValue(nameof(request.UserId)));
-        
+
         var result = await _userManager.ResetPasswordAsync(user, request.ResetPasswordToken, request.NewPassword);
         if (result.Succeeded)
         {

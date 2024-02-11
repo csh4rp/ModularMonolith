@@ -84,7 +84,7 @@ public static class WebApplicationBuilderExtensions
 
         var connectionString = builder.Configuration.GetConnectionString("Database");
         var connectionStringBuilder = new NpgsqlConnectionStringBuilder(connectionString);
-        
+
         builder.Services.AddOptions<SqlTransportOptions>().Configure(options =>
         {
             options.Host = connectionStringBuilder.Host;
@@ -107,34 +107,34 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 
         builder.Services.AddPostgresMigrationHostedService(true, false);
-        
+
         builder.Services.AddMassTransit(c =>
         {
             c.AddEntityFrameworkOutbox<ApplicationDbContext>(o =>
             {
                 o.UsePostgres();
-                
+
                 o.UseBusOutbox(a =>
                 {
                     a.MessageDeliveryLimit = 10;
                 });
             });
-            
+
             c.AddConsumers(modules.SelectMany(m => m.Assemblies).ToArray());
 
             c.AddConfigureEndpointsCallback((context, _, cfg) =>
             {
                 cfg.UseEntityFrameworkOutbox<ApplicationDbContext>(context);
             });
-            
-            
+
+
             c.UsingPostgres((context, cfg) =>
             {
                 cfg.AutoStart = true;
                 cfg.UseDbMessageScheduler();
-                
+
                 cfg.MessageTopology.SetEntityNameFormatter(new EventAttributeEntityNameFormatter());
-                
+
                 var consumerMessages = modules.SelectMany(m => m.Assemblies)
                     .SelectMany(a => a.GetTypes())
                     .Where(t => t.IsAssignableTo(typeof(IConsumer)))
@@ -142,16 +142,16 @@ public static class WebApplicationBuilderExtensions
                     {
                         var @interface = t.GetInterfaces()
                             .Single(i => i.IsGenericType && i.IsAssignableTo(typeof(IConsumer)));
-                        
+
                         return @interface.GenericTypeArguments[0];
                     })
                     .ToDictionary(t => t.Key, t => t.ToList());
-                
+
                 foreach (var messageType in consumerMessages.Keys)
                 {
                     cfg.Publish(messageType, msg =>
                     {
-                        
+
                     });
                 }
 
@@ -172,15 +172,15 @@ public static class WebApplicationBuilderExtensions
                             {
                                 cf.ConfigureConsumer(context, consumerType);
                             }
-                            
+
                             cf.Subscribe(topic);
                         });
                     }
                 }
             });
-            
+
         });
-        
+
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(opt =>
         {
@@ -230,7 +230,7 @@ public static class WebApplicationBuilderExtensions
             .AddIdentityServices()
             .AddHttpContextAccessor()
             .AddExceptionHandlers();
-        
+
         builder.Services.AddOpenTelemetry()
             .WithTracing(b =>
             {

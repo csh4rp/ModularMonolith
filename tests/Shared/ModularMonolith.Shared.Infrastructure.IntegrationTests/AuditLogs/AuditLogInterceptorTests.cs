@@ -33,9 +33,9 @@ public class AuditLogInterceptorTests : IAsyncDisposable
     {
         // Arrange
         using var activity = _auditLogInterceptorFixture.StartActivity();
-        
+
         var entity = await _auditLogInterceptorFixture.AddEntityAsync();
-        
+
         // Act
         var originalValue = entity.OwnedEntity!.Name;
         entity.OwnedEntity.Name = "12";

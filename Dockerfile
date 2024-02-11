@@ -10,7 +10,7 @@ COPY src/Startup/ModularMonolith.Startup.RestApi/*.csproj ./Startup/ModularMonol
 COPY src/Infrastructure/ModularMonolith.Infrastructure.DataAccess/*.csproj ./Infrastructure/ModularMonolith.Infrastructure.DataAccess/
 
 COPY src/Modules/CategoryManagement/ModularMonolith.CategoryManagement.Api/*.csproj ./Modules/CategoryManagement/ModularMonolith.CategoryManagement.Api/
-COPY src/Modules/CategoryManagement/ModularMonolith.CategoryManagement.Domain/*.csproj ./Modules/CategoryManagement/ModularMonolith.CategoryManagement.Domain/ 
+COPY src/Modules/CategoryManagement/ModularMonolith.CategoryManagement.Domain/*.csproj ./Modules/CategoryManagement/ModularMonolith.CategoryManagement.Domain/
 COPY src/Modules/CategoryManagement/ModularMonolith.CategoryManagement.Application/*.csproj ./Modules/CategoryManagement/ModularMonolith.CategoryManagement.Application/
 COPY src/Modules/CategoryManagement/ModularMonolith.CategoryManagement.Infrastructure/*.csproj ./Modules/CategoryManagement/ModularMonolith.CategoryManagement.Infrastructure/
 COPY src/Modules/CategoryManagement/ModularMonolith.CategoryManagement.Contracts/*.csproj ./Modules/CategoryManagement/ModularMonolith.CategoryManagement.Contracts/

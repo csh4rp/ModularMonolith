@@ -13,7 +13,7 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.AddScoped<IEventBus, OutboxEventBus>()
             .AddScoped<IEventLogStore, EventLogStore>();
-        
+
         foreach (var assembly in assemblies)
         {
             var mappings = assembly.GetExportedTypes()

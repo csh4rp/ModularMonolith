@@ -9,7 +9,7 @@ internal sealed class UpdateCategoryCommandHandlerTestsFixture
     private readonly ICategoryRepository _categoryRepository = Substitute.For<ICategoryRepository>();
 
     private Category? _category;
-    
+
     public UpdateCategoryCommandHandler CreateSut() => new(_categoryRepository);
 
     public Category SetupCategory()
@@ -24,10 +24,10 @@ internal sealed class UpdateCategoryCommandHandlerTestsFixture
 
         _categoryRepository.FindByNameAsync(_category.Name, Arg.Any<CancellationToken>())
             .Returns(_category);
-        
+
         return _category;
     }
-    
+
     public Category SetupOtherCategory()
     {
         var category = Category.From(new CategoryId(), "Category-2", null);
@@ -40,7 +40,7 @@ internal sealed class UpdateCategoryCommandHandlerTestsFixture
 
         _categoryRepository.FindByNameAsync(category.Name, Arg.Any<CancellationToken>())
             .Returns(category);
-        
+
         return category;
     }
 

@@ -40,7 +40,7 @@ internal sealed class UserEntityTypeConfiguration : IEntityTypeConfiguration<Use
             .HasMaxLength(64)
             .IsConcurrencyToken()
             .AuditIgnore();
-        
+
         builder.Property(b => b.PhoneNumber)
             .HasMaxLength(64);
 

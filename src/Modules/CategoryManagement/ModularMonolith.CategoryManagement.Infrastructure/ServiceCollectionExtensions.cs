@@ -9,7 +9,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<ICategoryRepository, CategoryRepository>();
-        
+
         return serviceCollection;
     }
 }

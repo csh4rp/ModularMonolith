@@ -6,7 +6,7 @@ namespace ModularMonolith.Shared.Contracts;
 public readonly record struct Result
 {
     public static readonly Result Successful = new();
-    
+
     public Result()
     {
     }

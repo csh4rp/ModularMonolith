@@ -10,7 +10,7 @@ internal sealed class CreateCategoryCommandHandlerTestsFixture
 
     public CreateCategoryCommandHandler CreateSut() => new(_categoryRepository);
 
-    public Task AssertThatCategoryWasAdded() => 
+    public Task AssertThatCategoryWasAdded() =>
         _categoryRepository.Received(1).AddAsync(Arg.Any<Category>(), Arg.Any<CancellationToken>());
 
     public Category SetupExistingCategory()
@@ -22,7 +22,7 @@ internal sealed class CreateCategoryCommandHandlerTestsFixture
 
         _categoryRepository.ExistsByNameAsync(category.Name, Arg.Any<CancellationToken>())
             .Returns(true);
-        
+
         return category;
     }
 }

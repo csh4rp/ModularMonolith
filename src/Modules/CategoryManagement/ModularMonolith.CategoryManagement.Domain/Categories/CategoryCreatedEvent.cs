@@ -7,12 +7,12 @@ namespace ModularMonolith.CategoryManagement.Domain.Categories;
 public record CategoryCreatedEvent(CategoryId Id, CategoryId? ParentId, string Name) : IEvent
 {
     public CategoryCreatedEvent() : this(default!, default, default!)
-    { 
+    {
     }
-    
+
     public CategoryId Id { get; set; } = Id;
-    
+
     public CategoryId? ParentId { get; set; } = ParentId;
-    
+
     public string Name { get; set; } = Name;
 }

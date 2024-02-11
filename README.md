@@ -71,6 +71,3 @@ to work with a data seed files are prepared. To put initial test data into the d
 run following `Makefile` target: `seed-database`
 
 `make seed-database`
-
-
-

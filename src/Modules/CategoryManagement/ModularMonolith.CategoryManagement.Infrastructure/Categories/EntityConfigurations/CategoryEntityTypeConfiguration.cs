@@ -14,7 +14,7 @@ internal sealed class CategoryEntityTypeConfiguration : IEntityTypeConfiguration
 
         builder.Property(b => b.Id)
             .HasConversion(b => b.Value, b => new CategoryId(b));
-        
+
         builder.Property(b => b.ParentId)
             .HasConversion(b => b == null ? (Guid?)null : b.Value.Value, b => b != null ?
                 new CategoryId(b.Value) : null);

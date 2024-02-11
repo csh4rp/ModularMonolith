@@ -9,7 +9,7 @@ namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.Cr
 public class CreateCategoryCommandHandlerTests
 {
     private readonly CreateCategoryCommandHandlerTestsFixture _fixture = new();
-    
+
     [Fact]
     public async Task ShouldCreateCategory_WhenCategoryNameIsUnique()
     {
@@ -33,7 +33,7 @@ public class CreateCategoryCommandHandlerTests
     {
         // Arrange
         var existingCategory = _fixture.SetupExistingCategory();
-        
+
         var command = new CreateCategoryCommand(null, existingCategory.Name);
 
         var handler = _fixture.CreateSut();

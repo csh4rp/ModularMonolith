@@ -3,9 +3,9 @@
 public abstract class Entity<TId> where TId : notnull
 {
     private Queue<IEvent>? _events;
-    
+
     public TId Id { get; init; } = default!;
-    
+
     public int Version { get; private set; }
 
     protected void EnqueueEvent(IEvent @event)
@@ -15,7 +15,7 @@ public abstract class Entity<TId> where TId : notnull
             _events = [];
             Version++;
         }
-        
+
         _events.Enqueue(@event);
     }
 
@@ -25,7 +25,7 @@ public abstract class Entity<TId> where TId : notnull
         {
             yield break;
         }
-        
+
         while (_events.TryDequeue(out var @event))
         {
             yield return @event;

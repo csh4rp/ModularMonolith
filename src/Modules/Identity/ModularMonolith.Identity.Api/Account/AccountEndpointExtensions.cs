@@ -36,7 +36,7 @@ internal static class AccountEndpointExtensions
                     return Results.Ok(response);
                 }
 
-                var errorResponse = new ValidationErrorResponse(httpContext.Request.Path, 
+                var errorResponse = new ValidationErrorResponse(httpContext.Request.Path,
                     Activity.Current!.TraceId.ToString(),
                     new[] { MemberError.InvalidValue(nameof(command.Email)) });
 

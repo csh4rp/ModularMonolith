@@ -27,11 +27,9 @@ services:
       - database_data:/var/lib/postgresql/data
     networks:
       - backend_net
-      
-volumes: 
+
+volumes:
   database_data:
-    
+
 networks:
   backend_net:
-  
-    

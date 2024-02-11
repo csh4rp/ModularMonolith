@@ -21,7 +21,7 @@ internal sealed class ConflictExceptionHandler : IExceptionHandler
         var traceId = currentActivity?.TraceId.ToString() ?? httpContext.TraceIdentifier;
         var response = new ValidationErrorResponse(httpContext.Request.Path, traceId, new[]
         {
-            MemberError.Conflict(conflictException.Reference), 
+            MemberError.Conflict(conflictException.Reference),
         });
 
         httpContext.Response.StatusCode = StatusCodes.Status409Conflict;

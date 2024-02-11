@@ -16,9 +16,9 @@ internal sealed class UpdateCategoryCommandHandler : ICommandHandler<UpdateCateg
 
     public async Task Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
     {
-        var category = await _categoryRepository.FindByIdAsync(new CategoryId(request.Id), cancellationToken) 
+        var category = await _categoryRepository.FindByIdAsync(new CategoryId(request.Id), cancellationToken)
                        ?? throw new EntityNotFoundException(typeof(Category), request.Id);
-        
+
         var categoryWithName = await _categoryRepository.FindByNameAsync(request.Name, cancellationToken);
         if (categoryWithName is not null && categoryWithName.Id != category.Id)
         {
@@ -33,7 +33,7 @@ internal sealed class UpdateCategoryCommandHandler : ICommandHandler<UpdateCateg
                 throw new ValidationException(MemberError.InvalidValue(nameof(CreateCategoryCommand.ParentId)));
             }
         }
-        
+
         category.Update(request.ParentId.HasValue ? new CategoryId(request.ParentId.Value) : null,
             request.Name);
 

@@ -3,7 +3,7 @@
 public sealed record SignInResponse
 {
     public string? Token { get; private set; }
-    
+
     public bool IsSuccessful { get; private set; }
 
     public static SignInResponse Succeeded(string token) => new()

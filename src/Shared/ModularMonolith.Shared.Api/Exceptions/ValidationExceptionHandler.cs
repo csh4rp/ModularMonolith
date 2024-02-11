@@ -14,15 +14,15 @@ internal sealed class ValidationExceptionHandler : IExceptionHandler
         {
             return false;
         }
-        
+
         var currentActivity = Activity.Current;
         var traceId = currentActivity?.TraceId.ToString() ?? httpContext.TraceIdentifier;
-        
+
         var response = new ValidationErrorResponse(httpContext.Request.Path, traceId, validationException.Errors);
 
         httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
         await httpContext.Response.WriteAsJsonAsync(response, cancellationToken);
-        
+
         return true;
     }
 }

@@ -5,4 +5,3 @@ namespace ModularMonolith.CategoryManagement.Domain.Categories;
 
 [Event(nameof(CategoryUpdatedEvent), nameof(Category), IsPersisted = true)]
 public record CategoryUpdatedEvent(CategoryId Id, CategoryId? ParentId, string Name) : IEvent;
-

@@ -25,7 +25,7 @@ internal sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand>
         var userWithGivenEmail = await _userManager.FindByEmailAsync(request.Email);
         if (userWithGivenEmail is not null)
         {
-            throw new ValidationException(new MemberError(AccountErrorCodes.EmailConflict, 
+            throw new ValidationException(new MemberError(AccountErrorCodes.EmailConflict,
                 "Email was already used",
                 nameof(request.Email)));
         }
@@ -36,7 +36,7 @@ internal sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand>
 
         if (!result.Succeeded)
         {
-            throw new ValidationException(new MemberError(AccountErrorCodes.PasswordNotMatchingPolicy, 
+            throw new ValidationException(new MemberError(AccountErrorCodes.PasswordNotMatchingPolicy,
                 "Password does not match current policy",
                 nameof(request.Password)));
         }
