@@ -71,3 +71,12 @@ to work with a data seed files are prepared. To put initial test data into the d
 run following `Makefile` target: `seed-database`
 
 `make seed-database`
+
+## Git
+
+Project follows conventional commit approach and uses [Pre Commit](https://pre-commit.com/#install) with
+[Conventional Commit Plugin](https://github.com/compilerla/conventional-pre-commit).
+
+After `pre-commit` is installed on your platform make sure to run:
+
+`pre-commit install`
