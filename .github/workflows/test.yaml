@@ -42,7 +42,7 @@ jobs:
         run: dotnet build ModularMonolith.sln
 
       - name: Run Tests
-        run: dotnet test --logger trx --results-directory "test-results" --collect:"XPlat Code Coverage" --filter "FullyQualifiedName~.UnitTests"
+        run: dotnet test --logger trx --results-directory "test-results" --collect:"XPlat Code Coverage"
 
       - name: Upload Unit-Test results
         uses: actions/upload-artifact@v4
