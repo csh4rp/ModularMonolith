@@ -17,6 +17,13 @@ jobs:
   dotnet-test:
     name: Run dotnet tests
     runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+      checks: write
+      contents: write
+      pull-requests: write
+      actions: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
