@@ -1,0 +1,9 @@
+---
+extends: default
+
+rules:
+  line-length: disable
+  new-lines:
+    type: unix
+  truthy: disable
+  comments-indentation: disable
