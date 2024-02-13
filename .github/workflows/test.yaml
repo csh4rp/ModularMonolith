@@ -26,12 +26,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
 
       - name: Setup .NET 8.x
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
 
@@ -43,8 +43,14 @@ jobs:
       - name: Build
         run: dotnet build ModularMonolith.sln
 
-      - name: Run Tests
-        run: dotnet test --logger trx --results-directory "test-results" --collect:"XPlat Code Coverage"
+      - name: Run Architecture-Tests
+        run: dotnet test --filter "FullyQualifiedName~.ArchitectureTests"
+
+      - name: Run Unit-Tests
+        run: dotnet test --logger trx --results-directory "test-results" --collect:"XPlat Code Coverage" --filter "FullyQualifiedName~.UnitTests"
+
+      - name: Run Integration-Tests
+        run: dotnet test --logger trx --results-directory "test-results" --collect:"XPlat Code Coverage" --filter "FullyQualifiedName~.IntegrationTests"
 
       - name: Generate report
         run: reportgenerator "-reports:test-results/*/*.xml" "-targetdir:coverage" "-reporttypes:Cobertura;"
