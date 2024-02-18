@@ -18,6 +18,7 @@ using ModularMonolith.Shared.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Infrastructure.Events;
 using ModularMonolith.Shared.Infrastructure.Identity;
 using ModularMonolith.Shared.Infrastructure.Messaging;
+using ModularMonolith.Shared.Infrastructure.Messaging.Interceptors;
 using Npgsql;
 using IConsumer = MassTransit.IConsumer;
 using OpenTelemetry.Resources;
@@ -100,7 +101,7 @@ public static class WebApplicationBuilderExtensions
         {
             optionsBuilder.UseNpgsql(connectionString);
             optionsBuilder.UseSnakeCaseNamingConvention();
-            optionsBuilder.AddInterceptors(new AuditLogInterceptor());
+            optionsBuilder.AddInterceptors(new AuditLogInterceptor(), new PublishEventsInterceptor());
             optionsBuilder.UseApplicationServiceProvider(sp);
         }, ServiceLifetime.Scoped);
 

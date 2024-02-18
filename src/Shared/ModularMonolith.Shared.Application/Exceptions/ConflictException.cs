@@ -1,6 +1,6 @@
 ﻿namespace ModularMonolith.Shared.Application.Exceptions;
 
-public abstract class ConflictException : AppException
+public abstract class ConflictException : ApplicationLogicException
 {
     protected ConflictException(string message, string reference) : base(message)
     {

@@ -14,7 +14,7 @@ internal sealed class UpdateCategoryCommandHandlerTestsFixture
 
     public Category SetupCategory()
     {
-        _category = Category.From(new CategoryId(), "Category-1", null);
+        _category = Category.From(CategoryId.NewId(), "Category-1", null);
 
         _categoryRepository.ExistsByIdAsync(_category.Id, Arg.Any<CancellationToken>())
             .Returns(true);
@@ -30,7 +30,7 @@ internal sealed class UpdateCategoryCommandHandlerTestsFixture
 
     public Category SetupOtherCategory()
     {
-        var category = Category.From(new CategoryId(), "Category-2", null);
+        var category = Category.From(CategoryId.NewId(), "Category-2", null);
 
         _categoryRepository.ExistsByIdAsync(category.Id, Arg.Any<CancellationToken>())
             .Returns(true);

@@ -5,15 +5,9 @@ public class EventAttribute : Attribute
 {
     public EventAttribute(string name) => Name = name;
 
-    public EventAttribute(string name, string? topic)
-    {
-        Name = name;
-        Topic = topic;
-    }
+    public string Name { get; set; }
 
-    public string Name { get; }
-
-    public string? Topic { get; }
-
+    public string? Topic { get; set; }
+    
     public bool IsPersisted { get; init; }
 }

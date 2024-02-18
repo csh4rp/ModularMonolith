@@ -48,7 +48,8 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
         using var request = GetResource("UpdateCategory.EmptyName.json");
 
         // Act
-        using var response = await _client.PutAsync($"api/category-management/categories/00000000-0000-0000-0000-000000000001", request);
+        using var response =
+            await _client.PutAsync($"api/category-management/categories/00000000-0000-0000-0000-000000000001", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -63,7 +64,8 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
         using var request = GetResource("UpdateCategory.Valid.json");
 
         // Act
-        using var response = await _client.PutAsync($"api/category-management/categories/00000000-0000-0000-0000-000000000001", request);
+        using var response =
+            await _client.PutAsync($"api/category-management/categories/00000000-0000-0000-0000-000000000001", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -76,7 +78,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
     {
         // Arrange
         var currentCategory = _categoryFixture.Clone()
-            .RuleFor(x => x.Id, new CategoryId(Guid.Parse("775DA6BC-13FE-46E9-9D00-55374A95C542")))
+            .RuleFor(x => x.Id, CategoryId.From(Guid.Parse("775DA6BC-13FE-46E9-9D00-55374A95C542")))
             .Generate();
 
         var otherCategory = _categoryFixture.Clone()
