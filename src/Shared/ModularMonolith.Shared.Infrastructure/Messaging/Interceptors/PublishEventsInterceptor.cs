@@ -5,7 +5,7 @@ using ModularMonolith.Shared.Domain.Abstractions;
 
 namespace ModularMonolith.Shared.Infrastructure.Messaging.Interceptors;
 
-public class PublishEventsInterceptor : SaveChangesInterceptor
+public sealed class PublishEventsInterceptor : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
