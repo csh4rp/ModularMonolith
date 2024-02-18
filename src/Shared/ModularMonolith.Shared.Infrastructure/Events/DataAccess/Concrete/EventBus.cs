@@ -12,23 +12,23 @@ using EventLog = ModularMonolith.Shared.Domain.Entities.EventLog;
 
 namespace ModularMonolith.Shared.Infrastructure.Events.DataAccess.Concrete;
 
-internal sealed class OutboxEventBus : IEventBus
+internal sealed class EventBus : IEventBus
 {
     private static readonly EventPublishOptions DefaultOptions = new();
 
-    private readonly DbContext _database;
+    private readonly DbContext _dbContext;
     private readonly IIdentityContextAccessor _identityContextAccessor;
     private readonly TimeProvider _timeProvider;
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly IServiceProvider _serviceProvider;
 
-    public OutboxEventBus(DbContext database,
+    public EventBus(DbContext dbContext,
         IIdentityContextAccessor identityContextAccessor,
         TimeProvider timeProvider,
         IPublishEndpoint publishEndpoint,
         IServiceProvider serviceProvider)
     {
-        _database = database;
+        _dbContext = dbContext;
         _identityContextAccessor = identityContextAccessor;
         _timeProvider = timeProvider;
         _publishEndpoint = publishEndpoint;
@@ -38,7 +38,9 @@ internal sealed class OutboxEventBus : IEventBus
     public Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : IEvent
         => PublishAsync(@event, DefaultOptions, cancellationToken);
 
-    public async Task PublishAsync<TEvent>(TEvent @event, EventPublishOptions options, CancellationToken cancellationToken)
+    public async Task PublishAsync<TEvent>(TEvent @event,
+        EventPublishOptions options,
+        CancellationToken cancellationToken)
         where TEvent : IEvent
     {
         var identityContext = _identityContextAccessor.Context;
@@ -58,7 +60,7 @@ internal sealed class OutboxEventBus : IEventBus
                 UserId = identityContext?.UserId
             };
 
-            _database.Set<EventLog>().Add(eventLog);
+            _dbContext.Set<EventLog>().Add(eventLog);
         }
 
         await _publishEndpoint.Publish(@event, a =>
@@ -82,7 +84,7 @@ internal sealed class OutboxEventBus : IEventBus
             }, cancellationToken);
         }
 
-        await _database.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken)
@@ -137,7 +139,7 @@ internal sealed class OutboxEventBus : IEventBus
             }
         }
 
-        _database.Set<EventLog>().AddRange(eventLogs);
-        await _database.SaveChangesAsync(cancellationToken);
+        _dbContext.Set<EventLog>().AddRange(eventLogs);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

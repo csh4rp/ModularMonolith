@@ -11,7 +11,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddEvents(this IServiceCollection serviceCollection,
         params Assembly[] assemblies)
     {
-        serviceCollection.AddScoped<IEventBus, OutboxEventBus>()
+        serviceCollection.AddScoped<IEventBus, EventBus>()
             .AddScoped<IEventLogStore, EventLogStore>();
 
         foreach (var assembly in assemblies)

@@ -13,11 +13,11 @@ internal sealed class CategoryEntityTypeConfiguration : IEntityTypeConfiguration
         builder.HasKey(b => b.Id);
 
         builder.Property(b => b.Id)
-            .HasConversion(b => b.Value, b => new CategoryId(b));
+            .HasConversion(b => b.Value, b => CategoryId.From(b));
 
         builder.Property(b => b.ParentId)
             .HasConversion(b => b == null ? (Guid?)null : b.Value.Value, b => b != null ?
-                new CategoryId(b.Value) : null);
+                CategoryId.From(b.Value) : null);
 
         builder.HasMany<Category>()
             .WithOne()

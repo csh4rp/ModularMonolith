@@ -1,6 +1,12 @@
 ﻿namespace ModularMonolith.Shared.Domain.Abstractions;
 
-public abstract class Entity<TId> where TId : notnull
+public interface IEntity
+{
+    IEnumerable<IEvent> DequeueEvents();
+}
+
+
+public abstract class Entity<TId> : IEntity where TId : notnull
 {
     private Queue<IEvent>? _events;
 

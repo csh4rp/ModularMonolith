@@ -2,9 +2,7 @@
 
 public readonly record struct CategoryId
 {
-    public CategoryId() => Value = Guid.NewGuid();
-
-    public CategoryId(Guid value)
+    private CategoryId(Guid value)
     {
         if (value == Guid.Empty)
         {
@@ -15,4 +13,10 @@ public readonly record struct CategoryId
     }
 
     public Guid Value { get; init; }
+
+    public static CategoryId NewId() => new(Guid.NewGuid());
+
+    public static CategoryId From(Guid value) => new(value);
+
+    public static implicit operator Guid(CategoryId categoryId) => categoryId.Value;
 }

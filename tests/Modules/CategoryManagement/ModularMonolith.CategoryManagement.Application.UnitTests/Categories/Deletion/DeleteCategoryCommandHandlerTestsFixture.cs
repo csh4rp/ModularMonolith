@@ -14,7 +14,7 @@ internal sealed class DeleteCategoryCommandHandlerTestsFixture
 
     public Category SetupCategory()
     {
-        _category = Category.From(new CategoryId(), "Category-1", null);
+        _category = Category.From(CategoryId.NewId(), "Category-1", null);
 
         _categoryRepository.FindByIdAsync(_category.Id, Arg.Any<CancellationToken>())
             .Returns(_category);

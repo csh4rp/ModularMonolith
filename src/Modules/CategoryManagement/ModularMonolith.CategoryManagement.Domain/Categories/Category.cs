@@ -8,13 +8,13 @@ public sealed class Category : Entity<CategoryId>, IAggregateRoot
     {
     }
 
-    private Category(CategoryId id, CategoryId? parentId, string name)
+    public Category(CategoryId? parentId, string name)
     {
-        Id = id;
+        Id = CategoryId.NewId();
         ParentId = parentId;
         Name = name;
 
-        EnqueueEvent(new CategoryCreatedEvent(id, parentId, name));
+        EnqueueEvent(new CategoryCreatedEvent(Id, parentId, name));
     }
 
     public CategoryId? ParentId { get; private set; }
@@ -36,8 +36,6 @@ public sealed class Category : Entity<CategoryId>, IAggregateRoot
     }
 
     private bool HasChanges(CategoryId? parentId, string name) => ParentId != parentId || Name != name;
-
-    public static Category Create(string name, CategoryId? parentId) => new(new CategoryId(), parentId, name);
 
     public static Category From(CategoryId id, string name, CategoryId? parentId) => new()
     {
