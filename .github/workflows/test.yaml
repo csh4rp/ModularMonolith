@@ -35,22 +35,30 @@ jobs:
         with:
           dotnet-version: '8.x'
 
+      - uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+
       - name: Install dependencies
         run: |
-          dotnet restore ModularMonolith.sln
+          dotnet restore Jobee.Management.sln
           dotnet tool install -g dotnet-reportgenerator-globaltool
 
       - name: Build
-        run: dotnet build ModularMonolith.sln
+        run: dotnet build Jobee.Management.sln
 
       - name: Run Architecture-Tests
-        run: dotnet test --filter "FullyQualifiedName~.ArchitectureTests"
+        run: dotnet test --no-restore --no-build --filter "FullyQualifiedName~.ArchitectureTests"
 
       - name: Run Unit-Tests
-        run: dotnet test --logger trx --results-directory "test-results" --collect:"XPlat Code Coverage" --filter "FullyQualifiedName~.UnitTests"
+        run: dotnet test --no-restore --no-build --logger trx --results-directory "test-results" --collect:"XPlat Code Coverage" --filter "FullyQualifiedName~.UnitTests"
 
       - name: Run Integration-Tests
-        run: dotnet test --logger trx --results-directory "test-results" --collect:"XPlat Code Coverage" --filter "FullyQualifiedName~.IntegrationTests"
+        run: dotnet test --no-restore --no-build --logger trx --results-directory "test-results" --collect:"XPlat Code Coverage" --filter "FullyQualifiedName~.IntegrationTests"
 
       - name: Generate report
         run: reportgenerator "-reports:test-results/*/*.xml" "-targetdir:coverage" "-reporttypes:Cobertura;"
@@ -58,14 +66,14 @@ jobs:
       - name: Upload Unit-Test results
         uses: actions/upload-artifact@v4
         with:
-          name: coverage
+          name: coverage-results
           path: coverage
         if: ${{ !cancelled() }}
 
       - name: Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: coverage/**/Cobertura.xml
+          filename: coverage-results/**/Cobertura.xml
           badge: true
           fail_below_min: true
           format: markdown
