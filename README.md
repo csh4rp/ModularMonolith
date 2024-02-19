@@ -82,3 +82,5 @@ After `pre-commit` is installed on your platform make sure to run:
 `pre-commit install`
 
 ## CI & CD
+
+TODO: add github actions description
