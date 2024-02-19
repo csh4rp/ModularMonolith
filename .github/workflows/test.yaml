@@ -45,11 +45,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          dotnet restore Jobee.Management.sln
+          dotnet restore ModularMonolith.sln
           dotnet tool install -g dotnet-reportgenerator-globaltool
 
       - name: Build
-        run: dotnet build Jobee.Management.sln
+        run: dotnet build ModularMonolith.sln
 
       - name: Run Architecture-Tests
         run: dotnet test --no-restore --no-build --filter "FullyQualifiedName~.ArchitectureTests"
