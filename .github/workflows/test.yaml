@@ -37,11 +37,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          dotnet restore ModularMonolith.sln
+          dotnet restore Jobee.Management.sln
           dotnet tool install -g dotnet-reportgenerator-globaltool
 
       - name: Build
-        run: dotnet build ModularMonolith.sln
+        run: dotnet build Jobee.Management.sln
 
       - name: Run Architecture-Tests
         run: dotnet test --filter "FullyQualifiedName~.ArchitectureTests"
@@ -58,14 +58,14 @@ jobs:
       - name: Upload Unit-Test results
         uses: actions/upload-artifact@v4
         with:
-          name: coverage
+          name: coverage-results
           path: coverage
         if: ${{ !cancelled() }}
 
       - name: Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: coverage/**/Cobertura.xml
+          filename: coverage-results/**/Cobertura.xml
           badge: true
           fail_below_min: true
           format: markdown
