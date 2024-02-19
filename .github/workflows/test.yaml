@@ -34,6 +34,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
+        if: ${{ !contains(runner.name, 'Github Actions') }}
 
       - uses: actions/cache@v4
         with:
