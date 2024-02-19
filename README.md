@@ -80,3 +80,5 @@ Project follows conventional commit approach and uses [Pre Commit](https://pre-c
 After `pre-commit` is installed on your platform make sure to run:
 
 `pre-commit install`
+
+## CI & CD
