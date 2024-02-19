@@ -1,4 +1,6 @@
 migration-name := 'initial'
+connection-string: = 'User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith'
+
 
 start-infrastructure:
 	docker-compose -f docker-compose.yml up -d
@@ -8,12 +10,12 @@ add-migration:
 	--project src/Infrastructure/ModularMonolith.Infrastructure.Migrations \
 	--startup-project src/Infrastructure/ModularMonolith.Infrastructure.Migrations \
 	$(migration-name) \
-	-- "User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;"
+	-- ${connection-string}
 
 update-database:
 	dotnet ef database update --context ApplicationDbContext \
 	--startup-project src/Infrastructure/ModularMonolith.Infrastructure.Migrations \
-	-- "User ID=postgres;Password=Admin123!@#;Host=localhost;Port=5432;Database=modular_monolith;"
+	-- ${connection-string}
 
 create-database:
 	$(eval database_image_id := $(shell docker ps --filter name=modular_monolith_db -aq))
