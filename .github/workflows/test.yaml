@@ -35,6 +35,14 @@ jobs:
         with:
           dotnet-version: '8.x'
 
+      - uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+
       - name: Install dependencies
         run: |
           dotnet restore Jobee.Management.sln
