@@ -3,7 +3,7 @@
 name: Lint PR
 
 on:
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - edited
@@ -11,6 +11,9 @@ on:
 
 permissions:
   pull-requests: write
+  id-token: write
+  contents: write
+  packages: write
 
 jobs:
   lint-pr:
