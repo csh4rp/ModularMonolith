@@ -32,3 +32,4 @@ jobs:
           VALIDATE_SQL: true
           DEFAULT_BRANCH: ${{ github.head_ref }}
           LINTER_RULES_PATH: ./
+          EDITORCONFIG_FILE_NAME: .editorconfig
