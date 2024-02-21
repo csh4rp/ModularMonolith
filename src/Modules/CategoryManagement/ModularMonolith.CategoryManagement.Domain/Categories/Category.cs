@@ -39,6 +39,8 @@ public sealed class Category : Entity<CategoryId>, IAggregateRoot
 
     public static Category From(CategoryId id, string name, CategoryId? parentId) => new()
     {
-        Id = id, Name = name, ParentId = parentId
+        Id = id,
+        Name = name,
+        ParentId = parentId
     };
 }

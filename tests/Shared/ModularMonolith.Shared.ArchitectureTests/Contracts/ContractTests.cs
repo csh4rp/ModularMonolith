@@ -2,8 +2,8 @@
 using ArchUnitNET.Loader;
 using ArchUnitNET.xUnit;
 using ModularMonolith.Shared.Contracts;
-using Assembly = System.Reflection.Assembly;
 using static ArchUnitNET.Fluent.ArchRuleDefinition;
+using Assembly = System.Reflection.Assembly;
 
 namespace ModularMonolith.Shared.ArchitectureTests.Contracts;
 

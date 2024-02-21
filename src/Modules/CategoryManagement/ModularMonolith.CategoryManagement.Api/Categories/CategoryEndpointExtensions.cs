@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Creation;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Deletion;

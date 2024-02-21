@@ -34,7 +34,7 @@ public class DeleteCategoryCommandHandlerTests
         var handler = _fixture.CreateSut();
 
         // Act
-        var exception = await Assert.ThrowsAsync<EntityNotFoundException>(() =>handler.Handle(command, default));
+        var exception = await Assert.ThrowsAsync<EntityNotFoundException>(() => handler.Handle(command, default));
 
         // Assert
         exception.Should().NotBeNull();

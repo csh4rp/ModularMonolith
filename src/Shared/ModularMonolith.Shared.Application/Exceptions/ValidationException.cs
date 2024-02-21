@@ -1,4 +1,4 @@
-using ModularMonolith.Shared.Contracts.Errors;
+﻿using ModularMonolith.Shared.Contracts.Errors;
 
 namespace ModularMonolith.Shared.Application.Exceptions;
 

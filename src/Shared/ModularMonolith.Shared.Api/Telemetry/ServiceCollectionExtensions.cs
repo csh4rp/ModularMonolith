@@ -1,4 +1,4 @@
-using OpenTelemetry.Resources;
+﻿using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
 namespace ModularMonolith.Shared.Api.Telemetry;
