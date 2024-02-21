@@ -31,3 +31,4 @@ jobs:
           VALIDATE_JSON: true
           VALIDATE_SQL: true
           DEFAULT_BRANCH: ${{ github.head_ref }}
+          LINTER_RULES_PATH: ./
