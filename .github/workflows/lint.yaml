@@ -25,7 +25,6 @@ jobs:
         uses: super-linter/super-linter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          YAML_CONFIG_FILE: .yamllint
           VALIDATE_CSHARP: true
           VALIDATE_YAML: true
           VALIDATE_XML: true
