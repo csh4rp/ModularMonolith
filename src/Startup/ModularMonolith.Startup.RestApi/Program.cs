@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using ModularMonolith.Shared.Api;
-using System;
 
 [assembly: ExcludeFromCodeCoverage]
 
@@ -13,7 +12,7 @@ public class Program
         var builder = WebApplication.CreateBuilder(args)
             .RegisterModules();
 
-        							var app = builder.Build()
+        var app = builder.Build()
             .PreparePipeline();
 
         await app.RunAsync();
