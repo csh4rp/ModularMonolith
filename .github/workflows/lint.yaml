@@ -32,4 +32,4 @@ jobs:
           VALIDATE_XML: true
           VALIDATE_JSON: true
           VALIDATE_SQL: true
-          DEFAULT_BRANCH: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.ref }}
