@@ -25,9 +25,9 @@ jobs:
         uses: super-linter/super-linter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EDITORCONFIG_FILE_NAME: ${{ github.workspace }}-.editorconfig
+          EDITORCONFIG_FILE_NAME: ${{ github.workspace }}/.editorconfig
           YAML_CONFIG_FILE: .yamllint
-          VALIDATE_DOTNET: true
+          VALIDATE_CSHARP: true
           VALIDATE_YAML: true
           VALIDATE_XML: true
           VALIDATE_JSON: true
