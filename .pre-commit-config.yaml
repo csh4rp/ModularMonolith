@@ -1,17 +1,25 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.3.0
+    rev: v4.5.0
     hooks:
     - id: check-yaml
     - id: end-of-file-fixer
     - id: trailing-whitespace
   - repo: https://github.com/psf/black
-    rev: 22.10.0
+    rev: 24.2.0
     hooks:
       - id: black
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.2
+    hooks:
+      - id: gitleaks
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v3.1.0
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
         args: []
+  - repo: https://github.com/dotnet/format
+    rev: v8.0.453106
+    hooks:
+    -   id: dotnet-format

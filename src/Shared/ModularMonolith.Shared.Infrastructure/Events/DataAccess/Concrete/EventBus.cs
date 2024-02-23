@@ -75,7 +75,7 @@ internal sealed class EventBus : IEventBus
         if (mapping is not null)
         {
             var method = mappingType.GetMethod(nameof(IEventMapping<IEvent>.Map))!;
-            var integrationEvent = (IIntegrationEvent) method.Invoke(mapping, [@event])!;
+            var integrationEvent = (IIntegrationEvent)method.Invoke(mapping, [@event])!;
 
             await _publishEndpoint.Publish(integrationEvent, integrationEvent.GetType(), cnx =>
             {
@@ -129,7 +129,7 @@ internal sealed class EventBus : IEventBus
             if (mapping is not null)
             {
                 var method = mappingType.GetMethod(nameof(IEventMapping<IEvent>.Map))!;
-                var integrationEvent = (IIntegrationEvent) method.Invoke(mapping, [@event])!;
+                var integrationEvent = (IIntegrationEvent)method.Invoke(mapping, [@event])!;
 
                 await _publishEndpoint.Publish(integrationEvent, integrationEvent.GetType(), cnx =>
                 {

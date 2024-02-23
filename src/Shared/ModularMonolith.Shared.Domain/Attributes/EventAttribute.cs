@@ -8,6 +8,6 @@ public class EventAttribute : Attribute
     public string Name { get; set; }
 
     public string? Topic { get; set; }
-    
+
     public bool IsPersisted { get; init; }
 }

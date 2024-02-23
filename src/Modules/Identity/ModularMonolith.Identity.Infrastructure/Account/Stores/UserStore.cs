@@ -30,7 +30,7 @@ internal sealed class UserStore : IUserLoginStore<User>,
         _identityErrorDescriber = identityErrorDescriber;
     }
 
-    public void Dispose() {}
+    public void Dispose() { }
 
     public Task<string> GetUserIdAsync(User user, CancellationToken cancellationToken) =>
         Task.FromResult(user.Id.ToString());

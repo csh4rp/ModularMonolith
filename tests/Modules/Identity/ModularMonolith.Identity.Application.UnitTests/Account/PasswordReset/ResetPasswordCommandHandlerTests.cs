@@ -8,7 +8,7 @@ namespace ModularMonolith.Identity.Application.UnitTests.Account.PasswordReset;
 
 public class ResetPasswordCommandHandlerTests
 {
-    private readonly ResetPasswordCommandHandlerTestsFixture _fixture = new ();
+    private readonly ResetPasswordCommandHandlerTestsFixture _fixture = new();
 
     [Fact]
     public async Task ShouldResetPassword_WhenPasswordResetTokenIsValid()

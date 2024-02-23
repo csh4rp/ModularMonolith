@@ -1,4 +1,4 @@
-namespace ModularMonolith.Shared.Contracts;
+﻿namespace ModularMonolith.Shared.Contracts;
 
 public interface IPaginatedQuery
 {

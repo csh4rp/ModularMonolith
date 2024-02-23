@@ -15,7 +15,7 @@ internal sealed class RoleStore : IRoleStore<Role>
         _identityErrorDescriber = identityErrorDescriber;
     }
 
-    public void Dispose() {}
+    public void Dispose() { }
 
     public async Task<IdentityResult> CreateAsync(Role role, CancellationToken cancellationToken)
     {

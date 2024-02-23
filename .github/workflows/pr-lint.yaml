@@ -1,5 +1,4 @@
 ---
-
 name: Lint PR
 
 on:
@@ -10,17 +9,17 @@ on:
       - synchronize
 
 permissions:
-  pull-requests: write
   id-token: write
   contents: write
   packages: write
+  pull-requests: write
 
 jobs:
-  lint-pr:
-    name: Validate PR
+  main:
+    name: Validate PR title
     runs-on: ubuntu-latest
     steps:
-      - uses: amannn/action-semantic-pull-request@v5
+      - uses: amannn/action-semantic-pull-request@v5.2.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -34,7 +33,7 @@ jobs:
             test
           scopes: |
             infra
-            code
+            core
             ci/cd
             ui
             deps
@@ -51,4 +50,4 @@ jobs:
             ignore-semantic-pull-request
           headerPattern: '^(\w*)(?:\(([\w$.\-*/ ]*)\))?: (.*)$'
           headerPatternCorrespondence: type, scope, subject
-          wip: true
+          wip: false

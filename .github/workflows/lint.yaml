@@ -1,0 +1,35 @@
+---
+
+name: Lint Code
+
+on:
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: read
+      statuses: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Super linter
+        uses: super-linter/super-linter@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_CSHARP: true
+          VALIDATE_YAML: true
+          VALIDATE_XML: true
+          VALIDATE_JSON: true
+          VALIDATE_SQL: true
+          DEFAULT_BRANCH: ${{ github.head_ref }}
+          LINTER_RULES_PATH: ./
+          EDITORCONFIG_FILE_NAME: .editorconfig

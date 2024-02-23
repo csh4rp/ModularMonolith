@@ -1,4 +1,4 @@
-using ModularMonolith.Shared.Domain.Abstractions;
+﻿using ModularMonolith.Shared.Domain.Abstractions;
 using ModularMonolith.Shared.Domain.Attributes;
 
 namespace ModularMonolith.CategoryManagement.Domain.Categories;

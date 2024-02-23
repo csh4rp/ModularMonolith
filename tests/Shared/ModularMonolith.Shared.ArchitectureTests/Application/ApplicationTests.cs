@@ -3,8 +3,8 @@ using ArchUnitNET.Loader;
 using ArchUnitNET.xUnit;
 using FluentValidation;
 using ModularMonolith.Shared.Application.Commands;
-using Assembly = System.Reflection.Assembly;
 using static ArchUnitNET.Fluent.ArchRuleDefinition;
+using Assembly = System.Reflection.Assembly;
 
 namespace ModularMonolith.Shared.ArchitectureTests.Application;
 

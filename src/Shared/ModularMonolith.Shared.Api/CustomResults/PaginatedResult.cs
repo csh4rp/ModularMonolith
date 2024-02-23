@@ -1,4 +1,4 @@
-using ModularMonolith.Shared.Contracts;
+﻿using ModularMonolith.Shared.Contracts;
 
 namespace ModularMonolith.Shared.Api.CustomResults;
 

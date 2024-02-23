@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using ModularMonolith.CategoryManagement.Application.Categories.Shared;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Modification;
 using ModularMonolith.Shared.Application.Exceptions;
