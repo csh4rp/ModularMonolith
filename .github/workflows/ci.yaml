@@ -98,7 +98,7 @@ jobs:
   publish:
     name: Publish new version
     needs: [tag_version]
-    if: needs.tag_version.outputs.new_release
+    if: ${{ needs.tag_version.outputs.new_release }}
     uses: ./.github/workflows/publish.yaml
     with:
       release_tag: ${{ needs.tag_version.outputs.new_version }}
