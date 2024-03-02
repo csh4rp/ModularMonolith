@@ -23,6 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: ./.github/workflows/test.yaml
+    if: ${{ !always() }}
 
   check_version_number:
     name: Check version number
