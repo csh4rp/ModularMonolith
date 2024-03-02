@@ -28,7 +28,7 @@ jobs:
     name: Build docker image
     runs-on: ubuntu-latest
     env:
-      REGISTRY: dockerhub
+      REGISTRY: docker.io
     steps:
       - name: Checkout
         uses: actions/checkout@v3
