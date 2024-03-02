@@ -52,7 +52,7 @@ jobs:
             type=raw,value=latest
             type=sha
             type=sha,format=long
-            type=semver,pattern{{version}},value=${{ inputs.release_tag }}
+            type=semver,pattern={{version}},value=${{ inputs.release_tag }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:

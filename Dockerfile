@@ -30,6 +30,7 @@ COPY src/Shared/ModularMonolith.Shared.Infrastructure/*.csproj ./Shared/ModularM
 
 RUN dotnet restore "./Startup/ModularMonolith.Startup.RestApi/ModularMonolith.Startup.RestApi.csproj"
 
+
 # copy everything else and build app
 COPY ./src ./
 RUN ls ./Startup/ModularMonolith.Startup.RestApi/
