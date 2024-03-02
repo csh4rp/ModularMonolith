@@ -3,10 +3,94 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'Dockerfile'
+      - '*.props'
 
 jobs:
+
   test:
-    name: Run Soluton Tests
+    name: Run soluton tests
     runs-on: ubuntu-latest
     steps:
       - uses: ./.github/workflows/test.yaml
+
+  check_version_number:
+    name: Check version number
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      new_release_published: ${{ steps.semantic_dry.outputs.new_release_published }}
+      new_release_version: ${{ steps.semantic_dry.outputs.new_release_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get semantic release version
+        uses: cycjimmy/semantic-release-action@v4
+        id: semantic_dry
+        env:
+          GITHUB_TOKEN: $ {{ secrets.GITHUB_TOKEN }}
+        with:
+          dry_run: true
+          branches: |
+            [
+              "master"
+            ]
+          extends: |
+            conventional-changelog-conventionalcommits@6.1.0
+          extra_plugins: |
+            @semantic-release/commit-analyzer@9.0.2
+            @semantic-release/release-notes-generator@10.0.3
+            @semantic-release/github@8.0.7
+            @semantic-release/changelog@6.0.2
+            @semantic-release/exec@6.0.3
+            @semantic-release/git@10.0.1
+
+  tag_version:
+    name: Tag version
+    needs: [check_version_number]
+    if: needs.check_version_number.outputs.new_release_published
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Semantic release
+        uses: cycjimmy/semantic-release-action@v4
+        id: semantic
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          semantic_version: 19
+          branches: |
+            [
+              "master"
+            ]
+          extends: |
+            conventional-changelog-conventionalcommits@6.1.0
+          extra_plugins: |
+            @semantic-release/commit-analyzer@9.0.2
+            @semantic-release/release-notes-generator@10.0.3
+            @semantic-release/github@8.0.7
+            @semantic-release/changelog@6.0.2
+            @semantic-release/exec@6.0.3
+            @semantic-release/git@10.0.1
+    outputs:
+      new_release: ${{ steps.semantic.outputs.new_release_published }}
+      new_version: ${{ steps.semantic.outputs.new_release_version }}
+
+  publish:
+    name: Publish new version
+    needs: [tag_version]
+    if: needs.tag_version.outputs.new_release
+    uses: ./.github/workflows/publish.yaml
+    with:
+      release_tag: ${{ needs.tag_version.outputs.new_version }}

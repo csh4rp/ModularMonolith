@@ -1,0 +1,42 @@
+---
+name: SAST scan
+
+on:
+  workflow_call:
+    inputs:
+      rules:
+        description: Semgrep rules
+        required: false
+        type: string
+        default: 'p/default'
+      upload-artifact:
+        description: Upload artifact to workflow
+        required: false
+        type: boolean
+        default: true
+      upload-results-github-security:
+        description: Upload scan results to GitHub Security tab
+        required: false
+        type: boolean
+        default: false
+      release-tag:
+        description: Git tag
+        required: false
+        type: string
+      upload-release-assets:
+        description: Upload release assets
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  scan:
+    name: SAST scan
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep:1.38.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run Semgrep
+        run: echo 1

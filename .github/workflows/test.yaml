@@ -7,8 +7,13 @@ on:
       - opened
       - synchronize
       - edited
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'Dockerfile'
+      - '*.props'
   workflow_call:
-    
+
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
   cancel-in-progress: true
