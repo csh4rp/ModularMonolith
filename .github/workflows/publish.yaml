@@ -17,11 +17,11 @@ on:
         type: string
 
 permissions:
-    id-token: write
-    contents: write
-    packages: write
-    pull-requests: write
-    security-events: write
+  id-token: write
+  contents: write
+  packages: write
+  pull-requests: write
+  security-events: write
 
 jobs:
   build_image:
