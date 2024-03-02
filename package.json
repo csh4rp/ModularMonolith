@@ -1,0 +1,28 @@
+{
+  "name": "modularmonolith",
+  "version": "1.0.0",
+  "description": "This is sample repository using modular monolith approach separate parts of code and allow easier maintainability and potential switch to microservices. Apart from splitting code into modules, project also uses vertical slices within each module to allow for more elastic approach to define layering. Additionally dependencies are created using ports & adapters approach.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/csh4rp/ModularMonolith.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/csh4rp/ModularMonolith/issues"
+  },
+  "homepage": "https://github.com/csh4rp/ModularMonolith#readme",
+  "devDependencies": {
+    "semantic-release": "^23.0.2"
+  },
+  "release": {
+    "branches": ["master"]
+  }
+}
