@@ -35,6 +35,7 @@ COPY ./src ./
 RUN ls ./Startup/ModularMonolith.Startup.RestApi/
 RUN dotnet publish "./Startup/ModularMonolith.Startup.RestApi/ModularMonolith.Startup.RestApi.csproj" -c release -o /app --no-restore
 
+
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
