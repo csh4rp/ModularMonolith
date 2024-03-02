@@ -9,6 +9,13 @@ on:
       - 'Dockerfile'
       - '*.props'
 
+permissions:
+  id-token: write
+  contents: write
+  packages: write
+  pull-requests: write
+  security-events: write
+
 jobs:
 
   test:
@@ -94,3 +101,4 @@ jobs:
     uses: ./.github/workflows/publish.yaml
     with:
       release_tag: ${{ needs.tag_version.outputs.new_version }}
+    secrets: inherit
