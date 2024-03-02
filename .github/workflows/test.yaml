@@ -1,12 +1,14 @@
 ---
-
 name: Run Tests
 
 on:
   pull_request:
     types:
       - opened
-
+      - synchronize
+      - edited
+  workflow_call:
+    
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
   cancel-in-progress: true
