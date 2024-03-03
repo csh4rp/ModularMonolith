@@ -24,4 +24,5 @@ RUN adduser \
   appuser
 
 USER appuser
+HEALTHCHECK NONE
 ENTRYPOINT ["dotnet", "ModularMonolith.Startup.RestApi.csproj.dll"]
