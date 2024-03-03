@@ -99,8 +99,10 @@ jobs:
   publish:
     name: Publish new version
     needs: [tag_version]
-    if: ${{ needs.tag_version.outputs.new_release }}
+    if: needs.tag_version.outputs.new_release == 'true'
     uses: ./.github/workflows/publish.yaml
     with:
-      release_tag: ${{ needs.tag_version.outputs.new_version }}
+      release-tag: ${{ needs.tag_version.outputs.new_version }}
+      image-name: modularmonolith
+      registry: docker.io
     secrets: inherit
