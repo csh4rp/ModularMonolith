@@ -59,12 +59,12 @@ jobs:
         contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'config'
+          scan-type: config
           format: ${{ inputs.format }}
           exit-code: ${{ inputs.exit-code }}
           ignore-unfixed: ${{ inputs.ignore-unfixed }}
@@ -76,13 +76,13 @@ jobs:
         id: check-report
         if: always()
         run: |
-            if [[ -s "${{ github.event.repository.name }}-iac-results.sarif" ]] ; then
-              echo "report=true" >> $GITHUB_OUTPUT;
-            fi
+          if [[ -s "${{ github.event.repository.name }}-iac-results.sarif" ]] ; then
+            echo "report=true" >> $GITHUB_OUTPUT;
+          fi
 
       - name: Upload Test results
         uses: actions/upload-artifact@master
-        if: steps.check-report.outputs.report && ( inputs.upload-artifact == true )
+        if: always() && steps.check-report.outputs.report && ( inputs.upload-artifact == true )
         with:
             name: "${{ github.event.repository.name }}-iac-results.sarif"
             path: "${{ github.event.repository.name }}-iac-results.sarif"
@@ -95,7 +95,7 @@ jobs:
 
       - name: Upload IaC results to release - v${{ inputs.release-tag }}
         uses: softprops/action-gh-release@v1
-        if: steps.check-report.outputs.report && ( inputs.upload-release-assets == true )
+        if: always() && steps.check-report.outputs.report && ( inputs.upload-release-assets == true )
         with:
           tag_name: "v${{ inputs.release-tag }}"
           files: "${{ github.event.repository.name }}-iac-results.sarif"
