@@ -67,7 +67,7 @@ jobs:
           output-file: "${{ github.event.repository.name }}-sbom.spdx.json"
 
       - name: Scan SBOM - Grype
-        if: inputs.scan-sbom
+        if: always() && inputs.scan-sbom
         uses: anchore/scan-action@v3.6.4
         id: scan
         with:
@@ -77,21 +77,21 @@ jobs:
 
       - name: Upload SBOM Scan Results
         uses: actions/upload-artifact@master
-        if: ( inputs.scan-sbom == true ) && ( inputs.upload-artifact == true )
+        if: always() && ( inputs.scan-sbom == true ) && ( inputs.upload-artifact == true )
         with:
             name: "${{ github.event.repository.name }}-sbom-scan-results.sarif"
             path: ${{ steps.scan.outputs.sarif }}
 
       - name: Upload SBOM to release - v${{ inputs.release-tag }}
         uses: softprops/action-gh-release@v1
-        if: inputs.upload-release-assets == true
+        if: always() && inputs.upload-release-assets == true
         with:
           tag_name: "v${{ inputs.release-tag }}"
           files: "${{ github.event.repository.name }}-sbom.spdx.json"
 
       - name: Upload SBOM Scan Results to release - v${{ inputs.release-tag }}
         uses: softprops/action-gh-release@v1
-        if: ( inputs.scan-sbom == true ) && ( inputs.upload-release-assets == true )
+        if: always() && ( inputs.scan-sbom == true ) && ( inputs.upload-release-assets == true )
         with:
           tag_name: "v${{ inputs.release-tag }}"
           files: ${{ steps.scan.outputs.sarif }}
