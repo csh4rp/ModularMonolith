@@ -21,6 +21,10 @@ permissions:
 
 jobs:
 
+  scan_secrets:
+    name: Scan for secrets
+    uses: ./.github/workflows/detect-secrets.yaml
+
   test:
     name: Run soluton tests
     uses: ./.github/workflows/test.yaml
