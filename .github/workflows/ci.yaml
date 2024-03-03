@@ -19,6 +19,10 @@ permissions:
   checks: write
   actions: write
 
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
 
   scan_secrets:
