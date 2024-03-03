@@ -22,5 +22,6 @@ RUN adduser \
   --no-create-home \
   --uid "${UID}" \
   appuser
+
 USER appuser
 ENTRYPOINT ["dotnet", "ModularMonolith.Startup.RestApi.csproj.dll"]
