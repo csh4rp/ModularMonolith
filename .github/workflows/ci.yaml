@@ -22,7 +22,8 @@ jobs:
     name: Run soluton tests
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/test.yaml
+      - name: Run tests
+        uses: ./.github/workflows/test.yaml
 
   check_version_number:
     name: Check version number
