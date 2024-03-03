@@ -15,6 +15,9 @@ permissions:
   packages: write
   pull-requests: write
   security-events: write
+  statuses: write
+  checks: write
+  actions: write
 
 jobs:
 
