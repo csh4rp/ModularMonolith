@@ -24,6 +24,20 @@ permissions:
   security-events: write
 
 jobs:
+
+  sast:
+    name: Validate code
+    uses: ./.github/workflows/sast-scan.yaml
+    permissions:
+      contents: write
+    with:
+      rules: "p/csharp"
+      upload-artifact: true
+      upload-release-assets: true
+      upload-results-github-security: true
+      release-tag: ${{ inputs.release_tag }}
+
+
   build_image:
     name: Build docker image
     runs-on: ubuntu-latest
@@ -32,17 +46,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2.2.0
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2.9.0
         id: buildx
+
       - name: Log in to Dockerhub
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ secrets.dockerhub_username }}
           password: ${{ secrets.dockerhub_password }}
+
       - name: Extract metadata for docker
         uses: docker/metadata-action@v4
         id: metadata
@@ -53,6 +71,7 @@ jobs:
             type=sha
             type=sha,format=long
             type=semver,pattern={{version}},value=${{ inputs.release_tag }}
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
@@ -65,6 +84,11 @@ jobs:
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
 
+      - name: Create Docker image URL
+        id: build_image_url
+        run: |
+          echo "image_url=${{ env.REGISTRY }}/${{ github.repository }}:${{ inputs.release_tag }}" | tr '[:upper:] '[:lower:]' >> "$GITHUB_OUTPUT"
+
       - name: Release Update - ${{ inputs.release_tag }}
         uses: softprops/action-gh-release@v1
         env:
@@ -74,5 +98,5 @@ jobs:
           tag_name: "v${{ inputs.release_tag }}"
           append_body: true
           body: |
-            - GitHub Packages Container URL: ${{ env.REGISTRY }}/${{ github.repository }}:${{ inputs.release_tag }}
+            - Dockerhub container URL: ${{ steps.build_image_url.outputs.image_url }}
           token: ${{ secrets.GITHUB_TOKEN }}

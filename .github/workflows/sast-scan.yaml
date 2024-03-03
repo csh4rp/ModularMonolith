@@ -9,20 +9,24 @@ on:
         required: false
         type: string
         default: 'p/default'
+
       upload-artifact:
         description: Upload artifact to workflow
         required: false
         type: boolean
         default: true
+
       upload-results-github-security:
         description: Upload scan results to GitHub Security tab
         required: false
         type: boolean
         default: false
+
       release-tag:
         description: Git tag
         required: false
         type: string
+
       upload-release-assets:
         description: Upload release assets
         required: false
@@ -34,9 +38,27 @@ jobs:
     name: SAST scan
     runs-on: ubuntu-latest
     container:
-      image: returntocorp/semgrep:1.38.0
+      image: returntocorp/semgrep:1.63.0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Run Semgrep
-        run: echo 1
+        run: semgrep ci --suppress-errors --sarif --output="${{ github.event.repository.name }}-sast-results.sarif"
+        env:
+          SEMGREP_RULES: ${{inputs.rules }}
+
+      - name: Check if report is generated
+        id: check_report
+        if: always()
+        run: |
+          if [[ -s "${{ github.event.repository.name }}-sast-results.sarif" ]] ; then
+            echo "report_exists=true" >> $GITHUB_OUTPUT;
+          fi
+
+      - name: Upload test results
+        if: steps.check_report.outputs.report_exists
+        uses: actions/upload-artifact@master
+        with:
+          name: "${{ github.event.repository.name }}-sast-results.sarif"
+          path: "${{ github.event.repository.name }}-sast-results.sarif"
