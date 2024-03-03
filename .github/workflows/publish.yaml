@@ -51,14 +51,14 @@ jobs:
       upload-artifact: true
       upload-release-assets: true
       upload-results-github-security: true
-      release-tag: ${{ inputs.release_tag }}
+      release-tag: ${{ inputs.release-tag }}
 
   sca:
     name: Validate dependencies
     uses: ./.github/workflows/sca-scan.yaml
     with:
       format: 'sarif'
-      release-tag: ${{ inputs.releaseitag }}
+      release-tag: ${{ inputs.release-tag }}
       severity: HIGH,CRITICAL
       upload-artifact: true
       upload-release-assets: true
@@ -113,7 +113,7 @@ jobs:
         run: |
           echo "image_url=`${{ inputs.REGISTRY }}/${{ inputs.image-name }}:${{ inputs.release-tag }} | tr '[:upper:] '[:lower:]'`" >> $GITHUB_OUTPUT
 
-      - name: Release Update - ${{ inputs.release_tag }}
+      - name: Release Update - ${{ inputs.release-tag }}
         uses: softprops/action-gh-release@v1
         env:
           REGISTRY: ${{ env.REGISTRY }}
