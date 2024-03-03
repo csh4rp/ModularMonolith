@@ -8,6 +8,10 @@ on:
         description: Docker registry name
         required: true
         type: string
+      registry-subdir:
+        description: Docker registry sub directory
+        required: true
+        type: string
       image-name:
         description: Image name
         required: true
@@ -21,6 +25,10 @@ on:
     inputs:
       registry:
         description: Docker registry name
+        required: true
+        type: string
+      registry-subdir:
+        description: Docker registry sub directory
         required: true
         type: string
       image-name:
@@ -133,7 +141,7 @@ jobs:
       registry-username: ${{ secrets.registry_username }}
       registry-password: ${{ secrets.registry_password }}
     with:
-      image: "${{ inputs.registry }}/${{ inputs.image-name }}:${{ inputs.release-tag}}"
+      image: "${{ inputs.registry }}/${{ inputs.registry-subdir }}/${{ inputs.image-name }}:${{ inputs.release-tag}}"
       release-tag: ${{ inputs.release-tag }}
       scan-sbom: true
       severity: high
@@ -148,6 +156,7 @@ jobs:
     uses: ./.github/workflows/iac-scan.yaml
     with:
       exit-code: 1
+      format: 'sarif'
       severity: HIGH,CRITICAL
       ignore-unfixed: true
       upload-artifact: true

@@ -42,6 +42,7 @@ on:
       registry-username:
         description: Username for registry
         required: true
+
       registry-password:
         description: Password for registry
         required: true
@@ -51,10 +52,10 @@ jobs:
     name: SBOM
     runs-on: ubuntu-latest
     permissions:
-        packages: read
-        contents: write
+      packages: read
+      contents: write
     steps:
-      - uses: anchore/sbom-action@v0.14.3
+      - uses: anchore/sbom-action@v0.15.8
         id: generate
         with:
           image: ${{ inputs.image }}
@@ -67,7 +68,7 @@ jobs:
 
       - name: Scan SBOM - Grype
         if: inputs.scan-sbom
-        uses: anchore/scan-action@v3.3.6
+        uses: anchore/scan-action@v3.6.4
         id: scan
         with:
           sbom: "${{ github.event.repository.name }}-sbom.spdx.json"

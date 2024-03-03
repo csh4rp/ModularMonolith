@@ -106,4 +106,5 @@ jobs:
       release-tag: ${{ needs.tag_version.outputs.new_version }}
       image-name: modularmonolith
       registry: docker.io
+      registry-subdir: csh4rp
     secrets: inherit
