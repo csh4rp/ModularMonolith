@@ -1,0 +1,101 @@
+---
+name: Scan IaC with Trivy
+
+on:
+  workflow_call:
+    inputs:
+      exit-code:
+        description: 1 if you want job to fail when CVEs are found
+        required: false
+        type: string
+        default: '0'
+
+      severity:
+        description: Comma delimited list of severities to scan for UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+        required: false
+        type: string
+        default: 'HIGH,CRITICAL'
+
+      format:
+        description: Report format - table, json, sarif
+        required: false
+        type: string
+        default: 'table'
+
+      ignore-unfixed:
+        description: Ignore unpatched/unfixed vulnerabilities
+        required: false
+        type: boolean
+        default: true
+
+      upload-artifact:
+        description: Upload artifact to workflow
+        required: false
+        type: boolean
+        default: true
+
+      upload-results-github-security:
+        description: Upload scan results to GitHub Security tab
+        required: false
+        type: boolean
+        default: false
+
+      release-tag:
+        description: Git tag
+        required: false
+        type: string
+
+      upload-release-assets:
+        description: Upload release assets
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  scan:
+    name: Scan IaC
+    runs-on: ubuntu-latest
+    permissions:
+        contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          format: ${{ inputs.format }}
+          exit-code: ${{ inputs.exit-code }}
+          ignore-unfixed: ${{ inputs.ignore-unfixed }}
+          severity: ${{ inputs.severity }}
+          output: "${{ github.event.repository.name }}-iac-results.sarif"
+          timeout: 10m0s
+
+      - name: Check if report is empty
+        id: check-report
+        if: always()
+        run: |
+            if [[ -s "${{ github.event.repository.name }}-iac-results.sarif" ]] ; then
+              echo "report=true" >> $GITHUB_OUTPUT;
+            fi
+
+      - name: Upload Test results
+        uses: actions/upload-artifact@master
+        if: steps.check-report.outputs.report && ( inputs.upload-artifact == true )
+        with:
+            name: "${{ github.event.repository.name }}-iac-results.sarif"
+            path: "${{ github.event.repository.name }}-iac-results.sarif"
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: always() && steps.check-report.outputs.report && ( inputs.upload-results-github-security == true )
+        with:
+          sarif_file: "${{ github.event.repository.name }}-iac-results.sarif"
+
+      - name: Upload IaC results to release - v${{ inputs.release-tag }}
+        uses: softprops/action-gh-release@v1
+        if: steps.check-report.outputs.report && ( inputs.upload-release-assets == true )
+        with:
+          tag_name: "v${{ inputs.release-tag }}"
+          files: "${{ github.event.repository.name }}-iac-results.sarif"

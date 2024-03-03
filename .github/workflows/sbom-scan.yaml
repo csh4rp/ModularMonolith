@@ -1,0 +1,96 @@
+---
+name: SBOM scan
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        description: Image to generate SBOM
+        required: true
+        type: string
+
+      severity:
+        description: The minimum vulnerability severity to trigger a failure
+        required: false
+        type: string
+        default: 'high'
+
+      upload-artifact:
+        description: Upload artifact to workflow
+        required: false
+        type: boolean
+        default: true
+
+      upload-release-assets:
+        description: Upload release assets
+        required: false
+        type: boolean
+        default: true
+
+      release-tag:
+        description: Git tag
+        required: false
+        type: string
+
+      scan-sbom:
+        description: Scan sbom result
+        required: false
+        type: boolean
+        default: true
+
+    secrets:
+      registry-username:
+        description: Username for registry
+        required: true
+      registry-password:
+        description: Password for registry
+        required: true
+
+jobs:
+  scan:
+    name: SBOM
+    runs-on: ubuntu-latest
+    permissions:
+        packages: read
+        contents: write
+    steps:
+      - uses: anchore/sbom-action@v0.14.3
+        id: generate
+        with:
+          image: ${{ inputs.image }}
+          registry-username: ${{ secrets.registry-username }}
+          registry-password: ${{ secrets.registry-password }}
+          format: spdx-json
+          upload-artifact: ${{ inputs.upload-artifact }}
+          upload-release-assets: ${{ inputs.upload-release-assets }}
+          output-file: "${{ github.event.repository.name }}-sbom.spdx.json"
+
+      - name: Scan SBOM - Grype
+        if: inputs.scan-sbom
+        uses: anchore/scan-action@v3.3.6
+        id: scan
+        with:
+          sbom: "${{ github.event.repository.name }}-sbom.spdx.json"
+          severity-cutoff: ${{ inputs.severity }}
+          output-format: sarif
+
+      - name: Upload SBOM Scan Results
+        uses: actions/upload-artifact@master
+        if: ( inputs.scan-sbom == true ) && ( inputs.upload-artifact == true )
+        with:
+            name: "${{ github.event.repository.name }}-sbom-scan-results.sarif"
+            path: ${{ steps.scan.outputs.sarif }}
+
+      - name: Upload SBOM to release - v${{ inputs.release-tag }}
+        uses: softprops/action-gh-release@v1
+        if: inputs.upload-release-assets == true
+        with:
+          tag_name: "v${{ inputs.release-tag }}"
+          files: "${{ github.event.repository.name }}-sbom.spdx.json"
+
+      - name: Upload SBOM Scan Results to release - v${{ inputs.release-tag }}
+        uses: softprops/action-gh-release@v1
+        if: ( inputs.scan-sbom == true ) && ( inputs.upload-release-assets == true )
+        with:
+          tag_name: "v${{ inputs.release-tag }}"
+          files: ${{ steps.scan.outputs.sarif }}
