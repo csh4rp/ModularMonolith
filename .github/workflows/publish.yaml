@@ -87,7 +87,7 @@ jobs:
       - name: Create Docker image URL
         id: build_image_url
         run: |
-          echo "image_url=${{ env.REGISTRY }}/${{ github.repository }}:${{ inputs.release_tag }}" | tr '[:upper:] '[:lower:]' >> "$GITHUB_OUTPUT"
+          echo "image_url=`${{ env.REGISTRY }}/${{ github.repository }}:${{ inputs.release_tag }} | tr '[:upper:] '[:lower:]'`" >> $GITHUB_OUTPUT
 
       - name: Release Update - ${{ inputs.release_tag }}
         uses: softprops/action-gh-release@v1
