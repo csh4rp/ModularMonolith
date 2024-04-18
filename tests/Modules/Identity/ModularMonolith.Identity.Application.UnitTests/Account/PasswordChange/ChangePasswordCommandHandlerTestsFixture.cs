@@ -2,8 +2,8 @@
 using ModularMonolith.Identity.Application.Account.PasswordChange;
 using ModularMonolith.Identity.Application.UnitTests.Account.Shared;
 using ModularMonolith.Identity.Domain.Users;
-using ModularMonolith.Shared.Application.Events;
-using ModularMonolith.Shared.Application.Identity;
+using ModularMonolith.Shared.Events;
+using ModularMonolith.Shared.Identity;
 using NSubstitute;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.PasswordChange;
@@ -36,7 +36,7 @@ internal sealed class ChangePasswordCommandHandlerTestsFixture
         _userManager.ChangePasswordAsync(_user, _password, Arg.Any<string>())
             .Returns(IdentityResult.Success);
 
-        _identityContextAccessor.Context.Returns(new IdentityContext(id, userName));
+        _identityContextAccessor.IdentityContext.Returns(new IdentityContext(userName));
     }
 
     public Task AssertThatPasswordChangedEventWasPublished() => _eventBus.Received(1)

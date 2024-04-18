@@ -1,5 +1,4 @@
 ﻿using ModularMonolith.CategoryManagement.Application.Categories.Shared;
-
 using ModularMonolith.CategoryManagement.Contracts.Categories.Creation;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.Application.Commands;
@@ -33,8 +32,7 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
             }
         }
 
-        var category = new Category(request.ParentId.HasValue ? CategoryId.From(request.ParentId.Value) : null,
-            request.Name);
+        var category = request.ToCategory();
 
         await _categoryRepository.AddAsync(category, cancellationToken);
 

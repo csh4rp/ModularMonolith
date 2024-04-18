@@ -3,7 +3,7 @@ using ModularMonolith.Identity.Application.Account.SigningIn;
 using ModularMonolith.Identity.Application.UnitTests.Account.Shared;
 using ModularMonolith.Identity.Core.Options;
 using ModularMonolith.Identity.Domain.Users;
-using ModularMonolith.Shared.Application.Events;
+using ModularMonolith.Shared.Events;
 using NSubstitute;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.SigningIn;

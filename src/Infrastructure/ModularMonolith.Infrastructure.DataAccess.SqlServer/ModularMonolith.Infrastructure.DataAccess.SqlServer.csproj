@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="MassTransit"/>
+    <PackageReference Include="MassTransit.EntityFrameworkCore"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\ModularMonolith.Shared.AuditTrail.Storage.SqlServer\ModularMonolith.Shared.AuditTrail.Storage.SqlServer.csproj"/>
+    <ProjectReference Include="..\..\Shared\ModularMonolith.Shared.Events.Storage.SqlServer\ModularMonolith.Shared.Events.Storage.SqlServer.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj"/>
+  </ItemGroup>
+</Project>

@@ -2,4 +2,4 @@
 
 namespace ModularMonolith.Identity.Domain.Users;
 
-public record PasswordChangedEvent(Guid UserId) : IEvent;
+public record PasswordChangedEvent(Guid UserId) : DomainEvent;

@@ -2,4 +2,4 @@
 
 namespace ModularMonolith.Identity.Domain.Users;
 
-public record AccountVerifiedEvent(Guid UserId) : IEvent;
+public sealed record AccountVerifiedEvent(Guid UserId) : DomainEvent;

@@ -2,4 +2,4 @@
 
 namespace ModularMonolith.Identity.Domain.Users;
 
-public record SignInFailedEvent(Guid UserId) : IEvent;
+public sealed record SignInFailedEvent(Guid UserId) : DomainEvent;

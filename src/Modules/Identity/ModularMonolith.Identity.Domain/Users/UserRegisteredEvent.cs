@@ -1,5 +1,5 @@
 ﻿using ModularMonolith.Shared.Domain.Abstractions;
 
-namespace ModularMonolith.Identity.Domain.Common.Events;
+namespace ModularMonolith.Identity.Domain.Users;
 
-public record UserRegisteredEvent(Guid UserId, string Email) : IEvent;
+public sealed record UserRegisteredEvent(Guid UserId, string Email) : DomainEvent;

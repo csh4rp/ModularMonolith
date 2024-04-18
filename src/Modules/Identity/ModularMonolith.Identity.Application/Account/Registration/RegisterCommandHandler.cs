@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using ModularMonolith.Identity.Contracts.Account.Registration;
-using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Shared.Application.Commands;
-using ModularMonolith.Shared.Application.Events;
 using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts.Errors;
+using ModularMonolith.Shared.Events;
 
 namespace ModularMonolith.Identity.Application.Account.Registration;
 

@@ -1,20 +1,14 @@
 ﻿namespace ModularMonolith.Shared.Domain.Abstractions;
 
-public interface IEntity
+public abstract class Entity<TId> : IEntity where TId : IEquatable<TId>
 {
-    IEnumerable<IEvent> DequeueEvents();
-}
-
-
-public abstract class Entity<TId> : IEntity where TId : notnull
-{
-    private Queue<IEvent>? _events;
+    private Queue<DomainEvent>? _events;
 
     public TId Id { get; init; } = default!;
 
     public int Version { get; private set; }
 
-    protected void EnqueueEvent(IEvent @event)
+    protected virtual void EnqueueEvent(DomainEvent @event)
     {
         if (_events is null)
         {
@@ -25,7 +19,7 @@ public abstract class Entity<TId> : IEntity where TId : notnull
         _events.Enqueue(@event);
     }
 
-    public IEnumerable<IEvent> DequeueEvents()
+    public IEnumerable<DomainEvent> DequeueEvents()
     {
         if (_events is null)
         {

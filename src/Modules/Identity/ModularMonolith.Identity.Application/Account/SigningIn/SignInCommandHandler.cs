@@ -8,7 +8,7 @@ using ModularMonolith.Identity.Contracts.Account.SigningIn;
 using ModularMonolith.Identity.Core.Options;
 using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Shared.Application.Commands;
-using ModularMonolith.Shared.Application.Events;
+using ModularMonolith.Shared.Events;
 
 namespace ModularMonolith.Identity.Application.Account.SigningIn;
 

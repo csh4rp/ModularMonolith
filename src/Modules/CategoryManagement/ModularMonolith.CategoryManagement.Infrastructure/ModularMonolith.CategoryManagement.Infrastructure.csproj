@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj"/>
+    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.DataAccess\ModularMonolith.Shared.DataAccess.csproj" />
+    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.DataAccess.Postgres\ModularMonolith.Shared.DataAccess.Postgres.csproj" />
     <ProjectReference Include="..\ModularMonolith.CategoryManagement.Application\ModularMonolith.CategoryManagement.Application.csproj"/>
     <ProjectReference Include="..\ModularMonolith.CategoryManagement.Contracts\ModularMonolith.CategoryManagement.Contracts.csproj"/>
   </ItemGroup>

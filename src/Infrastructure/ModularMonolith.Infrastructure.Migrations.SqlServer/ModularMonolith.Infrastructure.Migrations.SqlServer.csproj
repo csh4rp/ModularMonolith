@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <NoWarn>$(NoWarn);IDE0005;</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ModularMonolith.Infrastructure.DataAccess.SqlServer\ModularMonolith.Infrastructure.DataAccess.SqlServer.csproj" />
+    <ProjectReference Include="..\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj" />
+  </ItemGroup>
+</Project>

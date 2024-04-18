@@ -1,3 +1,3 @@
 ﻿namespace ModularMonolith.Shared.Domain.Abstractions;
 
-public interface IAggregateRoot;
+public abstract class AggregateRoot<TId> : Entity<TId> where TId : IEquatable<TId>;

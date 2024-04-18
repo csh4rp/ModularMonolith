@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 using ModularMonolith.Identity.Contracts.Account.Verification;
 using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Shared.Application.Commands;
-using ModularMonolith.Shared.Application.Events;
 using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts.Errors;
+using ModularMonolith.Shared.Events;
 
 namespace ModularMonolith.Identity.Application.Account.Verification;
 

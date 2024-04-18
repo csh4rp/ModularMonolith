@@ -18,8 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Infrastructure\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj" />
-    <ProjectReference Include="..\..\..\src\Infrastructure\ModularMonolith.Infrastructure.Migrations\ModularMonolith.Infrastructure.Migrations.csproj" />
-    <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj"/>
-    <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj"/>
+    <ProjectReference Include="..\..\..\src\Infrastructure\ModularMonolith.Infrastructure.Migrations.Postgres\ModularMonolith.Infrastructure.Migrations.Postgres.csproj" />
   </ItemGroup>
 </Project>

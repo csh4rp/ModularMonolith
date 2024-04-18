@@ -7,8 +7,9 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using ModularMonolith.Bootstrapper.Infrastructure;
-using ModularMonolith.Infrastructure.Migrations;
+using ModularMonolith.CategoryManagement.RestApi;
+using ModularMonolith.Infrastructure.DataAccess;
+using ModularMonolith.Infrastructure.Migrations.Postgres;
 using Npgsql;
 using Respawn;
 using Testcontainers.PostgreSql;
@@ -27,7 +28,7 @@ public class CategoryManagementFixture : IAsyncLifetime
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
 
-    public ApplicationDbContext DbContext { get; private set; } = default!;
+    public BaseDbContext DbContext { get; private set; } = default!;
 
     public async Task InitializeAsync()
     {
@@ -44,7 +45,7 @@ public class CategoryManagementFixture : IAsyncLifetime
         _connection = new NpgsqlConnection(connectionString);
         await _connection.OpenAsync();
 
-        DbContext = new ApplicationDbContextFactory().CreateDbContext([connectionString]);
+        DbContext = new PostgresDbContextFactory().CreateDbContext([connectionString]);
         await DbContext.Database.MigrateAsync();
 
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });

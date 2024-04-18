@@ -1,6 +1,6 @@
 ﻿using MassTransit;
 using ModularMonolith.CategoryManagement.Domain.Categories;
-using ModularMonolith.Shared.Domain.Attributes;
+using ModularMonolith.Shared.Events;
 
 namespace ModularMonolith.CategoryManagement.Application.Categories.Creation;
 

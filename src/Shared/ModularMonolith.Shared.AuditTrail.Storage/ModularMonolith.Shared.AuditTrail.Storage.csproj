@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ModularMonolith.Shared.AuditTrail\ModularMonolith.Shared.AuditTrail.csproj" />
+    <ProjectReference Include="..\ModularMonolith.Shared.Identity\ModularMonolith.Shared.Identity.csproj" />
+  </ItemGroup>
+</Project>

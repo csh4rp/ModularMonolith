@@ -3,14 +3,13 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using ModularMonolith.Shared.Application.Identity;
-using ModularMonolith.Shared.Domain.Entities;
+using ModularMonolith.Shared.AuditTrail;
+using ModularMonolith.Shared.AuditTrail.Storage.Factories;
+using ModularMonolith.Shared.AuditTrail.Storage.Interceptors;
 using ModularMonolith.Shared.Domain.ValueObjects;
-using ModularMonolith.Shared.Infrastructure.AuditLogs.Factories;
-using ModularMonolith.Shared.Infrastructure.AuditLogs.Interceptors;
+using ModularMonolith.Shared.Identity;
 using ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs.Entities;
 using NSubstitute;
-using EntityState = ModularMonolith.Shared.Domain.Enums.EntityState;
 
 namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs;
 
@@ -39,7 +38,7 @@ public class AuditLogInterceptorFixture
     {
         _dbContext = CreateDbContext(connectionString);
         _dateTimeProvider.GetUtcNow().Returns(Now);
-        _identityContextAccessor.Context.Returns(new IdentityContext(UserId, UserName));
+        _identityContextAccessor.IdentityContext.Returns(new IdentityContext(UserName));
         ActivitySource.AddActivityListener(ActivityListener);
     }
 
@@ -70,13 +69,13 @@ public class AuditLogInterceptorFixture
     public async Task AssertEntityAddedLogWasCreatedAsync(FirstTestEntity entity)
     {
         var auditLog = await _dbContext.Set<AuditLog>().SingleOrDefaultAsync(a =>
-            a.EntityState == EntityState.Added
+            a.EntityState == AuditTrail.EntityState.Added
             && a.EntityType == typeof(FirstTestEntity).FullName
             && a.EntityKeys.Any(k => k.Value == entity.Id.ToString()));
 
         auditLog.Should().NotBeNull();
         auditLog!.CreatedAt.Should().Be(Now);
-        auditLog.UserName.Should().Be(UserName);
+        auditLog.Subject.Should().Be(UserName);
         auditLog.OperationName.Should().Be(_activity!.OperationName);
         auditLog.TraceId.Should().Be(_activity.TraceId.ToString());
         auditLog.EntityKeys.Should().BeEquivalentTo(new List<EntityKey>
@@ -92,7 +91,7 @@ public class AuditLogInterceptorFixture
     public async Task AssertEntityModifiedLogWasNotCreatedAsync(FirstTestEntity entity)
     {
         var auditLog = await _dbContext.Set<AuditLog>().SingleOrDefaultAsync(a =>
-            a.EntityState == EntityState.Modified
+            a.EntityState == AuditTrail.EntityState.Modified
             && a.EntityType == typeof(FirstTestEntity).FullName
             && a.EntityKeys.Any(k => k.Value == entity.Id.ToString()));
 
@@ -102,13 +101,13 @@ public class AuditLogInterceptorFixture
     public async Task AssertOwnedEntityAddedLogWasCreatedAsync(Guid parentEntityId, OwnedEntity ownedEntity)
     {
         var ownedEntityAuditLog = await _dbContext.Set<AuditLog>().SingleOrDefaultAsync(a =>
-            a.EntityState == EntityState.Added
+            a.EntityState == AuditTrail.EntityState.Added
             && a.EntityType == typeof(OwnedEntity).FullName
             && a.EntityKeys.Any(k => k.Value == parentEntityId.ToString()));
 
         ownedEntityAuditLog.Should().NotBeNull();
         ownedEntityAuditLog!.CreatedAt.Should().Be(Now);
-        ownedEntityAuditLog.UserName.Should().Be(UserName);
+        ownedEntityAuditLog.Subject.Should().Be(UserName);
         ownedEntityAuditLog.OperationName.Should().Be(_activity!.OperationName);
         ownedEntityAuditLog.TraceId.Should().Be(_activity.TraceId.ToString());
         ownedEntityAuditLog.EntityKeys.Should().BeEquivalentTo(new List<EntityKey>
@@ -124,13 +123,13 @@ public class AuditLogInterceptorFixture
     public async Task AssertOwnedEntityModifiedLogWasCreatedAsync(Guid parentEntityId, List<PropertyChange> expectedChanges)
     {
         var ownedEntityAuditLog = await _dbContext.Set<AuditLog>().SingleOrDefaultAsync(a =>
-            a.EntityState == EntityState.Modified
+            a.EntityState == AuditTrail.EntityState.Modified
             && a.EntityType == typeof(OwnedEntity).FullName
             && a.EntityKeys.Any(k => k.Value == parentEntityId.ToString()));
 
         ownedEntityAuditLog.Should().NotBeNull();
         ownedEntityAuditLog!.CreatedAt.Should().Be(Now);
-        ownedEntityAuditLog.UserName.Should().Be(UserName);
+        ownedEntityAuditLog.Subject.Should().Be(UserName);
         ownedEntityAuditLog.OperationName.Should().Be(_activity!.OperationName);
         ownedEntityAuditLog.TraceId.Should().Be(_activity.TraceId.ToString());
         ownedEntityAuditLog.EntityKeys.Should().BeEquivalentTo(new List<EntityKey>

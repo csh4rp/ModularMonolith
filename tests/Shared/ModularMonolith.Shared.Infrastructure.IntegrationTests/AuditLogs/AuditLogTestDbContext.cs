@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Shared.Infrastructure.AuditLogs.EntityConfigurations;
-using ModularMonolith.Shared.Infrastructure.AuditLogs.Extensions;
+using ModularMonolith.Shared.AuditTrail.Storage;
+using ModularMonolith.Shared.AuditTrail.Storage.Postgres.EntityConfigurations;
 using ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs.Entities;
 
 namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs;
@@ -49,6 +49,6 @@ public class AuditLogTestDbContext : DbContext
             .ToTable("second_test_entity")
             .AuditIgnore();
 
-        modelBuilder.ApplyConfiguration(new AuditLogEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new PostgresAuditLogEntityTypeConfiguration());
     }
 }

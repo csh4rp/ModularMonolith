@@ -9,8 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
-using ModularMonolith.Bootstrapper.Infrastructure;
-using ModularMonolith.Infrastructure.Migrations;
+using ModularMonolith.Identity.RestApi;
+using ModularMonolith.Infrastructure.DataAccess;
+using ModularMonolith.Infrastructure.Migrations.Postgres;
 using ModularMonolith.Shared.TestUtils.Fakes;
 using Npgsql;
 using Respawn;
@@ -30,7 +31,7 @@ public class IdentityFixture : IAsyncLifetime
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
 
-    public ApplicationDbContext DbContext { get; private set; } = default!;
+    public BaseDbContext DbContext { get; private set; } = default!;
 
     public async Task InitializeAsync()
     {
@@ -47,7 +48,7 @@ public class IdentityFixture : IAsyncLifetime
         _connection = new NpgsqlConnection(connectionString);
         await _connection.OpenAsync();
 
-        DbContext = new ApplicationDbContextFactory().CreateDbContext([connectionString]);
+        DbContext = new PostgresDbContextFactory().CreateDbContext([connectionString]);
         await DbContext.Database.MigrateAsync();
 
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });

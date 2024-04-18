@@ -2,8 +2,8 @@
 using ModularMonolith.CategoryManagement.Contracts.Categories.Querying;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Shared;
 using ModularMonolith.CategoryManagement.Domain.Categories;
-using ModularMonolith.Shared.Infrastructure.DataAccess.Extensions;
-using ModularMonolith.Shared.Infrastructure.Queries;
+using ModularMonolith.Shared.DataAccess.Extensions;
+using ModularMonolith.Shared.DataAccess.Queries;
 using Z.EntityFramework.Plus;
 
 namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.Querying;

@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using ModularMonolith.Identity.Application.Account.Registration;
 using ModularMonolith.Identity.Application.UnitTests.Account.Shared;
-using ModularMonolith.Identity.Domain.Common.Events;
 using ModularMonolith.Identity.Domain.Users;
-using ModularMonolith.Shared.Application.Events;
+using ModularMonolith.Shared.Events;
 using NSubstitute;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.Registration;

@@ -1,15 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <ItemGroup>
-    <PackageReference Include="MediatR.Contracts"/>
+    <PackageReference Include="MediatR.Contracts" />
+    <PackageReference Include="FluentValidation" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="FluentValidation"/>
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
   </ItemGroup>
-
 </Project>

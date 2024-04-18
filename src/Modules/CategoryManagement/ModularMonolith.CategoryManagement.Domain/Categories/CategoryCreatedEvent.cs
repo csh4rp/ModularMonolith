@@ -1,10 +1,10 @@
 ﻿using ModularMonolith.Shared.Domain.Abstractions;
-using ModularMonolith.Shared.Domain.Attributes;
+using ModularMonolith.Shared.Events;
 
 namespace ModularMonolith.CategoryManagement.Domain.Categories;
 
 [Event(nameof(CategoryCreatedEvent), Topic = nameof(Category), IsPersisted = true)]
-public sealed record CategoryCreatedEvent(CategoryId Id, CategoryId? ParentId, string Name) : IEvent
+public sealed record CategoryCreatedEvent(CategoryId Id, CategoryId? ParentId, string Name) : DomainEvent
 {
     public CategoryCreatedEvent() : this(default!, default, default!)
     {

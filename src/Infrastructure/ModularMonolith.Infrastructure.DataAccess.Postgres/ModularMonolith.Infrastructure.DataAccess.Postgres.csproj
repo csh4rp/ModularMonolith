@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="MassTransit"/>
+    <PackageReference Include="MassTransit.EntityFrameworkCore"/>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\ModularMonolith.Shared.AuditTrail.Storage.Postgres\ModularMonolith.Shared.AuditTrail.Storage.Postgres.csproj"/>
+    <ProjectReference Include="..\..\Shared\ModularMonolith.Shared.Events.Storage.Postgres\ModularMonolith.Shared.Events.Storage.Postgres.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj"/>
+  </ItemGroup>
+</Project>
