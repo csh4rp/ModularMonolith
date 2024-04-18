@@ -1,17 +1,17 @@
 ﻿using System.Reflection;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Shared.Domain.Attributes;
+using Microsoft.Extensions.DependencyInjection;
+using ModularMonolith.Shared.Events;
 using Npgsql;
 
-namespace ModularMonolith.Shared.Infrastructure.Messaging;
+namespace ModularMonolith.Shared.Messaging.Postgres;
 
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddPostgresMessaging<TDbContext>(this IServiceCollection serviceCollection,
         string connectionString,
-        Assembly[] assemblies)
-        where TDbContext : DbContext
+        Assembly[] assemblies) where TDbContext : DbContext
     {
         var connectionStringBuilder = new NpgsqlConnectionStringBuilder(connectionString);
 
