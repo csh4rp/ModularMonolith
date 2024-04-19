@@ -2,14 +2,14 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
 
-namespace ModularMonolith.Shared.Events.Storage.SqlServer.EntityConfigurations;
+namespace ModularMonolith.Shared.Events.EntityFramework.Postgres.EntityConfigurations;
 
-public sealed class SqlServerEventLogEntityTypeConfiguration : IEntityTypeConfiguration<EventLog>
+public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<EventLog>
 {
     private readonly string _schemaName;
     private readonly string _tableName;
 
-    public SqlServerEventLogEntityTypeConfiguration(string schemaName = "Shared", string tableName = "EventLog")
+    public EventLogEntityTypeConfiguration(string schemaName = "shared", string tableName = "event_log")
     {
         _schemaName = schemaName;
         _tableName = tableName;
@@ -29,6 +29,7 @@ public sealed class SqlServerEventLogEntityTypeConfiguration : IEntityTypeConfig
             .HasMaxLength(256);
 
         builder.Property(b => b.EventPayload)
+            .HasColumnType("jsonb")
             .IsRequired();
 
         builder.Property(b => b.EventType)

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.CategoryManagement.Domain.Categories;
-using ModularMonolith.Shared.DataAccess.Postgres.Repositories;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Repositories;
 
 namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.Repositories;
 

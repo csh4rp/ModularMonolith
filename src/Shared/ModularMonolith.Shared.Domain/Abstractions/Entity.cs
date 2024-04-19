@@ -19,7 +19,7 @@ public abstract class Entity<TId> : IEntity where TId : IEquatable<TId>
         _events.Enqueue(@event);
     }
 
-    public IEnumerable<DomainEvent> DequeueEvents()
+    public virtual IEnumerable<DomainEvent> DequeueEvents()
     {
         if (_events is null)
         {

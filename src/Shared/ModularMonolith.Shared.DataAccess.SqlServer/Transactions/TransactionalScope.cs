@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.Application.Abstract;
 
-namespace ModularMonolith.Shared.DataAccess.Transactions;
+namespace ModularMonolith.Shared.DataAccess.SqlServer.Transactions;
 
 public sealed class TransactionalScope : ITransactionalScope
 {

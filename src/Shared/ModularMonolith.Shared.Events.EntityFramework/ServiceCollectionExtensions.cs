@@ -2,15 +2,15 @@
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Application.Abstract;
 
-namespace ModularMonolith.Shared.Events.Storage;
+namespace ModularMonolith.Shared.Events.EntityFramework;
 
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddEvents(this IServiceCollection serviceCollection,
         params Assembly[] assemblies)
     {
-        serviceCollection.AddScoped<IEventBus, EfEventBus>()
-            .AddScoped<IEventLogStore, EfEventLogStore>();
+        serviceCollection.AddScoped<IEventBus, EventBus>()
+            .AddScoped<IEventLogStore, EventLogStore>();
 
         foreach (var assembly in assemblies)
         {

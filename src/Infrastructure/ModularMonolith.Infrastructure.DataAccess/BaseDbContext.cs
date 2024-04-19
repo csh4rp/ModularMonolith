@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Shared.DataAccess.Transactions;
+using ModularMonolith.Shared.DataAccess.Postgres.Transactions;
 
 namespace ModularMonolith.Infrastructure.DataAccess;
 

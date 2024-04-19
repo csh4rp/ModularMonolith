@@ -3,7 +3,7 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.AuditTrail.Storage;
 using ModularMonolith.Shared.AuditTrail.Storage.SqlServer.EntityConfigurations;
-using ModularMonolith.Shared.Events.Storage.SqlServer.EntityConfigurations;
+using ModularMonolith.Shared.Events.EntityFramework.SqlServer.EntityConfigurations;
 
 namespace ModularMonolith.Infrastructure.DataAccess.SqlServer;
 
@@ -17,7 +17,7 @@ public sealed class SqlServerDbContext : BaseDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new SqlServerEventLogEntityTypeConfiguration(schemaName: SharedSchemaName))
+        modelBuilder.ApplyConfiguration(new EventLogEntityTypeConfiguration(schemaName: SharedSchemaName))
             .ApplyConfiguration(new SqlServerAuditLogEntityTypeConfiguration(schemaName: SharedSchemaName));
 
         modelBuilder.AddInboxStateEntity(c =>

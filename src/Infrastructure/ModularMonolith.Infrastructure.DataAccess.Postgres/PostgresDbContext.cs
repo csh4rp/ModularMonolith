@@ -3,7 +3,7 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.AuditTrail.Storage;
 using ModularMonolith.Shared.AuditTrail.Storage.Postgres.EntityConfigurations;
-using ModularMonolith.Shared.Events.Storage.Postgres.EntityConfigurations;
+using ModularMonolith.Shared.Events.EntityFramework.Postgres.EntityConfigurations;
 
 namespace ModularMonolith.Infrastructure.DataAccess.Postgres;
 
@@ -17,7 +17,7 @@ public sealed class PostgresDbContext : BaseDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new PostgresEventLogEntityTypeConfiguration(schemaName: SharedSchemaName))
+        modelBuilder.ApplyConfiguration(new EventLogEntityTypeConfiguration(schemaName: SharedSchemaName))
             .ApplyConfiguration(new PostgresAuditLogEntityTypeConfiguration(schemaName: SharedSchemaName));
 
         modelBuilder.AddInboxStateEntity(c =>

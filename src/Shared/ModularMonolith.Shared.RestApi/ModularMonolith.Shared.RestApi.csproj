@@ -19,6 +19,6 @@
     <ProjectReference Include="..\..\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Application\ModularMonolith.CategoryManagement.Application.csproj"/>
     <ProjectReference Include="..\..\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Infrastructure\ModularMonolith.CategoryManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
-    <ProjectReference Include="..\ModularMonolith.Shared.DataAccess.Postgres\ModularMonolith.Shared.DataAccess.Postgres.csproj" />
+    <ProjectReference Include="..\ModularMonolith.Shared.DataAccess.EntityFramework\ModularMonolith.Shared.DataAccess.EntityFramework.csproj" />
   </ItemGroup>
 </Project>

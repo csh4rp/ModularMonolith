@@ -1,4 +1,5 @@
 ﻿using ModularMonolith.Shared.Domain.Abstractions;
+using ModularMonolith.Shared.Events;
 using MongoDB.Driver;
 
 namespace ModularMonolith.Shared.DataAccess.Mongo.Repositories;
@@ -6,18 +7,33 @@ namespace ModularMonolith.Shared.DataAccess.Mongo.Repositories;
 public abstract class CrudRepository<TAggregate, TId> where TAggregate : AggregateRoot<TId> where TId : IEquatable<TId>
 {
     protected IMongoDatabase Database { get; set; }
+
+    protected IEventBus EventBus { get; set; }
+
     protected virtual IMongoCollection<TAggregate> Collection => Database.GetCollection<TAggregate>(typeof(TAggregate).Name);
 
-    protected CrudRepository(IMongoDatabase database)
+    protected CrudRepository(IMongoDatabase database, IEventBus eventBus)
     {
         Database = database;
+        EventBus = eventBus;
     }
 
-    public Task AddAsync(TAggregate aggregate, CancellationToken cancellationToken) =>
-        Collection.InsertOneAsync(aggregate, new InsertOneOptions(), cancellationToken);
+    public async Task AddAsync(TAggregate aggregate, CancellationToken cancellationToken)
+    {
+        await Collection.InsertOneAsync(aggregate, new InsertOneOptions(), cancellationToken);
 
-    public Task AddAsync(IEnumerable<TAggregate> aggregates, CancellationToken cancellationToken) =>
-        Collection.InsertManyAsync(aggregates, new InsertManyOptions(), cancellationToken);
+        var events = aggregate.DequeueEvents();
+        await EventBus.PublishAsync(events, cancellationToken);
+    }
+
+    public async Task AddAsync(IEnumerable<TAggregate> aggregates, CancellationToken cancellationToken)
+    {
+        var aggregatesList = aggregates as IReadOnlyCollection<TAggregate> ?? aggregates.ToList();
+        await Collection.InsertManyAsync(aggregatesList, new InsertManyOptions(), cancellationToken);
+
+        var events = aggregatesList.SelectMany(a => a.DequeueEvents());
+        await EventBus.PublishAsync(events, cancellationToken);
+    }
 
     public async Task UpdateAsync(TAggregate aggregate, CancellationToken cancellationToken)
     {
@@ -29,6 +45,9 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
                 IsUpsert = false
             },
             cancellationToken: cancellationToken);
+
+        var events = aggregate.DequeueEvents();
+        await EventBus.PublishAsync(events, cancellationToken);
 
         if (result.ModifiedCount == 0)
         {

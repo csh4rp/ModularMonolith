@@ -1,13 +1,13 @@
 ﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 
-namespace ModularMonolith.Shared.Events.Storage;
+namespace ModularMonolith.Shared.Events.EntityFramework;
 
-internal class EfEventLogStore : IEventLogStore
+internal class EventLogStore : IEventLogStore
 {
     private readonly DbContext _dbContext;
 
-    public EfEventLogStore(DbContext dbContext) => _dbContext = dbContext;
+    public EventLogStore(DbContext dbContext) => _dbContext = dbContext;
 
     public virtual async Task<TEvent?> FindFirstOccurenceAsync<TEvent>(string subject, CancellationToken cancellationToken)
         where TEvent : IEvent

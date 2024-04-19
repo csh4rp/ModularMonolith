@@ -6,9 +6,9 @@ using ModularMonolith.Shared.Application.Abstract;
 using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.Identity;
 
-namespace ModularMonolith.Shared.Events.Storage;
+namespace ModularMonolith.Shared.Events.EntityFramework;
 
-internal sealed class EfEventBus : IEventBus
+internal sealed class EventBus : IEventBus
 {
     private static readonly EventPublishOptions DefaultOptions = new();
 
@@ -18,7 +18,7 @@ internal sealed class EfEventBus : IEventBus
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly IServiceProvider _serviceProvider;
 
-    public EfEventBus(DbContext dbContext,
+    public EventBus(DbContext dbContext,
         IIdentityContextAccessor identityContextAccessor,
         TimeProvider timeProvider,
         IPublishEndpoint publishEndpoint,

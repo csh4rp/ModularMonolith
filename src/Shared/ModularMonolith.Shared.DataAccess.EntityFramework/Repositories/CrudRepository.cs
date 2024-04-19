@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.Domain.Abstractions;
 
-namespace ModularMonolith.Shared.DataAccess.Postgres.Repositories;
+namespace ModularMonolith.Shared.DataAccess.EntityFramework.Repositories;
 
 public abstract class CrudRepository<TAggregate, TId> where TAggregate : AggregateRoot<TId> where TId : IEquatable<TId>
 {

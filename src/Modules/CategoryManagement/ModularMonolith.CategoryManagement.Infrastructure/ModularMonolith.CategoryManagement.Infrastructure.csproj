@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.DataAccess\ModularMonolith.Shared.DataAccess.csproj" />
-    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.DataAccess.Postgres\ModularMonolith.Shared.DataAccess.Postgres.csproj" />
+    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.DataAccess.EntityFramework\ModularMonolith.Shared.DataAccess.EntityFramework.csproj" />
     <ProjectReference Include="..\ModularMonolith.CategoryManagement.Application\ModularMonolith.CategoryManagement.Application.csproj"/>
     <ProjectReference Include="..\ModularMonolith.CategoryManagement.Contracts\ModularMonolith.CategoryManagement.Contracts.csproj"/>
   </ItemGroup>
