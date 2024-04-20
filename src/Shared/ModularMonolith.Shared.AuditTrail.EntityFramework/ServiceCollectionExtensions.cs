@@ -1,6 +1,6 @@
-﻿using ModularMonolith.Shared.AuditTrail.Storage.Factories;
+﻿using ModularMonolith.Shared.AuditTrail.EntityFramework.Factories;
 
-namespace ModularMonolith.Shared.AuditTrail.Storage;
+namespace ModularMonolith.Shared.AuditTrail.EntityFramework;
 
 public static class ServiceCollectionExtensions
 {

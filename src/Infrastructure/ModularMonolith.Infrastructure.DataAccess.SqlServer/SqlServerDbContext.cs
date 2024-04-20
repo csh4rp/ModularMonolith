@@ -2,7 +2,7 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.AuditTrail.Storage;
-using ModularMonolith.Shared.AuditTrail.Storage.SqlServer.EntityConfigurations;
+using ModularMonolith.Shared.AuditTrail.EntityFramework.SqlServer.EntityConfigurations;
 using ModularMonolith.Shared.Events.EntityFramework.SqlServer.EntityConfigurations;
 
 namespace ModularMonolith.Infrastructure.DataAccess.SqlServer;

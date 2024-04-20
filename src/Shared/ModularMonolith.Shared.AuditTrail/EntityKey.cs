@@ -1,4 +1,4 @@
-﻿namespace ModularMonolith.Shared.Domain.ValueObjects;
+﻿namespace ModularMonolith.Shared.AuditTrail;
 
 public record EntityKey
 {

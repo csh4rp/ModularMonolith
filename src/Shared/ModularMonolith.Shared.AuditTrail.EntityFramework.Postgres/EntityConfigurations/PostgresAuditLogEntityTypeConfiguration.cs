@@ -2,14 +2,14 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
 
-namespace ModularMonolith.Shared.AuditTrail.Storage.SqlServer.EntityConfigurations;
+namespace ModularMonolith.Shared.AuditTrail.EntityFramework.Postgres.EntityConfigurations;
 
-public sealed class SqlServerAuditLogEntityTypeConfiguration : IEntityTypeConfiguration<AuditLog>
+public sealed class PostgresAuditLogEntityTypeConfiguration : IEntityTypeConfiguration<AuditLog>
 {
     private readonly string _schemaName;
     private readonly string _tableName;
 
-    public SqlServerAuditLogEntityTypeConfiguration(string schemaName = "Shared", string tableName = "AuditLog")
+    public PostgresAuditLogEntityTypeConfiguration(string schemaName = "shared", string tableName = "audit_log")
     {
         _schemaName = schemaName;
         _tableName = tableName;
@@ -32,13 +32,13 @@ public sealed class SqlServerAuditLogEntityTypeConfiguration : IEntityTypeConfig
         builder.OwnsMany(b => b.EntityPropertyChanges, b =>
         {
             b.ToTable(_tableName, _schemaName);
-            b.ToJson("EntityPropertyChanges");
+            b.ToJson("entity_property_changes");
         });
 
         builder.OwnsMany(b => b.EntityKeys, b =>
         {
             b.ToTable(_tableName, _schemaName);
-            b.ToJson("EntityKeys");
+            b.ToJson("entity_keys");
         });
 
         builder.Property(b => b.EntityType)

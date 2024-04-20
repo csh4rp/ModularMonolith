@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using ModularMonolith.Shared.AuditTrail.Storage.Factories;
+using ModularMonolith.Shared.AuditTrail.EntityFramework.Factories;
 
-namespace ModularMonolith.Shared.AuditTrail.Storage.Interceptors;
+namespace ModularMonolith.Shared.AuditTrail.EntityFramework.Interceptors;
 
 public sealed class AuditLogInterceptor : SaveChangesInterceptor
 {

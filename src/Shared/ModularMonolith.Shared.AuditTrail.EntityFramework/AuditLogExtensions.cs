@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ModularMonolith.Shared.AuditTrail.Storage;
+namespace ModularMonolith.Shared.AuditTrail.EntityFramework;
 
 public static class AuditLogExtensions
 {

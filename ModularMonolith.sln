@@ -101,17 +101,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Even
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.AuditTrail", "src\Shared\ModularMonolith.Shared.AuditTrail\ModularMonolith.Shared.AuditTrail.csproj", "{6B5989D9-0CA8-49AD-A2F9-48BDA1D40D21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.AuditTrail.Storage", "src\Shared\ModularMonolith.Shared.AuditTrail.Storage\ModularMonolith.Shared.AuditTrail.Storage.csproj", "{AB2EBD0B-ABA2-4DDF-90F6-EE15867FD34A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.AuditTrail.EntityFramework", "src\Shared\ModularMonolith.Shared.AuditTrail.EntityFramework\ModularMonolith.Shared.AuditTrail.EntityFramework.csproj", "{AB2EBD0B-ABA2-4DDF-90F6-EE15867FD34A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Identity", "src\Shared\ModularMonolith.Shared.Identity\ModularMonolith.Shared.Identity.csproj", "{C05377C1-62C2-46C5-B5EA-77A238DBF4B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.AuditTrail.Storage.Postgres", "src\Shared\ModularMonolith.Shared.AuditTrail.Storage.Postgres\ModularMonolith.Shared.AuditTrail.Storage.Postgres.csproj", "{787D8F64-DD99-4266-B94D-FAC5AFDB5211}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.AuditTrail.EntityFramework.Postgres", "src\Shared\ModularMonolith.Shared.AuditTrail.EntityFramework.Postgres\ModularMonolith.Shared.AuditTrail.EntityFramework.Postgres.csproj", "{787D8F64-DD99-4266-B94D-FAC5AFDB5211}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Infrastructure.DataAccess.Postgres", "src\Infrastructure\ModularMonolith.Infrastructure.DataAccess.Postgres\ModularMonolith.Infrastructure.DataAccess.Postgres.csproj", "{271D9E7E-70AB-491C-A256-E27C48DBB571}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Messaging.SqlServer", "src\Shared\ModularMonolith.Shared.Messaging.SqlServer\ModularMonolith.Shared.Messaging.SqlServer.csproj", "{9964BB44-2B84-4E8F-9A50-86595ABC0411}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.AuditTrail.Storage.SqlServer", "src\Shared\ModularMonolith.Shared.AuditTrail.Storage.SqlServer\ModularMonolith.Shared.AuditTrail.Storage.SqlServer.csproj", "{0EF9BDE7-EF11-4A47-94B4-C79A4D062967}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.AuditTrail.EntityFramework.SqlServer", "src\Shared\ModularMonolith.Shared.AuditTrail.EntityFramework.SqlServer\ModularMonolith.Shared.AuditTrail.EntityFramework.SqlServer.csproj", "{0EF9BDE7-EF11-4A47-94B4-C79A4D062967}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Events.EntityFramework.SqlServer", "src\Shared\ModularMonolith.Shared.Events.EntityFramework.SqlServer\ModularMonolith.Shared.Events.EntityFramework.SqlServer.csproj", "{71FB870E-0708-4249-9812-418299DB7122}"
 EndProject
@@ -148,6 +148,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer", "src\Shared\ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer\ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.csproj", "{78C52E5D-99C0-4CAA-9654-C77391C04DD5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Events.Mongo", "src\Shared\ModularMonolith.Shared.Events.Mongo\ModularMonolith.Shared.Events.Mongo.csproj", "{618FE70C-468E-450B-8687-2913528D18CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.AuditTrail.Mongo", "src\Shared\ModularMonolith.Shared.AuditTrail.Mongo\ModularMonolith.Shared.AuditTrail.Mongo.csproj", "{D60A2CFF-F919-4782-87EB-F26ABCC902F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -225,6 +227,7 @@ Global
 		{1CFA080E-580D-4267-B3AE-C0FE51A6AB84} = {BE90A33A-C3AE-419D-810D-9E30314D1004}
 		{78C52E5D-99C0-4CAA-9654-C77391C04DD5} = {BE90A33A-C3AE-419D-810D-9E30314D1004}
 		{618FE70C-468E-450B-8687-2913528D18CC} = {94F2F009-63B8-4D3A-B6F6-2B508EE605A8}
+		{D60A2CFF-F919-4782-87EB-F26ABCC902F7} = {ACC627E9-B384-40F8-93D5-A51746B305B9}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BBAF6E32-FA5F-4916-9F22-AD58F95D2992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -419,5 +422,9 @@ Global
 		{618FE70C-468E-450B-8687-2913528D18CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{618FE70C-468E-450B-8687-2913528D18CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{618FE70C-468E-450B-8687-2913528D18CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D60A2CFF-F919-4782-87EB-F26ABCC902F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D60A2CFF-F919-4782-87EB-F26ABCC902F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D60A2CFF-F919-4782-87EB-F26ABCC902F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D60A2CFF-F919-4782-87EB-F26ABCC902F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

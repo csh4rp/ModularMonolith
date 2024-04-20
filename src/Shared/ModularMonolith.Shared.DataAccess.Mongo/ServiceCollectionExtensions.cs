@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Application.Abstract;
 using ModularMonolith.Shared.DataAccess.Mongo.Transactions;
+using ModularMonolith.Shared.Events.Mongo;
 using MongoDB.Driver;
 
 namespace ModularMonolith.Shared.DataAccess.Mongo;
@@ -21,4 +22,7 @@ public static class ServiceCollectionExtensions
 
         return serviceCollection;
     }
+
+    public static IServiceCollection AddMongoOutbox(this IServiceCollection serviceCollection) =>
+        serviceCollection.AddHostedService<OutboxBackgroundService>();
 }

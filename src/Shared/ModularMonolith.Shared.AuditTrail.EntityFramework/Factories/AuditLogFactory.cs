@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using ModularMonolith.Shared.Domain.ValueObjects;
 using ModularMonolith.Shared.Identity;
 
-namespace ModularMonolith.Shared.AuditTrail.Storage.Factories;
+namespace ModularMonolith.Shared.AuditTrail.EntityFramework.Factories;
 
 public sealed class AuditLogFactory
 {

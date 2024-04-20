@@ -29,7 +29,7 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
     public async Task AddAsync(IEnumerable<TAggregate> aggregates, CancellationToken cancellationToken)
     {
         var aggregatesList = aggregates as IReadOnlyCollection<TAggregate> ?? aggregates.ToList();
-        await Collection.InsertManyAsync(aggregatesList, new InsertManyOptions(), cancellationToken);
+        await Collection.InsertManyAsync(aggregatesList, new InsertManyOptions{Comment = ""}, cancellationToken);
 
         var events = aggregatesList.SelectMany(a => a.DequeueEvents());
         await EventBus.PublishAsync(events, cancellationToken);

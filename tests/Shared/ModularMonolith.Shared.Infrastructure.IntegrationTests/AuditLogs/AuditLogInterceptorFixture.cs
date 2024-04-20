@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.AuditTrail;
 using ModularMonolith.Shared.AuditTrail.Storage.Factories;
 using ModularMonolith.Shared.AuditTrail.Storage.Interceptors;
-using ModularMonolith.Shared.Domain.ValueObjects;
 using ModularMonolith.Shared.Identity;
 using ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs.Entities;
 using NSubstitute;

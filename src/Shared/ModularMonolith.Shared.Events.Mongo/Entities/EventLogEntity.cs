@@ -5,16 +5,16 @@ namespace ModularMonolith.Shared.Events.Mongo.Entities;
 
 public class EventLogEntity
 {
-    [BsonId]
     public required Guid Id { get; init; }
 
-    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+    [BsonDateTimeOptions(Kind = DateTimeKind.Utc, Representation = BsonType.String)]
     public required DateTime OccurredAt { get; init; }
+
+    public required Guid? CorrelationId { get; init; }
 
     public string? Subject { get; init; }
 
     public required string EventType { get; init; }
 
-    [BsonExtraElements]
     public required BsonDocument EventPayload { get; init; }
 }
