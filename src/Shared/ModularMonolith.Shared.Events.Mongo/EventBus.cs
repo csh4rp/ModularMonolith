@@ -1,8 +1,6 @@
 ﻿using ModularMonolith.Shared.Events.Mongo.Entities;
 using ModularMonolith.Shared.Identity;
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
 namespace ModularMonolith.Shared.Events.Mongo;
@@ -38,7 +36,7 @@ internal sealed class EventBus : IEventBus
             Id = Guid.NewGuid(),
             CorrelationId = options.CorrelationId,
             OccurredAt = @event.OccurredAt.UtcDateTime,
-            EventPayload = Serialize(@event),
+            EventPayload = @event.ToBsonDocument(),
             EventType = typeof(TEvent).FullName!,
             Subject = _identityContextAccessor.IdentityContext?.Subject,
         };
@@ -52,13 +50,5 @@ internal sealed class EventBus : IEventBus
     {
         var eventLogs = events.Select(e => CreateEventLog(e, options));
         return _eventLogs.InsertManyAsync(eventLogs, DefaultInsertManyOptions, cancellationToken);
-    }
-
-    private static BsonDocument Serialize<TEvent>(TEvent @event) where TEvent : IEvent
-    {
-        using var ms = new MemoryStream();
-        using var writer = new BsonBinaryWriter(ms);
-        BsonSerializer.Serialize(writer, @event);
-        return writer.ToBsonDocument();
     }
 }

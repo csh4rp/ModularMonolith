@@ -9,7 +9,7 @@ public class PostgresDbContextFactory : IDesignTimeDbContextFactory<PostgresDbCo
 {
     public PostgresDbContext CreateDbContext(string[] args)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<BaseDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<DbContext>();
 
         optionsBuilder.UseNpgsql(args[0], b =>
             {

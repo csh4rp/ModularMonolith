@@ -8,7 +8,7 @@ namespace ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer;
 
 public static class ServiceConnectionExtensions
 {
-    public static IServiceCollection AddPostgresDataAccess<TDbContext>(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddSqlServerDataAccess<TDbContext>(this IServiceCollection serviceCollection)
         where TDbContext : DbContext
     {
         serviceCollection

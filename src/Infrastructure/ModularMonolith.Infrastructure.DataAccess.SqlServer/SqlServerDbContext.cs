@@ -1,17 +1,17 @@
 ﻿using System.Reflection;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Shared.AuditTrail.Storage;
+using ModularMonolith.Shared.AuditTrail.EntityFramework;
 using ModularMonolith.Shared.AuditTrail.EntityFramework.SqlServer.EntityConfigurations;
 using ModularMonolith.Shared.Events.EntityFramework.SqlServer.EntityConfigurations;
 
 namespace ModularMonolith.Infrastructure.DataAccess.SqlServer;
 
-public sealed class SqlServerDbContext : BaseDbContext
+public sealed class SqlServerDbContext : DbContext
 {
     private const string SharedSchemaName = "Shared";
 
-    public SqlServerDbContext(DbContextOptions<BaseDbContext> options) : base(options)
+    public SqlServerDbContext(DbContextOptions<DbContext> options) : base(options)
     {
     }
 

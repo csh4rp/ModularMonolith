@@ -4,5 +4,5 @@ namespace ModularMonolith.Shared.Domain.Abstractions;
 
 public abstract record DomainEvent : IEvent
 {
-    public DateTimeOffset OccurredAt { get; protected set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset OccurredAt { get; protected set; } = TimeProvider.System.GetUtcNow();
 }

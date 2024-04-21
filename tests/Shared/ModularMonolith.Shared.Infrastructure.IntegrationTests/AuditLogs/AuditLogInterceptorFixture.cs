@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.AuditTrail;
-using ModularMonolith.Shared.AuditTrail.Storage.Factories;
-using ModularMonolith.Shared.AuditTrail.Storage.Interceptors;
+using ModularMonolith.Shared.AuditTrail.EntityFramework.Factories;
+using ModularMonolith.Shared.AuditTrail.EntityFramework.Interceptors;
 using ModularMonolith.Shared.Identity;
 using ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs.Entities;
 using NSubstitute;
@@ -74,9 +74,9 @@ public class AuditLogInterceptorFixture
 
         auditLog.Should().NotBeNull();
         auditLog!.CreatedAt.Should().Be(Now);
-        auditLog.Subject.Should().Be(UserName);
-        auditLog.OperationName.Should().Be(_activity!.OperationName);
-        auditLog.TraceId.Should().Be(_activity.TraceId.ToString());
+        auditLog.MetaData.Subject.Should().Be(UserName);
+        auditLog.MetaData.OperationName.Should().Be(_activity!.OperationName);
+        auditLog.MetaData.TraceId.Should().Be(_activity.TraceId.ToString());
         auditLog.EntityKeys.Should().BeEquivalentTo(new List<EntityKey>
         {
             new("Id", entity.Id.ToString())
@@ -106,9 +106,9 @@ public class AuditLogInterceptorFixture
 
         ownedEntityAuditLog.Should().NotBeNull();
         ownedEntityAuditLog!.CreatedAt.Should().Be(Now);
-        ownedEntityAuditLog.Subject.Should().Be(UserName);
-        ownedEntityAuditLog.OperationName.Should().Be(_activity!.OperationName);
-        ownedEntityAuditLog.TraceId.Should().Be(_activity.TraceId.ToString());
+        ownedEntityAuditLog.MetaData.Subject.Should().Be(UserName);
+        ownedEntityAuditLog.MetaData.OperationName.Should().Be(_activity!.OperationName);
+        ownedEntityAuditLog.MetaData.TraceId.Should().Be(_activity.TraceId.ToString());
         ownedEntityAuditLog.EntityKeys.Should().BeEquivalentTo(new List<EntityKey>
         {
             new("OwnerEntityId", parentEntityId.ToString())
@@ -128,9 +128,9 @@ public class AuditLogInterceptorFixture
 
         ownedEntityAuditLog.Should().NotBeNull();
         ownedEntityAuditLog!.CreatedAt.Should().Be(Now);
-        ownedEntityAuditLog.Subject.Should().Be(UserName);
-        ownedEntityAuditLog.OperationName.Should().Be(_activity!.OperationName);
-        ownedEntityAuditLog.TraceId.Should().Be(_activity.TraceId.ToString());
+        ownedEntityAuditLog.MetaData.Subject.Should().Be(UserName);
+        ownedEntityAuditLog.MetaData.OperationName.Should().Be(_activity!.OperationName);
+        ownedEntityAuditLog.MetaData.TraceId.Should().Be(_activity.TraceId.ToString());
         ownedEntityAuditLog.EntityKeys.Should().BeEquivalentTo(new List<EntityKey>
         {
             new("OwnerEntityId", parentEntityId.ToString())

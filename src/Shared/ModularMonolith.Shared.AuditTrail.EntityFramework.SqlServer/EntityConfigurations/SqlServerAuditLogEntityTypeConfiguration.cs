@@ -9,7 +9,7 @@ public sealed class SqlServerAuditLogEntityTypeConfiguration : IEntityTypeConfig
     private readonly string _schemaName;
     private readonly string _tableName;
 
-    public SqlServerAuditLogEntityTypeConfiguration(string schemaName = "Shared", string tableName = "AuditLog")
+    public SqlServerAuditLogEntityTypeConfiguration(string schemaName = "Shared", string tableName = nameof(AuditLog))
     {
         _schemaName = schemaName;
         _tableName = tableName;
@@ -32,45 +32,24 @@ public sealed class SqlServerAuditLogEntityTypeConfiguration : IEntityTypeConfig
         builder.OwnsMany(b => b.EntityPropertyChanges, b =>
         {
             b.ToTable(_tableName, _schemaName);
-            b.ToJson("EntityPropertyChanges");
+            b.ToJson(nameof(AuditLog.EntityPropertyChanges));
         });
 
         builder.OwnsMany(b => b.EntityKeys, b =>
         {
             b.ToTable(_tableName, _schemaName);
-            b.ToJson("EntityKeys");
+            b.ToJson(nameof(AuditLog.EntityKeys));
         });
 
         builder.Property(b => b.EntityType)
             .IsRequired()
             .HasMaxLength(256);
 
-        builder.Property(b => b.OperationName)
-            .IsRequired()
-            .HasMaxLength(128);
-
-        builder.Property(b => b.TraceId)
-            .IsRequired()
-            .IsUnicode(false)
-            .HasMaxLength(32);
-
-        builder.Property(b => b.SpanId)
-            .IsRequired()
-            .IsUnicode(false)
-            .HasMaxLength(16);
-
-        builder.Property(b => b.ParentSpanId)
-            .IsUnicode(false)
-            .HasMaxLength(16);
-
-        builder.Property(b => b.Subject)
-            .HasMaxLength(128);
-
-        builder.Property(b => b.IpAddress)
-            .HasMaxLength(32);
-
-        builder.Property(b => b.UserAgent)
-            .HasMaxLength(256);
+        builder.OwnsOne(b => b.MetaData, b =>
+        {
+            b.ToTable(_tableName, _schemaName);
+            b.ToJson(nameof(AuditLog.MetaData));
+        });
 
         // TODO: Add index for EntityKey, EntityType [{"PropertyName": "id", "Value": "GUID"}]
     }

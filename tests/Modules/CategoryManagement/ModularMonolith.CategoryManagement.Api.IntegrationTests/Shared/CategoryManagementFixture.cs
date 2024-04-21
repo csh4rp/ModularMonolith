@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ModularMonolith.CategoryManagement.RestApi;
-using ModularMonolith.Infrastructure.DataAccess;
 using ModularMonolith.Infrastructure.Migrations.Postgres;
 using Npgsql;
 using Respawn;
@@ -28,7 +27,7 @@ public class CategoryManagementFixture : IAsyncLifetime
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
 
-    public BaseDbContext DbContext { get; private set; } = default!;
+    public DbContext DbContext { get; private set; } = default!;
 
     public async Task InitializeAsync()
     {

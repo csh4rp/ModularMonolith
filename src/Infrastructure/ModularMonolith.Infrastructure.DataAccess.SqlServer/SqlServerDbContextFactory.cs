@@ -7,7 +7,7 @@ public class SqlServerDbContextFactory : IDesignTimeDbContextFactory<SqlServerDb
 {
     public SqlServerDbContext CreateDbContext(string[] args)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<BaseDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<DbContext>();
 
         optionsBuilder.UseSqlServer(args[0], b =>
         {

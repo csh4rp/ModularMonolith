@@ -1,17 +1,17 @@
 ﻿using System.Reflection;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Shared.AuditTrail.Storage;
+using ModularMonolith.Shared.AuditTrail.EntityFramework;
 using ModularMonolith.Shared.AuditTrail.EntityFramework.Postgres.EntityConfigurations;
 using ModularMonolith.Shared.Events.EntityFramework.Postgres.EntityConfigurations;
 
 namespace ModularMonolith.Infrastructure.DataAccess.Postgres;
 
-public sealed class PostgresDbContext : BaseDbContext
+public sealed class PostgresDbContext : DbContext
 {
     private const string SharedSchemaName = "shared";
 
-    public PostgresDbContext(DbContextOptions<BaseDbContext> options) : base(options)
+    public PostgresDbContext(DbContextOptions<DbContext> options) : base(options)
     {
     }
 
@@ -39,6 +39,4 @@ public sealed class PostgresDbContext : BaseDbContext
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.Load("ModularMonolith.CategoryManagement.Infrastructure"));
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.Load("ModularMonolith.Identity.Infrastructure"));
     }
-
-
 }

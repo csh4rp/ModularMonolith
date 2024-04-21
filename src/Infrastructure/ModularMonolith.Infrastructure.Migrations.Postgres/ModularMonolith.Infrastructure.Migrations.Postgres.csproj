@@ -9,6 +9,5 @@
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\ModularMonolith.Infrastructure.DataAccess.Postgres\ModularMonolith.Infrastructure.DataAccess.Postgres.csproj" />
-      <ProjectReference Include="..\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj" />
     </ItemGroup>
 </Project>

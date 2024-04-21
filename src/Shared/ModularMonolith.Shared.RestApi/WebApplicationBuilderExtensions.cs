@@ -1,5 +1,11 @@
 ﻿using Asp.Versioning;
+using FluentValidation;
+using ModularMonolith.Infrastructure.DataAccess;
+using ModularMonolith.Shared.Application;
+using ModularMonolith.Shared.Events.Mongo;
+using ModularMonolith.Shared.RestApi.Authorization;
 using ModularMonolith.Shared.RestApi.Swagger;
+using ModularMonolith.Shared.RestApi.Telemetry;
 
 namespace ModularMonolith.Shared.RestApi;
 
@@ -31,14 +37,14 @@ public static class WebApplicationBuilderExtensions
             builder.Services.AddSwaggerWithBearerToken(modules);
         }
         //
-        // builder.Services
-        //     .AddPostgresDataAccess(connectionString)
-        //     .AddAuth(builder.Configuration)
-        //     .AddTelemetryWithTracing(builder.Configuration, builder.Environment)
-        //     .AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true)
+        builder.Services
+            .AddDataAccess(builder.Configuration)
+            .AddAuth(builder.Configuration)
+        .AddTelemetryWithTracing(builder.Configuration, builder.Environment)
+        .AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true)
         //     .AddPostgresMessaging<BaseDbContext>(connectionString!, assemblies)
-        //     .AddMediator(assemblies)
-        //     .AddEvents(assemblies)
+        .AddMediator(assemblies)
+        .AddEvents(assemblies)
         //     .AddAuditLogs()
         //     .AddIdentityServices()
         //     .AddHttpContextAccessor()

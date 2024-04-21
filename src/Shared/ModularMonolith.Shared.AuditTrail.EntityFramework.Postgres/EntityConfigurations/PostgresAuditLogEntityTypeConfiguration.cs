@@ -45,32 +45,11 @@ public sealed class PostgresAuditLogEntityTypeConfiguration : IEntityTypeConfigu
             .IsRequired()
             .HasMaxLength(256);
 
-        builder.Property(b => b.OperationName)
-            .IsRequired()
-            .HasMaxLength(128);
-
-        builder.Property(b => b.TraceId)
-            .IsRequired()
-            .IsUnicode(false)
-            .HasMaxLength(32);
-
-        builder.Property(b => b.SpanId)
-            .IsRequired()
-            .IsUnicode(false)
-            .HasMaxLength(16);
-
-        builder.Property(b => b.ParentSpanId)
-            .IsUnicode(false)
-            .HasMaxLength(16);
-
-        builder.Property(b => b.Subject)
-            .HasMaxLength(128);
-
-        builder.Property(b => b.IpAddress)
-            .HasMaxLength(32);
-
-        builder.Property(b => b.UserAgent)
-            .HasMaxLength(256);
+        builder.OwnsOne(b => b.EntityPropertyChanges, b =>
+        {
+            b.ToTable(_tableName, _schemaName);
+            b.ToJson("entity_property_changes");
+        });
 
         // TODO: Add index for EntityKey, EntityType [{"PropertyName": "id", "Value": "GUID"}]
     }

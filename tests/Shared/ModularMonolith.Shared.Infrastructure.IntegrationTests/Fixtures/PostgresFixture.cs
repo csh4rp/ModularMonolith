@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Infrastructure.DataAccess;
 using ModularMonolith.Infrastructure.Migrations.Postgres;
 using Npgsql;
 using Respawn;
@@ -14,7 +13,7 @@ public class PostgresFixture : IAsyncLifetime
     private PostgreSqlContainer? _container;
     private Respawner? _respawner;
 
-    public BaseDbContext DbContext { get; private set; } = default!;
+    public DbContext DbContext { get; private set; } = default!;
 
     public string ConnectionString => _container!.GetConnectionString();
 

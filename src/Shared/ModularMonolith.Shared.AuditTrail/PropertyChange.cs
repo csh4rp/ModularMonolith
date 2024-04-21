@@ -15,7 +15,7 @@ public record PropertyChange
 
     public string PropertyName { get; private set; } = default!;
 
-    public string? CurrentValue { get; private set; } = default!;
+    public string? CurrentValue { get; private set; }
 
-    public string? OriginalValue { get; private set; } = default!;
+    public string? OriginalValue { get; private set; }
 }

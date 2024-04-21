@@ -151,6 +151,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Even
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.AuditTrail.Mongo", "src\Shared\ModularMonolith.Shared.AuditTrail.Mongo\ModularMonolith.Shared.AuditTrail.Mongo.csproj", "{D60A2CFF-F919-4782-87EB-F26ABCC902F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Infrastructure.Messaging", "src\Infrastructure\ModularMonolith.Infrastructure.Messaging\ModularMonolith.Infrastructure.Messaging.csproj", "{932B1408-4717-48BD-8D25-21FDB1368368}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -228,6 +230,7 @@ Global
 		{78C52E5D-99C0-4CAA-9654-C77391C04DD5} = {BE90A33A-C3AE-419D-810D-9E30314D1004}
 		{618FE70C-468E-450B-8687-2913528D18CC} = {94F2F009-63B8-4D3A-B6F6-2B508EE605A8}
 		{D60A2CFF-F919-4782-87EB-F26ABCC902F7} = {ACC627E9-B384-40F8-93D5-A51746B305B9}
+		{932B1408-4717-48BD-8D25-21FDB1368368} = {FE218637-2EC8-4978-ADE4-68C1205A93B3}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BBAF6E32-FA5F-4916-9F22-AD58F95D2992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -426,5 +429,9 @@ Global
 		{D60A2CFF-F919-4782-87EB-F26ABCC902F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D60A2CFF-F919-4782-87EB-F26ABCC902F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D60A2CFF-F919-4782-87EB-F26ABCC902F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{932B1408-4717-48BD-8D25-21FDB1368368}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{932B1408-4717-48BD-8D25-21FDB1368368}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{932B1408-4717-48BD-8D25-21FDB1368368}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{932B1408-4717-48BD-8D25-21FDB1368368}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

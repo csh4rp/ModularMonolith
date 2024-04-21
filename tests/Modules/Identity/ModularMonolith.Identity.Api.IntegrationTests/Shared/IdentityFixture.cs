@@ -10,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using ModularMonolith.Identity.RestApi;
-using ModularMonolith.Infrastructure.DataAccess;
 using ModularMonolith.Infrastructure.Migrations.Postgres;
 using ModularMonolith.Shared.TestUtils.Fakes;
 using Npgsql;
@@ -31,7 +30,7 @@ public class IdentityFixture : IAsyncLifetime
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
 
-    public BaseDbContext DbContext { get; private set; } = default!;
+    public DbContext DbContext { get; private set; } = default!;
 
     public async Task InitializeAsync()
     {

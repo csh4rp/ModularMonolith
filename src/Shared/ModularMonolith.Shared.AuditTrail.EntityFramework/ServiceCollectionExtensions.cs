@@ -6,7 +6,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddAuditLogs(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddScoped<AuditLogFactory>();
+        serviceCollection.AddScoped<AuditLogFactory>()
+            .AddScoped<IAuditMetaDataProvider, AuditMetaDataProvider>();
 
         return serviceCollection;
     }

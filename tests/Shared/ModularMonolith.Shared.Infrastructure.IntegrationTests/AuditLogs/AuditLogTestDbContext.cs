@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Shared.AuditTrail.Storage;
-using ModularMonolith.Shared.AuditTrail.Storage.Postgres.EntityConfigurations;
+using ModularMonolith.Shared.AuditTrail.EntityFramework;
+using ModularMonolith.Shared.AuditTrail.EntityFramework.Postgres.EntityConfigurations;
 using ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs.Entities;
 
 namespace ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs;

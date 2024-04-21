@@ -75,19 +75,21 @@ public sealed class AuditLogFactory
         return new AuditLog
         {
             CreatedAt = _timeProvider.GetUtcNow(),
-            Subject = identityContext?.Subject,
             EntityState = GetChangeType(entry),
             EntityKeys = keys,
             EntityType = entityType.FullName!,
             EntityPropertyChanges = [.. changes],
-            OperationName = Activity.Current.OperationName,
-            TraceId = activity.TraceId.ToString(),
-            SpanId = activity.SpanId.ToString(),
-            ParentSpanId = activity.Parent is null
-                ? null
-                : activity.ParentSpanId.ToString(),
-            IpAddress = ipAddress,
-            UserAgent = userAgent
+            MetaData = new AuditMetaData
+            {
+                Subject = identityContext?.Subject,
+                OperationName = Activity.Current.OperationName,
+                TraceId = activity.TraceId.ToString(),
+                SpanId = activity.SpanId.ToString(),
+                ParentSpanId = activity.Parent is null ? null : activity.ParentSpanId.ToString(),
+                IpAddress = ipAddress,
+                UserAgent = userAgent,
+                ExtraData = []
+            }
         };
     }
 

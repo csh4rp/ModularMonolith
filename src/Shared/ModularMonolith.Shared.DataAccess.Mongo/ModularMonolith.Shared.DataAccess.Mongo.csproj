@@ -6,6 +6,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj" />
+    <ProjectReference Include="..\ModularMonolith.Shared.AuditTrail.Mongo\ModularMonolith.Shared.AuditTrail.Mongo.csproj" />
+    <ProjectReference Include="..\ModularMonolith.Shared.AuditTrail\ModularMonolith.Shared.AuditTrail.csproj" />
     <ProjectReference Include="..\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj" />
     <ProjectReference Include="..\ModularMonolith.Shared.Events.Mongo\ModularMonolith.Shared.Events.Mongo.csproj" />
   </ItemGroup>
