@@ -1,6 +1,6 @@
 ﻿namespace ModularMonolith.Shared.Events;
 
-public sealed class EventLog
+public sealed record EventLog
 {
     public required Guid Id { get; init; }
 
@@ -8,7 +8,7 @@ public sealed class EventLog
 
     public string? Subject { get; init; }
 
-    public required string EventType { get; init; }
+    public required Type EventType { get; init; }
 
-    public required string EventPayload { get; init; }
+    public required object EventPayload { get; init; }
 }

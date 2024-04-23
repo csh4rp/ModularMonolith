@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.Entities;
 
-namespace ModularMonolith.Shared.Events.EntityFramework.Postgres.EntityConfigurations;
+namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EntityConfigurations;
 
-public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<EventLog>
+public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<EventLogEntity>
 {
     private readonly string _schemaName;
     private readonly string _tableName;
@@ -15,7 +16,7 @@ public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<E
         _tableName = tableName;
     }
 
-    public void Configure(EntityTypeBuilder<EventLog> builder)
+    public void Configure(EntityTypeBuilder<EventLogEntity> builder)
     {
         builder.ToTable(_tableName, _schemaName);
 
@@ -24,18 +25,21 @@ public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<E
         builder.Property(b => b.Id)
             .HasValueGenerator(typeof(SequentialGuidValueGenerator));
 
-        builder.Property(b => b.Subject)
+        builder.Property(b => b.EventTypeName)
             .IsRequired()
-            .HasMaxLength(256);
+            .HasMaxLength(512);
 
         builder.Property(b => b.EventPayload)
             .HasColumnType("jsonb")
             .IsRequired();
 
-        builder.Property(b => b.EventType)
-            .IsRequired()
-            .HasMaxLength(256);
+        builder.OwnsOne(b => b.MetaData, b =>
+        {
+            b.ToJson("meta_data");
+        });
 
-        builder.HasIndex(b => new { b.Subject, b.EventType, b.OccurredAt });
+        builder.HasIndex(b => b.Timestamp);
+
+        builder.HasIndex(b => new { b.EventTypeName, b.Timestamp });
     }
 }

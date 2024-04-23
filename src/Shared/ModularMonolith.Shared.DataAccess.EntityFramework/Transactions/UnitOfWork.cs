@@ -5,7 +5,6 @@ namespace ModularMonolith.Shared.DataAccess.EntityFramework.Transactions;
 
 public sealed class UnitOfWork : IUnitOfWork
 {
-
     private readonly IDbContextTransaction _transaction;
 
     public UnitOfWork(IDbContextTransaction transaction) => _transaction = transaction;

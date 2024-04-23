@@ -10,4 +10,6 @@ public interface IEventLogStore
     Task<TEvent?> FindLastOccurenceAsync<TEvent>(string subject, CancellationToken cancellationToken) where TEvent : IEvent;
 
     Task<EventLog?> FindLastOccurenceAsync(string subject, Type eventType, CancellationToken cancellationToken);
+
+    Task<List<EventLog>> GetAllAsync(DateTimeOffset from, CancellationToken cancellationToken);
 }

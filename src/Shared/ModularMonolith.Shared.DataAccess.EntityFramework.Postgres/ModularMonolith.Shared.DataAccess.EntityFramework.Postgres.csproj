@@ -3,6 +3,7 @@
     <PackageReference Include="Npgsql"/>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
     <PackageReference Include="EFCore.NamingConventions"/>
+    <PackageReference Include="Z.EntityFramework.Plus.EFCore" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ModularMonolith.Shared.AuditTrail.EntityFramework\ModularMonolith.Shared.AuditTrail.EntityFramework.csproj" />
