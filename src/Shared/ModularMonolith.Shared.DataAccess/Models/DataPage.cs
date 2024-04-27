@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace ModularMonolith.Shared.DataAccess.Models;
 
-public record DataPage<T>(ImmutableArray<T> Items, long TotalCount) : IReadOnlyList<T>
+public sealed record DataPage<T>(ImmutableArray<T> Items, long TotalCount) : IReadOnlyList<T>
 {
     public int Count => Items.Length;
 

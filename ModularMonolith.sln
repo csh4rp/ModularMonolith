@@ -101,8 +101,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Even
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.AuditTrail", "src\Shared\ModularMonolith.Shared.AuditTrail\ModularMonolith.Shared.AuditTrail.csproj", "{6B5989D9-0CA8-49AD-A2F9-48BDA1D40D21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.AuditTrail.EntityFramework", "src\Shared\ModularMonolith.Shared.AuditTrail.EntityFramework\ModularMonolith.Shared.AuditTrail.EntityFramework.csproj", "{AB2EBD0B-ABA2-4DDF-90F6-EE15867FD34A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Identity", "src\Shared\ModularMonolith.Shared.Identity\ModularMonolith.Shared.Identity.csproj", "{C05377C1-62C2-46C5-B5EA-77A238DBF4B3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.AuditTrail.EntityFramework.Postgres", "src\Shared\ModularMonolith.Shared.AuditTrail.EntityFramework.Postgres\ModularMonolith.Shared.AuditTrail.EntityFramework.Postgres.csproj", "{787D8F64-DD99-4266-B94D-FAC5AFDB5211}"
@@ -192,7 +190,6 @@ Global
 		{B424D8C9-1CED-47B1-B9D0-8382F64ED47A} = {D1ADAFDE-DA2C-4A16-8AC9-F4F9D61C68E4}
 		{ACC627E9-B384-40F8-93D5-A51746B305B9} = {23D97AF7-96F3-49EC-BFE2-CCE1B738FCEE}
 		{6B5989D9-0CA8-49AD-A2F9-48BDA1D40D21} = {ACC627E9-B384-40F8-93D5-A51746B305B9}
-		{AB2EBD0B-ABA2-4DDF-90F6-EE15867FD34A} = {ACC627E9-B384-40F8-93D5-A51746B305B9}
 		{787D8F64-DD99-4266-B94D-FAC5AFDB5211} = {ACC627E9-B384-40F8-93D5-A51746B305B9}
 		{0EF9BDE7-EF11-4A47-94B4-C79A4D062967} = {ACC627E9-B384-40F8-93D5-A51746B305B9}
 		{BE90A33A-C3AE-419D-810D-9E30314D1004} = {23D97AF7-96F3-49EC-BFE2-CCE1B738FCEE}
@@ -373,10 +370,6 @@ Global
 		{6B5989D9-0CA8-49AD-A2F9-48BDA1D40D21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B5989D9-0CA8-49AD-A2F9-48BDA1D40D21}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B5989D9-0CA8-49AD-A2F9-48BDA1D40D21}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AB2EBD0B-ABA2-4DDF-90F6-EE15867FD34A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AB2EBD0B-ABA2-4DDF-90F6-EE15867FD34A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AB2EBD0B-ABA2-4DDF-90F6-EE15867FD34A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AB2EBD0B-ABA2-4DDF-90F6-EE15867FD34A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C05377C1-62C2-46C5-B5EA-77A238DBF4B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C05377C1-62C2-46C5-B5EA-77A238DBF4B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C05377C1-62C2-46C5-B5EA-77A238DBF4B3}.Release|Any CPU.ActiveCfg = Release|Any CPU

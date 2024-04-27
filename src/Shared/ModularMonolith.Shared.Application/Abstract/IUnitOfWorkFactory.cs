@@ -2,5 +2,5 @@
 
 public interface IUnitOfWorkFactory
 {
-    ValueTask<IUnitOfWork> CreateAsync(CancellationToken cancellationToken);
+   Task<IUnitOfWork> CreateAsync(CancellationToken cancellationToken = new());
 }

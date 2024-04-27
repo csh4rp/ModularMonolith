@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Shared.AuditTrail.EntityFramework;
 using ModularMonolith.Shared.AuditTrail.EntityFramework.Postgres.EntityConfigurations;
 using ModularMonolith.Shared.Events.EntityFramework.Postgres.EntityConfigurations;
 

@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
-using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.Entities;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLog.Models;
 
-namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EntityConfigurations;
+namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLog.EntityConfigurations;
 
 public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<EventLogEntity>
 {
@@ -26,12 +26,13 @@ public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<E
             .HasValueGenerator(typeof(SequentialGuidValueGenerator));
 
         builder.Property(b => b.EventTypeName)
-            .IsRequired()
-            .HasMaxLength(512);
-
-        builder.Property(b => b.EventPayload)
-            .HasColumnType("jsonb")
+            .HasMaxLength(512)
             .IsRequired();
+
+        builder.OwnsOne(b => b.EventPayload, b =>
+        {
+            b.ToJson("event_payload");
+        });
 
         builder.OwnsOne(b => b.MetaData, b =>
         {

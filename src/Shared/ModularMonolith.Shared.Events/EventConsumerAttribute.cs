@@ -3,7 +3,7 @@
 [AttributeUsage(AttributeTargets.Class)]
 public class EventConsumerAttribute : Attribute
 {
-    public string Queue { get; }
+    public string ConsumerName { get; }
 
-    public EventConsumerAttribute(string queue) => Queue = queue;
+    public EventConsumerAttribute(string consumerName) => ConsumerName = consumerName;
 }

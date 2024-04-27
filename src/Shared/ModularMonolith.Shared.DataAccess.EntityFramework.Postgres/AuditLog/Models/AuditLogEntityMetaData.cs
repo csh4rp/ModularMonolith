@@ -1,6 +1,6 @@
-﻿namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.Entities;
+﻿namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLog.Models;
 
-public class EventLogEntityMetaData
+public record AuditLogEntityMetaData
 {
     public required string? Subject { get; init; }
 
@@ -15,4 +15,6 @@ public class EventLogEntityMetaData
     public required string? SpanId { get; init; }
 
     public required string? ParentSpanId { get; init; }
+
+    public required Guid? CorrelationId { get; init; }
 }

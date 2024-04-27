@@ -6,7 +6,6 @@
     <PackageReference Include="Z.EntityFramework.Plus.EFCore" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ModularMonolith.Shared.AuditTrail.EntityFramework\ModularMonolith.Shared.AuditTrail.EntityFramework.csproj" />
     <ProjectReference Include="..\ModularMonolith.Shared.DataAccess.EntityFramework\ModularMonolith.Shared.DataAccess.EntityFramework.csproj" />
     <ProjectReference Include="..\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj" />
   </ItemGroup>

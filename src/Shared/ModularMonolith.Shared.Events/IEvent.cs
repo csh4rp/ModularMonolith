@@ -2,5 +2,7 @@
 
 public interface IEvent
 {
-    DateTimeOffset OccurredAt { get; }
+    Guid Id { get; }
+
+    DateTimeOffset Timestamp { get; }
 }

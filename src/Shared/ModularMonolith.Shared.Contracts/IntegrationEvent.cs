@@ -2,4 +2,4 @@
 
 namespace ModularMonolith.Shared.Contracts;
 
-public abstract record IntegrationEvent(DateTimeOffset OccurredAt) : IEvent;
+public abstract record IntegrationEvent(Guid Id, DateTimeOffset Timestamp) : IEvent;

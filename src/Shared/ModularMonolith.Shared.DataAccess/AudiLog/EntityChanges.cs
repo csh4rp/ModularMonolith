@@ -3,11 +3,11 @@ using System.Collections.Frozen;
 
 namespace ModularMonolith.Shared.DataAccess.AudiLog;
 
-public record EntityChanges : IEnumerable<EntityFieldChange>
+public sealed record EntityChanges : IEnumerable<EntityFieldChange>
 {
     private readonly FrozenDictionary<string, EntityFieldChange> _changes;
 
-    public EntityChanges(EntityFieldChange[] changes) => _changes = changes.ToFrozenDictionary(k => k.Name);
+    public EntityChanges(IEnumerable<EntityFieldChange> changes) => _changes = changes.ToFrozenDictionary(k => k.Name);
 
     public IReadOnlyList<string> FieldNames => _changes.Keys;
 
@@ -20,7 +20,7 @@ public record EntityChanges : IEnumerable<EntityFieldChange>
         }
     }
 
-    public bool TryGetValue(string fieldName, out (object? OriginalValue, object? CurrentValue) value)
+    public bool TryGetFieldValues(string fieldName, out (object? OriginalValue, object? CurrentValue) value)
     {
         if (!_changes.TryGetValue(fieldName, out var change))
         {

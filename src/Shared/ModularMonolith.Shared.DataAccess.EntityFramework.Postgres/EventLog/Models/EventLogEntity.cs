@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.Entities;
+namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLog.Models;
 
 public class EventLogEntity
 {

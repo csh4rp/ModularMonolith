@@ -4,7 +4,7 @@ public enum AuditOperationType
 {
     Added = 1,
 
-    Updated = 2,
+    Modified = 2,
 
-    Removed = 3
+    Deleted = 3
 }

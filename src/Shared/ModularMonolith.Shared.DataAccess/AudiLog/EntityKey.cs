@@ -3,17 +3,17 @@ using System.Collections.Frozen;
 
 namespace ModularMonolith.Shared.DataAccess.AudiLog;
 
-public class EntityKey : IEnumerable<EntityField>
+public sealed class EntityKey : IEnumerable<EntityField>
 {
     private readonly FrozenDictionary<string, EntityField> _fields;
 
-    public EntityKey(EntityField[] fields) => _fields = fields.ToFrozenDictionary(k => k.Name);
+    public EntityKey(IEnumerable<EntityField> fields) => _fields = fields.ToFrozenDictionary(k => k.Name);
 
     public IReadOnlyList<string> FieldNames => _fields.Keys;
 
-    public object? this[string fieldName] => _fields[fieldName];
+    public object? this[string fieldName] => _fields[fieldName].Value;
 
-    public bool TryGetValue(string fieldName, out object? value)
+    public bool TryGetFieldValue(string fieldName, out object? value)
     {
         if (!_fields.TryGetValue(fieldName, out var entityField))
         {

@@ -80,7 +80,7 @@ public static class ServiceCollectionExtensions
                     var topic = eventAttribute.Topic ?? messageType.Name;
 
                     var groupedConsumers = consumerMessages.Values.SelectMany(s => s)
-                        .GroupBy(t => t.GetCustomAttribute<EventConsumerAttribute>()?.Queue ?? topic)
+                        .GroupBy(t => t.GetCustomAttribute<EventConsumerAttribute>()?.ConsumerName ?? topic)
                         .ToDictionary(t => t.Key, t => t.ToList());
 
                     foreach (var (queue, consumerTypes) in groupedConsumers)

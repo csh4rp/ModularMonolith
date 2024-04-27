@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
-using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.Entities;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLog.Models;
 
-namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EntityConfigurations;
+namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLog.EntityConfigurations;
 
 public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<AuditLogEntity>
 {
@@ -26,16 +26,18 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
             .HasValueGenerator(typeof(SequentialGuidValueGenerator));
 
         builder.Property(b => b.EntityTypeName)
-            .IsRequired()
-            .HasMaxLength(512);
-
-        builder.Property(b => b.EntityKey)
-            .HasColumnType("jsonb")
+            .HasMaxLength(512)
             .IsRequired();
 
-        builder.Property(b => b.EntityChanges)
-            .HasColumnType("jsonb")
-            .IsRequired();
+        builder.OwnsOne(b => b.EntityKey, b =>
+        {
+            b.ToJson("entity_key");
+        });
+
+        builder.OwnsOne(b => b.EntityChanges, b =>
+        {
+            b.ToJson("entity_changes");
+        });
 
         builder.OwnsOne(b => b.MetaData, b =>
         {

@@ -1,9 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OutputType>library</OutputType>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ModularMonolith.Shared.AuditTrail.EntityFramework\ModularMonolith.Shared.AuditTrail.EntityFramework.csproj" />
     <ProjectReference Include="..\ModularMonolith.Shared.DataAccess\ModularMonolith.Shared.DataAccess.csproj"/>
     <ProjectReference Include="..\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj"/>
   </ItemGroup>

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 
 namespace ModularMonolith.Shared.DataAccess.AudiLog;
 
@@ -12,9 +13,11 @@ public record AuditMetaData
 
     public required string? OperationName { get; init; }
 
-    public required string? TraceId { get; init; }
+    public required ActivityTraceId? TraceId { get; init; }
 
-    public required string? SpanId { get; init; }
+    public required ActivitySpanId? SpanId { get; init; }
 
-    public required string? ParentSpanId { get; init; }
+    public required ActivitySpanId? ParentSpanId { get; init; }
+
+    public required Guid? CorrelationId { get; init; }
 }

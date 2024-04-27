@@ -1,25 +1,30 @@
 ﻿using System.Collections.Immutable;
 using System.Linq.Expressions;
-using System.Net;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.Entities;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLog.Factories;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLog.Models;
 using ModularMonolith.Shared.DataAccess.EventLog;
 using ModularMonolith.Shared.DataAccess.Models;
 using Z.EntityFramework.Plus;
 
-namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres;
+namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLog.Stores;
 
 internal sealed class EventLogStore : IEventLogStore
 {
     private readonly DbContext _dbContext;
+    private readonly EventLogFactory _eventLogFactory;
 
-    public EventLogStore(DbContext dbContext) => _dbContext = dbContext;
+    public EventLogStore(DbContext dbContext, EventLogFactory eventLogFactory)
+    {
+        _dbContext = dbContext;
+        _eventLogFactory = eventLogFactory;
+    }
 
     public Task AddAsync(EventLogEntry entry, CancellationToken cancellationToken = new())
     {
-        var entity = Map(entry);
+        var entity = _eventLogFactory.Create(entry);
+
 
         _dbContext.Set<EventLogEntity>().Add(entity);
         return _dbContext.SaveChangesAsync(cancellationToken);
@@ -28,7 +33,7 @@ internal sealed class EventLogStore : IEventLogStore
     public Task AddRangeAsync(IEnumerable<EventLogEntry> entries,
         CancellationToken cancellationToken = new())
     {
-        var entities = entries.Select(Map);
+        var entities = entries.Select(_eventLogFactory.Create);
 
         _dbContext.Set<EventLogEntity>().AddRange(entities);
         return _dbContext.SaveChangesAsync(cancellationToken);
@@ -51,7 +56,7 @@ internal sealed class EventLogStore : IEventLogStore
         var items = await orderedQueryable.ToListAsync(cancellationToken);
         var totalCount = await totalCountDeferred.FutureValue().ValueAsync(cancellationToken);
 
-        var entries = items.Select(Map).ToImmutableArray();
+        var entries = items.Select(_eventLogFactory.Create).ToImmutableArray();
 
         return new DataPage<EventLogEntry>(entries, totalCount);
     }
@@ -96,54 +101,14 @@ internal sealed class EventLogStore : IEventLogStore
 
             foreach (var eventLogEntity in batch)
             {
-                yield return Map(eventLogEntity);
+                yield return _eventLogFactory.Create(eventLogEntity);
             }
 
             skip += take;
         }
     }
 
-    private static EventLogEntry Map(EventLogEntity entity)
-    {
-        var type = Type.GetType(entity.EventTypeName)!;
 
-        return new EventLogEntry
-        {
-            Id = entity.Id,
-            Timestamp = entity.Timestamp,
-            EventInstance = entity.EventPayload.Deserialize(type)!,
-            EventType = type,
-            MetaData = new EventLogEntryMetaData
-            {
-                Subject = entity.MetaData.Subject,
-                Uri = entity.MetaData.Uri is null ? null : new Uri(entity.MetaData.Uri),
-                IpAddress = entity.MetaData.IpAddress is null ? null : IPAddress.Parse(entity.MetaData.IpAddress),
-                OperationName = entity.MetaData.OperationName,
-                TraceId = entity.MetaData.TraceId,
-                SpanId = entity.MetaData.SpanId,
-                ParentSpanId = entity.MetaData.ParentSpanId
-            }
-        };
-    }
-
-    private static EventLogEntity Map(EventLogEntry entry) =>
-        new()
-        {
-            Id = entry.Id,
-            Timestamp = entry.Timestamp,
-            EventPayload = JsonSerializer.SerializeToDocument(entry.EventInstance),
-            EventTypeName = entry.EventType.FullName!,
-            MetaData = new EventLogEntityMetaData
-            {
-                Subject = entry.MetaData.Subject,
-                Uri = entry.MetaData.Uri?.ToString(),
-                IpAddress = entry.MetaData.IpAddress?.ToString(),
-                OperationName = entry.MetaData.OperationName,
-                TraceId = entry.MetaData.TraceId,
-                SpanId = entry.MetaData.SpanId,
-                ParentSpanId = entry.MetaData.ParentSpanId
-            }
-        };
 
     private Expression<Func<EventLogEntity, object>> MapOrderBy(Expression<Func<EventLogEntry, object>> expression)
     {

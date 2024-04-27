@@ -9,8 +9,13 @@ internal sealed class UnitOfWorkFactory : IUnitOfWorkFactory
 
     public UnitOfWorkFactory(DbContext dbContext) => _dbContext = dbContext;
 
-    public async ValueTask<IUnitOfWork> CreateAsync(CancellationToken cancellationToken)
+    public async Task<IUnitOfWork> CreateAsync(CancellationToken cancellationToken)
     {
+        if (_dbContext.Database.CurrentTransaction is not null)
+        {
+            throw new InvalidOperationException("Transaction is already in place, cannot start another transaction");
+        }
+
         var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
         return new UnitOfWork(transaction);
     }
