@@ -11,10 +11,10 @@ internal sealed class TransactionalMiddleware<TRequest, TResponse>
 {
     private static readonly ConcurrentDictionary<Type, bool> TransactionBehaviourLookup = new();
 
-    private readonly IUnitOfWorkFactory _unitOfWorkFactory;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public TransactionalMiddleware(IUnitOfWorkFactory unitOfWorkFactory) =>
-        _unitOfWorkFactory = unitOfWorkFactory;
+    public TransactionalMiddleware(IUnitOfWork unitOfWork) =>
+        _unitOfWork = unitOfWork;
 
     public async Task<TResponse> Handle(TRequest request,
         RequestHandlerDelegate<TResponse> next,
@@ -46,11 +46,11 @@ internal sealed class TransactionalMiddleware<TRequest, TResponse>
             return await next();
         }
 
-        await using var unitOfWork = await _unitOfWorkFactory.CreateAsync(cancellationToken);
+        await using var scope = await _unitOfWork.BeginScopeAsync(cancellationToken);
 
         var result = await next();
 
-        await unitOfWork.CompleteAsync(cancellationToken);
+        await scope.CompleteAsync(cancellationToken);
 
         return result;
     }

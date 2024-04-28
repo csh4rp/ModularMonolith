@@ -1,6 +1,6 @@
 ﻿namespace ModularMonolith.Shared.Application.Abstract;
 
-public interface IUnitOfWork : IAsyncDisposable
+public interface IUnitOfWork
 {
-    Task CompleteAsync(CancellationToken cancellationToken);
+   Task<IUnitOfWorkScope> BeginScopeAsync(CancellationToken cancellationToken = new());
 }

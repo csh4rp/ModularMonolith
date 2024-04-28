@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.DataAccess.AudiLog;
@@ -12,6 +11,8 @@ namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLog.St
 
 internal sealed class AuditLogStore : IAuditLogStore
 {
+    private const int BatchSize = 1000;
+
     private readonly DbContext _dbContext;
     private readonly AuditLogFactory _auditLogFactory;
 
@@ -30,7 +31,7 @@ internal sealed class AuditLogStore : IAuditLogStore
     }
 
     public Task AddRangeAsync(IEnumerable<AuditLogEntry> entries,
-        CancellationToken cancellationToken = new CancellationToken())
+        CancellationToken cancellationToken)
     {
         var entities = entries.Select(_auditLogFactory.Create);
 
@@ -38,17 +39,15 @@ internal sealed class AuditLogStore : IAuditLogStore
         return _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<DataPage<AuditLogEntry>> FindAsync(Paginator<AuditLogEntry> paginator,
-        AuditLogSearchFilters? filters = null,
-        CancellationToken cancellationToken = new())
+    public async Task<DataPage<AuditLogEntry>> FindAsync(Paginator paginator,
+        AuditLogSearchFilters filters,
+        CancellationToken cancellationToken)
     {
-        var query = filters is null
-            ? _dbContext.Set<AuditLogEntity>().AsNoTracking()
-            : FilterQuery(filters).AsNoTracking();
+        var query = ApplyFilters(filters).AsNoTracking();
 
-        var (orderByExpression, isAsc) = paginator.GetOrderByExpression();
-
-        var orderedQueryable = isAsc ? query.OrderBy(MapOrderBy(orderByExpression)) : query.OrderByDescending(MapOrderBy(orderByExpression));
+        var orderedQueryable = paginator.IsAscending
+            ? query.OrderBy(a => a.Timestamp)
+            : query.OrderByDescending(a => a.Timestamp);
 
         var totalCountDeferred = query.DeferredLongCount();
 
@@ -60,32 +59,28 @@ internal sealed class AuditLogStore : IAuditLogStore
         return new DataPage<AuditLogEntry>(entries, totalCount);
     }
 
-    public async IAsyncEnumerable<AuditLogEntry> FindAllAsync(AuditLogSearchFilters? filters = null,
+    public async IAsyncEnumerable<AuditLogEntry> FindAllAsync(AuditLogSearchFilters filters,
         [EnumeratorCancellation] CancellationToken cancellationToken = new())
     {
-        const int take = 100;
+        var query = ApplyFilters(filters).AsNoTracking();
 
-        var query = filters is null
-            ? _dbContext.Set<AuditLogEntity>().OrderBy(e => e.Timestamp).AsNoTracking()
-            : FilterQuery(filters).OrderBy(e => e.Timestamp).AsNoTracking();
-
-        var batch = await query.Take(take).ToListAsync(cancellationToken);
-        var skip = take;
+        var batch = await query.Take(BatchSize).ToListAsync(cancellationToken);
+        var skip = BatchSize;
 
         while (batch.Count > 0 && !cancellationToken.IsCancellationRequested)
         {
-            batch = await query.Skip(skip).Take(take).ToListAsync(cancellationToken);
+            batch = await query.Skip(skip).Take(BatchSize).ToListAsync(cancellationToken);
 
             foreach (var auditLogEntity in batch)
             {
                 yield return _auditLogFactory.Create(auditLogEntity);
             }
 
-            skip += take;
+            skip += BatchSize;
         }
     }
 
-    private IQueryable<AuditLogEntity> FilterQuery(AuditLogSearchFilters filters)
+    private IQueryable<AuditLogEntity> ApplyFilters(AuditLogSearchFilters filters)
     {
         var query = _dbContext.Set<AuditLogEntity>().AsQueryable();
 
@@ -106,11 +101,4 @@ internal sealed class AuditLogStore : IAuditLogStore
 
         return query;
     }
-
-    private static Expression<Func<AuditLogEntity, object>> MapOrderBy(Expression<Func<AuditLogEntry, object>> expression)
-    {
-
-        return default!;
-    }
-
 }

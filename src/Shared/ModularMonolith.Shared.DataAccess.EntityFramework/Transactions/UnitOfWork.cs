@@ -1,15 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.Application.Abstract;
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.Transactions;
 
-public sealed class UnitOfWork : IUnitOfWork
+internal sealed class UnitOfWork : IUnitOfWork
 {
-    private readonly IDbContextTransaction _transaction;
+    private readonly DbContext _dbContext;
 
-    public UnitOfWork(IDbContextTransaction transaction) => _transaction = transaction;
+    public UnitOfWork(DbContext dbContext) => _dbContext = dbContext;
 
-    public Task CompleteAsync(CancellationToken cancellationToken) => _transaction.CommitAsync(cancellationToken);
+    public async Task<IUnitOfWorkScope> BeginScopeAsync(CancellationToken cancellationToken)
+    {
+        if (_dbContext.Database.CurrentTransaction is not null)
+        {
+            throw new InvalidOperationException("Transaction is already in place, cannot start another transaction");
+        }
 
-    public ValueTask DisposeAsync() => _transaction.DisposeAsync();
+        var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+        return new UnitOfWorkScope(transaction);
+    }
 }

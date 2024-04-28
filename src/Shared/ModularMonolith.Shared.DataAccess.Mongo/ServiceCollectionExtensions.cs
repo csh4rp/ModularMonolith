@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddMongoDataAccess(this IServiceCollection serviceCollection,
         string databaseName)
     {
-        serviceCollection.AddScoped<IUnitOfWorkFactory, UnitOfWorkFactory>()
+        serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>()
             .AddSingleton<IMongoClient>(sp =>
             {
                 var configuration = sp.GetRequiredService<IConfiguration>();

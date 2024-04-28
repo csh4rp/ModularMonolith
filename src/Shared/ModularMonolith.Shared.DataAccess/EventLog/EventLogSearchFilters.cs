@@ -1,10 +1,12 @@
 ﻿namespace ModularMonolith.Shared.DataAccess.EventLog;
 
-public class EventLogSearchFilters
+public sealed record EventLogSearchFilters
 {
-    public DateTimeOffset? FromTimestamp { get; set; }
+    public static readonly EventLogSearchFilters Empty = new();
 
-    public DateTimeOffset? ToTimestamp { get; set; }
+    public DateTimeOffset? FromTimestamp { get; init; }
 
-    public Type? EventType { get; set; }
+    public DateTimeOffset? ToTimestamp { get; init; }
+
+    public Type? EventType { get; init; }
 }

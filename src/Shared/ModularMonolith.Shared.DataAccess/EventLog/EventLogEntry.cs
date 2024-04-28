@@ -1,6 +1,6 @@
 ﻿namespace ModularMonolith.Shared.DataAccess.EventLog;
 
-public record EventLogEntry
+public sealed record EventLogEntry
 {
     public required Guid Id { get; init; }
 

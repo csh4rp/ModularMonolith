@@ -40,7 +40,7 @@ public sealed class AuditLogInterceptor : SaveChangesInterceptor
 
         var store = eventData.Context.GetService<IAuditLogStore>();
 
-        store.AddRangeAsync(logs).GetAwaiter().GetResult();
+        store.AddRangeAsync(logs, CancellationToken.None).GetAwaiter().GetResult();
 
         return result;
     }

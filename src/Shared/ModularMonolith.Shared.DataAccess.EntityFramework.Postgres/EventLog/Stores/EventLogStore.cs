@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLog.Factories;
@@ -12,6 +11,8 @@ namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLog.St
 
 internal sealed class EventLogStore : IEventLogStore
 {
+    private const int BatchSize = 1000;
+
     private readonly DbContext _dbContext;
     private readonly EventLogFactory _eventLogFactory;
 
@@ -21,17 +22,16 @@ internal sealed class EventLogStore : IEventLogStore
         _eventLogFactory = eventLogFactory;
     }
 
-    public Task AddAsync(EventLogEntry entry, CancellationToken cancellationToken = new())
+    public Task AddAsync(EventLogEntry entry, CancellationToken cancellationToken)
     {
         var entity = _eventLogFactory.Create(entry);
-
 
         _dbContext.Set<EventLogEntity>().Add(entity);
         return _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public Task AddRangeAsync(IEnumerable<EventLogEntry> entries,
-        CancellationToken cancellationToken = new())
+        CancellationToken cancellationToken)
     {
         var entities = entries.Select(_eventLogFactory.Create);
 
@@ -39,17 +39,15 @@ internal sealed class EventLogStore : IEventLogStore
         return _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<DataPage<EventLogEntry>> FindAsync(Paginator<EventLogEntry> paginator,
-        EventLogSearchFilters? filters = null,
-        CancellationToken cancellationToken = new())
+    public async Task<DataPage<EventLogEntry>> FindAsync(Paginator paginator,
+        EventLogSearchFilters filters,
+        CancellationToken cancellationToken)
     {
-        var query = filters is null
-            ? _dbContext.Set<EventLogEntity>().AsNoTracking()
-            : FilterQuery(filters).AsNoTracking();
+        var query = ApplyFilters(filters).AsNoTracking();
 
-        var (orderByExpression, isAsc) = paginator.GetOrderByExpression();
-
-        var orderedQueryable = isAsc ? query.OrderBy(MapOrderBy(orderByExpression)) : query.OrderByDescending(MapOrderBy(orderByExpression));
+        var orderedQueryable = paginator.IsAscending
+            ? query.OrderBy(e => e.Timestamp)
+            : query.OrderByDescending(e => e.Timestamp);
 
         var totalCountDeferred = query.DeferredLongCount();
 
@@ -61,7 +59,7 @@ internal sealed class EventLogStore : IEventLogStore
         return new DataPage<EventLogEntry>(entries, totalCount);
     }
 
-    private IQueryable<EventLogEntity> FilterQuery(EventLogSearchFilters filters)
+    private IQueryable<EventLogEntity> ApplyFilters(EventLogSearchFilters filters)
     {
         var query = _dbContext.Set<EventLogEntity>().AsQueryable();
 
@@ -83,35 +81,24 @@ internal sealed class EventLogStore : IEventLogStore
         return query;
     }
 
-    public async IAsyncEnumerable<EventLogEntry> FindAllAsync(EventLogSearchFilters? filters = null,
+    public async IAsyncEnumerable<EventLogEntry> FindAllAsync(EventLogSearchFilters filters,
         [EnumeratorCancellation] CancellationToken cancellationToken = new())
     {
-        const int take = 100;
+        var query = ApplyFilters(filters).OrderBy(e => e.Timestamp).AsNoTracking();
 
-        var query = filters is null
-                ? _dbContext.Set<EventLogEntity>().OrderBy(e => e.Timestamp).AsNoTracking()
-                : FilterQuery(filters).OrderBy(e => e.Timestamp).AsNoTracking();
-
-        var batch = await query.Take(take).ToListAsync(cancellationToken);
-        var skip = take;
+        var batch = await query.Take(BatchSize).ToListAsync(cancellationToken);
+        var skip = BatchSize;
 
         while (batch.Count > 0 && !cancellationToken.IsCancellationRequested)
         {
-            batch = await query.Skip(skip).Take(take).ToListAsync(cancellationToken);
+            batch = await query.Skip(skip).Take(BatchSize).ToListAsync(cancellationToken);
 
             foreach (var eventLogEntity in batch)
             {
                 yield return _eventLogFactory.Create(eventLogEntity);
             }
 
-            skip += take;
+            skip += BatchSize;
         }
-    }
-
-
-
-    private Expression<Func<EventLogEntity, object>> MapOrderBy(Expression<Func<EventLogEntry, object>> expression)
-    {
-        return default!;
     }
 }

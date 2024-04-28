@@ -1,30 +1,23 @@
-﻿using System.Linq.Expressions;
+﻿namespace ModularMonolith.Shared.DataAccess.Models;
 
-namespace ModularMonolith.Shared.DataAccess.Models;
-
-public class Paginator<T>
+public sealed record Paginator
 {
-    private readonly Expression<Func<T, object>> _orderByExpression;
-    private readonly bool _isAscending;
+    private static readonly Paginator Default = new(0, int.MaxValue, true);
 
-    public Paginator(Expression<Func<T, object>> orderByExpression, bool isAscending, long skip, long take)
+    private Paginator(long skip, long take, bool isAscending)
     {
-        _orderByExpression = orderByExpression;
-        _isAscending = isAscending;
         Skip = skip;
         Take = take;
+        IsAscending = isAscending;
     }
 
     public long Skip { get; private set; }
 
     public long Take { get; private set; }
 
-    public (Expression<Func<T, object>> Expression, bool IsAscending) GetOrderByExpression() => (_orderByExpression, _isAscending);
+    public bool IsAscending { get; private set; }
 
-    public static Paginator<T> Ascending(long skip, long take, Expression<Func<T, object>> orderByExpression) =>
-        new(orderByExpression, true, skip, take);
+    public static Paginator Ascending(long skip, long take) => new(skip, take, true);
 
-    public static Paginator<T> Descending(long skip, long take, Expression<Func<T, object>> orderByExpression) =>
-        new(orderByExpression, false, skip, take);
-
+    public static Paginator Descending(long skip, long take) => new(skip, take, false);
 }

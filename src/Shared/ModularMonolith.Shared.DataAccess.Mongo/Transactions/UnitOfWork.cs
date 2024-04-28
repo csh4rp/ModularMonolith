@@ -5,22 +5,13 @@ namespace ModularMonolith.Shared.DataAccess.Mongo.Transactions;
 
 internal sealed class UnitOfWork : IUnitOfWork
 {
-    public static AsyncLocal<UnitOfWork> Current { get; } = new();
+    private readonly IMongoClient _mongoClient;
 
-    private readonly IClientSessionHandle _session;
+    public UnitOfWork(IMongoClient mongoClient) => _mongoClient = mongoClient;
 
-    public UnitOfWork(IClientSessionHandle session)
+    public async ValueTask<IUnitOfWorkScope> CreateAsync(CancellationToken cancellationToken)
     {
-        _session = session;
-        Current.Value = this;
+        var session = await _mongoClient.StartSessionAsync(new ClientSessionOptions(), cancellationToken);
+        return new UnitOfWorkScope(session);
     }
-
-    public ValueTask DisposeAsync()
-    {
-        _session.Dispose();
-        return ValueTask.CompletedTask;
-    }
-
-    public Task CompleteAsync(CancellationToken cancellationToken) =>
-        _session.CommitTransactionAsync(cancellationToken);
 }

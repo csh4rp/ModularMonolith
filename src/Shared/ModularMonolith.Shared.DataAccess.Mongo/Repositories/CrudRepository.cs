@@ -60,7 +60,7 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
 
         try
         {
-            if (UnitOfWork.Current.Value is null)
+            if (UnitOfWorkScope.Current.Value is null)
             {
                 session = await Database.Client.StartSessionAsync(new ClientSessionOptions(), cancellationToken);
                 session.StartTransaction();
