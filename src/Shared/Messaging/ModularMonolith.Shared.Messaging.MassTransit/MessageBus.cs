@@ -7,7 +7,7 @@ using ModularMonolith.Shared.Events;
 using ModularMonolith.Shared.Tracing;
 using EventLogEntry = ModularMonolith.Shared.DataAccess.EventLog.EventLogEntry;
 
-namespace ModularMonolith.Shared.Messaging.EntityFramework;
+namespace ModularMonolith.Shared.Messaging.MassTransit;
 
 internal sealed class MessageBus : IMessageBus
 {
@@ -93,6 +93,8 @@ internal sealed class MessageBus : IMessageBus
         }
 
         await _eventLogStore.AddRangeAsync(eventsToPersist, cancellationToken);
+
+        _logger.EventsPersisted(eventsToPersist.Select(e => e.Id));
 
         foreach (var @event in eventsList)
         {

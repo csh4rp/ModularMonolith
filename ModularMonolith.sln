@@ -89,7 +89,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Data
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.DataAccess.EntityFramework", "src\Shared\ModularMonolith.Shared.DataAccess.EntityFramework\ModularMonolith.Shared.DataAccess.EntityFramework.csproj", "{A2A89BAE-2BCB-4F70-8DF6-0E471924F72A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Messaging.Postgres", "src\Shared\ModularMonolith.Shared.Messaging.Postgres\ModularMonolith.Shared.Messaging.Postgres.csproj", "{42307BA9-5DD2-4301-867B-73F815D2A124}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Messaging.MassTransit.Postgres", "src\Shared\ModularMonolith.Shared.Messaging.MassTransit.Postgres\ModularMonolith.Shared.Messaging.MassTransit.Postgres.csproj", "{42307BA9-5DD2-4301-867B-73F815D2A124}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Events", "src\Shared\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj", "{1C5BDB07-D3B5-48CE-873C-C7C30775CBFC}"
 EndProject
@@ -105,7 +105,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Audi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Infrastructure.DataAccess.Postgres", "src\Infrastructure\ModularMonolith.Infrastructure.DataAccess.Postgres\ModularMonolith.Infrastructure.DataAccess.Postgres.csproj", "{271D9E7E-70AB-491C-A256-E27C48DBB571}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Messaging.SqlServer", "src\Shared\ModularMonolith.Shared.Messaging.SqlServer\ModularMonolith.Shared.Messaging.SqlServer.csproj", "{9964BB44-2B84-4E8F-9A50-86595ABC0411}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Messaging.MassTransit.SqlServer", "src\Shared\ModularMonolith.Shared.Messaging.MassTransit.SqlServer\ModularMonolith.Shared.Messaging.MassTransit.SqlServer.csproj", "{9964BB44-2B84-4E8F-9A50-86595ABC0411}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.AuditTrail.EntityFramework.SqlServer", "src\Shared\ModularMonolith.Shared.AuditTrail.EntityFramework.SqlServer\ModularMonolith.Shared.AuditTrail.EntityFramework.SqlServer.csproj", "{0EF9BDE7-EF11-4A47-94B4-C79A4D062967}"
 EndProject
@@ -149,13 +149,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Audi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Infrastructure.Messaging", "src\Infrastructure\ModularMonolith.Infrastructure.Messaging\ModularMonolith.Infrastructure.Messaging.csproj", "{932B1408-4717-48BD-8D25-21FDB1368368}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Messaging.EntityFramework", "src\Shared\Messaging\ModularMonolith.Shared.Messaging.EntityFramework\ModularMonolith.Shared.Messaging.EntityFramework.csproj", "{4532DBDC-A858-4CDF-BA57-D700B4EFBB1D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Messaging.MassTransit", "src\Shared\Messaging\ModularMonolith.Shared.Messaging.MassTransit\ModularMonolith.Shared.Messaging.MassTransit.csproj", "{4532DBDC-A858-4CDF-BA57-D700B4EFBB1D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Messaging", "src\Shared\Messaging\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj", "{9DB4D546-F00E-4DC5-875D-B85317E0DA7F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tracing", "Tracing", "{DEC15310-10CD-40DB-B91C-A86E0841D70E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Tracing", "src\Shared\ModularMonolith.Shared.Tracing\ModularMonolith.Shared.Tracing.csproj", "{FC028785-165C-476B-A40F-44BE27E36EB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Messaging.MassTransit.Kafka", "src\Shared\Messaging\ModularMonolith.Shared.Messaging.MassTransit.Kafka\ModularMonolith.Shared.Messaging.MassTransit.Kafka.csproj", "{56A7724D-A921-428D-B6FC-1FA844E4CDA0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -237,6 +239,7 @@ Global
 		{9DB4D546-F00E-4DC5-875D-B85317E0DA7F} = {6FCA4809-9F62-4A15-8C76-F1472AC91749}
 		{DEC15310-10CD-40DB-B91C-A86E0841D70E} = {23D97AF7-96F3-49EC-BFE2-CCE1B738FCEE}
 		{FC028785-165C-476B-A40F-44BE27E36EB4} = {DEC15310-10CD-40DB-B91C-A86E0841D70E}
+		{56A7724D-A921-428D-B6FC-1FA844E4CDA0} = {6FCA4809-9F62-4A15-8C76-F1472AC91749}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BBAF6E32-FA5F-4916-9F22-AD58F95D2992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -443,5 +446,9 @@ Global
 		{FC028785-165C-476B-A40F-44BE27E36EB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC028785-165C-476B-A40F-44BE27E36EB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC028785-165C-476B-A40F-44BE27E36EB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56A7724D-A921-428D-B6FC-1FA844E4CDA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56A7724D-A921-428D-B6FC-1FA844E4CDA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56A7724D-A921-428D-B6FC-1FA844E4CDA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56A7724D-A921-428D-B6FC-1FA844E4CDA0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

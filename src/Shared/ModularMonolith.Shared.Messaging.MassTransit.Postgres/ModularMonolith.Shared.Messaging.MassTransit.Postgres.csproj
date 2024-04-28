@@ -6,6 +6,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Messaging\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj" />
     <ProjectReference Include="..\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+﻿using System.Diagnostics;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using ModularMonolith.Shared.Domain.Abstractions;
 using ModularMonolith.Shared.Events;
@@ -9,7 +10,9 @@ public sealed class PublishEventsInterceptor : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
-        var bus = eventData.Context!.GetService<IEventBus>();
+        Debug.Assert(eventData.Context is not null);
+
+        var bus = eventData.Context.GetService<IMessageBus>();
         var events = GetEvents(eventData);
 
         if (events.Count > 0)
@@ -24,7 +27,9 @@ public sealed class PublishEventsInterceptor : SaveChangesInterceptor
         InterceptionResult<int> result,
         CancellationToken cancellationToken = new())
     {
-        var bus = eventData.Context!.GetService<IEventBus>();
+        Debug.Assert(eventData.Context is not null);
+
+        var bus = eventData.Context.GetService<IMessageBus>();
         var events = GetEvents(eventData);
 
         if (events.Count > 0)

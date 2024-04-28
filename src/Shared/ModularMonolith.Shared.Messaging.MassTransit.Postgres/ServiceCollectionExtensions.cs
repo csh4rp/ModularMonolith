@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Events;
 using Npgsql;
 
-namespace ModularMonolith.Shared.Messaging.Postgres;
+namespace ModularMonolith.Shared.Messaging.MassTransit.Postgres;
 
 public static class ServiceCollectionExtensions
 {
@@ -93,6 +93,7 @@ public static class ServiceCollectionExtensions
                             }
 
                             cf.Subscribe(topic);
+                            cf.UseEntityFrameworkOutbox<TDbContext>(context);
                         });
                     }
                 }

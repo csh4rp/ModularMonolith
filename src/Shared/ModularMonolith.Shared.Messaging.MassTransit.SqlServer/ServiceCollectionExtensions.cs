@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Events;
 
-namespace ModularMonolith.Shared.Messaging.SqlServer;
+namespace ModularMonolith.Shared.Messaging.MassTransit.SqlServer;
 
 public static class ServiceCollectionExtensions
 {
@@ -37,12 +37,12 @@ public static class ServiceCollectionExtensions
         {
             c.AddEntityFrameworkOutbox<TDbContext>(o =>
             {
-                o.UsePostgres();
-
+                o.UseSqlServer();
                 o.UseBusOutbox(a =>
                 {
                     a.MessageDeliveryLimit = 10;
                 });
+
             });
 
             c.AddConsumers(assemblies);
