@@ -2,34 +2,16 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using ModularMonolith.Shared.Contracts.Attributes;
 using ModularMonolith.Shared.Events;
-using Npgsql;
 
-namespace ModularMonolith.Shared.Messaging.MassTransit.Postgres;
+namespace ModularMonolith.Shared.Messaging.MassTransit.RabbitMQ;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddPostgresMessaging<TDbContext>(this IServiceCollection serviceCollection,
-        string connectionString,
-        Assembly[] assemblies,
-        string? target = null) where TDbContext : DbContext
+    public static IServiceCollection AddRabbitMQ<TDbContext>(this IServiceCollection serviceCollection,
+        Assembly[] assemblies)
+        where TDbContext : DbContext
     {
-        var connectionStringBuilder = new NpgsqlConnectionStringBuilder(connectionString);
-
-        serviceCollection.AddOptions<SqlTransportOptions>().Configure(options =>
-        {
-            options.Host = connectionStringBuilder.Host;
-            options.Port = connectionStringBuilder.Port;
-            options.Database = connectionStringBuilder.Database;
-            options.Schema = "shared";
-            options.Role = "shared";
-            options.Username = connectionStringBuilder.Username;
-            options.Password = connectionStringBuilder.Password;
-        });
-
-        serviceCollection.AddPostgresMigrationHostedService(true, false);
-
         serviceCollection.AddMassTransit(c =>
         {
             c.AddEntityFrameworkOutbox<TDbContext>(o =>
@@ -42,31 +24,21 @@ public static class ServiceCollectionExtensions
                 });
             });
 
-            c.AddConsumers(t =>
-            {
-                var eventAttribute = t.GetCustomAttribute<EventAttribute>();
-
-                if (eventAttribute is not null && eventAttribute.Target == target)
-                {
-                    return true;
-                }
-
-                var commandAttribute = t.GetCustomAttribute<CommandAttribute>();
-
-                return commandAttribute is not null && commandAttribute.Target == target;
-            }, assemblies);
+            c.AddConsumers(assemblies);
 
             c.AddConfigureEndpointsCallback((context, _, cfg) =>
             {
                 cfg.UseEntityFrameworkOutbox<TDbContext>(context);
             });
 
-            c.UsingPostgres((context, cfg) =>
-            {
-                cfg.AutoStart = true;
-                cfg.UseDbMessageScheduler();
 
-                cfg.MessageTopology.SetEntityNameFormatter(new EventAttributeEntityNameFormatter());
+            c.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host("localhost", "/", h =>
+                {
+                    h.Username("guest");
+                    h.Password("guest");
+                });
 
                 var consumerMessages = assemblies
                     .SelectMany(a => a.GetTypes())
@@ -106,13 +78,14 @@ public static class ServiceCollectionExtensions
                                 cf.ConfigureConsumer(context, consumerType);
                             }
 
-                            cf.Subscribe(topic);
+                            cf.Bind(topic);
                             cf.UseEntityFrameworkOutbox<TDbContext>(context);
                         });
                     }
                 }
-            });
 
+                cfg.ConfigureEndpoints(context);
+            });
         });
 
         return serviceCollection;

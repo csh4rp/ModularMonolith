@@ -2,7 +2,8 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.AuditTrail.EntityFramework.Postgres.EntityConfigurations;
-using ModularMonolith.Shared.Events.EntityFramework.Postgres.EntityConfigurations;
+using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLog;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLog.EntityConfigurations;
 
 namespace ModularMonolith.Infrastructure.DataAccess.Postgres;
 

@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="MassTransit.RabbitMQ" />
+  </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\ModularMonolith.Shared.Messaging.MassTransit\ModularMonolith.Shared.Messaging.MassTransit.csproj" />
+    </ItemGroup>
+</Project>

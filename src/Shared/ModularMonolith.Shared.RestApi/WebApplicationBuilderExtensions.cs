@@ -2,7 +2,6 @@
 using FluentValidation;
 using ModularMonolith.Infrastructure.DataAccess;
 using ModularMonolith.Shared.Application;
-using ModularMonolith.Shared.Events.Mongo;
 using ModularMonolith.Shared.RestApi.Authorization;
 using ModularMonolith.Shared.RestApi.Swagger;
 using ModularMonolith.Shared.RestApi.Telemetry;
@@ -40,11 +39,11 @@ public static class WebApplicationBuilderExtensions
         builder.Services
             .AddDataAccess(builder.Configuration)
             .AddAuth(builder.Configuration)
-        .AddTelemetryWithTracing(builder.Configuration, builder.Environment)
-        .AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true)
-        //     .AddPostgresMessaging<BaseDbContext>(connectionString!, assemblies)
-        .AddMediator(assemblies)
-        .AddEvents(assemblies)
+            .AddTelemetryWithTracing(builder.Configuration, builder.Environment)
+            .AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true)
+            //     .AddPostgresMessaging<BaseDbContext>(connectionString!, assemblies)
+            .AddMediator(assemblies)
+            ;        // .AddEvents(assemblies)
         //     .AddAuditLogs()
         //     .AddIdentityServices()
         //     .AddHttpContextAccessor()

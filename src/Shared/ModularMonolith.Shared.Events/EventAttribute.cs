@@ -9,5 +9,7 @@ public class EventAttribute : Attribute
 
     public string? Topic { get; set; }
 
+    public string? Target { get; set; }
+
     public bool IsPersisted { get; init; }
 }

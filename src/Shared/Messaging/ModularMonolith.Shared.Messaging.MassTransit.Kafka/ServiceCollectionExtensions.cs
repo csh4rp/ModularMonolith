@@ -15,7 +15,6 @@ public static class ServiceCollectionExtensions
         {
             c.AddEntityFrameworkOutbox<TDbContext>(o =>
             {
-                o.
                 o.UsePostgres();
 
                 o.UseBusOutbox(a =>
@@ -33,9 +32,13 @@ public static class ServiceCollectionExtensions
 
             c.AddRider(cfg=>
             {
+                cfg.SetDefaultEndpointNameFormatter();
+
                 cfg.UsingKafka((context, configurator) =>
                 {
                     configurator.Host("");
+
+
 
                     var consumerMessages = assemblies
                         .SelectMany(a => a.GetTypes())

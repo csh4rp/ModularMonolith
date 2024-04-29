@@ -5,5 +5,7 @@ public class EventConsumerAttribute : Attribute
 {
     public string ConsumerName { get; }
 
+    public string? Target { get; set; }
+
     public EventConsumerAttribute(string consumerName) => ConsumerName = consumerName;
 }

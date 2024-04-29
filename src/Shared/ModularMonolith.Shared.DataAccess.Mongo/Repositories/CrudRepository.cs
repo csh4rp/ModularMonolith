@@ -3,9 +3,7 @@ using ModularMonolith.Shared.AuditTrail;
 using ModularMonolith.Shared.AuditTrail.Mongo;
 using ModularMonolith.Shared.AuditTrail.Mongo.Model;
 using ModularMonolith.Shared.AuditTrail.Mongo.Options;
-using ModularMonolith.Shared.DataAccess.Mongo.Transactions;
 using ModularMonolith.Shared.Domain.Abstractions;
-using ModularMonolith.Shared.Events;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
@@ -18,14 +16,12 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
 
     protected CrudRepository(IOptions<AuditTrailOptions> options,
         IMongoDatabase database,
-        IEventBus eventBus,
         IAuditMetaDataProvider auditMetaDataProvider,
         TimeProvider timeProvider)
     {
         _classMap = BsonClassMap.LookupClassMap(typeof(TAggregate));
         Options = options;
         Database = database;
-        EventBus = eventBus;
         AuditMetaDataProvider = auditMetaDataProvider;
         TimeProvider = timeProvider;
     }
@@ -34,7 +30,6 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
 
     protected IMongoDatabase Database { get; }
 
-    protected IEventBus EventBus { get; }
 
     protected IAuditMetaDataProvider AuditMetaDataProvider { get; }
 
@@ -50,7 +45,6 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
         await RunInTransactionAsync(async ct =>
         {
             await Collection.InsertOneAsync(document, new InsertOneOptions(), ct);
-            await EventBus.PublishAsync(events, ct);
         }, cancellationToken);
     }
 
@@ -60,11 +54,11 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
 
         try
         {
-            if (UnitOfWorkScope.Current.Value is null)
-            {
-                session = await Database.Client.StartSessionAsync(new ClientSessionOptions(), cancellationToken);
-                session.StartTransaction();
-            }
+            // if (UnitOfWorkScope.Current.Value is null)
+            // {
+            //     session = await Database.Client.StartSessionAsync(new ClientSessionOptions(), cancellationToken);
+            //     session.StartTransaction();
+            // }
 
             await func(cancellationToken);
 
@@ -88,7 +82,6 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
         await RunInTransactionAsync(async ct =>
         {
             await Collection.InsertManyAsync(documents, new InsertManyOptions(), ct);
-            await EventBus.PublishAsync(events, ct);
         }, cancellationToken);
     }
 
@@ -110,8 +103,6 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
                 document,
                 new ReplaceOptions { IsUpsert = false },
                 cancellationToken: ct);
-
-            await EventBus.PublishAsync(events, ct);
 
             if (result.ModifiedCount == 0)
             {
@@ -148,8 +139,6 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
 
                 events.AddRange(aggregate.DequeueEvents());
             }
-
-            await EventBus.PublishAsync(events, ct);
 
         }, cancellationToken);
     }

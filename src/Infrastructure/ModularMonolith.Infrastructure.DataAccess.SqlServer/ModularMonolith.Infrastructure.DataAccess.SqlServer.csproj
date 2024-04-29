@@ -6,6 +6,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\ModularMonolith.Shared.AuditTrail.EntityFramework.SqlServer\ModularMonolith.Shared.AuditTrail.EntityFramework.SqlServer.csproj" />
-    <ProjectReference Include="..\..\Shared\ModularMonolith.Shared.Events.EntityFramework.SqlServer\ModularMonolith.Shared.Events.EntityFramework.SqlServer.csproj" />
+    <ProjectReference Include="..\..\Shared\ModularMonolith.Shared.DataAccess.EntityFramework.Postgres\ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.csproj" />
+    <ProjectReference Include="..\..\Shared\ModularMonolith.Shared.DataAccess.EntityFramework\ModularMonolith.Shared.DataAccess.EntityFramework.csproj" />
   </ItemGroup>
 </Project>

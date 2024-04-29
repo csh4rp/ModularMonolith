@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLog.Interceptors;
-using ModularMonolith.Shared.Messaging.Interceptors;
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer;
 
@@ -19,7 +18,7 @@ public static class ServiceConnectionExtensions
                 var connectionString = configuration.GetConnectionString("Database");
 
                 optionsBuilder.UseSqlServer(connectionString);
-                optionsBuilder.AddInterceptors(new AuditLogInterceptor(), new PublishEventsInterceptor());
+                optionsBuilder.AddInterceptors(new AuditLogInterceptor());
                 optionsBuilder.UseApplicationServiceProvider(sp);
             }, ServiceLifetime.Scoped);
 

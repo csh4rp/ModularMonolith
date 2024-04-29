@@ -11,4 +11,7 @@
     <ProjectReference Include="..\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj" />
     <ProjectReference Include="..\ModularMonolith.Shared.Events.Mongo\ModularMonolith.Shared.Events.Mongo.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Transactions\" />
+  </ItemGroup>
 </Project>

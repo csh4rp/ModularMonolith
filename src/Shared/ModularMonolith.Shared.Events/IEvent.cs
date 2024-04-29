@@ -2,7 +2,7 @@
 
 public interface IEvent
 {
-    Guid Id { get; }
+    Guid EventId { get; }
 
     DateTimeOffset Timestamp { get; }
 }

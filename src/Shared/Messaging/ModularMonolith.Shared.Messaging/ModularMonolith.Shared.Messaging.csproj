@@ -8,8 +8,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
     <ProjectReference Include="..\..\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj" />
-    <ProjectReference Include="..\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
-    <ProjectReference Include="..\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
-    <ProjectReference Include="..\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj"/>
+    <ProjectReference Include="..\..\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
+    <ProjectReference Include="..\..\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj"/>
   </ItemGroup>
 </Project>

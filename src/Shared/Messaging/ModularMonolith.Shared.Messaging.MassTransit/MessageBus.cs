@@ -47,16 +47,16 @@ internal sealed class MessageBus : IMessageBus
             var entry = CreateEventLogEntry(@event, eventType, operationContext);
             await _eventLogStore.AddAsync(entry, cancellationToken);
 
-            _logger.EventPersisted(eventType.FullName!, @event.Id);
+            _logger.EventPersisted(eventType.FullName!, @event.EventId);
         }
         else
         {
-            _logger.EventPersistenceSkipped(eventType.FullName!, @event.Id);
+            _logger.EventPersistenceSkipped(eventType.FullName!, @event.EventId);
         }
 
         await _publishEndpoint.Publish(@event, eventType, p =>
         {
-            p.MessageId = @event.Id;
+            p.MessageId = @event.EventId;
             p.Headers.Set("timestamp", @event.Timestamp);
             p.Headers.Set("subject", operationContext.Subject);
             p.Headers.Set("trace_id", operationContext.TraceId.ToString());
@@ -64,7 +64,7 @@ internal sealed class MessageBus : IMessageBus
             p.Headers.Set("parent_span_id", operationContext.ParentSpanId.ToString());
         }, cancellationToken);
 
-        _logger.EventPublished(eventType.FullName!, @event.Id);
+        _logger.EventPublished(eventType.FullName!, @event.EventId);
     }
 
     public async Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken)
@@ -84,7 +84,7 @@ internal sealed class MessageBus : IMessageBus
 
             if (eventAttribute?.IsPersisted is not true)
             {
-                _logger.EventPersistenceSkipped(eventType.FullName!, @event.Id);
+                _logger.EventPersistenceSkipped(eventType.FullName!, @event.EventId);
                 continue;
             }
 
@@ -102,7 +102,7 @@ internal sealed class MessageBus : IMessageBus
 
             await _publishEndpoint.Publish(@event, eventType, p =>
             {
-                p.MessageId = @event.Id;
+                p.MessageId = @event.EventId;
                 p.Headers.Set("timestamp", @event.Timestamp);
                 p.Headers.Set("subject", operationContext.Subject);
                 p.Headers.Set("trace_id", operationContext.TraceId.ToString());
@@ -110,14 +110,14 @@ internal sealed class MessageBus : IMessageBus
                 p.Headers.Set("parent_span_id", operationContext.ParentSpanId.ToString());
             }, cancellationToken);
 
-            _logger.EventPublished(eventType.FullName!, @event.Id);
+            _logger.EventPublished(eventType.FullName!, @event.EventId);
         }
     }
 
     private static EventLogEntry CreateEventLogEntry(IEvent @event, Type type, IOperationContext operationContext) =>
         new()
         {
-            Id = @event.Id,
+            Id = @event.EventId,
             Timestamp = @event.Timestamp,
             EventInstance = @event,
             EventType = type,

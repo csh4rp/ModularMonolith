@@ -1,7 +1,9 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Text.Json;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLog.Models;
 using ModularMonolith.Shared.DataAccess.EventLog;
+using EventLogEntry = ModularMonolith.Shared.DataAccess.EventLog.EventLogEntry;
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLog.Factories;
 
@@ -23,10 +25,9 @@ internal sealed class EventLogFactory
                 Uri = entity.MetaData.Uri is null ? null : new Uri(entity.MetaData.Uri),
                 IpAddress = entity.MetaData.IpAddress is null ? null : IPAddress.Parse(entity.MetaData.IpAddress),
                 OperationName = entity.MetaData.OperationName,
-                TraceId = entity.MetaData.TraceId,
-                SpanId = entity.MetaData.SpanId,
-                ParentSpanId = entity.MetaData.ParentSpanId,
-                CorrelationId = entity.MetaData.CorrelationId
+                TraceId = entity.MetaData.TraceId is null ? null : ActivityTraceId.CreateFromString(entity.MetaData.TraceId),
+                SpanId = entity.MetaData.SpanId is null ? null : ActivitySpanId.CreateFromString(entity.MetaData.SpanId),
+                ParentSpanId = entity.MetaData.ParentSpanId is null ? null :  ActivitySpanId.CreateFromString(entity.MetaData.ParentSpanId),
             }
         };
     }
@@ -44,10 +45,9 @@ internal sealed class EventLogFactory
                 Uri = entry.MetaData.Uri?.ToString(),
                 IpAddress = entry.MetaData.IpAddress?.ToString(),
                 OperationName = entry.MetaData.OperationName,
-                TraceId = entry.MetaData.TraceId,
-                SpanId = entry.MetaData.SpanId,
-                ParentSpanId = entry.MetaData.ParentSpanId,
-                CorrelationId = entry.MetaData.CorrelationId
+                TraceId = entry.MetaData.TraceId?.ToString(),
+                SpanId = entry.MetaData.SpanId?.ToString(),
+                ParentSpanId = entry.MetaData.ParentSpanId?.ToString()
             }
         };
 }
