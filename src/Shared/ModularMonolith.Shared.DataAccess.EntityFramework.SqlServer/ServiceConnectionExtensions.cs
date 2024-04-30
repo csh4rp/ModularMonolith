@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLog.Interceptors;
+using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs.Interceptors;
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer;
 

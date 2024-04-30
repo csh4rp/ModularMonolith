@@ -3,6 +3,9 @@ using ModularMonolith.Shared.AuditTrail;
 using ModularMonolith.Shared.AuditTrail.Mongo;
 using ModularMonolith.Shared.AuditTrail.Mongo.Model;
 using ModularMonolith.Shared.AuditTrail.Mongo.Options;
+using ModularMonolith.Shared.DataAccess.Mongo.Outbox.Models;
+using ModularMonolith.Shared.DataAccess.Mongo.Outbox.Options;
+using ModularMonolith.Shared.DataAccess.Mongo.Transactions;
 using ModularMonolith.Shared.Domain.Abstractions;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -14,22 +17,26 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
 {
     private readonly BsonClassMap _classMap;
 
-    protected CrudRepository(IOptions<AuditTrailOptions> options,
+    protected CrudRepository(IOptions<AuditTrailOptions> auditOptions,
+        IOptions<OutboxOptions> outboxOutboxOptions,
         IMongoDatabase database,
         IAuditMetaDataProvider auditMetaDataProvider,
         TimeProvider timeProvider)
     {
         _classMap = BsonClassMap.LookupClassMap(typeof(TAggregate));
-        Options = options;
+        AuditOptions = auditOptions;
+        OutboxOptions = outboxOutboxOptions;
         Database = database;
         AuditMetaDataProvider = auditMetaDataProvider;
         TimeProvider = timeProvider;
     }
 
-    protected IOptions<AuditTrailOptions> Options { get; }
+    protected IOptions<AuditTrailOptions> AuditOptions { get; }
+
+    protected IOptions<OutboxOptions> OutboxOptions { get; }
+
 
     protected IMongoDatabase Database { get; }
-
 
     protected IAuditMetaDataProvider AuditMetaDataProvider { get; }
 
@@ -37,15 +44,36 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
 
     protected virtual IMongoCollection<BsonDocument> Collection => Database.GetCollection<BsonDocument>(_classMap.GetCollectionName());
 
-    public async Task AddAsync(TAggregate aggregate, CancellationToken cancellationToken)
+    protected virtual IMongoCollection<OutboxMessage> OutboxMessageCollection => Database.GetCollection<OutboxMessage>(OutboxOptions.Value.CollectionName);
+
+    public Task AddAsync(TAggregate aggregate, CancellationToken cancellationToken)
     {
         var document = CreateDocument(aggregate);
         var events = aggregate.DequeueEvents();
 
-        await RunInTransactionAsync(async ct =>
+        var outboxMessages = CreateOutboxMessages(events);
+        if (outboxMessages.Count == 0)
         {
-            await Collection.InsertOneAsync(document, new InsertOneOptions(), ct);
+            return Collection.InsertOneAsync(document, new InsertOneOptions(), cancellationToken);
+        }
+
+        return RunInTransactionAsync(async ct =>
+        {
+            await Collection.InsertOneAsync(document, new InsertOneOptions(), cancellationToken);
+            await OutboxMessageCollection.InsertManyAsync(outboxMessages, new InsertManyOptions(), ct);
         }, cancellationToken);
+    }
+
+    private static List<OutboxMessage> CreateOutboxMessages(IEnumerable<DomainEvent> events)
+    {
+        var outboxMessages = events.Select(e => new OutboxMessage
+        {
+            Id = e.EventId,
+            Timestamp = e.Timestamp,
+            MessagePayload = BsonDocument.Create(e),
+            MessageTypeName = e.GetType().FullName!,
+        }).ToList();
+        return outboxMessages;
     }
 
     private async Task RunInTransactionAsync(Func<CancellationToken, Task> func, CancellationToken cancellationToken)
@@ -54,11 +82,11 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
 
         try
         {
-            // if (UnitOfWorkScope.Current.Value is null)
-            // {
-            //     session = await Database.Client.StartSessionAsync(new ClientSessionOptions(), cancellationToken);
-            //     session.StartTransaction();
-            // }
+            if (UnitOfWorkScope.Current.Value is null)
+            {
+                session = await Database.Client.StartSessionAsync(new ClientSessionOptions(), cancellationToken);
+                session.StartTransaction();
+            }
 
             await func(cancellationToken);
 
@@ -73,22 +101,30 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
         }
     }
 
-    public async Task AddAsync(IEnumerable<TAggregate> aggregates, CancellationToken cancellationToken)
+    public Task AddAsync(IEnumerable<TAggregate> aggregates, CancellationToken cancellationToken)
     {
         var aggregatesList = aggregates as IReadOnlyCollection<TAggregate> ?? aggregates.ToList();
         var documents = aggregatesList.Select(CreateDocument).ToList();
         var events = aggregatesList.SelectMany(a => a.DequeueEvents());
 
-        await RunInTransactionAsync(async ct =>
+        var outboxMessages = CreateOutboxMessages(events);
+        if (outboxMessages.Count == 0)
         {
-            await Collection.InsertManyAsync(documents, new InsertManyOptions(), ct);
+            return Collection.InsertManyAsync(documents, new InsertManyOptions(), cancellationToken);
+        }
+
+        return RunInTransactionAsync(async ct =>
+        {
+            await Collection.InsertManyAsync(documents, new InsertManyOptions(), cancellationToken);
+            await OutboxMessageCollection.InsertManyAsync(outboxMessages, new InsertManyOptions(), ct);
         }, cancellationToken);
     }
 
-    public async Task UpdateAsync(TAggregate aggregate, CancellationToken cancellationToken)
+    public Task UpdateAsync(TAggregate aggregate, CancellationToken cancellationToken)
     {
         var document = CreateDocument(aggregate);
         var events = aggregate.DequeueEvents();
+        var outboxMessages = CreateOutboxMessages(events);
 
         var idMemberMap = _classMap.GetMemberMap(nameof(aggregate.Id));
         var versionMemberMap = _classMap.GetMemberMap(nameof(aggregate.Version));
@@ -97,7 +133,18 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
         var versionFilter = Builders<BsonDocument>.Filter.Eq(versionMemberMap.ElementName, aggregate.Version);
         var filter = Builders<BsonDocument>.Filter.And(idFilter, versionFilter);
 
-        await RunInTransactionAsync(async ct =>
+        if (outboxMessages.Count == 0)
+        {
+            return Update(cancellationToken);
+        }
+
+        return RunInTransactionAsync(async ct =>
+        {
+            await Update(ct);
+            await OutboxMessageCollection.InsertManyAsync(outboxMessages, new InsertManyOptions(), ct);
+        }, cancellationToken);
+
+        async Task Update(CancellationToken ct)
         {
             var result = await Collection.ReplaceOneAsync(filter,
                 document,
@@ -108,16 +155,16 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
             {
                 throw new InvalidOperationException("Could not match aggregate version to replace");
             }
-        }, cancellationToken);
+        }
     }
 
-    public async Task UpdateAsync(IEnumerable<TAggregate> aggregates, CancellationToken cancellationToken)
+    public Task UpdateAsync(IEnumerable<TAggregate> aggregates, CancellationToken cancellationToken)
     {
         var versionMemberMap = _classMap.GetMemberMap(nameof(AggregateRoot<int>.Version));
 
-        await RunInTransactionAsync(async ct =>
+        return RunInTransactionAsync(async ct =>
         {
-            var events = new List<DomainEvent>();
+            var messages = new List<OutboxMessage>();
 
             foreach (var aggregate in aggregates)
             {
@@ -137,8 +184,10 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
                     throw new InvalidOperationException("Could not match aggregate version to replace");
                 }
 
-                events.AddRange(aggregate.DequeueEvents());
+                messages.AddRange(CreateOutboxMessages(aggregate.DequeueEvents()));
             }
+
+            await OutboxMessageCollection.InsertManyAsync(messages, new InsertManyOptions(), ct);
 
         }, cancellationToken);
     }
@@ -146,7 +195,7 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
     public async Task RemoveAsync(TAggregate aggregate, CancellationToken cancellationToken)
     {
         var idFilter = Builders<BsonDocument>.Filter.Eq(_classMap.IdMemberMap.ElementName, aggregate.Id);
-        var auditLogCollection = Database.GetCollection<AuditLogEntity>(Options.Value.CollectionName);
+        var auditLogCollection = Database.GetCollection<AuditLogEntity>(AuditOptions.Value.CollectionName);
 
         await RunInTransactionAsync(async ct =>
         {
@@ -181,7 +230,7 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
 
         var idFilter = Builders<BsonDocument>.Filter.In(_classMap.IdMemberMap.ElementName, ids);
         var logs = aggregatesList.Select(a => CreateDeletedAuditLog(a, _classMap.IdMemberMap));
-        var auditLogCollection = Database.GetCollection<AuditLogEntity>(Options.Value.CollectionName);
+        var auditLogCollection = Database.GetCollection<AuditLogEntity>(AuditOptions.Value.CollectionName);
 
         await RunInTransactionAsync(async ct =>
         {

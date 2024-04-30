@@ -137,8 +137,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Data
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer", "src\Shared\ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer\ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.csproj", "{78C52E5D-99C0-4CAA-9654-C77391C04DD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Events.Mongo", "src\Shared\ModularMonolith.Shared.Events.Mongo\ModularMonolith.Shared.Events.Mongo.csproj", "{618FE70C-468E-450B-8687-2913528D18CC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.AuditTrail.Mongo", "src\Shared\ModularMonolith.Shared.AuditTrail.Mongo\ModularMonolith.Shared.AuditTrail.Mongo.csproj", "{D60A2CFF-F919-4782-87EB-F26ABCC902F7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Infrastructure.Messaging", "src\Infrastructure\ModularMonolith.Infrastructure.Messaging\ModularMonolith.Infrastructure.Messaging.csproj", "{932B1408-4717-48BD-8D25-21FDB1368368}"
@@ -225,7 +223,6 @@ Global
 		{858CBC9F-565B-4892-8E07-99E26D5D3093} = {BE90A33A-C3AE-419D-810D-9E30314D1004}
 		{1CFA080E-580D-4267-B3AE-C0FE51A6AB84} = {BE90A33A-C3AE-419D-810D-9E30314D1004}
 		{78C52E5D-99C0-4CAA-9654-C77391C04DD5} = {BE90A33A-C3AE-419D-810D-9E30314D1004}
-		{618FE70C-468E-450B-8687-2913528D18CC} = {94F2F009-63B8-4D3A-B6F6-2B508EE605A8}
 		{D60A2CFF-F919-4782-87EB-F26ABCC902F7} = {ACC627E9-B384-40F8-93D5-A51746B305B9}
 		{932B1408-4717-48BD-8D25-21FDB1368368} = {FE218637-2EC8-4978-ADE4-68C1205A93B3}
 		{4532DBDC-A858-4CDF-BA57-D700B4EFBB1D} = {6FCA4809-9F62-4A15-8C76-F1472AC91749}
@@ -404,10 +401,6 @@ Global
 		{78C52E5D-99C0-4CAA-9654-C77391C04DD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78C52E5D-99C0-4CAA-9654-C77391C04DD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78C52E5D-99C0-4CAA-9654-C77391C04DD5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{618FE70C-468E-450B-8687-2913528D18CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{618FE70C-468E-450B-8687-2913528D18CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{618FE70C-468E-450B-8687-2913528D18CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{618FE70C-468E-450B-8687-2913528D18CC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D60A2CFF-F919-4782-87EB-F26ABCC902F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D60A2CFF-F919-4782-87EB-F26ABCC902F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D60A2CFF-F919-4782-87EB-F26ABCC902F7}.Release|Any CPU.ActiveCfg = Release|Any CPU

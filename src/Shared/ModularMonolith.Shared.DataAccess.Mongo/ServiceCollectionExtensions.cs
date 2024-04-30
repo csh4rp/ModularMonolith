@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ModularMonolith.Shared.Events.Mongo;
+using ModularMonolith.Shared.Application.Abstract;
+using ModularMonolith.Shared.DataAccess.Mongo.Transactions;
 using MongoDB.Driver;
 
 namespace ModularMonolith.Shared.DataAccess.Mongo;
@@ -11,6 +12,7 @@ public static class ServiceCollectionExtensions
         string databaseName)
     {
         serviceCollection
+            .AddScoped<IUnitOfWork, UnitOfWork>()
             .AddSingleton<IMongoClient>(sp =>
             {
                 var configuration = sp.GetRequiredService<IConfiguration>();

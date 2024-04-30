@@ -2,10 +2,10 @@
 using System.Reflection;
 using MassTransit;
 using ModularMonolith.Shared.Contracts;
-using ModularMonolith.Shared.DataAccess.EventLog;
+using ModularMonolith.Shared.DataAccess.EventLogs;
 using ModularMonolith.Shared.Events;
 using ModularMonolith.Shared.Tracing;
-using EventLogEntry = ModularMonolith.Shared.DataAccess.EventLog.EventLogEntry;
+using EventLogEntry = ModularMonolith.Shared.DataAccess.EventLogs.EventLogEntry;
 
 namespace ModularMonolith.Shared.Messaging.MassTransit;
 
