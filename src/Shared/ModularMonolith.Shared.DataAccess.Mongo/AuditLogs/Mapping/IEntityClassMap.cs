@@ -1,4 +1,4 @@
-﻿namespace ModularMonolith.Shared.AuditTrail.Mongo.Mapping;
+﻿namespace ModularMonolith.Shared.DataAccess.Mongo.AuditLogs.Mapping;
 
 public interface IEntityClassMap
 {

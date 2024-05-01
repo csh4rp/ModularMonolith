@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.AuditTrail;
 using ModularMonolith.Shared.AuditTrail.Mongo;
-using ModularMonolith.Shared.AuditTrail.Mongo.Model;
-using ModularMonolith.Shared.AuditTrail.Mongo.Options;
+using ModularMonolith.Shared.DataAccess.Mongo.AuditLogs.Models;
+using ModularMonolith.Shared.DataAccess.Mongo.AuditLogs.Options;
 using ModularMonolith.Shared.DataAccess.Mongo.Outbox.Models;
 using ModularMonolith.Shared.DataAccess.Mongo.Outbox.Options;
 using ModularMonolith.Shared.DataAccess.Mongo.Transactions;
@@ -215,7 +215,7 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
         new()
         {
             Id = Guid.NewGuid(),
-            CreatedAt = TimeProvider.GetUtcNow().UtcDateTime,
+            Timestamp = TimeProvider.GetUtcNow(),
             EntityState = EntityState.Deleted,
             EntityType = typeof(TAggregate).FullName!,
             EntityKeys = new BsonDocument { { idMemberMap.ElementName, idMemberMap.Getter(aggregate).ToString() } },

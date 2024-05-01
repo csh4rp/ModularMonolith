@@ -1,21 +1,26 @@
-﻿using Microsoft.Extensions.Options;
-using ModularMonolith.Shared.AuditTrail.Mongo.Model;
-using ModularMonolith.Shared.AuditTrail.Mongo.Options;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using ModularMonolith.Shared.AuditTrail;
+using ModularMonolith.Shared.AuditTrail.Mongo;
+using ModularMonolith.Shared.DataAccess.Mongo.AuditLogs.Models;
+using ModularMonolith.Shared.DataAccess.Mongo.AuditLogs.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
-namespace ModularMonolith.Shared.AuditTrail.Mongo;
+namespace ModularMonolith.Shared.DataAccess.Mongo.AuditLogs.BackgroundServices;
 
 public class AuditTrailBackgroundService : BackgroundService
 {
     private readonly IMongoDatabase _mongoDatabase;
+    private readonly TimeProvider _timeProvider;
     private readonly IOptionsMonitor<AuditTrailOptions> _optionsMonitor;
 
-    public AuditTrailBackgroundService(IMongoDatabase mongoDatabase, IOptionsMonitor<AuditTrailOptions> optionsMonitor)
+    public AuditTrailBackgroundService(IMongoDatabase mongoDatabase, IOptionsMonitor<AuditTrailOptions> optionsMonitor, TimeProvider timeProvider)
     {
         _mongoDatabase = mongoDatabase;
         _optionsMonitor = optionsMonitor;
+        _timeProvider = timeProvider;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -37,11 +42,15 @@ public class AuditTrailBackgroundService : BackgroundService
                     || change.OperationType == ChangeStreamOperationType.Replace)
                 );
 
+        var startTime = _timeProvider.GetUtcNow().Add(-1 * _optionsMonitor.CurrentValue.ChangeDataCaptureDiff);
+        var startOffset = startTime - DateTimeOffset.UnixEpoch;
+        var startTimestamp = new BsonTimestamp((long)startOffset.TotalSeconds);
+
         using var cursor = await _mongoDatabase.WatchAsync(pipeline, new ChangeStreamOptions
         {
             FullDocument = ChangeStreamFullDocumentOption.WhenAvailable,
-            BatchSize = 100,
-            StartAtOperationTime = new BsonTimestamp(DateTimeOffset.UtcNow.AddHours(-1).ToUnixTimeSeconds())
+            BatchSize = _optionsMonitor.CurrentValue.ChangeDataCaptureBatchSize,
+            StartAtOperationTime = startTimestamp
         }, stoppingToken);
 
         while (await cursor.MoveNextAsync(stoppingToken))
@@ -55,7 +64,7 @@ public class AuditTrailBackgroundService : BackgroundService
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
-                if (!document.BackingDocument.TryGetElement("__audit", out var meteData))
+                if (!document.FullDocument.TryGetElement("__audit", out var meteData))
                 {
                     continue;
                 }
@@ -76,7 +85,7 @@ public class AuditTrailBackgroundService : BackgroundService
                 var auditLog = new AuditLogEntity
                 {
                     Id = Guid.NewGuid(),
-                    CreatedAt = document.ClusterTime.ToUniversalTime(),
+                    Timestamp = _timeProvider.GetUtcNow(),
                     EntityState = state,
                     EntityKeys = document.DocumentKey,
                     EntityType = classMap.ClassType.FullName!,

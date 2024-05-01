@@ -1,14 +1,13 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using ModularMonolith.Shared.AuditTrail;
+using MongoDB.Bson;
 
-namespace ModularMonolith.Shared.AuditTrail.Mongo.Model;
+namespace ModularMonolith.Shared.DataAccess.Mongo.AuditLogs.Models;
 
 public class AuditLogEntity
 {
     public required Guid Id { get; init; }
 
-    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-    public required DateTime CreatedAt { get; init; }
+    public required DateTimeOffset Timestamp { get; init; }
 
     public required string EntityType { get; init; }
 

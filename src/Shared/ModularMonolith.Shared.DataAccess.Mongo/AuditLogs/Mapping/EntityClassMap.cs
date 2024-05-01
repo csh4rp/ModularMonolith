@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson.Serialization;
 
-namespace ModularMonolith.Shared.AuditTrail.Mongo.Mapping;
+namespace ModularMonolith.Shared.DataAccess.Mongo.AuditLogs.Mapping;
 
 public class EntityClassMap<T> : BsonClassMap<T>, IEntityClassMap
 {
