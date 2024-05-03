@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Reflection;
+﻿using System.Reflection;
 using MassTransit;
 using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.DataAccess.EventLogs;
@@ -73,7 +72,6 @@ internal sealed class MessageBus : IMessageBus
 
         var operationContext = _operationContextAccessor.OperationContext;
 
-        Debug.Assert(operationContext is not null);
 
         var eventsToPersist = new List<EventLogEntry>();
 
@@ -114,30 +112,11 @@ internal sealed class MessageBus : IMessageBus
         }
     }
 
-    private static EventLogEntry CreateEventLogEntry(IEvent @event, Type type, IOperationContext operationContext) =>
-        new()
-        {
-            Id = @event.EventId,
-            Timestamp = @event.Timestamp,
-            EventInstance = @event,
-            EventType = type,
-            MetaData = new EventLogEntryMetaData
-            {
-                Subject = operationContext.Subject,
-                Uri = operationContext.Uri,
-                IpAddress = operationContext.IpAddress,
-                OperationName = operationContext.OperationName,
-                TraceId = operationContext.TraceId,
-                SpanId = operationContext.SpanId,
-                ParentSpanId = operationContext.ParentSpanId
-            }
-        };
 
     public async Task SendAsync(ICommand command, CancellationToken cancellationToken)
     {
         var operationContext = _operationContextAccessor.OperationContext;
 
-        Debug.Assert(operationContext is not null);
 
         await _sendEndpoint.Send(command, command.GetType(), p =>
         {

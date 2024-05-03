@@ -7,6 +7,5 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ModularMonolith.Infrastructure.DataAccess.SqlServer\ModularMonolith.Infrastructure.DataAccess.SqlServer.csproj" />
   </ItemGroup>
 </Project>

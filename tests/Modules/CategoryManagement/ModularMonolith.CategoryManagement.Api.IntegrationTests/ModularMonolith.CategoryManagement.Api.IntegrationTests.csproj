@@ -19,8 +19,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Infrastructure\ModularMonolith.Infrastructure.Migrations.Postgres\ModularMonolith.Infrastructure.Migrations.Postgres.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Infrastructure\Postgres\ModularMonolith.Infrastructure.Migrations.Postgres\ModularMonolith.Infrastructure.Migrations.Postgres.csproj" />
     <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.RestApi\ModularMonolith.CategoryManagement.RestApi.csproj" />
     <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.TestUtils\ModularMonolith.Shared.TestUtils.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Shared\Utils\ModularMonolith.Shared.TestUtils\ModularMonolith.Shared.TestUtils.csproj" />
   </ItemGroup>
 
   <ItemGroup>

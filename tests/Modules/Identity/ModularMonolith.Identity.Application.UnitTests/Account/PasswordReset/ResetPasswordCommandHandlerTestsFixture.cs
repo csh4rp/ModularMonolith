@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using ModularMonolith.Identity.Application.Account.PasswordReset;
 using ModularMonolith.Identity.Application.UnitTests.Account.Shared;
 using ModularMonolith.Identity.Domain.Users;
+using ModularMonolith.Shared.Events;
 using ModularMonolith.Shared.Messaging;
 using NSubstitute;
 
@@ -40,5 +41,5 @@ internal sealed class ResetPasswordCommandHandlerTestsFixture
     public Task AssertThatPasswordResetEventWasPublished() => _messageBus.Received(1)
         .PublishAsync(Arg.Is<PasswordResetEvent>(u => u.UserId == _user!.Id), Arg.Any<CancellationToken>());
 
-    public Task AssertThatNoEventWasPublished() => _messageBus.DidNotReceiveWithAnyArgs().PublishAsync(default!, default);
+    public Task AssertThatNoEventWasPublished() => _messageBus.DidNotReceiveWithAnyArgs().PublishAsync(Arg.Any<IEvent>(), default);
 }

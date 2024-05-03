@@ -19,5 +19,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Infrastructure\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj" />
     <ProjectReference Include="..\..\..\src\Infrastructure\ModularMonolith.Infrastructure.Migrations.Postgres\ModularMonolith.Infrastructure.Migrations.Postgres.csproj" />
+    <ProjectReference Include="..\..\..\src\Infrastructure\Postgres\ModularMonolith.Infrastructure.Migrations.Postgres\ModularMonolith.Infrastructure.Migrations.Postgres.csproj" />
   </ItemGroup>
 </Project>

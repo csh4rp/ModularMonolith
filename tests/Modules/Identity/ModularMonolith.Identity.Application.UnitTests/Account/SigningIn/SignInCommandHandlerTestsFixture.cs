@@ -3,6 +3,7 @@ using ModularMonolith.Identity.Application.Account.SigningIn;
 using ModularMonolith.Identity.Application.UnitTests.Account.Shared;
 using ModularMonolith.Identity.Core.Options;
 using ModularMonolith.Identity.Domain.Users;
+using ModularMonolith.Shared.Events;
 using ModularMonolith.Shared.Messaging;
 using NSubstitute;
 
@@ -48,5 +49,5 @@ internal sealed class SignInCommandHandlerTestsFixture
     public Task AssertThatSignInFailedEventWasPublished() => _messageBus.Received(1)
         .PublishAsync(Arg.Is<SignInFailedEvent>(u => u.UserId == _user!.Id), Arg.Any<CancellationToken>());
 
-    public Task AssertThatNoEventWasPublished() => _messageBus.DidNotReceiveWithAnyArgs().PublishAsync(default!, default);
+    public Task AssertThatNoEventWasPublished() => _messageBus.DidNotReceiveWithAnyArgs().PublishAsync(Arg.Any<IEvent>(), default);
 }

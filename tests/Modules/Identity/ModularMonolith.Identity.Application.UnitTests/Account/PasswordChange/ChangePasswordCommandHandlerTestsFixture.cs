@@ -2,6 +2,7 @@
 using ModularMonolith.Identity.Application.Account.PasswordChange;
 using ModularMonolith.Identity.Application.UnitTests.Account.Shared;
 using ModularMonolith.Identity.Domain.Users;
+using ModularMonolith.Shared.Events;
 using ModularMonolith.Shared.Identity;
 using ModularMonolith.Shared.Messaging;
 using NSubstitute;
@@ -43,5 +44,5 @@ internal sealed class ChangePasswordCommandHandlerTestsFixture
         .PublishAsync(Arg.Is<PasswordChangedEvent>(c => c.UserId == _user!.Id), Arg.Any<CancellationToken>());
 
     public Task AssertThatNoEventWasPublished() => _eventBus.DidNotReceiveWithAnyArgs()
-        .PublishAsync(default!, default);
+        .PublishAsync(Arg.Any<IEvent>(), default);
 }

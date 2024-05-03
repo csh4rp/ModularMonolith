@@ -6,4 +6,9 @@
     <ProjectReference Include="..\ModularMonolith.Shared.DataAccess.EntityFramework\ModularMonolith.Shared.DataAccess.EntityFramework.csproj" />
     <ProjectReference Include="..\..\Messaging\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Z.EntityFramework.Plus.EFCore">
+      <HintPath>..\..\..\..\..\..\..\.nuget\packages\z.entityframework.plus.efcore\8.102.2.1\lib\net8.0\Z.EntityFramework.Plus.EFCore.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

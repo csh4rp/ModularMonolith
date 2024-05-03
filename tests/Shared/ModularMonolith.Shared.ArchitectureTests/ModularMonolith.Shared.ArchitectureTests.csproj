@@ -20,10 +20,10 @@
     <ProjectReference Include="..\..\..\src\Modules\Identity\ModularMonolith.Identity.Core\ModularMonolith.Identity.Core.csproj"/>
     <ProjectReference Include="..\..\..\src\Modules\Identity\ModularMonolith.Identity.Domain\ModularMonolith.Identity.Domain.csproj"/>
     <ProjectReference Include="..\..\..\src\Modules\Identity\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj"/>
-    <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj" />
-    <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
-    <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
-    <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
+    <ProjectReference Include="..\..\..\src\Shared\Api\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj" />
+    <ProjectReference Include="..\..\..\src\Shared\Common\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
+    <ProjectReference Include="..\..\..\src\Shared\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
+    <ProjectReference Include="..\..\..\src\Shared\Common\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
   </ItemGroup>
 
 </Project>

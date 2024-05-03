@@ -14,6 +14,8 @@
     <ProjectReference Include="..\..\..\..\src\Infrastructure\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj" />
     <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Application\ModularMonolith.CategoryManagement.Application.csproj"/>
     <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Infrastructure\ModularMonolith.CategoryManagement.Infrastructure.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Shared\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Shared\Common\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj" />
     <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.TestUtils\ModularMonolith.Shared.TestUtils.csproj"/>
   </ItemGroup>
 

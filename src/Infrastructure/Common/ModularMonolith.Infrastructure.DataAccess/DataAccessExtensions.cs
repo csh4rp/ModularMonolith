@@ -14,8 +14,8 @@ public static class DataAccessExtensions
         IConfiguration configuration)
     {
         var dataAccessSection = configuration.GetSection("DataAccess");
-        var provider = dataAccessSection.GetValue<string>("Provider");
-        var dbName = dataAccessSection.GetValue<string>("DatabaseName") ?? "modular_monolith";
+        var provider = dataAccessSection.GetSection("Provider").Value;
+        var dbName = dataAccessSection.GetSection("DatabaseName").Value ?? "modular_monolith";
 
         switch (provider)
         {
