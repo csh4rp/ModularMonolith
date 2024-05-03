@@ -7,7 +7,7 @@
     <PackageReference Include="MediatR"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Api\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj" />
     <ProjectReference Include="..\ModularMonolith.Identity.Application\ModularMonolith.Identity.Application.csproj"/>
     <ProjectReference Include="..\ModularMonolith.Identity.Contracts\ModularMonolith.Identity.Contracts.csproj"/>
     <ProjectReference Include="..\ModularMonolith.Identity.Core\ModularMonolith.Identity.Core.csproj"/>

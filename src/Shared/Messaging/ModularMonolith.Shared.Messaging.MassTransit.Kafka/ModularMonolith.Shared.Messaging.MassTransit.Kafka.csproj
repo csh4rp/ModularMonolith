@@ -7,8 +7,7 @@
         <PackageReference Include="MassTransit.Kafka" />
     </ItemGroup>
       <ItemGroup>
-        <ProjectReference Include="..\..\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj" />
-        <ProjectReference Include="..\..\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj" />
-        <ProjectReference Include="..\..\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj" />
+        <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj" />
+        <ProjectReference Include="..\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj" />
       </ItemGroup>
 </Project>

@@ -3,22 +3,22 @@ using Microsoft.Extensions.Logging;
 using ModularMonolith.Identity.Contracts.Account.PasswordReset;
 using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Shared.Application.Commands;
-using ModularMonolith.Shared.Events;
+using ModularMonolith.Shared.Messaging;
 
 namespace ModularMonolith.Identity.Application.Account.PasswordReset;
 
 internal sealed class InitializePasswordResetCommandHandler : ICommandHandler<InitializePasswordResetCommand>
 {
     private readonly UserManager<User> _userManager;
-    private readonly IEventBus _eventBus;
+    private readonly IMessageBus _messageBus;
     private readonly ILogger<InitializePasswordResetCommandHandler> _logger;
 
     public InitializePasswordResetCommandHandler(UserManager<User> userManager,
-        IEventBus eventBus,
+        IMessageBus messageBus,
         ILogger<InitializePasswordResetCommandHandler> logger)
     {
         _userManager = userManager;
-        _eventBus = eventBus;
+        _messageBus = messageBus;
         _logger = logger;
     }
 
@@ -32,6 +32,6 @@ internal sealed class InitializePasswordResetCommandHandler : ICommandHandler<In
             return;
         }
 
-        await _eventBus.PublishAsync(new PasswordResetInitializedEvent(user.Id), cancellationToken);
+        await _messageBus.PublishAsync(new PasswordResetInitializedEvent(user.Id), cancellationToken);
     }
 }

@@ -6,10 +6,9 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
-    <ProjectReference Include="..\..\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj" />
-    <ProjectReference Include="..\..\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
-    <ProjectReference Include="..\..\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
-    <ProjectReference Include="..\..\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj"/>
+    <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj" />
+    <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
   </ItemGroup>
 </Project>

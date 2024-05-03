@@ -4,8 +4,8 @@ using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts.Errors;
-using ModularMonolith.Shared.Events;
 using ModularMonolith.Shared.Identity;
+using ModularMonolith.Shared.Messaging;
 
 namespace ModularMonolith.Identity.Application.Account.PasswordChange;
 
@@ -13,15 +13,15 @@ internal sealed class ChangePasswordCommandHandler : ICommandHandler<ChangePassw
 {
     private readonly UserManager<User> _userManager;
     private readonly IIdentityContextAccessor _identityContextAccessor;
-    private readonly IEventBus _eventBus;
+    private readonly IMessageBus _messageBus;
 
     public ChangePasswordCommandHandler(UserManager<User> userManager,
         IIdentityContextAccessor identityContextAccessor,
-        IEventBus eventBus)
+        IMessageBus messageBus)
     {
         _userManager = userManager;
         _identityContextAccessor = identityContextAccessor;
-        _eventBus = eventBus;
+        _messageBus = messageBus;
     }
 
     public async Task Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
@@ -32,7 +32,7 @@ internal sealed class ChangePasswordCommandHandler : ICommandHandler<ChangePassw
 
         if (result.Succeeded)
         {
-            await _eventBus.PublishAsync(new PasswordChangedEvent(user!.Id), cancellationToken);
+            await _messageBus.PublishAsync(new PasswordChangedEvent(user!.Id), cancellationToken);
             return;
         }
 

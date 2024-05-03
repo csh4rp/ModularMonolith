@@ -8,24 +8,24 @@ using ModularMonolith.Identity.Contracts.Account.SigningIn;
 using ModularMonolith.Identity.Core.Options;
 using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Shared.Application.Commands;
-using ModularMonolith.Shared.Events;
+using ModularMonolith.Shared.Messaging;
 
 namespace ModularMonolith.Identity.Application.Account.SigningIn;
 
 internal sealed class SignInCommandHandler : ICommandHandler<SignInCommand, SignInResponse>
 {
     private readonly UserManager<User> _userManager;
-    private readonly IEventBus _eventBus;
+    private readonly IMessageBus _messageBus;
     private readonly IOptions<AuthOptions> _options;
     private readonly TimeProvider _timeProvider;
 
     public SignInCommandHandler(UserManager<User> userManager,
-        IEventBus eventBus,
+        IMessageBus messageBus,
         IOptions<AuthOptions> options,
         TimeProvider timeProvider)
     {
         _userManager = userManager;
-        _eventBus = eventBus;
+        _messageBus = messageBus;
         _options = options;
         _timeProvider = timeProvider;
     }
@@ -41,7 +41,7 @@ internal sealed class SignInCommandHandler : ICommandHandler<SignInCommand, Sign
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
         if (!isPasswordValid)
         {
-            await _eventBus.PublishAsync(new SignInFailedEvent(user.Id), cancellationToken);
+            await _messageBus.PublishAsync(new SignInFailedEvent(user.Id), cancellationToken);
 
             return SignInResponse.InvalidCredentials();
         }
@@ -62,7 +62,7 @@ internal sealed class SignInCommandHandler : ICommandHandler<SignInCommand, Sign
 
         var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
 
-        await _eventBus.PublishAsync(new SignInSucceededEvent(user.Id), cancellationToken);
+        await _messageBus.PublishAsync(new SignInSucceededEvent(user.Id), cancellationToken);
 
         return SignInResponse.Succeeded(tokenValue);
     }

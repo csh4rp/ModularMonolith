@@ -1,11 +1,10 @@
 ﻿using System.Diagnostics;
-using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using ModularMonolith.Shared.AuditTrail;
-using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLog.Factories;
-using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLog.Interceptors;
+using ModularMonolith.Shared.DataAccess.AudiLogs;
+using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs.Factories;
+using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs.Interceptors;
 using ModularMonolith.Shared.Identity;
 using ModularMonolith.Shared.Infrastructure.IntegrationTests.AuditLogs.Entities;
 using NSubstitute;

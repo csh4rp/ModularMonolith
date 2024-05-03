@@ -4,19 +4,19 @@ using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts.Errors;
-using ModularMonolith.Shared.Events;
+using ModularMonolith.Shared.Messaging;
 
 namespace ModularMonolith.Identity.Application.Account.Registration;
 
 internal sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand>
 {
     private readonly UserManager<User> _userManager;
-    private readonly IEventBus _eventBus;
+    private readonly IMessageBus _messageBus;
 
-    public RegisterCommandHandler(UserManager<User> userManager, IEventBus eventBus)
+    public RegisterCommandHandler(UserManager<User> userManager, IMessageBus messageBus)
     {
         _userManager = userManager;
-        _eventBus = eventBus;
+        _messageBus = messageBus;
     }
 
     public async Task Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -40,6 +40,6 @@ internal sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand>
                 nameof(request.Password)));
         }
 
-        await _eventBus.PublishAsync(new UserRegisteredEvent(user.Id, user.Email), cancellationToken);
+        await _messageBus.PublishAsync(new UserRegisteredEvent(user.Id, user.Email), cancellationToken);
     }
 }

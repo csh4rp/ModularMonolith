@@ -2,8 +2,8 @@
 using ModularMonolith.Identity.Application.Account.PasswordChange;
 using ModularMonolith.Identity.Application.UnitTests.Account.Shared;
 using ModularMonolith.Identity.Domain.Users;
-using ModularMonolith.Shared.Events;
 using ModularMonolith.Shared.Identity;
+using ModularMonolith.Shared.Messaging;
 using NSubstitute;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.PasswordChange;
@@ -12,7 +12,7 @@ internal sealed class ChangePasswordCommandHandlerTestsFixture
 {
     private readonly FakeUserManager _userManager = Substitute.For<FakeUserManager>();
     private readonly IIdentityContextAccessor _identityContextAccessor = Substitute.For<IIdentityContextAccessor>();
-    private readonly IEventBus _eventBus = Substitute.For<IEventBus>();
+    private readonly IMessageBus _eventBus = Substitute.For<IMessageBus>();
 
     private User? _user;
     private string? _password;

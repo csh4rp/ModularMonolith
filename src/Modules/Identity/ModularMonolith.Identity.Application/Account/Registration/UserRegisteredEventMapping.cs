@@ -8,5 +8,9 @@ namespace ModularMonolith.Identity.Application.Account.Registration;
 internal sealed class UserRegisteredEventMapping : IEventMapping<UserRegisteredEvent>
 {
     public IntegrationEvent Map(UserRegisteredEvent @event) =>
-        new UserRegisteredIntegrationEvent(@event.OccurredAt, @event.UserId, @event.Email);
+        new UserRegisteredIntegrationEvent(@event.UserId, @event.Email)
+        {
+            EventId = @event.EventId,
+            Timestamp = @event.Timestamp
+        };
 }

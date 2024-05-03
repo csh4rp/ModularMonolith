@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ModularMonolith.Identity.Domain.Users;
+using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs;
 
 namespace ModularMonolith.Identity.Infrastructure.Account.EntityConfigurations;
 

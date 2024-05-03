@@ -26,7 +26,14 @@ public static class DataAccessExtensions
                 serviceCollection.AddPostgresDataAccess<PostgresDbContext>();
                 break;
             case "Mongo":
-                serviceCollection.AddMongoDataAccess(dbName);
+                serviceCollection.AddMongoDataAccess(c =>
+                {
+                    
+                },
+                a =>
+                {
+                    
+                });
                 break;
         }
 
