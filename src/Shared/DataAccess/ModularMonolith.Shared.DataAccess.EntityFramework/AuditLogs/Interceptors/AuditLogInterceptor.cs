@@ -7,7 +7,7 @@ using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs.Factories;
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs.Interceptors;
 
-public sealed class AuditLogInterceptor : SaveChangesInterceptor
+public class AuditLogInterceptor : SaveChangesInterceptor
 {
     public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData,
         InterceptionResult<int> result,

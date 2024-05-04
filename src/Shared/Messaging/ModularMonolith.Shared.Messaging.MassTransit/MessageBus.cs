@@ -1,8 +1,10 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using MassTransit;
 using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.DataAccess.EventLogs;
 using ModularMonolith.Shared.Events;
+using ModularMonolith.Shared.Messaging.MassTransit.Factories;
 using ModularMonolith.Shared.Tracing;
 using EventLogEntry = ModularMonolith.Shared.DataAccess.EventLogs.EventLogEntry;
 
@@ -14,6 +16,7 @@ internal sealed class MessageBus : IMessageBus
     private readonly ISendEndpoint _sendEndpoint;
     private readonly IOperationContextAccessor _operationContextAccessor;
     private readonly IEventLogStore _eventLogStore;
+    private readonly EventLogEntryFactory _eventLogEntryFactory;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<MessageBus> _logger;
 
@@ -21,6 +24,7 @@ internal sealed class MessageBus : IMessageBus
         ISendEndpoint sendEndpoint,
         IOperationContextAccessor operationContextAccessor,
         IEventLogStore eventLogStore,
+        EventLogEntryFactory eventLogEntryFactory,
         TimeProvider timeProvider,
         ILogger<MessageBus> logger)
     {
@@ -28,6 +32,7 @@ internal sealed class MessageBus : IMessageBus
         _sendEndpoint = sendEndpoint;
         _operationContextAccessor = operationContextAccessor;
         _eventLogStore = eventLogStore;
+        _eventLogEntryFactory = eventLogEntryFactory;
         _timeProvider = timeProvider;
         _logger = logger;
     }
@@ -35,7 +40,6 @@ internal sealed class MessageBus : IMessageBus
     public async Task PublishAsync(IEvent @event, CancellationToken cancellationToken)
     {
         var operationContext = _operationContextAccessor.OperationContext;
-
         Debug.Assert(operationContext is not null);
 
         var eventType = @event.GetType();
@@ -43,7 +47,7 @@ internal sealed class MessageBus : IMessageBus
 
         if (eventAttribute?.IsPersisted is true)
         {
-            var entry = CreateEventLogEntry(@event, eventType, operationContext);
+            var entry = _eventLogEntryFactory.Create(@event);
             await _eventLogStore.AddAsync(entry, cancellationToken);
 
             _logger.EventPersisted(eventType.FullName!, @event.EventId);
@@ -71,7 +75,7 @@ internal sealed class MessageBus : IMessageBus
         var eventsList = events as IReadOnlyCollection<IEvent> ?? events.ToList();
 
         var operationContext = _operationContextAccessor.OperationContext;
-
+        Debug.Assert(operationContext is not null);
 
         var eventsToPersist = new List<EventLogEntry>();
 
@@ -86,7 +90,7 @@ internal sealed class MessageBus : IMessageBus
                 continue;
             }
 
-            var entry = CreateEventLogEntry(@event, eventType, operationContext);
+            var entry = _eventLogEntryFactory.Create(@event);
             eventsToPersist.Add(entry);
         }
 
@@ -116,7 +120,7 @@ internal sealed class MessageBus : IMessageBus
     public async Task SendAsync(ICommand command, CancellationToken cancellationToken)
     {
         var operationContext = _operationContextAccessor.OperationContext;
-
+        Debug.Assert(operationContext is not null);
 
         await _sendEndpoint.Send(command, command.GetType(), p =>
         {

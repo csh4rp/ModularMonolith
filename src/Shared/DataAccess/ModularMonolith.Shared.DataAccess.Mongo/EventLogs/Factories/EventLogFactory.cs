@@ -18,8 +18,7 @@ internal sealed class EventLogFactory
         {
             Id = entity.Id,
             Timestamp = entity.Timestamp,
-            EventType = type,
-            EventInstance = BsonSerializer.Deserialize(entity.EventPayload, type),
+            Instance = BsonSerializer.Deserialize(entity.EventPayload, type),
             MetaData = new EventLogEntryMetaData
             {
                 Subject = entity.MetaData.Subject,
@@ -42,8 +41,8 @@ internal sealed class EventLogFactory
         {
             Id = entry.Id,
             Timestamp = entry.Timestamp,
-            EventTypeName = entry.EventType.FullName!,
-            EventPayload = BsonDocument.Create(entry.EventInstance),
+            EventTypeName = entry.Instance.GetType().FullName!,
+            EventPayload = BsonDocument.Create(entry.Instance),
             MetaData = new EventLogEntityMetaData
             {
                 Subject = entry.MetaData.Subject,

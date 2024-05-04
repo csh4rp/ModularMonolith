@@ -6,9 +6,7 @@ public sealed record EventLogEntry
 
     public required DateTimeOffset Timestamp { get; init; }
 
-    public required Type EventType { get; init; }
-
-    public required object EventInstance { get; init; }
+    public required object Instance { get; init; }
 
     public required EventLogEntryMetaData MetaData { get; init; }
 }

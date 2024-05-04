@@ -5,14 +5,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Modules\CategoryManagement\ModularMonolith.CategoryManagement.RestApi\ModularMonolith.CategoryManagement.RestApi.csproj" />
-    <ProjectReference Include="..\..\Modules\Identity\ModularMonolith.Identity.RestApi\ModularMonolith.Identity.RestApi.csproj" />
-    <ProjectReference Include="..\..\Modules\Identity\ModularMonolith.Identity.Application\ModularMonolith.Identity.Application.csproj"/>
-    <ProjectReference Include="..\..\Modules\Identity\ModularMonolith.Identity.Contracts\ModularMonolith.Identity.Contracts.csproj"/>
-    <ProjectReference Include="..\..\Modules\Identity\ModularMonolith.Identity.Core\ModularMonolith.Identity.Core.csproj"/>
-    <ProjectReference Include="..\..\Modules\Identity\ModularMonolith.Identity.Domain\ModularMonolith.Identity.Domain.csproj"/>
-    <ProjectReference Include="..\..\Modules\Identity\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj"/>
-    <ProjectReference Include="..\..\Shared\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
-    <ProjectReference Include="..\..\Infrastructure\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj" />
+    <ProjectReference Include="..\..\Shared\Api\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj" />
   </ItemGroup>
 </Project>

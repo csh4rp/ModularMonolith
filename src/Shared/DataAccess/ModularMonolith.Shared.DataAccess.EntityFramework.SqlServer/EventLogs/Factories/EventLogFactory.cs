@@ -17,8 +17,7 @@ internal sealed class EventLogFactory
         {
             Id = entity.Id,
             Timestamp = entity.Timestamp,
-            EventInstance = JsonSerializer.Deserialize(entity.EventPayload, type)!,
-            EventType = type,
+            Instance = JsonSerializer.Deserialize(entity.EventPayload, type)!,
             MetaData = new EventLogEntryMetaData
             {
                 Subject = entity.MetaData.Subject,
@@ -37,8 +36,8 @@ internal sealed class EventLogFactory
         {
             Id = entry.Id,
             Timestamp = entry.Timestamp,
-            EventPayload = JsonSerializer.Serialize(entry.EventInstance),
-            EventTypeName = entry.EventType.FullName!,
+            EventPayload = JsonSerializer.Serialize(entry.Instance),
+            EventTypeName = entry.Instance.GetType().FullName!,
             MetaData = new EventLogEntityMetaData
             {
                 Subject = entry.MetaData.Subject,

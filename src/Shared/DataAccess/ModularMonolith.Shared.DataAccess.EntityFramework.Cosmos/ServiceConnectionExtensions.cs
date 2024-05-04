@@ -1,32 +1,29 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs.Interceptors;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Cosmos.Factories;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Cosmos.Options;
 using ModularMonolith.Shared.DataAccess.EntityFramework.EventLogs.Interceptors;
-using ModularMonolith.Shared.DataAccess.EntityFramework.Options;
-using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.Factories;
 
-namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres;
+namespace ModularMonolith.Shared.DataAccess.EntityFramework.Cosmos;
 
 public static class ServiceConnectionExtensions
 {
-    public static IServiceCollection AddPostgresDataAccess<TDbContext>(this IServiceCollection serviceCollection,
-        Action<EntityFrameworkDataAccessOptions> optionsSetup)
+    public static IServiceCollection AddCosmosDataAccess<TDbContext>(this IServiceCollection serviceCollection,
+        Action<CosmosOptions> optionsSetup)
         where TDbContext : DbContext
     {
-        serviceCollection.AddOptionsWithValidateOnStart<EntityFrameworkDataAccessOptions>()
+        serviceCollection.AddOptionsWithValidateOnStart<CosmosOptions>()
             .PostConfigure(optionsSetup);
 
         serviceCollection
-            .AddScoped<PostgresConnectionFactory>()
+            .AddScoped<CosmosClientFactory>()
             .AddEntityFrameworkDataAccess()
             .AddDbContextFactory<TDbContext>((serviceProvider, optionsBuilder) =>
             {
-                var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-                var options = serviceProvider.GetRequiredService<IOptions<EntityFrameworkDataAccessOptions>>().Value;
-                var connectionString = configuration.GetConnectionString(options.ConnectionStringName);
+                var options = serviceProvider.GetRequiredService<IOptions<CosmosOptions>>().Value;
 
                 var interceptors = new List<IInterceptor>();
                 if (options.UseAuditLogInterceptor)
@@ -44,7 +41,30 @@ public static class ServiceConnectionExtensions
                     optionsBuilder.UseSnakeCaseNamingConvention();
                 }
 
-                optionsBuilder.UseNpgsql(connectionString);
+                if (options.TokenCredential is not null)
+                {
+                    optionsBuilder.UseCosmos(options.AccountEndpoint,
+                        options.TokenCredential,
+                        options.DatabaseName,
+                        c =>
+                        {
+
+                        });
+                }
+                else if (options.AccountKey is not null)
+                {
+                    optionsBuilder.UseCosmos(options.AccountEndpoint,
+                        options.AccountKey,
+                        options.DatabaseName, c =>
+                        {
+
+                        });
+                }
+                else
+                {
+                    ArgumentNullException.ThrowIfNull(options.AccountKey);
+                }
+
                 optionsBuilder.AddInterceptors(interceptors);
                 optionsBuilder.UseApplicationServiceProvider(serviceProvider);
             }, ServiceLifetime.Scoped);

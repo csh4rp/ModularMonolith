@@ -4,6 +4,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\Common\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj" />
-    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
   </ItemGroup>
 </Project>

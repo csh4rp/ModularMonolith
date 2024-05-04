@@ -1,9 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Bogus"/>
     <PackageReference Include="EFCore.NamingConventions"/>
@@ -16,8 +14,6 @@
     <PackageReference Include="Verify.Http"/>
     <PackageReference Include="Verify.Xunit"/>
   </ItemGroup>
-
-
   <ItemGroup>
     <EmbeddedResource Include="Account\SigningIn\Requests\SignIn.InvalidPassword.json" />
     <EmbeddedResource Include="Account\SigningIn\Requests\SignIn.Valid.json" />
@@ -62,7 +58,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\Infrastructure\ModularMonolith.Infrastructure.Migrations.Postgres\ModularMonolith.Infrastructure.Migrations.Postgres.csproj" />
     <ProjectReference Include="..\..\..\..\src\Infrastructure\Postgres\ModularMonolith.Infrastructure.Migrations.Postgres\ModularMonolith.Infrastructure.Migrations.Postgres.csproj" />
     <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.RestApi\ModularMonolith.Identity.RestApi.csproj" />
     <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj"/>

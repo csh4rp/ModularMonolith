@@ -38,8 +38,6 @@ public static class ServiceCollectionExtensions
                 {
                     configurator.Host("");
 
-
-
                     var consumerMessages = assemblies
                         .SelectMany(a => a.GetTypes())
                         .Where(t => t.IsAssignableTo(typeof(IConsumer)))

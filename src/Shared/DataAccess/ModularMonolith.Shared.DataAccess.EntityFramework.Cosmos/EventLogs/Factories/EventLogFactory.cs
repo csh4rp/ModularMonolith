@@ -1,12 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
-using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLog.Models;
-using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLogs.Models;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Cosmos.EventLogs.Models;
 using ModularMonolith.Shared.DataAccess.EventLogs;
 using EventLogEntry = ModularMonolith.Shared.DataAccess.EventLogs.EventLogEntry;
 
-namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLogs.Factories;
+namespace ModularMonolith.Shared.DataAccess.EntityFramework.Cosmos.EventLogs.Factories;
 
 internal sealed class EventLogFactory
 {
@@ -18,7 +17,7 @@ internal sealed class EventLogFactory
         {
             Id = entity.Id,
             Timestamp = entity.Timestamp,
-            Instance = entity.EventPayload.Deserialize(type)!,
+            Instance = JsonSerializer.Deserialize(entity.EventPayload, type)!,
             MetaData = new EventLogEntryMetaData
             {
                 Subject = entity.MetaData.Subject,
@@ -37,7 +36,7 @@ internal sealed class EventLogFactory
         {
             Id = entry.Id,
             Timestamp = entry.Timestamp,
-            EventPayload = JsonSerializer.SerializeToDocument(entry.Instance),
+            EventPayload = JsonSerializer.Serialize(entry.Instance),
             EventTypeName = entry.Instance.GetType().FullName!,
             MetaData = new EventLogEntityMetaData
             {
