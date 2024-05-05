@@ -139,6 +139,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Data
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Messaging.MassTransit.Postgres", "src\Shared\Messaging\ModularMonolith.Shared.Messaging.MassTransit.Postgres\ModularMonolith.Shared.Messaging.MassTransit.Postgres.csproj", "{DDCD7DE8-7F89-4C2B-9E2B-A34ADAF10EE4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.DataAccess.Cosmos", "src\Shared\DataAccess\ModularMonolith.Shared.DataAccess.Cosmos\ModularMonolith.Shared.DataAccess.Cosmos.csproj", "{EA401287-BA22-40F8-B418-7011926C62F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -210,6 +212,7 @@ Global
 		{BDAB7348-639B-4223-8E65-A7BA34AD31CC} = {2C1A8162-911B-430E-93BB-9975001E9996}
 		{01256FB0-14BE-431A-9D5A-AEF8E128C092} = {BE90A33A-C3AE-419D-810D-9E30314D1004}
 		{DDCD7DE8-7F89-4C2B-9E2B-A34ADAF10EE4} = {6FCA4809-9F62-4A15-8C76-F1472AC91749}
+		{EA401287-BA22-40F8-B418-7011926C62F3} = {BE90A33A-C3AE-419D-810D-9E30314D1004}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BBAF6E32-FA5F-4916-9F22-AD58F95D2992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -388,5 +391,9 @@ Global
 		{DDCD7DE8-7F89-4C2B-9E2B-A34ADAF10EE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDCD7DE8-7F89-4C2B-9E2B-A34ADAF10EE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDCD7DE8-7F89-4C2B-9E2B-A34ADAF10EE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA401287-BA22-40F8-B418-7011926C62F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA401287-BA22-40F8-B418-7011926C62F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA401287-BA22-40F8-B418-7011926C62F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA401287-BA22-40F8-B418-7011926C62F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

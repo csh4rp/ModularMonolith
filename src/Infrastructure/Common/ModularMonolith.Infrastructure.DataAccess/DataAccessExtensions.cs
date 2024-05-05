@@ -15,24 +15,31 @@ public static class DataAccessExtensions
     {
         var dataAccessSection = configuration.GetSection("DataAccess");
         var provider = dataAccessSection.GetSection("Provider").Value;
-        var dbName = dataAccessSection.GetSection("DatabaseName").Value ?? "modular_monolith";
 
         switch (provider)
         {
             case "SqlServer":
-                serviceCollection.AddSqlServerDataAccess<SqlServerDbContext>();
+                serviceCollection.AddSqlServerDataAccess<SqlServerDbContext>(options =>
+                {
+                    options.UseAuditLogInterceptor = true;
+                    options.UseEventLogInterceptor = true;
+                    options.ConnectionStringName = "Database";
+                });
                 break;
             case "Postgres":
-                serviceCollection.AddPostgresDataAccess<PostgresDbContext>();
+                serviceCollection.AddPostgresDataAccess<PostgresDbContext>(options =>
+                {
+                    options.UseAuditLogInterceptor = true;
+                    options.UseEventLogInterceptor = true;
+                    options.ConnectionStringName = "Database";
+                });
                 break;
             case "Mongo":
-                serviceCollection.AddMongoDataAccess(c =>
+                serviceCollection.AddMongoDataAccess(options =>
                 {
-                    
-                },
-                a =>
-                {
-                    
+                    options.ConnectionStringName = "Database";
+                    options.AuditLogOptions.CollectionName = "audit_logs";
+                    options.AuditLogOptions.ChangeDataCaptureDiff
                 });
                 break;
         }

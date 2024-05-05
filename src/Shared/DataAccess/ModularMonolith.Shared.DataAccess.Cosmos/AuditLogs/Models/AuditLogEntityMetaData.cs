@@ -1,4 +1,4 @@
-﻿namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.Models;
+﻿namespace ModularMonolith.Shared.DataAccess.Cosmos.AuditLogs.Models;
 
 public record AuditLogEntityMetaData
 {

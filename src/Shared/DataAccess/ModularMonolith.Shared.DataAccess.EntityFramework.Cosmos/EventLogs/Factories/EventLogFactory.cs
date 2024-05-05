@@ -37,7 +37,9 @@ internal sealed class EventLogFactory
             Id = entry.Id,
             Timestamp = entry.Timestamp,
             EventPayload = JsonSerializer.Serialize(entry.Instance),
-            EventTypeName = entry.Instance.GetType().FullName!,
+            EventTypeName = entry.Instance.GetType()
+                .FullName!,
+            PartitionKey = entry.Instance.GetType().Name,
             MetaData = new EventLogEntityMetaData
             {
                 Subject = entry.MetaData.Subject,
@@ -47,6 +49,6 @@ internal sealed class EventLogFactory
                 TraceId = entry.MetaData.TraceId?.ToString(),
                 SpanId = entry.MetaData.SpanId?.ToString(),
                 ParentSpanId = entry.MetaData.ParentSpanId?.ToString()
-            }
+            },
         };
 }
