@@ -13,7 +13,7 @@ namespace ModularMonolith.Shared.DataAccess.Cosmos.Repositories;
 
 public abstract class CrudRepository<TAggregate, TId> where TAggregate : AggregateRoot<TId> where TId : IEquatable<TId>
 {
-    protected EntityMapping<TAggregate> Mmapping { get; }
+    protected EntityMapping<TAggregate> Mapping { get; }
 
     protected CosmosClient CosmosClient;
 
@@ -31,8 +31,8 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
         OutboxMessageFactory = outboxMessageFactory;
         AuditMetaDataProvider = auditMetaDataProvider;
         Options = options;
-        Mmapping = EntityMapping.Get<TAggregate>();
-        Container = CosmosClient.GetContainer(Options.Value.DatabaseId, Mmapping.Container);
+        Mapping = EntityMapping.Get<TAggregate>();
+        Container = CosmosClient.GetContainer(Options.Value.DatabaseId, Mapping.Container);
     }
 
     public virtual async Task AddAsync(TAggregate aggregate, CancellationToken cancellationToken)
@@ -41,12 +41,12 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
 
         var document = new CosmosDocument(aggregate);
 
-        if (Mmapping.IsAuditEnabled)
+        if (Mapping.IsAuditEnabled)
         {
             document.SetAuditMetaData(AuditMetaDataProvider.GetMetaData());
         }
 
-        var batch = Container.CreateTransactionalBatch(Mmapping.GetPartitionKey(aggregate))
+        var batch = Container.CreateTransactionalBatch(Mapping.GetPartitionKey(aggregate))
             .CreateItem(aggregate, new TransactionalBatchItemRequestOptions());
 
         foreach (var domainEvent in events)
@@ -72,7 +72,7 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
 
         foreach (var aggregate in aggregates)
         {
-            var currentPartitionKey = Mmapping.GetPartitionKey(aggregate);
+            var currentPartitionKey = Mapping.GetPartitionKey(aggregate);
 
             if (partitionKey != default && partitionKey != currentPartitionKey)
             {
@@ -80,7 +80,7 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
             }
 
             var document = new CosmosDocument(aggregate);
-            if (Mmapping.IsAuditEnabled)
+            if (Mapping.IsAuditEnabled)
             {
                 document.SetAuditMetaData(AuditMetaDataProvider.GetMetaData());
             }
@@ -116,12 +116,12 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
 
         var document = new CosmosDocument(aggregate);
 
-        if (Mmapping.IsAuditEnabled)
+        if (Mapping.IsAuditEnabled)
         {
             document.SetAuditMetaData(AuditMetaDataProvider.GetMetaData());
         }
 
-        var batch = Container.CreateTransactionalBatch(Mmapping.GetPartitionKey(aggregate))
+        var batch = Container.CreateTransactionalBatch(Mapping.GetPartitionKey(aggregate))
             .UpsertItem(aggregate, new TransactionalBatchItemRequestOptions
             {
                 IfMatchEtag = aggregate.Version.ToString()
@@ -143,7 +143,7 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
 
     public virtual async Task RemoveAsync(TAggregate aggregate, CancellationToken cancellationToken)
     {
-        var response = await Container.DeleteItemAsync<TAggregate>(aggregate.Id.ToString(), Mmapping.GetPartitionKey(aggregate),
+        var response = await Container.DeleteItemAsync<TAggregate>(aggregate.Id.ToString(), Mapping.GetPartitionKey(aggregate),
             new ItemRequestOptions(), cancellationToken);
 
         if (response.StatusCode != HttpStatusCode.OK)
@@ -172,7 +172,7 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
         return enumerator.Current;
     }
 
-    private Container GetContainer() => CosmosClient.GetContainer(Options.Value.DatabaseId, Mmapping.Container);
+    private Container GetContainer() => CosmosClient.GetContainer(Options.Value.DatabaseId, Mapping.Container);
 
     public virtual async Task<List<TAggregate>> FindAllByIdsAsync(IEnumerable<TId> ids, CancellationToken cancellationToken)
     {

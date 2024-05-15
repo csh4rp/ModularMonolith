@@ -2,6 +2,9 @@
     <PropertyGroup>
       <OutputType>library</OutputType>
     </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MassTransit"/>
+  </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
       <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj" />

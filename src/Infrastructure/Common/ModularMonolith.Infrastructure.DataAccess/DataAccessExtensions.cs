@@ -39,7 +39,6 @@ public static class DataAccessExtensions
                 {
                     options.ConnectionStringName = "Database";
                     options.AuditLogOptions.CollectionName = "audit_logs";
-                    options.AuditLogOptions.ChangeDataCaptureDiff
                 });
                 break;
         }
