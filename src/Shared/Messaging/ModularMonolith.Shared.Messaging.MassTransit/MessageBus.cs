@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using MassTransit;
+using Microsoft.Extensions.Logging;
 using ModularMonolith.Shared.Contracts;
 using ModularMonolith.Shared.DataAccess.EventLogs;
 using ModularMonolith.Shared.Events;

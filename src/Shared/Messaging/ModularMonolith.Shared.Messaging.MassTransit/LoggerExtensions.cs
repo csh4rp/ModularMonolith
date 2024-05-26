@@ -1,4 +1,6 @@
-﻿namespace ModularMonolith.Shared.Messaging.MassTransit;
+﻿using Microsoft.Extensions.Logging;
+
+namespace ModularMonolith.Shared.Messaging.MassTransit;
 
 public static partial class LoggerExtensions
 {

@@ -1,13 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
       <ItemGroup>
-        <PackageReference Include="MassTransit"/>
-        <PackageReference Include="MassTransit.EntityFrameworkCore"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
         <PackageReference Include="MassTransit.Kafka" />
+        <PackageReference Include="MassTransit.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
     </ItemGroup>
       <ItemGroup>
-        <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj" />
-        <ProjectReference Include="..\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj" />
+        <ProjectReference Include="..\ModularMonolith.Shared.Messaging.MassTransit\ModularMonolith.Shared.Messaging.MassTransit.csproj" />
       </ItemGroup>
 </Project>

@@ -3,6 +3,7 @@ using ModularMonolith.CategoryManagement.Application.Categories.Shared;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Modification;
 using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts.Errors;
+using Xunit;
 
 namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.Modification;
 

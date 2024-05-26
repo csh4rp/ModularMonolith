@@ -6,19 +6,12 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore"/>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
     <PackageReference Include="NSubstitute"/>
-    <PackageReference Include="NSubstitute.Analyzers.CSharp"/>
     <PackageReference Include="Respawn"/>
     <PackageReference Include="Respawn.Postgres"/>
     <PackageReference Include="Testcontainers.PostgreSql"/>
-    <PackageReference Update="NSubstitute.Analyzers.CSharp">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Infrastructure\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj" />
-    <ProjectReference Include="..\..\..\src\Infrastructure\ModularMonolith.Infrastructure.Migrations.Postgres\ModularMonolith.Infrastructure.Migrations.Postgres.csproj" />
     <ProjectReference Include="..\..\..\src\Infrastructure\Postgres\ModularMonolith.Infrastructure.Migrations.Postgres\ModularMonolith.Infrastructure.Migrations.Postgres.csproj" />
   </ItemGroup>
 </Project>

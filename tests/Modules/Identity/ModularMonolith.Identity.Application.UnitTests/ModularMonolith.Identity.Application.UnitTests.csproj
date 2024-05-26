@@ -9,10 +9,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory"/>
     <PackageReference Include="MockQueryable.NSubstitute"/>
     <PackageReference Include="NSubstitute"/>
-    <PackageReference Include="NSubstitute.Analyzers.CSharp">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Deletion;
 using ModularMonolith.Shared.Application.Exceptions;
+using Xunit;
 
 namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.Deletion;
 

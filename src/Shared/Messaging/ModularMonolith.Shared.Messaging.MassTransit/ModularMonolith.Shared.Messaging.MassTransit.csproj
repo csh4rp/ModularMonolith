@@ -1,15 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-    <PropertyGroup>
-      <OutputType>library</OutputType>
-    </PropertyGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <ItemGroup>
-    <PackageReference Include="MassTransit"/>
+    <PackageReference Include="MassTransit.Abstractions"/>
   </ItemGroup>
+
     <ItemGroup>
-      <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
       <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj" />
       <ProjectReference Include="..\..\DataAccess\ModularMonolith.Shared.DataAccess\ModularMonolith.Shared.DataAccess.csproj" />
-      <ProjectReference Include="..\..\Identity\ModularMonolith.Shared.Identity\ModularMonolith.Shared.Identity.csproj" />
       <ProjectReference Include="..\..\Tracing\ModularMonolith.Shared.Tracing\ModularMonolith.Shared.Tracing.csproj" />
       <ProjectReference Include="..\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj" />
     </ItemGroup>
