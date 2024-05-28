@@ -10,14 +10,17 @@ internal sealed class EventLogEntryFactory
 {
     private readonly IOperationContextAccessor _operationContextAccessor;
 
-    public EventLogEntryFactory(IOperationContextAccessor operationContextAccessor) =>
+    public EventLogEntryFactory(IOperationContextAccessor operationContextAccessor)
+    {
         _operationContextAccessor = operationContextAccessor;
+    }
 
     public EventLogEntry Create(IEvent @event)
     {
         var operationContext = _operationContextAccessor.OperationContext;
+        
         Debug.Assert(operationContext is not null);
-
+        
         return new()
         {
             Id = @event.EventId,
@@ -33,7 +36,7 @@ internal sealed class EventLogEntryFactory
                 SpanId = operationContext.SpanId,
                 ParentSpanId = operationContext.ParentSpanId
             }
-        };
+        };   
     }
 
 }
