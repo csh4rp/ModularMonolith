@@ -6,6 +6,10 @@ namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.Integration
 
 public class AuditLogDbContext : DbContext
 {
+    public AuditLogDbContext(DbContextOptions options) : base(options)
+    {
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         var firstEntityBuilder = modelBuilder.Entity<FirstTestEntity>();
@@ -21,7 +25,6 @@ public class AuditLogDbContext : DbContext
                 j => j.HasKey("FirstTestEntityId", "SecondTestEntityId"));
         
         firstEntityBuilder.Property(x => x.Timestamp).AuditIgnore();
-        
         
         var secondEntityBuilder = modelBuilder.Entity<SecondTestEntity>();
         secondEntityBuilder.ToTable("SecondTestEntity");
