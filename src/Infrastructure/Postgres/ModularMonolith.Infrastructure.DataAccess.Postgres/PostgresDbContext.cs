@@ -11,8 +11,12 @@ public sealed class PostgresDbContext : DbContext
 {
     private const string SharedSchemaName = "shared";
 
-    public PostgresDbContext(DbContextOptions<DbContext> options) : base(options)
+    private readonly IReadOnlyCollection<Assembly> _configurationAssemblies;
+
+    public PostgresDbContext(DbContextOptions<DbContext> options, IReadOnlyCollection<Assembly> configurationAssemblies)
+        : base(options)
     {
+        _configurationAssemblies = configurationAssemblies;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,18 +29,22 @@ public sealed class PostgresDbContext : DbContext
             c.ToTable("inbox_state", SharedSchemaName);
             c.AuditIgnore();
         });
+
         modelBuilder.AddOutboxStateEntity(c =>
         {
             c.ToTable("outbox_state", SharedSchemaName);
             c.AuditIgnore();
         });
+
         modelBuilder.AddOutboxMessageEntity(c =>
         {
             c.ToTable("outbox_message", SharedSchemaName);
             c.AuditIgnore();
         });
 
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.Load("ModularMonolith.CategoryManagement.Infrastructure"));
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.Load("ModularMonolith.Identity.Infrastructure"));
+        foreach (var configurationAssembly in _configurationAssemblies)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(configurationAssembly);
+        }
     }
 }

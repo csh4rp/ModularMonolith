@@ -19,6 +19,6 @@ public record AuditMetaData
 
     public required ActivitySpanId? ParentSpanId { get; init; }
     
-    public required Dictionary<string, object> ExtraData { get; init; }
+    // public required List<KeyValuePair<string, string>> ExtraData { get; init; }
     
 }

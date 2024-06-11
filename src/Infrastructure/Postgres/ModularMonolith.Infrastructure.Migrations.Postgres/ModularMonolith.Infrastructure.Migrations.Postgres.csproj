@@ -6,6 +6,10 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.EntityFrameworkCore"/>
       <PackageReference Include="EFCore.NamingConventions"/>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\ModularMonolith.Infrastructure.DataAccess.Postgres\ModularMonolith.Infrastructure.DataAccess.Postgres.csproj" />

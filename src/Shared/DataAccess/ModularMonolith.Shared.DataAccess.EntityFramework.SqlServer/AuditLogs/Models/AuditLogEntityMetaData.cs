@@ -15,5 +15,6 @@ public record AuditLogEntityMetaData
     public required string? SpanId { get; init; }
 
     public required string? ParentSpanId { get; init; }
-    public required Dictionary<string, object> ExtraData { get; init; }
+    
+    // public required Dictionary<string, object> ExtraData { get; init; }
 }

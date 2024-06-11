@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.EntityConfigurations;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.Models;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.IntegrationTests.AuditLogs.Entities;
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.IntegrationTests.AuditLogs;
@@ -9,6 +11,8 @@ public class AuditLogDbContext : DbContext
     public AuditLogDbContext(DbContextOptions options) : base(options)
     {
     }
+    
+    public DbSet<AuditLogEntity> AuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -19,10 +23,9 @@ public class AuditLogDbContext : DbContext
         
         firstEntityBuilder.HasMany(b => b.SecondTestEntities)
             .WithMany(b => b.FirstTestEntities)
-            .UsingEntity("FirstSecondTestEntity",
-                    l => l.HasOne(typeof(FirstTestEntity)).WithMany().HasForeignKey("FirstTestEntityId").HasPrincipalKey(nameof(FirstTestEntity.Id)),
-                r => r.HasOne(typeof(SecondTestEntity)).WithMany().HasForeignKey("SecondTestEntityId").HasPrincipalKey(nameof(SecondTestEntity.Id)),
-                j => j.HasKey("FirstTestEntityId", "SecondTestEntityId"));
+            .UsingEntity<Dictionary<string, object>>("FirstSecondTestEntity",
+                    l => l.HasOne<SecondTestEntity>().WithMany().HasForeignKey("SecondTestEntityId"),
+                r => r.HasOne<FirstTestEntity>().WithMany().HasForeignKey("FirstTestEntityId"));
         
         firstEntityBuilder.Property(x => x.Timestamp).AuditIgnore();
         
@@ -30,5 +33,7 @@ public class AuditLogDbContext : DbContext
         secondEntityBuilder.ToTable("SecondTestEntity");
         secondEntityBuilder.HasKey(x => x.Id);;
         secondEntityBuilder.AuditIgnore();
+
+        modelBuilder.ApplyConfiguration(new AuditLogEntityTypeConfiguration());
     }
 }

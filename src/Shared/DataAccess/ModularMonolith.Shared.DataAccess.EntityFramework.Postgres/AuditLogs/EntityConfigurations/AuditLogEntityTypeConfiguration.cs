@@ -29,12 +29,12 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
             .HasMaxLength(512)
             .IsRequired();
 
-        builder.OwnsOne(b => b.EntityKey, b =>
+        builder.OwnsMany(b => b.EntityKey, b =>
         {
             b.ToJson("entity_key");
         });
 
-        builder.OwnsOne(b => b.EntityChanges, b =>
+        builder.OwnsMany(b => b.EntityChanges, b =>
         {
             b.ToJson("entity_changes");
         });
@@ -42,6 +42,7 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
         builder.OwnsOne(b => b.MetaData, b =>
         {
             b.ToJson("meta_data");
+            // b.OwnsMany(p => p.ExtraData);
         });
 
         builder.HasIndex(b => b.Timestamp);

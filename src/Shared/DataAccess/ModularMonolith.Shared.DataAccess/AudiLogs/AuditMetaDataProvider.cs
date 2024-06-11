@@ -40,7 +40,7 @@ public class AuditMetaDataProvider : IAuditMetaDataProvider
             Uri = _httpContextAccessor.HttpContext is null 
                 ? null 
                 : new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl()),
-            ExtraData = extraData
+            // ExtraData = extraData
         };
     }
 

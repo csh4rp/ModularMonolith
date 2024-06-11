@@ -1,3 +1,3 @@
 ﻿namespace ModularMonolith.Shared.DataAccess.AudiLogs;
 
-public sealed record EntityField(string Name, object? Value);
+public sealed record EntityField(string Name, string? Value);

@@ -29,12 +29,12 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
             .HasMaxLength(512)
             .IsRequired();
 
-        builder.OwnsOne(b => b.EntityKey, b =>
+        builder.OwnsMany(b => b.EntityKey, b =>
         {
             b.ToJson(nameof(AuditLogEntity.EntityKey));
         });
 
-        builder.OwnsOne(b => b.EntityChanges, b =>
+        builder.OwnsMany(b => b.EntityChanges, b =>
         {
             b.ToJson(nameof(AuditLogEntity.EntityChanges));
         });

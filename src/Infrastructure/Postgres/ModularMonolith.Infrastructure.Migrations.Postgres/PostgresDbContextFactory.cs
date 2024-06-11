@@ -9,6 +9,12 @@ public class PostgresDbContextFactory : IDesignTimeDbContextFactory<PostgresDbCo
 {
     public PostgresDbContext CreateDbContext(string[] args)
     {
+        if (args.Length == 0)
+        {
+            throw new ArgumentException(
+                "Connection string is required. Usage: dotnet ef migrations add <MigrationName> -- <ConnectionString>");
+        }
+        
         var optionsBuilder = new DbContextOptionsBuilder<DbContext>();
 
         optionsBuilder.UseNpgsql(args[0], b =>
@@ -20,6 +26,6 @@ public class PostgresDbContextFactory : IDesignTimeDbContextFactory<PostgresDbCo
 
         var options = optionsBuilder.Options;
 
-        return new PostgresDbContext(options);
+        return new PostgresDbContext(options, []);
     }
 }

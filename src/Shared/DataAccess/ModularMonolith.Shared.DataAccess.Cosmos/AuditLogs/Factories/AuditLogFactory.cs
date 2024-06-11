@@ -54,7 +54,7 @@ public class AuditLogFactory
             ParentSpanId =
                 entity.MetaData.ParentSpanId is null
                     ? null : ActivitySpanId.CreateFromString(entity.MetaData.ParentSpanId),
-            ExtraData = entity.MetaData.ExtraData
+            // ExtraData = entity.MetaData.ExtraData
         }
     };
 }

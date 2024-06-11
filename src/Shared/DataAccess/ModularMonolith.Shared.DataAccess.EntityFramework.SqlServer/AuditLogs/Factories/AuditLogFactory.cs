@@ -24,7 +24,7 @@ internal sealed class AuditLogFactory
             TraceId = entry.MetaData.TraceId?.ToString(),
             SpanId = entry.MetaData.SpanId?.ToString(),
             ParentSpanId = entry.MetaData.ParentSpanId?.ToString(),
-            ExtraData = entry.MetaData.ExtraData
+            // ExtraData = entry.MetaData.ExtraData
         }
     };
 
@@ -49,7 +49,7 @@ internal sealed class AuditLogFactory
                 TraceId = entity.MetaData.TraceId is null ? null : ActivityTraceId.CreateFromString(entity.MetaData.TraceId),
                 SpanId = entity.MetaData.SpanId is null ? null : ActivitySpanId.CreateFromString(entity.MetaData.SpanId),
                 ParentSpanId = entity.MetaData.ParentSpanId is null ? null : ActivitySpanId.CreateFromString(entity.MetaData.ParentSpanId),
-                ExtraData = entity.MetaData.ExtraData
+                // ExtraData = entity.MetaData.ExtraData
             }
         };
     }

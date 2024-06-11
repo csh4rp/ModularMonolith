@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using ModularMonolith.Shared.DataAccess.AudiLogs;
 using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs.Factories;
 using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs.Interceptors;
 using ModularMonolith.Shared.Identity;
@@ -15,6 +16,7 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
     
     private readonly TimeProvider _dateTimeProvider = Substitute.For<TimeProvider>();
     private readonly IIdentityContextAccessor _identityContextAccessor = Substitute.For<IIdentityContextAccessor>();
+    private readonly IHttpContextAccessor _httpContextAccessor = Substitute.For<IHttpContextAccessor>();
     
     private readonly string _connectionString;
     
@@ -27,7 +29,9 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
      public AuditLogDbContext CreateDbContext()
      {
          var serviceCollection = new ServiceCollection();
+         serviceCollection.AddTransient<IHttpContextAccessor>(_ => _httpContextAccessor);
          serviceCollection.AddTransient<AuditLogFactory>();
+         serviceCollection.AddTransient<IAuditMetaDataProvider, AuditMetaDataProvider>();
          serviceCollection.AddTransient<IIdentityContextAccessor>(_ => _identityContextAccessor);
          serviceCollection.AddTransient<IHttpContextAccessor>(_ =>
              new HttpContextAccessor { HttpContext = new DefaultHttpContext() });
@@ -45,29 +49,30 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
      public async Task InitializeAsync()
      {
          await using var connection = new NpgsqlConnection(_connectionString);
+         await connection.OpenAsync();
          
          await using var cmd = connection.CreateCommand();
          cmd.CommandText =
              """
              CREATE TABLE "FirstTestEntity"
              (
-                 "Id" UUID NOT NULL PRIMARY KEY,
-                 "Timestamp" TIMESTAMP NOT NULL,
-                 "Name" VARCHAR(128) NOT NULL,
-                 "OwnedEntity" JSONB
+                 "id" UUID NOT NULL PRIMARY KEY,
+                 "timestamp" TIMESTAMP NOT NULL,
+                 "name" VARCHAR(128) NOT NULL,
+                 "owned_entity" JSONB
              );
 
              CREATE TABLE "SecondTestEntity"
              (
-                 "Id" UUID NOT NULL PRIMARY KEY,
-                 "Name" VARCHAR(128) NOT NULL
+                 "id" UUID NOT NULL PRIMARY KEY,
+                 "name" VARCHAR(128) NOT NULL
              );
 
              CREATE TABLE "FirstSecondTestEntity"
              (
-                 "FirstTestEntityId" UUID NOT NULL,
-                 "SecondTestEntityId" UUID NOT NULL,
-                 PRIMARY KEY ("FirstTestEntityId", "SecondTestEntityId")
+                 "first_test_entity_id" UUID NOT NULL,
+                 "second_test_entity_id" UUID NOT NULL,
+                 PRIMARY KEY ("first_test_entity_id", "second_test_entity_id")
              );
              """;
 

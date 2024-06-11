@@ -40,14 +40,14 @@ public sealed class AuditLogFactory
             if (operationType == AuditOperationType.Modified && propertyEntry.IsModified)
             {
                 var change = new EntityFieldChange(propertyEntry.Metadata.Name,
-                    propertyEntry.OriginalValue,
-                    propertyEntry.CurrentValue);
+                    propertyEntry.OriginalValue?.ToString(),
+                    propertyEntry.CurrentValue?.ToString());
 
                 changes.Add(change);
             }
             else
             {
-                var change = new EntityFieldChange(propertyEntry.Metadata.Name, null, propertyEntry.CurrentValue);
+                var change = new EntityFieldChange(propertyEntry.Metadata.Name, null, propertyEntry.CurrentValue?.ToString());
                 changes.Add(change);
             }
         }
@@ -58,7 +58,7 @@ public sealed class AuditLogFactory
 
             Debug.Assert(propertyEntry.CurrentValue is not null);
 
-            keyFields.Add(new EntityField(propertyEntry.Metadata.Name, propertyEntry.CurrentValue));
+            keyFields.Add(new EntityField(propertyEntry.Metadata.Name, propertyEntry.CurrentValue?.ToString()));
         }
         
         return new AuditLogEntry

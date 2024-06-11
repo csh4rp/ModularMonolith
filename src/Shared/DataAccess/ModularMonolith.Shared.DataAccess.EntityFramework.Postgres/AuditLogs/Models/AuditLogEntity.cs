@@ -10,9 +10,9 @@ public class AuditLogEntity
 
     public required string EntityTypeName { get; init; }
 
-    public required EntityField[] EntityKey { get; init; }
+    public required List<EntityField> EntityKey { get; init; }
 
-    public required EntityFieldChange[] EntityChanges { get; init; }
+    public required List<EntityFieldChange> EntityChanges { get; init; }
 
     public required AuditOperationType OperationType { get; init; }
 
