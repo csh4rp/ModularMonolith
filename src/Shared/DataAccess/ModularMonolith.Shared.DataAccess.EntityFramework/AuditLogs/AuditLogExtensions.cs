@@ -14,6 +14,15 @@ public static class AuditLogExtensions
 
         return entityTypeBuilder;
     }
+    
+    public static OwnedNavigationBuilder<TEntity, TOwned> AuditIgnore<TEntity, TOwned>(
+        this OwnedNavigationBuilder<TEntity, TOwned> navigationBuilder)
+        where TEntity : class where TOwned : class
+    {
+        navigationBuilder.Metadata.AddAnnotation(AuditIgnoreAnnotation, true);
+
+        return navigationBuilder;
+    }
 
     public static bool IsAuditable(this EntityEntry entry)
     {

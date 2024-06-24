@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
+using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs;
 using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.AuditLogs.Models;
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.AuditLogs.EntityConfigurations;
@@ -47,5 +48,7 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
         builder.HasIndex(b => b.Timestamp);
 
         builder.HasIndex(b => new { b.EntityTypeName, b.Timestamp });
+
+        builder.AuditIgnore();
     }
 }

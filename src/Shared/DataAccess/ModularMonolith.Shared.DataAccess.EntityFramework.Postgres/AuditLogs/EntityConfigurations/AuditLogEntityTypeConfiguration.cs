@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
+using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.Models;
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.EntityConfigurations;
@@ -32,21 +33,26 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
         builder.OwnsMany(b => b.EntityKey, b =>
         {
             b.ToJson("entity_key");
+            b.AuditIgnore();
         });
 
         builder.OwnsMany(b => b.EntityChanges, b =>
         {
             b.ToJson("entity_changes");
+            b.AuditIgnore();
         });
 
         builder.OwnsOne(b => b.MetaData, b =>
         {
             b.ToJson("meta_data");
+            b.AuditIgnore();
             // b.OwnsMany(p => p.ExtraData);
         });
 
         builder.HasIndex(b => b.Timestamp);
 
         builder.HasIndex(b => new { b.EntityTypeName, b.Timestamp });
+
+        builder.AuditIgnore();
     }
 }

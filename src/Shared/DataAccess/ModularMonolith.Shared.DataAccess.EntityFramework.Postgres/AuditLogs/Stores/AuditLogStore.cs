@@ -9,7 +9,7 @@ using Z.EntityFramework.Plus;
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.Stores;
 
-internal sealed class AuditLogStore : IAuditLogStore
+public class AuditLogStore : IAuditLogStore
 {
     private const int BatchSize = 1000;
 

@@ -5,7 +5,7 @@ using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.Model
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.Factories;
 
-internal sealed class AuditLogFactory
+public sealed class AuditLogFactory
 {
     public AuditLogEntity Create(AuditLogEntry entry) => new()
     {
