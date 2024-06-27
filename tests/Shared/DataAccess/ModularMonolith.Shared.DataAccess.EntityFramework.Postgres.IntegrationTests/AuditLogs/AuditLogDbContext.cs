@@ -19,7 +19,12 @@ public class AuditLogDbContext : DbContext
         var firstEntityBuilder = modelBuilder.Entity<FirstTestEntity>();
         firstEntityBuilder.ToTable("FirstTestEntity");
         firstEntityBuilder.HasKey(x => x.Id);
-        firstEntityBuilder.OwnsOne(b => b.OwnedEntity);
+        firstEntityBuilder.OwnsOne(b => b.OwnedEntity, b =>
+        {
+            b.OwnedEntityType.AuditIgnore();
+        });
+
+        // modelBuilder.Entity<OwnedEntity>().AuditIgnore();
         
         firstEntityBuilder.HasMany(b => b.SecondTestEntities)
             .WithMany(b => b.FirstTestEntities)

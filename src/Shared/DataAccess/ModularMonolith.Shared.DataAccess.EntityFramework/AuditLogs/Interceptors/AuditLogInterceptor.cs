@@ -51,7 +51,10 @@ public class AuditLogInterceptor : SaveChangesInterceptor
         var factory = context.GetService<AuditLogFactory>();
 
         var changedEntities = context.ChangeTracker.Entries()
-            .Where(e => e.State != EntityState.Detached  && e.State != EntityState.Unchanged && e.IsAuditable());
+            .Where(e => e.State != EntityState.Detached && e.State != EntityState.Unchanged && e.IsAuditable())
+            .ToList();
+
+        var x = changedEntities.LastOrDefault()?.Metadata.FindAnnotation("AuditIgnore");
 
         return changedEntities.Select(e => factory.Create(e)).ToList();
     }

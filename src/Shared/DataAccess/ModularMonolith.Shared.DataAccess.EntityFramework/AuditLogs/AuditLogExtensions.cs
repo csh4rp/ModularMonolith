@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs;
@@ -15,13 +16,11 @@ public static class AuditLogExtensions
         return entityTypeBuilder;
     }
     
-    public static OwnedNavigationBuilder<TEntity, TOwned> AuditIgnore<TEntity, TOwned>(
-        this OwnedNavigationBuilder<TEntity, TOwned> navigationBuilder)
-        where TEntity : class where TOwned : class
+    public static IMutableEntityType AuditIgnore(this IMutableEntityType entityType)
     {
-        navigationBuilder.Metadata.AddAnnotation(AuditIgnoreAnnotation, true);
+        entityType.AddAnnotation(AuditIgnoreAnnotation, true);
 
-        return navigationBuilder;
+        return entityType;
     }
 
     public static bool IsAuditable(this EntityEntry entry)

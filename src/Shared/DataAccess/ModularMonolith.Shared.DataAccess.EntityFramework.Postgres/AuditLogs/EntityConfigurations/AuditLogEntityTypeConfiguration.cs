@@ -33,19 +33,19 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
         builder.OwnsMany(b => b.EntityKey, b =>
         {
             b.ToJson("entity_key");
-            b.AuditIgnore();
+            b.OwnedEntityType.AuditIgnore();
         });
 
         builder.OwnsMany(b => b.EntityChanges, b =>
         {
             b.ToJson("entity_changes");
-            b.AuditIgnore();
+            b.OwnedEntityType.AuditIgnore();
         });
 
         builder.OwnsOne(b => b.MetaData, b =>
         {
             b.ToJson("meta_data");
-            b.AuditIgnore();
+            b.OwnedEntityType.AuditIgnore();
             // b.OwnsMany(p => p.ExtraData);
         });
 
