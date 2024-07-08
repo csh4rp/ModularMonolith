@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Net;
 using ModularMonolith.Shared.DataAccess.AudiLogs;
 using ModularMonolith.Shared.DataAccess.Cosmos.AuditLogs.Models;
 
@@ -13,21 +12,19 @@ public class AuditLogFactory
         PartitionKey = entry.EntityType.Name,
         Timestamp = entry.Timestamp,
         EntityKey = entry.EntityKey.Select(k => new EntityField(k.Name, k.Value)).ToArray(),
-        EntityChanges =
-            entry.EntityChanges.Select(k => new EntityFieldChange(k.Name, k.OriginalValue, k.CurrentValue))
-                .ToArray(),
+        EntityChanges = entry.EntityChanges
+            .Select(k => new EntityFieldChange(k.Name, k.OriginalValue, k.CurrentValue))
+            .ToArray(),
         EntityTypeName = entry.EntityType.FullName!,
         OperationType = entry.OperationType,
         MetaData = new AuditLogEntityMetaData
         {
             Subject = entry.MetaData.Subject,
-            Uri = entry.MetaData.Uri?.ToString(),
-            IpAddress = entry.MetaData.IpAddress?.ToString(),
             OperationName = entry.MetaData.OperationName,
             TraceId = entry.MetaData.TraceId?.ToString(),
             SpanId = entry.MetaData.SpanId?.ToString(),
             ParentSpanId = entry.MetaData.ParentSpanId?.ToString(),
-            ExtraData = []
+            ExtraData = entry.MetaData.ExtraData.ToDictionary(),
         }
     };
 
@@ -42,11 +39,8 @@ public class AuditLogFactory
         MetaData = new AuditMetaData
         {
             Subject = entity.MetaData.Subject,
-            Uri = entity.MetaData.Uri is null ? null : new Uri(entity.MetaData.Uri),
-            IpAddress = entity.MetaData.IpAddress is null ? null : IPAddress.Parse(entity.MetaData.IpAddress),
             OperationName = entity.MetaData.OperationName,
-            TraceId =
-                entity.MetaData.TraceId is null
+            TraceId = entity.MetaData.TraceId is null
                     ? null
                     : ActivityTraceId.CreateFromString(entity.MetaData.TraceId),
             SpanId =
@@ -54,7 +48,7 @@ public class AuditLogFactory
             ParentSpanId =
                 entity.MetaData.ParentSpanId is null
                     ? null : ActivitySpanId.CreateFromString(entity.MetaData.ParentSpanId),
-            // ExtraData = entity.MetaData.ExtraData
+            ExtraData = entity.MetaData.ExtraData
         }
     };
 }

@@ -46,7 +46,7 @@ public sealed class AuditLogEntityTypeConfiguration : IEntityTypeConfiguration<A
         {
             b.ToJson("meta_data");
             b.OwnedEntityType.AuditIgnore();
-            // b.OwnsMany(p => p.ExtraData);
+            b.OwnsMany(p => p.ExtraData);
         });
 
         builder.HasIndex(b => b.Timestamp);

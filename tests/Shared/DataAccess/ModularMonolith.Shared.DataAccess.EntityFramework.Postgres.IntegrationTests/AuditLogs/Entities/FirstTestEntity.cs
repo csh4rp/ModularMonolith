@@ -8,7 +8,9 @@ public class FirstTestEntity
     
     public required string Name { get; set; }
     
-    public required OwnedEntity OwnedEntity { get; set; }
+    public required FirstOwnedEntity FirstOwnedEntity { get; set; }
+    
+    public required SecondOwnedEntity SecondOwnedEntity { get; set; }
     
     public IList<SecondTestEntity> SecondTestEntities { get; set; } = new List<SecondTestEntity>();
 }

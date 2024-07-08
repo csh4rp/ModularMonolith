@@ -27,7 +27,7 @@ public class AuditLogStore : IAuditLogStore
         var entity = _auditLogFactory.Create(entry);
 
         _dbContext.Set<AuditLogEntity>().Add(entity);
-        return _dbContext.SaveChangesAsync(cancellationToken);
+        return Task.CompletedTask;
     }
 
     public Task AddRangeAsync(IEnumerable<AuditLogEntry> entries,
@@ -36,7 +36,7 @@ public class AuditLogStore : IAuditLogStore
         var entities = entries.Select(_auditLogFactory.Create);
 
         _dbContext.Set<AuditLogEntity>().AddRange(entities);
-        return _dbContext.SaveChangesAsync(cancellationToken);
+        return Task.CompletedTask;
     }
 
     public async Task<DataPage<AuditLogEntry>> FindAsync(Paginator paginator,

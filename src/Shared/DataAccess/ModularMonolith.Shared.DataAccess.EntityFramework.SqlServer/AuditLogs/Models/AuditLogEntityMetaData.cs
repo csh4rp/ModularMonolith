@@ -3,11 +3,7 @@
 public record AuditLogEntityMetaData
 {
     public required string? Subject { get; init; }
-
-    public required string? IpAddress { get; init; }
-
-    public required string? Uri { get; init; }
-
+    
     public required string? OperationName { get; init; }
 
     public required string? TraceId { get; init; }
@@ -16,5 +12,5 @@ public record AuditLogEntityMetaData
 
     public required string? ParentSpanId { get; init; }
     
-    // public required Dictionary<string, object> ExtraData { get; init; }
+    public required List<KeyValuePair<string, string?>> ExtraData { get; init; }
 }

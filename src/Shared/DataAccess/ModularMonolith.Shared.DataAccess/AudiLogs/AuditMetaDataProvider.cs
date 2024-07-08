@@ -24,7 +24,6 @@ public class AuditMetaDataProvider : IAuditMetaDataProvider
         var httpContext = _httpContextAccessor.HttpContext;
         var identityContext = _identityContextAccessor.IdentityContext;
 
-        var ipAddress = httpContext?.Connection.RemoteIpAddress;
         var extraData = GetExtraData();
 
         return new AuditMetaData
@@ -36,23 +35,20 @@ public class AuditMetaDataProvider : IAuditMetaDataProvider
             ParentSpanId = activity.Parent is null
                 ? null
                 : activity.ParentSpanId,
-            IpAddress = ipAddress,
-            Uri = _httpContextAccessor.HttpContext is null 
-                ? null 
-                : new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl()),
-            // ExtraData = extraData
+            ExtraData = extraData
         };
     }
 
-    protected virtual Dictionary<string, object> GetExtraData()
+    protected virtual Dictionary<string, string?> GetExtraData()
     {
         var httpContext = _httpContextAccessor.HttpContext;
-        var extraData = new Dictionary<string, object>();
+        var extraData = new Dictionary<string, string?>();
         
-        var userAgent = httpContext?.Request.Headers.UserAgent;
-        if (userAgent.HasValue)
+        if (httpContext is not null)
         {
-            extraData["user-agent"] = userAgent;
+            extraData["user-agent"] = httpContext.Request.Headers.UserAgent.ToString();
+            extraData["ip-address"] = httpContext.Connection.RemoteIpAddress?.ToString();
+            extraData["uri"] = httpContext.Request.GetEncodedUrl();
         }
 
         return extraData;

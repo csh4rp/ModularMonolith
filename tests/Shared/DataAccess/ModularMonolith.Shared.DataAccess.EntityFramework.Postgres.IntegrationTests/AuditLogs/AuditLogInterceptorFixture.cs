@@ -47,6 +47,8 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
 
     public Activity StartActivity() => ActivitySource.StartActivity()!;
 
+    public HttpContext GetHttpContext() => _httpContextAccessor.HttpContext!;
+
      public AuditLogDbContext CreateDbContext()
      {
          var serviceCollection = new ServiceCollection();
@@ -91,21 +93,22 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
          await using var cmd = connection.CreateCommand();
          cmd.CommandText =
              """
-             CREATE TABLE "FirstTestEntity"
+             CREATE TABLE IF NOT EXISTS "FirstTestEntity"
              (
                  "id" UUID NOT NULL PRIMARY KEY,
                  "timestamp" TIMESTAMP NOT NULL,
                  "name" VARCHAR(128) NOT NULL,
-                 "owned_entity" JSONB
+                 "first_owned_entity" JSONB,
+                 "second_owned_entity" JSONB
              );
 
-             CREATE TABLE "SecondTestEntity"
+             CREATE TABLE IF NOT EXISTS "SecondTestEntity"
              (
                  "id" UUID NOT NULL PRIMARY KEY,
                  "name" VARCHAR(128) NOT NULL
              );
 
-             CREATE TABLE "FirstSecondTestEntity"
+             CREATE TABLE IF NOT EXISTS "FirstSecondTestEntity"
              (
                  "first_test_entity_id" UUID NOT NULL,
                  "second_test_entity_id" UUID NOT NULL,

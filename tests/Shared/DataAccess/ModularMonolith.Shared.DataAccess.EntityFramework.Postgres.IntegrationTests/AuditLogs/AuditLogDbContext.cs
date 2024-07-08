@@ -19,20 +19,23 @@ public class AuditLogDbContext : DbContext
         var firstEntityBuilder = modelBuilder.Entity<FirstTestEntity>();
         firstEntityBuilder.ToTable("FirstTestEntity");
         firstEntityBuilder.HasKey(x => x.Id);
-        firstEntityBuilder.OwnsOne(b => b.OwnedEntity, b =>
+        firstEntityBuilder.Property(x => x.Timestamp).AuditIgnore();
+        firstEntityBuilder.OwnsOne(b => b.FirstOwnedEntity, b =>
         {
+            b.ToJson();
             b.OwnedEntityType.AuditIgnore();
         });
-
-        // modelBuilder.Entity<OwnedEntity>().AuditIgnore();
+        firstEntityBuilder.OwnsOne(b => b.SecondOwnedEntity, b =>
+        {
+            b.ToJson();
+            b.WithOwner().HasPrincipalKey("");
+        });
         
         firstEntityBuilder.HasMany(b => b.SecondTestEntities)
             .WithMany(b => b.FirstTestEntities)
             .UsingEntity<Dictionary<string, object>>("FirstSecondTestEntity",
                     l => l.HasOne<SecondTestEntity>().WithMany().HasForeignKey("SecondTestEntityId"),
                 r => r.HasOne<FirstTestEntity>().WithMany().HasForeignKey("FirstTestEntityId"));
-        
-        firstEntityBuilder.Property(x => x.Timestamp).AuditIgnore();
         
         var secondEntityBuilder = modelBuilder.Entity<SecondTestEntity>();
         secondEntityBuilder.ToTable("SecondTestEntity");

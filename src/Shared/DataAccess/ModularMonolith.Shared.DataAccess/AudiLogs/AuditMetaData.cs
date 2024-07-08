@@ -1,16 +1,11 @@
 ﻿using System.Diagnostics;
-using System.Net;
 
 namespace ModularMonolith.Shared.DataAccess.AudiLogs;
 
 public record AuditMetaData
 {
     public required string? Subject { get; init; }
-
-    public required IPAddress? IpAddress { get; init; }
-
-    public required Uri? Uri { get; init; }
-
+    
     public required string? OperationName { get; init; }
 
     public required ActivityTraceId? TraceId { get; init; }
@@ -19,6 +14,6 @@ public record AuditMetaData
 
     public required ActivitySpanId? ParentSpanId { get; init; }
     
-    // public required List<KeyValuePair<string, string>> ExtraData { get; init; }
+    public required IReadOnlyDictionary<string, string?> ExtraData { get; init; }
     
 }

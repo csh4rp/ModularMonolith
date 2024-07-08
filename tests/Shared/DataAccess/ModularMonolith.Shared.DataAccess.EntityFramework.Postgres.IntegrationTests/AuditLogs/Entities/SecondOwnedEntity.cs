@@ -1,6 +1,6 @@
 ﻿namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.IntegrationTests.AuditLogs.Entities;
 
-public class OwnedEntity
+public class SecondOwnedEntity
 {
-    public double Value { get; set; }
+    public string? Value { get; set; }
 }
