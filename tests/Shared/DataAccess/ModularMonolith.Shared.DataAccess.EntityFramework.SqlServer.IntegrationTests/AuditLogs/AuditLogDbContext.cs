@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs;
-using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.EntityConfigurations;
-using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.Models;
-using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.IntegrationTests.AuditLogs.Entities;
+using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.AuditLogs.EntityConfigurations;
+using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.AuditLogs.Models;
+using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.IntegrationTests.AuditLogs.Entities;
 
-namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.IntegrationTests.AuditLogs;
+namespace ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.IntegrationTests.AuditLogs;
 
 public class AuditLogDbContext : DbContext
 {

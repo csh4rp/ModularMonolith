@@ -14,10 +14,8 @@ public sealed class PostgresDbContext : DbContext
     private readonly IReadOnlyCollection<Assembly> _configurationAssemblies;
 
     public PostgresDbContext(DbContextOptions<DbContext> options, IReadOnlyCollection<Assembly> configurationAssemblies)
-        : base(options)
-    {
+        : base(options) =>
         _configurationAssemblies = configurationAssemblies;
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

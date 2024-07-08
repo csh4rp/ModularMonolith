@@ -61,6 +61,7 @@
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="7.5.2" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="3.8.0" />
+    <PackageVersion Include="Testcontainers.MsSql" Version="3.9.0" />
     <PackageVersion Include="TngTech.ArchUnitNET.xUnit" Version="0.10.6" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Compilers" Version="4.9.2" />
     <PackageVersion Include="Microsoft.Net.Compilers" Version="4.2.0" />

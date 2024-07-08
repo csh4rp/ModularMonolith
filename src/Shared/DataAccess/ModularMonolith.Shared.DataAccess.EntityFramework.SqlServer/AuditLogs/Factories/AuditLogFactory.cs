@@ -4,7 +4,7 @@ using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.AuditLogs.Mode
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.AuditLogs.Factories;
 
-internal sealed class AuditLogFactory
+public sealed class AuditLogFactory
 {
     public AuditLogEntity Create(AuditLogEntry entry) => new()
     {
@@ -21,7 +21,7 @@ internal sealed class AuditLogFactory
             TraceId = entry.MetaData.TraceId?.ToString(),
             SpanId = entry.MetaData.SpanId?.ToString(),
             ParentSpanId = entry.MetaData.ParentSpanId?.ToString(),
-            ExtraData = entry.MetaData.ExtraData.Select(k => new KeyValuePair<string, string?>(k.Key, k.Value))
+            ExtraData = entry.MetaData.ExtraData.Select(k => new ExtraData(k.Key, k.Value))
                 .ToList()
         }
     };
@@ -45,7 +45,7 @@ internal sealed class AuditLogFactory
                 TraceId = entity.MetaData.TraceId is null ? null : ActivityTraceId.CreateFromString(entity.MetaData.TraceId),
                 SpanId = entity.MetaData.SpanId is null ? null : ActivitySpanId.CreateFromString(entity.MetaData.SpanId),
                 ParentSpanId = entity.MetaData.ParentSpanId is null ? null : ActivitySpanId.CreateFromString(entity.MetaData.ParentSpanId),
-                ExtraData = entity.MetaData.ExtraData.ToDictionary()
+                ExtraData = entity.MetaData.ExtraData.ToDictionary(k => k.Key, v => v.Value)
             }
         };
     }

@@ -7,9 +7,9 @@ using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.AuditLogs.Mode
 using ModularMonolith.Shared.DataAccess.Models;
 using Z.EntityFramework.Plus;
 
-namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.Stores;
+namespace ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.AuditLogs.Stores;
 
-internal sealed class AuditLogStore : IAuditLogStore
+public sealed class AuditLogStore : IAuditLogStore
 {
     private const int BatchSize = 1000;
 
@@ -27,7 +27,7 @@ internal sealed class AuditLogStore : IAuditLogStore
         var entity = _auditLogFactory.Create(entry);
 
         _dbContext.Set<AuditLogEntity>().Add(entity);
-        return _dbContext.SaveChangesAsync(cancellationToken);
+        return Task.CompletedTask;
     }
 
     public Task AddRangeAsync(IEnumerable<AuditLogEntry> entries,
@@ -36,7 +36,7 @@ internal sealed class AuditLogStore : IAuditLogStore
         var entities = entries.Select(_auditLogFactory.Create);
 
         _dbContext.Set<AuditLogEntity>().AddRange(entities);
-        return _dbContext.SaveChangesAsync(cancellationToken);
+        return Task.CompletedTask;
     }
 
     public async Task<DataPage<AuditLogEntry>> FindAsync(Paginator paginator,

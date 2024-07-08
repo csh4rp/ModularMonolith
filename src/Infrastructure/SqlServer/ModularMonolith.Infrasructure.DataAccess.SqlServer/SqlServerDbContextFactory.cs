@@ -17,6 +17,6 @@ public class SqlServerDbContextFactory : IDesignTimeDbContextFactory<SqlServerDb
 
         var options = optionsBuilder.Options;
 
-        return new SqlServerDbContext(options);
+        return new SqlServerDbContext(options, []);
     }
 }

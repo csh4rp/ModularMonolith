@@ -1,22 +1,21 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.IntegrationTests.AuditLogs.Entities;
-using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.IntegrationTests.Fixtures;
+using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.IntegrationTests.AuditLogs.Entities;
+using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.IntegrationTests.Fixtures;
 
-namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.IntegrationTests.AuditLogs;
+namespace ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.IntegrationTests.AuditLogs;
 
 [Collection("AuditLogs")]
 public class AuditLogInterceptorTests : IAsyncLifetime
 {
-    private readonly PostgresFixture _postgresFixture;
+    private readonly SqlServerFixture _sqlServerFixture;
     private readonly AuditLogInterceptorFixture _fixture;
     
-    public AuditLogInterceptorTests(PostgresFixture postgresFixture)
+    public AuditLogInterceptorTests(SqlServerFixture sqlServerFixture)
     {
-        _postgresFixture = postgresFixture;
-        _fixture = new AuditLogInterceptorFixture(_postgresFixture.ConnectionString);
+        _sqlServerFixture = sqlServerFixture;
+        _fixture = new AuditLogInterceptorFixture(_sqlServerFixture.ConnectionString);
     }
-    
     
     [Fact]
     public async Task ShouldNotGenerateLog_WhenEntityIsIgnored()
@@ -122,5 +121,5 @@ public class AuditLogInterceptorTests : IAsyncLifetime
 
     public Task InitializeAsync() => _fixture.InitializeAsync();
 
-    public Task DisposeAsync() => _postgresFixture.ResetAsync();
+    public Task DisposeAsync() => _sqlServerFixture.ResetAsync();
 }

@@ -4,7 +4,6 @@ using ModularMonolith.Infrastructure.DataAccess.Postgres;
 using ModularMonolith.Infrastructure.DataAccess.SqlServer;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres;
 using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer;
-using ModularMonolith.Shared.DataAccess.Mongo;
 
 namespace ModularMonolith.Infrastructure.DataAccess;
 
@@ -32,13 +31,6 @@ public static class DataAccessExtensions
                     options.UseAuditLogInterceptor = true;
                     options.UseEventLogInterceptor = true;
                     options.ConnectionStringName = "Database";
-                });
-                break;
-            case "Mongo":
-                serviceCollection.AddMongoDataAccess(options =>
-                {
-                    options.ConnectionStringName = "Database";
-                    options.AuditLogOptions.CollectionName = "audit_logs";
                 });
                 break;
         }
