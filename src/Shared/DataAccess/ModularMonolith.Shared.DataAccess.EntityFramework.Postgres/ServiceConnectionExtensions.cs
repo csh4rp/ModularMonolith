@@ -6,7 +6,10 @@ using Microsoft.Extensions.Options;
 using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs.Interceptors;
 using ModularMonolith.Shared.DataAccess.EntityFramework.EventLogs.Interceptors;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Options;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLogs.Factories;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLogs.Stores;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.Factories;
+using ModularMonolith.Shared.DataAccess.EventLogs;
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres;
 
@@ -22,6 +25,8 @@ public static class ServiceConnectionExtensions
         serviceCollection
             .AddScoped<PostgresConnectionFactory>()
             .AddEntityFrameworkDataAccess()
+            .AddSingleton<EventLogFactory>()
+            .AddScoped<IEventLogStore, EventLogStore>()
             .AddDbContextFactory<TDbContext>((serviceProvider, optionsBuilder) =>
             {
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();
@@ -47,7 +52,8 @@ public static class ServiceConnectionExtensions
                 optionsBuilder.UseNpgsql(connectionString);
                 optionsBuilder.AddInterceptors(interceptors);
                 optionsBuilder.UseApplicationServiceProvider(serviceProvider);
-            }, ServiceLifetime.Scoped);
+            }, ServiceLifetime.Scoped)
+            .AddDbContextFactory<DbContext>((serviceProvider, _) => serviceProvider.GetRequiredService<TDbContext>(), ServiceLifetime.Scoped);
 
         return serviceCollection;
     }

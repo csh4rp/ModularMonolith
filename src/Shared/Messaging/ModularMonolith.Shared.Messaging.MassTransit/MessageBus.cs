@@ -14,7 +14,7 @@ namespace ModularMonolith.Shared.Messaging.MassTransit;
 internal sealed class MessageBus : IMessageBus
 {
     private readonly IPublishEndpoint _publishEndpoint;
-    private readonly ISendEndpoint _sendEndpoint;
+    private readonly ISendEndpointProvider _sendEndpointProvider;
     private readonly IOperationContextAccessor _operationContextAccessor;
     private readonly IEventLogStore _eventLogStore;
     private readonly EventLogEntryFactory _eventLogEntryFactory;
@@ -22,7 +22,7 @@ internal sealed class MessageBus : IMessageBus
     private readonly ILogger<MessageBus> _logger;
 
     public MessageBus(IPublishEndpoint publishEndpoint,
-        ISendEndpoint sendEndpoint,
+        ISendEndpointProvider sendEndpointProvider,
         IOperationContextAccessor operationContextAccessor,
         IEventLogStore eventLogStore,
         EventLogEntryFactory eventLogEntryFactory,
@@ -30,7 +30,7 @@ internal sealed class MessageBus : IMessageBus
         ILogger<MessageBus> logger)
     {
         _publishEndpoint = publishEndpoint;
-        _sendEndpoint = sendEndpoint;
+        _sendEndpointProvider = sendEndpointProvider;
         _operationContextAccessor = operationContextAccessor;
         _eventLogStore = eventLogStore;
         _eventLogEntryFactory = eventLogEntryFactory;
@@ -123,7 +123,9 @@ internal sealed class MessageBus : IMessageBus
         var operationContext = _operationContextAccessor.OperationContext;
         Debug.Assert(operationContext is not null);
 
-        await _sendEndpoint.Send(command, command.GetType(), p =>
+        var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri(""));
+        
+        await sendEndpoint.Send(command, command.GetType(), p =>
         {
             p.Headers.Set("timestamp", _timeProvider.GetUtcNow());
             p.Headers.Set("subject", operationContext.Subject);

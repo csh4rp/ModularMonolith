@@ -26,7 +26,7 @@ public sealed class IdentityModule : AppModule
             {
                 conf.GetSection("Modules:Identity:Auth").Bind(opt);
             });
-
+        
         serviceCollection.AddInfrastructure();
         return serviceCollection;
     }

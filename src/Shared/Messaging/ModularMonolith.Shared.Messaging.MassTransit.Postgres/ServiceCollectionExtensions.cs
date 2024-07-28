@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Events;
 
@@ -8,10 +9,18 @@ namespace ModularMonolith.Shared.Messaging.MassTransit.Postgres;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection Add<TDbContext>(this IServiceCollection serviceCollection,
+    public static IServiceCollection AddPostgresMessaging<TDbContext>(this IServiceCollection serviceCollection,
+        IConfiguration configuration,
         Assembly[] assemblies)
         where TDbContext : DbContext
     {
+        var connectionString = configuration.GetConnectionString("Database");
+        
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new ArgumentException("Database connection string is required");
+        }
+        
         serviceCollection.AddMassTransit(c =>
         {
             c.AddEntityFrameworkOutbox<TDbContext>(o =>
@@ -31,7 +40,7 @@ public static class ServiceCollectionExtensions
                 cfg.UseEntityFrameworkOutbox<TDbContext>(context);
             });
 
-            c.UsingPostgres("", (context, configurator) =>
+            c.UsingPostgres(connectionString, (context, configurator) =>
             {
                 var consumerMessages = assemblies
                     .SelectMany(a => a.GetTypes())

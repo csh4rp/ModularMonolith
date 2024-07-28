@@ -141,6 +141,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Data
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.IntegrationTests", "tests\Shared\DataAccess\ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.IntegrationTests\ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.IntegrationTests.csproj", "{6BCB3691-D364-4D1B-8EAD-F1203E4C2191}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Infrastrucutre.Messaging", "src\Infrastructure\Common\ModularMonolith.Infrastrucutre.Messaging\ModularMonolith.Infrastrucutre.Messaging.csproj", "{79C3FBC7-C3CD-40DC-8432-1C705310767A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -213,6 +215,7 @@ Global
 		{C4491749-58FA-47D8-8CFF-EBCB2D7BF7F4} = {282304E4-D50F-4AB3-8699-7CD18964EBF0}
 		{E06F6124-4026-43CD-8EC4-A71039F089CB} = {C4491749-58FA-47D8-8CFF-EBCB2D7BF7F4}
 		{6BCB3691-D364-4D1B-8EAD-F1203E4C2191} = {C4491749-58FA-47D8-8CFF-EBCB2D7BF7F4}
+		{79C3FBC7-C3CD-40DC-8432-1C705310767A} = {FE218637-2EC8-4978-ADE4-68C1205A93B3}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BBAF6E32-FA5F-4916-9F22-AD58F95D2992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -391,5 +394,9 @@ Global
 		{6BCB3691-D364-4D1B-8EAD-F1203E4C2191}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BCB3691-D364-4D1B-8EAD-F1203E4C2191}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6BCB3691-D364-4D1B-8EAD-F1203E4C2191}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79C3FBC7-C3CD-40DC-8432-1C705310767A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79C3FBC7-C3CD-40DC-8432-1C705310767A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79C3FBC7-C3CD-40DC-8432-1C705310767A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79C3FBC7-C3CD-40DC-8432-1C705310767A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

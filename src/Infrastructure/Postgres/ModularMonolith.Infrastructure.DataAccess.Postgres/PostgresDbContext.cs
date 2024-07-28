@@ -1,6 +1,6 @@
-﻿using System.Reflection;
-using MassTransit;
+﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using ModularMonolith.Shared.DataAccess.EntityFramework;
 using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.EntityConfigurations;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLogs.EntityConfigurations;
@@ -11,9 +11,10 @@ public sealed class PostgresDbContext : DbContext
 {
     private const string SharedSchemaName = "shared";
 
-    private readonly IReadOnlyCollection<Assembly> _configurationAssemblies;
+    private readonly ConfigurationAssemblyCollection _configurationAssemblies;
 
-    public PostgresDbContext(DbContextOptions<DbContext> options, IReadOnlyCollection<Assembly> configurationAssemblies)
+    public PostgresDbContext(DbContextOptions<DbContext> options,
+        ConfigurationAssemblyCollection configurationAssemblies)
         : base(options) =>
         _configurationAssemblies = configurationAssemblies;
 

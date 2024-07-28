@@ -38,6 +38,7 @@ public class IdentityFixture : IAsyncLifetime
             .WithImage("postgres:16.1")
             .WithName("identity_automated_tests")
             .WithDatabase("tests_database")
+            .WithPortBinding("32860")
             .Build();
 
         await _container.StartAsync();
@@ -47,14 +48,23 @@ public class IdentityFixture : IAsyncLifetime
         _connection = new NpgsqlConnection(connectionString);
         await _connection.OpenAsync();
 
-        DbContext = new PostgresDbContextFactory().CreateDbContext([connectionString]);
+        var assemblyName = "ModularMonolith.Identity.Infrastructure";
+        
+        DbContext = new PostgresDbContextFactory().CreateDbContext([connectionString, assemblyName]);
+        var m =DbContext.Database.GetMigrations();
+        var app = DbContext.Database.GetPendingMigrations().ToList();
         await DbContext.Database.MigrateAsync();
+        app = DbContext.Database.GetPendingMigrations().ToList();
 
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
 
+        
+        
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseSetting("ConnectionStrings:Database", connectionString);
+            builder.UseSetting("DataAccess:Provider", "Postgres");
+            builder.UseSetting("Messaging:Provider", "Postgres");
             builder.UseSetting("Modules:Identity:Enabled", "true");
             builder.UseSetting("Modules:Identity:Auth:Audience", AuthAudience);
             builder.UseSetting("Modules:Identity:Auth:Issuer", AuthIssuer);
@@ -69,8 +79,7 @@ public class IdentityFixture : IAsyncLifetime
 
             builder.ConfigureServices(s =>
             {
-                s.Replace(new ServiceDescriptor(typeof(TimeProvider), typeof(FakeTimeProvider),
-                    ServiceLifetime.Singleton));
+                s.Replace(new ServiceDescriptor(typeof(TimeProvider), typeof(FakeTimeProvider), ServiceLifetime.Singleton));
             });
         });
 

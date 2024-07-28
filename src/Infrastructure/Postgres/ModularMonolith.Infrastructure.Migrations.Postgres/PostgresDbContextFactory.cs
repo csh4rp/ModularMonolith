@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using ModularMonolith.Infrastructure.DataAccess;
 using ModularMonolith.Infrastructure.DataAccess.Postgres;
+using ModularMonolith.Shared.DataAccess.EntityFramework;
 
 namespace ModularMonolith.Infrastructure.Migrations.Postgres;
 
@@ -26,6 +28,19 @@ public class PostgresDbContextFactory : IDesignTimeDbContextFactory<PostgresDbCo
 
         var options = optionsBuilder.Options;
 
-        return new PostgresDbContext(options, []);
+        if (args.Length > 1)
+        {
+            var assemblyNames = args[1..];
+            
+            var assemblies = new List<Assembly>(assemblyNames.Length);
+            foreach (var assemblyName in assemblyNames)
+            {
+                assemblies.Add(Assembly.Load(assemblyName));
+            }
+            
+            return new PostgresDbContext(options, ConfigurationAssemblyCollection.FromAssemblies(assemblies));
+        }
+
+        return new PostgresDbContext(options, ConfigurationAssemblyCollection.Empty);
     }
 }

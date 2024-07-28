@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Events;
 
@@ -9,6 +10,7 @@ namespace ModularMonolith.Shared.Messaging.MassTransit.Kafka;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddKafkaMessaging<TDbContext>(this IServiceCollection serviceCollection,
+        IConfiguration configuration,
         Assembly[] assemblies) where TDbContext : DbContext
     {
         serviceCollection.AddMassTransit(c =>

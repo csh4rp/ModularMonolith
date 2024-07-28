@@ -47,7 +47,8 @@ public static class ServiceConnectionExtensions
                 optionsBuilder.UseSqlServer(connectionString);
                 optionsBuilder.AddInterceptors(interceptors);
                 optionsBuilder.UseApplicationServiceProvider(serviceProvider);
-            }, ServiceLifetime.Scoped);
+            }, ServiceLifetime.Scoped)
+            .AddDbContextFactory<DbContext>((serviceProvider, _) => serviceProvider.GetRequiredService<TDbContext>());
 
         return serviceCollection;
     }

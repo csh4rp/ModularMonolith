@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Events;
 
@@ -8,7 +9,8 @@ namespace ModularMonolith.Shared.Messaging.MassTransit.RabbitMQ;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddRabbitMQ<TDbContext>(this IServiceCollection serviceCollection,
+    public static IServiceCollection AddRabbitMQMessaging<TDbContext>(this IServiceCollection serviceCollection,
+        IConfiguration configuration,
         Assembly[] assemblies)
         where TDbContext : DbContext
     {
