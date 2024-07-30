@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using ModularMonolith.Identity.Contracts.Account.ChangePassword;
+using ModularMonolith.Identity.Contracts.Account.PasswordChange;
 
 namespace ModularMonolith.Identity.Application.Account.PasswordChange;
 

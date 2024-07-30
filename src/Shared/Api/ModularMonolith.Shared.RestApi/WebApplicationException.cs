@@ -41,7 +41,6 @@ public static class WebApplicationException
 
         app.UseAuthentication();
         app.UseAuthorization();
-
         app.UseMiddleware<IdentityMiddleware>();
 
         app.UseEndpoints(e =>

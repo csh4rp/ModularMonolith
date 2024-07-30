@@ -5,6 +5,7 @@ using ModularMonolith.Infrastrucutre.Messaging;
 using ModularMonolith.Shared.Application;
 using ModularMonolith.Shared.Identity;
 using ModularMonolith.Shared.RestApi.Authorization;
+using ModularMonolith.Shared.RestApi.Middlewares;
 using ModularMonolith.Shared.RestApi.Swagger;
 using ModularMonolith.Shared.RestApi.Telemetry;
 using ModularMonolith.Shared.Tracing;
@@ -54,8 +55,8 @@ public static class WebApplicationBuilderExtensions
             //     .AddExceptionHandlers()
             //     .AddScoped<DbContext>(sp => sp.GetRequiredService<BaseDbContext>())
             .AddSingleton(TimeProvider.System)
-            .AddTracingServices();
-        //     .AddScoped<IdentityMiddleware>();
+            .AddTracingServices()
+            .AddScoped<IdentityMiddleware>();
 
         foreach (var module in modules)
         {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using ModularMonolith.Identity.Contracts.Account.ChangePassword;
+using ModularMonolith.Identity.Contracts.Account.PasswordChange;
 using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Shared.Application.Commands;
 using ModularMonolith.Shared.Application.Exceptions;

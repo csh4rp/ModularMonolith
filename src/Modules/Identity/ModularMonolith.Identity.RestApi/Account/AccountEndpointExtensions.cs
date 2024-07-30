@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ModularMonolith.Identity.Contracts.Account.ChangePassword;
+using ModularMonolith.Identity.Contracts.Account.PasswordChange;
 using ModularMonolith.Identity.Contracts.Account.PasswordReset;
 using ModularMonolith.Identity.Contracts.Account.Registration;
 using ModularMonolith.Identity.Contracts.Account.SigningIn;

@@ -53,6 +53,8 @@ public abstract class BaseIntegrationTest<TClass> : IAsyncLifetime
             settings.UseParameters(parameters);
         }
 
+        var response = httpResponseMessage.Content.ReadAsStringAsync().Result;
+
         await VerifyJson(httpResponseMessage.Content.ReadAsStreamAsync(), settings);
     }
 
