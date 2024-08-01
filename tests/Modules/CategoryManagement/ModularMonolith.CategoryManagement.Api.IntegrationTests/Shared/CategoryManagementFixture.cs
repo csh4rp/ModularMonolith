@@ -52,6 +52,8 @@ public class CategoryManagementFixture : IAsyncLifetime
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseSetting("ConnectionStrings:Database", _container!.GetConnectionString());
+            builder.UseSetting("DataAccess:Provider", "Postgres");
+            builder.UseSetting("Messaging:Provider", "Postgres");
             builder.UseSetting("Modules:CategoryManagement:Enabled", "true");
             builder.UseSetting("Authentication:Type", "Bearer");
             builder.UseSetting("Authentication:Audience", AuthAudience);
