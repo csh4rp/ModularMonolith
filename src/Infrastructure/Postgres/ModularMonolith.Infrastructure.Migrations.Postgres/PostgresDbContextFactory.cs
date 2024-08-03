@@ -16,8 +16,8 @@ public class PostgresDbContextFactory : IDesignTimeDbContextFactory<PostgresDbCo
             throw new ArgumentException(
                 "Connection string is required. Usage: dotnet ef migrations add <MigrationName> -- <ConnectionString>");
         }
-        
-        var optionsBuilder = new DbContextOptionsBuilder<DbContext>();
+
+        var optionsBuilder = new DbContextOptionsBuilder<PostgresDbContext>();
 
         optionsBuilder.UseNpgsql(args[0], b =>
             {
@@ -31,13 +31,13 @@ public class PostgresDbContextFactory : IDesignTimeDbContextFactory<PostgresDbCo
         if (args.Length > 1)
         {
             var assemblyNames = args[1..];
-            
+
             var assemblies = new List<Assembly>(assemblyNames.Length);
             foreach (var assemblyName in assemblyNames)
             {
                 assemblies.Add(Assembly.Load(assemblyName));
             }
-            
+
             return new PostgresDbContext(options, ConfigurationAssemblyCollection.FromAssemblies(assemblies));
         }
 

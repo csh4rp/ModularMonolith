@@ -1,23 +1,9 @@
 version: "3.9"
 
 services:
-  backend:
-    container_name: modular_monolith_backend
-    restart: always
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "7117:7117"
-      - "5087:5087"
-    profiles:
-      - all
-    networks:
-      - backend_net
-
   database:
     container_name: modular_monolith_db
-    image: postgres:16.1
+    image: postgres:latest
     restart: always
     ports:
       - "5432:5432"

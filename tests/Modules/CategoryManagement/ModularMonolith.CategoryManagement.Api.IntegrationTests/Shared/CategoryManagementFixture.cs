@@ -44,7 +44,7 @@ public class CategoryManagementFixture : IAsyncLifetime
         _connection = new NpgsqlConnection(connectionString);
         await _connection.OpenAsync();
 
-        DbContext = new PostgresDbContextFactory().CreateDbContext([connectionString]);
+        DbContext = new PostgresDbContextFactory().CreateDbContext([connectionString, "ModularMonolith.CategoryManagement.Infrastructure"]);
         await DbContext.Database.MigrateAsync();
 
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
@@ -59,8 +59,7 @@ public class CategoryManagementFixture : IAsyncLifetime
             builder.UseSetting("Authentication:Audience", AuthAudience);
             builder.UseSetting("Authentication:Issuer", AuthIssuer);
             builder.UseSetting("Authentication:SigningKey", AuthSigningKey);
-            builder.UseSetting("Logging:LogLevel:Default", "Warning");
-            builder.UseSetting("Events:RunBackgroundWorkers", "false");
+            builder.UseSetting("Logging:LogLevel:Default", "Debug");
         });
 
         _testServer = _factory.Server;

@@ -25,17 +25,19 @@ internal sealed class TransactionalMiddleware<TRequest, TResponse>
             return await next();
         }
 
-        var type = typeof(IRequestHandler<,>).MakeGenericType(typeof(TRequest), typeof(TResponse));
+        var hasReturnType = typeof(TResponse) != typeof(Unit);
+
+        var type = hasReturnType
+            ? typeof(IRequestHandler<,>).MakeGenericType(typeof(TRequest), typeof(TResponse))
+            : typeof(IRequestHandler<>).MakeGenericType(typeof(TRequest));
 
         if (!TransactionBehaviourLookup.TryGetValue(type, out var shouldUseTransaction))
         {
-            var handlerType = Assembly.GetEntryAssembly()!
-                .GetReferencedAssemblies()
-                .Select(Assembly.Load)
+            var handlerType = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(a => a.GetTypes())
-                .First(t => t.IsAssignableTo(type));
+                .FirstOrDefault(t => t.IsAssignableTo(type));
 
-            var hasTransactionalAttribute = handlerType.GetCustomAttribute<TransactionalAttribute>();
+            var hasTransactionalAttribute = handlerType?.GetCustomAttribute<TransactionalAttribute>();
 
             shouldUseTransaction = hasTransactionalAttribute is not null;
             TransactionBehaviourLookup.TryAdd(type, shouldUseTransaction);

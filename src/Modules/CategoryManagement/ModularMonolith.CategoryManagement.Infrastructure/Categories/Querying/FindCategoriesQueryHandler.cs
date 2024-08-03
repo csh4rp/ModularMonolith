@@ -18,6 +18,8 @@ internal sealed class FindCategoriesQueryHandler : IQueryHandler<FindCategoriesQ
     {
         var query = _database.Set<Category>().AsQueryable();
 
+        var q = query.ToList();
+
         if (!string.IsNullOrEmpty(request.SearchTerm))
         {
             query = query.Where(c => c.Name.StartsWith(request.SearchTerm));

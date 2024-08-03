@@ -13,7 +13,7 @@ public sealed class PostgresDbContext : DbContext
 
     private readonly ConfigurationAssemblyCollection _configurationAssemblies;
 
-    public PostgresDbContext(DbContextOptions<DbContext> options,
+    public PostgresDbContext(DbContextOptions<PostgresDbContext> options,
         ConfigurationAssemblyCollection configurationAssemblies)
         : base(options) =>
         _configurationAssemblies = configurationAssemblies;

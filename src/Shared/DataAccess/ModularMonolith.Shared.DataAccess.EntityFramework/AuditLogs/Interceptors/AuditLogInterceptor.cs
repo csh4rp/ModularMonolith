@@ -47,13 +47,12 @@ public class AuditLogInterceptor : SaveChangesInterceptor
 
     private static List<AuditLogEntry> CreateLogs(DbContext context)
     {
-        var correlationId = context.Database.CurrentTransaction?.TransactionId ?? Guid.NewGuid();
         var factory = context.GetService<AuditLogFactory>();
 
         var changedEntities = context.ChangeTracker.Entries()
             .Where(e => e.State != EntityState.Detached && e.State != EntityState.Unchanged && e.IsAuditable())
             .ToList();
-        
+
         return changedEntities.Select(e => factory.Create(e)).ToList();
     }
 }

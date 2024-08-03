@@ -3,9 +3,12 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using ModularMonolith.Shared.DataAccess.AudiLogs;
+using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs.Factories;
 using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs.Interceptors;
 using ModularMonolith.Shared.DataAccess.EntityFramework.EventLogs.Interceptors;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Options;
+using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.Stores;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLogs.Factories;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLogs.Stores;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.Factories;
@@ -27,6 +30,9 @@ public static class ServiceConnectionExtensions
             .AddEntityFrameworkDataAccess()
             .AddSingleton<EventLogFactory>()
             .AddScoped<IEventLogStore, EventLogStore>()
+            .AddScoped<IAuditLogStore, AuditLogStore>()
+            .AddScoped<AuditLogFactory>()
+            .AddScoped<AuditLogs.Factories.AuditLogFactory>()
             .AddDbContextFactory<TDbContext>((serviceProvider, optionsBuilder) =>
             {
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();
@@ -53,7 +59,11 @@ public static class ServiceConnectionExtensions
                 optionsBuilder.AddInterceptors(interceptors);
                 optionsBuilder.UseApplicationServiceProvider(serviceProvider);
             }, ServiceLifetime.Scoped)
-            .AddDbContextFactory<DbContext>((serviceProvider, _) => serviceProvider.GetRequiredService<TDbContext>(), ServiceLifetime.Scoped);
+            .AddScoped<DbContext>(sp =>
+            {
+                var factory = sp.GetRequiredService<IDbContextFactory<TDbContext>>();
+                return factory.CreateDbContext();
+            });
 
         return serviceCollection;
     }

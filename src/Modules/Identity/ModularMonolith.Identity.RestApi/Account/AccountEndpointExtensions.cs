@@ -46,11 +46,22 @@ internal static class AccountEndpointExtensions
             .Produces<SignInResponse>();
 
         group.MapPost("change-password", async ([FromServices] IMediator mediator,
+                [FromServices] IServiceProvider sp,
                 [FromBody] ChangePasswordCommand command,
                 CancellationToken cancellationToken) =>
             {
-                await mediator.Send(command, cancellationToken);
-                return Results.NoContent();
+                try
+                {
+                    var p = sp.GetRequiredService<IRequestHandler<ChangePasswordCommand>>();
+
+                    await mediator.Send(command, cancellationToken);
+                    return Results.NoContent();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
             })
             .AddValidation<ChangePasswordCommand>()
             .Produces(StatusCodes.Status204NoContent)

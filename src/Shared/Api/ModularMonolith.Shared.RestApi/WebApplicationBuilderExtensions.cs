@@ -5,6 +5,7 @@ using ModularMonolith.Infrastrucutre.Messaging;
 using ModularMonolith.Shared.Application;
 using ModularMonolith.Shared.Identity;
 using ModularMonolith.Shared.RestApi.Authorization;
+using ModularMonolith.Shared.RestApi.Exceptions;
 using ModularMonolith.Shared.RestApi.Middlewares;
 using ModularMonolith.Shared.RestApi.Swagger;
 using ModularMonolith.Shared.RestApi.Telemetry;
@@ -16,9 +17,6 @@ public static class WebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder RegisterModules(this WebApplicationBuilder builder)
     {
-        var connectionString = builder.Configuration.GetConnectionString("Database")
-                               ?? throw new ArgumentException("'ConnectionStrings:Database' is not configured");
-
         var modules = builder.Configuration.GetEnabledModules().ToList();
 
         foreach (var module in modules)
@@ -39,21 +37,17 @@ public static class WebApplicationBuilderExtensions
         {
             builder.Services.AddSwaggerWithBearerToken(modules);
         }
-        //
+
         builder.Services
             .AddDataAccess(builder.Configuration, assemblies)
             .AddAuth(builder.Configuration)
             .AddTelemetryWithTracing(builder.Configuration, builder.Environment)
             .AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true)
-            //     .AddPostgresMessaging<BaseDbContext>(connectionString!, assemblies)
             .AddMediator(assemblies)
             .AddMessaging(builder.Configuration, assemblies)
-            // .AddEvents(assemblies)
-            //     .AddAuditLogs()
             .AddIdentityContextAccessor()
             .AddHttpContextAccessor()
-            //     .AddExceptionHandlers()
-            //     .AddScoped<DbContext>(sp => sp.GetRequiredService<BaseDbContext>())
+            .AddExceptionHandlers()
             .AddSingleton(TimeProvider.System)
             .AddTracingServices()
             .AddScoped<IdentityMiddleware>();

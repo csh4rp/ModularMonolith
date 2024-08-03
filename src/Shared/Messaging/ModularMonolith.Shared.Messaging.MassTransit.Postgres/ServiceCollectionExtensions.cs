@@ -15,12 +15,19 @@ public static class ServiceCollectionExtensions
         where TDbContext : DbContext
     {
         var connectionString = configuration.GetConnectionString("Database");
-        
+
         if (string.IsNullOrEmpty(connectionString))
         {
             throw new ArgumentException("Database connection string is required");
         }
-        
+
+        serviceCollection.AddPostgresMigrationHostedService(create: true, delete: false);
+
+        serviceCollection.AddOptions<SqlTransportOptions>().Configure(options =>
+        {
+            options.ConnectionString = connectionString;
+        });
+
         serviceCollection.AddMassTransit(c =>
         {
             c.AddEntityFrameworkOutbox<TDbContext>(o =>

@@ -17,7 +17,7 @@ public static class DataAccessExtensions
     {
         var collection = ConfigurationAssemblyCollection.FromAssemblies(assemblies);
         serviceCollection.Add(new ServiceDescriptor(typeof(ConfigurationAssemblyCollection), _ => collection, ServiceLifetime.Singleton));
-        
+
         var dataAccessSection = configuration.GetSection("DataAccess");
         var provider = dataAccessSection.GetSection("Provider").Value;
 
@@ -25,7 +25,7 @@ public static class DataAccessExtensions
         {
             throw new ArgumentException("DataAccess:Provider is required");
         }
-        
+
         switch (provider)
         {
             case "SqlServer":
@@ -41,6 +41,7 @@ public static class DataAccessExtensions
                 {
                     options.UseAuditLogInterceptor = true;
                     options.UseEventLogInterceptor = true;
+                    options.UseSnakeCaseNamingConvention = true;
                     options.ConnectionStringName = "Database";
                 });
                 break;

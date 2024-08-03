@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
+using ModularMonolith.Shared.Application.Middlewares;
 
 [assembly: InternalsVisibleTo("ModularMonolith.CategoryManagement.Application.UnitTests")]
 
@@ -12,9 +13,8 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.AddMediatR(c =>
         {
-            // c.NotificationPublisher = new ForeachAwaitPublisher();
-            // c.AddOpenBehavior(typeof(TracingMiddleware<,>));
-            // c.AddOpenBehavior(typeof(TransactionalMiddleware<,>));
+            c.AddOpenBehavior(typeof(TracingMiddleware<,>));
+            c.AddOpenBehavior(typeof(TransactionalMiddleware<,>));
             c.RegisterServicesFromAssemblies(assemblies);
         });
 
