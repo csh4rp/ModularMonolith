@@ -19,6 +19,7 @@ public static class WebApplicationException
             app.UseSwagger(o =>
             {
             });
+
             app.UseSwaggerUI(options =>
             {
                 foreach (var module in modules)
@@ -30,14 +31,13 @@ public static class WebApplicationException
 
         app.UseExceptionHandler(o =>
         {
-            o.Use(async (c, d) =>
+            o.Use(async (httpContext, next) =>
             {
-                await d();
+                await next();
             });
         });
 
         app.UseRouting();
-
 
         app.UseAuthentication();
         app.UseAuthorization();

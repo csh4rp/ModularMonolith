@@ -28,17 +28,18 @@ internal sealed class ChangePasswordCommandHandlerTestsFixture
         _user = new User(userName) { Id = id };
         _password = password;
 
-        _userManager.FindByIdAsync(_user.Id.ToString())
+        _userManager.FindByNameAsync(Arg.Is<string>(arg => _user.UserName.Equals(arg, StringComparison.InvariantCultureIgnoreCase)))
             .Returns(_user);
 
-        _userManager.ChangePasswordAsync(Arg.Any<User>(), Arg.Any<string>(), Arg.Any<string>())
+        _userManager.ChangePasswordAsync(Arg.Any<User>(), Arg.Is<string>(arg => arg != _password), Arg.Any<string>())
             .Returns(IdentityResult.Failed(new IdentityError { Code = "PasswordMismatch" }));
 
-        _userManager.ChangePasswordAsync(_user, _password, Arg.Any<string>())
+        _userManager.ChangePasswordAsync(_user, Arg.Is<string>(a => a == _password), Arg.Any<string>())
             .Returns(IdentityResult.Success);
 
         _identityContextAccessor.IdentityContext.Returns(new IdentityContext(userName));
     }
+
 
     public Task AssertThatPasswordChangedEventWasPublished() => _eventBus.Received(1)
         .PublishAsync(Arg.Is<PasswordChangedEvent>(c => c.UserId == _user!.Id), Arg.Any<CancellationToken>());

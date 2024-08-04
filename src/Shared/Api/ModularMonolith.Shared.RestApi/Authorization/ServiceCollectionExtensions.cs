@@ -41,6 +41,9 @@ public static class ServiceCollectionExtensions
                         ValidateIssuer = true,
                         ValidateIssuerSigningKey = true
                     };
+
+
+                    options.MapInboundClaims = false;
                 });
         }
         else
