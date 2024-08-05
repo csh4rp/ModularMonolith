@@ -1,6 +1,6 @@
-﻿using System.Reflection;
-using MassTransit;
+﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using ModularMonolith.Shared.DataAccess.EntityFramework;
 using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs;
 using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.AuditLogs.EntityConfigurations;
 using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.EventLogs.EntityConfigurations;
@@ -10,11 +10,13 @@ namespace ModularMonolith.Infrastructure.DataAccess.SqlServer;
 public sealed class SqlServerDbContext : DbContext
 {
     private const string SharedSchemaName = "Shared";
-    
-    private readonly IReadOnlyCollection<Assembly> _configurationAssemblies;
 
-    public SqlServerDbContext(DbContextOptions<DbContext> options, IReadOnlyCollection<Assembly> configurationAssemblies) : base(options) => 
-        _configurationAssemblies = configurationAssemblies;
+    private readonly ConfigurationAssemblyCollection _configurationAssemblyCollection;
+
+    public SqlServerDbContext(DbContextOptions<SqlServerDbContext> options,
+        ConfigurationAssemblyCollection configurationAssemblyCollection)
+        : base(options) =>
+        _configurationAssemblyCollection = configurationAssemblyCollection;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,7 +39,7 @@ public sealed class SqlServerDbContext : DbContext
             c.AuditIgnore();
         });
 
-        foreach (var configurationAssembly in _configurationAssemblies)
+        foreach (var configurationAssembly in _configurationAssemblyCollection)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(configurationAssembly);
         }

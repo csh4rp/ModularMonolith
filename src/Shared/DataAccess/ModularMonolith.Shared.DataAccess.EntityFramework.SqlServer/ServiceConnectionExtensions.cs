@@ -48,7 +48,11 @@ public static class ServiceConnectionExtensions
                 optionsBuilder.AddInterceptors(interceptors);
                 optionsBuilder.UseApplicationServiceProvider(serviceProvider);
             }, ServiceLifetime.Scoped)
-            .AddDbContextFactory<DbContext>((serviceProvider, _) => serviceProvider.GetRequiredService<TDbContext>());
+            .AddScoped<DbContext>(sp =>
+            {
+                var factory = sp.GetRequiredService<IDbContextFactory<TDbContext>>();
+                return factory.CreateDbContext();
+            });
 
         return serviceCollection;
     }

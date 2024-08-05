@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.CategoryManagement.RestApi;
 using ModularMonolith.Infrastructure.Migrations.Postgres;
 using Npgsql;
@@ -26,8 +27,7 @@ public class CategoryManagementFixture : IAsyncLifetime
     private Respawner? _respawner;
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
-
-    public DbContext DbContext { get; private set; } = default!;
+    private DbContext _dbContext = default!;
 
     public async Task InitializeAsync()
     {
@@ -44,8 +44,8 @@ public class CategoryManagementFixture : IAsyncLifetime
         _connection = new NpgsqlConnection(connectionString);
         await _connection.OpenAsync();
 
-        DbContext = new PostgresDbContextFactory().CreateDbContext([connectionString, "ModularMonolith.CategoryManagement.Infrastructure"]);
-        await DbContext.Database.MigrateAsync();
+        _dbContext = new PostgresDbContextFactory().CreateDbContext([connectionString, "ModularMonolith.CategoryManagement.Infrastructure"]);
+        await _dbContext.Database.MigrateAsync();
 
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
 
@@ -65,7 +65,7 @@ public class CategoryManagementFixture : IAsyncLifetime
         _testServer = _factory.Server;
     }
 
-    public HttpClient CreateClient()
+    private HttpClient CreateClient()
     {
         var client = _testServer.CreateClient();
         client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;v=1.0;q=1.0"));
@@ -96,6 +96,13 @@ public class CategoryManagementFixture : IAsyncLifetime
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    public async Task AddCategoriesAsync(params Category[] categories)
+    {
+        _dbContext.AddRange(categories);
+        await _dbContext.SaveChangesAsync();
+    }
+
+
     public async Task DisposeAsync()
     {
         if (_respawner is not null && _connection is not null)
@@ -110,7 +117,7 @@ public class CategoryManagementFixture : IAsyncLifetime
             await _container.DisposeAsync();
         }
 
-        await DbContext.DisposeAsync();
+        await _dbContext.DisposeAsync();
         await _factory.DisposeAsync();
     }
 

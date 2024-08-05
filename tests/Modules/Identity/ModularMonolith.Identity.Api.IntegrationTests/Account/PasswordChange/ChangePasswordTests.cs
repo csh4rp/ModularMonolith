@@ -2,7 +2,6 @@
 using FluentAssertions;
 using ModularMonolith.Identity.Api.IntegrationTests.Account.Fixtures;
 using ModularMonolith.Identity.Api.IntegrationTests.Shared;
-using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Shared.IntegrationTests.Common;
 using ModularMonolith.Shared.TestUtils.Abstractions;
 
@@ -28,8 +27,7 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
         // Arrange
         var user = _accountFixture.AActiveUser();
         user.Id = UserId;
-        _identityFixture.DbContext.Set<User>().Add(user);
-        await _identityFixture.DbContext.SaveChangesAsync();
+        await _identityFixture.AddUsersAsync(user);
 
         using var client = _identityFixture.CreateClientWithAuthToken(UserId);
         using var request = GetResource("ChangePassword.Valid.json");
@@ -48,8 +46,8 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
         // Arrange
         var user = _accountFixture.AActiveUser();
         user.Id = UserId;
-        _identityFixture.DbContext.Set<User>().Add(user);
-        await _identityFixture.DbContext.SaveChangesAsync();
+
+        await _identityFixture.AddUsersAsync(user);
 
         using var client = _identityFixture.CreateClientWithAuthToken(UserId);
         using var request = GetResource("ChangePassword.InvalidCurrentPassword.json");
@@ -69,8 +67,7 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
         // Arrange
         var user = _accountFixture.AActiveUser();
         user.Id = UserId;
-        _identityFixture.DbContext.Set<User>().Add(user);
-        await _identityFixture.DbContext.SaveChangesAsync();
+        await _identityFixture.AddUsersAsync(user);
 
         using var client = _identityFixture.CreateClientWithAuthToken(UserId);
         using var request = GetResource("ChangePassword.NewPasswordNotMatchingPolicy.json");

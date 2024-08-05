@@ -33,8 +33,9 @@ public class ResetPasswordTests : BaseIntegrationTest<ResetPasswordTests>
     {
         // Arrange
         var user = _accountFixture.AActiveUser();
-        _identityFixture.DbContext.Set<User>().Add(user);
-        await _identityFixture.DbContext.SaveChangesAsync();
+
+        await _identityFixture.AddUsersAsync(user);
+
 
         var manager = _serviceScope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var token = await manager.GeneratePasswordResetTokenAsync(user);
@@ -85,8 +86,8 @@ public class ResetPasswordTests : BaseIntegrationTest<ResetPasswordTests>
     {
         // Arrange
         var user = _accountFixture.AActiveUser();
-        _identityFixture.DbContext.Set<User>().Add(user);
-        await _identityFixture.DbContext.SaveChangesAsync();
+
+        await _identityFixture.AddUsersAsync(user);
 
         var payload = new
         {

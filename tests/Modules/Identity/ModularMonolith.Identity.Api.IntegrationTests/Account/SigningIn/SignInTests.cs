@@ -2,7 +2,6 @@
 using FluentAssertions;
 using ModularMonolith.Identity.Api.IntegrationTests.Account.Fixtures;
 using ModularMonolith.Identity.Api.IntegrationTests.Shared;
-using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Shared.IntegrationTests.Common;
 using ModularMonolith.Shared.TestUtils.Abstractions;
 
@@ -28,8 +27,8 @@ public class SignInTests : BaseIntegrationTest<SignInTests>
     {
         // Arrange
         var user = _accountFixture.AActiveUser();
-        _identityFixture.DbContext.Set<User>().Add(user);
-        await _identityFixture.DbContext.SaveChangesAsync();
+
+        await _identityFixture.AddUsersAsync(user);
 
         using var request = GetResource("SignIn.Valid.json");
 
@@ -47,8 +46,8 @@ public class SignInTests : BaseIntegrationTest<SignInTests>
     {
         // Arrange
         var user = _accountFixture.AActiveUser();
-        _identityFixture.DbContext.Set<User>().Add(user);
-        await _identityFixture.DbContext.SaveChangesAsync();
+
+        await _identityFixture.AddUsersAsync(user);
 
         using var request = GetResource("SignIn.InvalidPassword.json");
 

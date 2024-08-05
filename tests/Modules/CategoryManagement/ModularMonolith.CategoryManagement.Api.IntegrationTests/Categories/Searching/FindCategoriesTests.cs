@@ -2,7 +2,6 @@
 using FluentAssertions;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories.Shared;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Shared;
-using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.IntegrationTests.Common;
 using ModularMonolith.Shared.TestUtils.Abstractions;
 
@@ -33,10 +32,9 @@ public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
             .RuleFor(x => x.Name, _ => $"Category-{index++}")
             .GenerateForever()
             .Take(20)
-            .ToList();
+            .ToArray();
 
-        _categoryManagementFixture.DbContext.Set<Category>().AddRange(categories);
-        await _categoryManagementFixture.DbContext.SaveChangesAsync();
+        await _categoryManagementFixture.AddCategoriesAsync(categories);
 
         // Act
         using var response = await _client.GetAsync("api/category-management/categories");
@@ -58,10 +56,9 @@ public class FindCategoriesTests : BaseIntegrationTest<FindCategoriesTests>
             .RuleFor(x => x.Name, f => $"Category-{index++}")
             .GenerateForever()
             .Take(20)
-            .ToList();
+            .ToArray();
 
-        _categoryManagementFixture.DbContext.Set<Category>().AddRange(categories);
-        await _categoryManagementFixture.DbContext.SaveChangesAsync();
+        await _categoryManagementFixture.AddCategoriesAsync(categories);
 
         // Act
         using var response =

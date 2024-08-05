@@ -2,7 +2,6 @@
 using FluentAssertions;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories.Shared;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Shared;
-using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.IntegrationTests.Common;
 using ModularMonolith.Shared.TestUtils.Abstractions;
 
@@ -31,8 +30,7 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
             .RuleFor(x => x.Name, "Category-Name-1")
             .Generate();
 
-        _categoryManagementFixture.DbContext.Set<Category>().Add(category);
-        await _categoryManagementFixture.DbContext.SaveChangesAsync();
+        await _categoryManagementFixture.AddCategoriesAsync(category);
 
         // Act
         using var response = await _client.GetAsync($"api/category-management/categories/{category.Id.Value}");

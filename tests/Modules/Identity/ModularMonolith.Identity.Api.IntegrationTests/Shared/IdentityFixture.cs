@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
+using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Identity.RestApi;
 using ModularMonolith.Infrastructure.Migrations.Postgres;
 using ModularMonolith.Shared.TestUtils.Fakes;
@@ -29,8 +30,7 @@ public class IdentityFixture : IAsyncLifetime
     private Respawner? _respawner;
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
-
-    public DbContext DbContext { get; private set; } = default!;
+    private DbContext _dbContext = default!;
 
     public async Task InitializeAsync()
     {
@@ -48,18 +48,15 @@ public class IdentityFixture : IAsyncLifetime
         _connection = new NpgsqlConnection(connectionString);
         await _connection.OpenAsync();
 
-        var assemblyName = "ModularMonolith.Identity.Infrastructure";
-        
-        DbContext = new PostgresDbContextFactory().CreateDbContext([connectionString, assemblyName]);
-        var m =DbContext.Database.GetMigrations();
-        var app = DbContext.Database.GetPendingMigrations().ToList();
-        await DbContext.Database.MigrateAsync();
-        app = DbContext.Database.GetPendingMigrations().ToList();
+        const string assemblyName = "ModularMonolith.Identity.Infrastructure";
+
+        _dbContext = new PostgresDbContextFactory().CreateDbContext([connectionString, assemblyName]);
+        await _dbContext.Database.MigrateAsync();
 
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
 
-        
-        
+
+
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseSetting("ConnectionStrings:Database", connectionString);
@@ -121,6 +118,12 @@ public class IdentityFixture : IAsyncLifetime
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    public Task AddUsersAsync(params User[] users)
+    {
+        _dbContext.AddRange(users);
+        return _dbContext.SaveChangesAsync();
+    }
+
     public AsyncServiceScope CreateServiceScope() => _testServer.Services.CreateAsyncScope();
 
     public async Task DisposeAsync()
@@ -137,7 +140,7 @@ public class IdentityFixture : IAsyncLifetime
             await _container.DisposeAsync();
         }
 
-        await DbContext.DisposeAsync();
+        await _dbContext.DisposeAsync();
         await _factory.DisposeAsync();
     }
 
@@ -146,7 +149,7 @@ public class IdentityFixture : IAsyncLifetime
         Debug.Assert(_connection is not null);
         Debug.Assert(_respawner is not null);
 
-        DbContext.ChangeTracker.Clear();
+        _dbContext.ChangeTracker.Clear();
         return _respawner.ResetAsync(_connection);
     }
 }

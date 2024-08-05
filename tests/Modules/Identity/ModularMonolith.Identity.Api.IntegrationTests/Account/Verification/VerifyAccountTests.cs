@@ -33,8 +33,9 @@ public class VerifyAccountTests : BaseIntegrationTest<VerifyAccountTests>
     {
         // Arrange
         var user = _accountFixture.AUnverifiedUser();
-        _identityFixture.DbContext.Set<User>().Add(user);
-        await _identityFixture.DbContext.SaveChangesAsync();
+
+        await _identityFixture.AddUsersAsync(user);
+
 
         var manager = _serviceScope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var token = await manager.GenerateEmailConfirmationTokenAsync(user);
@@ -56,8 +57,8 @@ public class VerifyAccountTests : BaseIntegrationTest<VerifyAccountTests>
     {
         // Arrange
         var user = _accountFixture.AUnverifiedUser();
-        _identityFixture.DbContext.Set<User>().Add(user);
-        await _identityFixture.DbContext.SaveChangesAsync();
+
+        await _identityFixture.AddUsersAsync(user);
 
         var manager = _serviceScope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var token = await manager.GenerateEmailConfirmationTokenAsync(user);
@@ -80,8 +81,8 @@ public class VerifyAccountTests : BaseIntegrationTest<VerifyAccountTests>
     {
         // Arrange
         var user = _accountFixture.AUnverifiedUser();
-        _identityFixture.DbContext.Set<User>().Add(user);
-        await _identityFixture.DbContext.SaveChangesAsync(default);
+
+        await _identityFixture.AddUsersAsync(user);
 
         var payload = new { UserId = user.Id, VerificationToken = "123" };
 

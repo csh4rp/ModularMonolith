@@ -2,7 +2,6 @@
 using FluentAssertions;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories.Shared;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Shared;
-using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.IntegrationTests.Common;
 using ModularMonolith.Shared.TestUtils.Abstractions;
 
@@ -46,8 +45,7 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
             .RuleFor(x => x.Name, "Created-Category-Duplicate")
             .Generate();
 
-        _categoryManagementFixture.DbContext.Set<Category>().Add(category);
-        await _categoryManagementFixture.DbContext.SaveChangesAsync();
+        await _categoryManagementFixture.AddCategoriesAsync(category);
 
         using var request = GetResource("CreateCategory.DuplicateName.json");
 
