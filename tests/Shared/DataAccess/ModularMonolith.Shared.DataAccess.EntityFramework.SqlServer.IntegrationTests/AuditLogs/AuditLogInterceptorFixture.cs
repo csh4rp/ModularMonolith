@@ -17,16 +17,15 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
 {
     private static readonly DateTimeOffset Now = new(2024, 1, 1, 12, 0, 0, TimeSpan.Zero);
     private static readonly ActivitySource ActivitySource = new(nameof(AuditLogInterceptorFixture));
-    
-    
+
     private readonly TimeProvider _dateTimeProvider = Substitute.For<TimeProvider>();
     private readonly IIdentityContextAccessor _identityContextAccessor = Substitute.For<IIdentityContextAccessor>();
     private readonly IHttpContextAccessor _httpContextAccessor = Substitute.For<IHttpContextAccessor>();
-    
+
     private readonly string _connectionString;
 
     private AuditLogDbContext? _dbContext;
-    
+
     public AuditLogInterceptorFixture(string connectionString)
     {
         ActivitySource.AddActivityListener(new ActivityListener
@@ -40,7 +39,7 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
             {
             },
         });
-        
+
         _connectionString = connectionString;
         _dateTimeProvider.GetUtcNow().Returns(Now);
     }
@@ -58,6 +57,8 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
          serviceCollection.AddTransient<IAuditMetaDataProvider, AuditMetaDataProvider>();
          serviceCollection.AddTransient<IIdentityContextAccessor>(_ => _identityContextAccessor);
          serviceCollection.AddTransient<IAuditLogStore, AuditLogStore>();
+         serviceCollection.AddTransient<TimeProvider>(_ => _dateTimeProvider);
+         serviceCollection.AddTransient<DbContext>(_ => _dbContext!);
          serviceCollection.AddTransient<IHttpContextAccessor>(_ =>
              new HttpContextAccessor { HttpContext = new DefaultHttpContext()
              {
@@ -71,14 +72,12 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
                      Query = new QueryCollection()
                  }
              } });
-         serviceCollection.AddTransient<TimeProvider>(_ => _dateTimeProvider);
-         serviceCollection.AddTransient<DbContext>(_ => _dbContext!);
 
          var builder = new DbContextOptionsBuilder<AuditLogDbContext>();
          builder.UseApplicationServiceProvider(serviceCollection.BuildServiceProvider());
          builder.AddInterceptors(new AuditLogInterceptor());
          builder.UseSqlServer(_connectionString);
-         
+
          _dbContext = new AuditLogDbContext(builder.Options);
          return _dbContext;
      }
@@ -87,7 +86,7 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
      {
          await using var connection = new SqlConnection(_connectionString);
          await connection.OpenAsync();
-         
+
          await using var cmd = connection.CreateCommand();
          cmd.CommandText =
              """

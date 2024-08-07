@@ -17,16 +17,16 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
 {
     private static readonly DateTimeOffset Now = new(2024, 1, 1, 12, 0, 0, TimeSpan.Zero);
     private static readonly ActivitySource ActivitySource = new(nameof(AuditLogInterceptorFixture));
-    
-    
+
+
     private readonly TimeProvider _dateTimeProvider = Substitute.For<TimeProvider>();
     private readonly IIdentityContextAccessor _identityContextAccessor = Substitute.For<IIdentityContextAccessor>();
     private readonly IHttpContextAccessor _httpContextAccessor = Substitute.For<IHttpContextAccessor>();
-    
+
     private readonly string _connectionString;
 
     private AuditLogDbContext? _dbContext;
-    
+
     public AuditLogInterceptorFixture(string connectionString)
     {
         ActivitySource.AddActivityListener(new ActivityListener
@@ -40,7 +40,7 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
             {
             },
         });
-        
+
         _connectionString = connectionString;
         _dateTimeProvider.GetUtcNow().Returns(Now);
     }
@@ -80,7 +80,6 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
          builder.UseNpgsql(_connectionString)
              .UseSnakeCaseNamingConvention();
 
-         
          _dbContext = new AuditLogDbContext(builder.Options);
          return _dbContext;
      }
@@ -89,7 +88,7 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
      {
          await using var connection = new NpgsqlConnection(_connectionString);
          await connection.OpenAsync();
-         
+
          await using var cmd = connection.CreateCommand();
          cmd.CommandText =
              """
