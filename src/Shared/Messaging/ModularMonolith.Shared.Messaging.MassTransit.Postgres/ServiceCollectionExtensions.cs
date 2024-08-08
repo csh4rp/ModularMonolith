@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddPostgresMessaging<TDbContext>(this IServiceCollection serviceCollection,
         IConfiguration configuration,
+        OutboxStorageType outboxStorageType,
         Assembly[] assemblies)
         where TDbContext : DbContext
     {
@@ -32,7 +33,15 @@ public static class ServiceCollectionExtensions
         {
             c.AddEntityFrameworkOutbox<TDbContext>(o =>
             {
-                o.UsePostgres();
+                switch (outboxStorageType)
+                {
+                    case OutboxStorageType.Postgres:
+                        o.UsePostgres();
+                        break;
+                    case OutboxStorageType.SqlServer:
+                        o.UseSqlServer();
+                        break;
+                }
 
                 o.UseBusOutbox(a =>
                 {
@@ -84,7 +93,6 @@ public static class ServiceCollectionExtensions
                     }
                 }
             });
-
         });
 
         return serviceCollection;

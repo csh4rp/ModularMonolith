@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Confluent.Kafka;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -11,13 +12,26 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddKafkaMessaging<TDbContext>(this IServiceCollection serviceCollection,
         IConfiguration configuration,
+        OutboxStorageType outboxStorageType,
         Assembly[] assemblies) where TDbContext : DbContext
     {
+        var options = configuration.GetSection("Kafka")
+                          .Get<KafkaOptions>()
+            ?? throw new NullReferenceException("Kafka section is missing");
+
         serviceCollection.AddMassTransit(c =>
         {
             c.AddEntityFrameworkOutbox<TDbContext>(o =>
             {
-                o.UsePostgres();
+                switch (outboxStorageType)
+                {
+                    case OutboxStorageType.Postgres:
+                        o.UsePostgres();
+                        break;
+                    case OutboxStorageType.SqlServer:
+                        o.UseSqlServer();
+                        break;
+                }
 
                 o.UseBusOutbox(a =>
                 {
@@ -38,7 +52,17 @@ public static class ServiceCollectionExtensions
 
                 cfg.UsingKafka((context, configurator) =>
                 {
-                    configurator.Host("");
+                    configurator.Host(options.Host, host =>
+                    {
+                        host.UseSasl(saslConfigurator =>
+                        {
+                            saslConfigurator.Username = options.Username;
+                            saslConfigurator.Password = options.Password;
+                            saslConfigurator.Mechanism = SaslMechanism.Plain;
+                        });
+
+                        host.UseSsl(s => s.EndpointIdentificationAlgorithm = SslEndpointIdentificationAlgorithm.Https);
+                    });
 
                     var consumerMessages = assemblies
                         .SelectMany(a => a.GetTypes())

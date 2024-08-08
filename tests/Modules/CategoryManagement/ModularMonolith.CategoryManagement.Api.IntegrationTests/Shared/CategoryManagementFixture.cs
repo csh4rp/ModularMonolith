@@ -13,6 +13,7 @@ using ModularMonolith.Infrastructure.Migrations.Postgres;
 using Npgsql;
 using Respawn;
 using Testcontainers.PostgreSql;
+using Testcontainers.RabbitMq;
 
 namespace ModularMonolith.CategoryManagement.Api.IntegrationTests.Shared;
 
@@ -23,7 +24,8 @@ public class CategoryManagementFixture : IAsyncLifetime
     private const string AuthSigningKey = "12345678123456781234567812345678";
 
     private NpgsqlConnection? _connection;
-    private PostgreSqlContainer? _container;
+    private PostgreSqlContainer? _databaseContainer;
+    private RabbitMqContainer? _messagingContainer;
     private Respawner? _respawner;
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
@@ -31,15 +33,23 @@ public class CategoryManagementFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        _container = new PostgreSqlBuilder()
+        _databaseContainer = new PostgreSqlBuilder()
             .WithImage("postgres:16.1")
             .WithName("category_management_automated_tests")
             .WithDatabase("tests_database")
             .Build();
 
-        await _container.StartAsync();
+        _messagingContainer = new RabbitMqBuilder()
+            .WithUsername("guest")
+            .WithPassword("guest")
+            .Build();
 
-        var connectionString = _container.GetConnectionString();
+        var databaseTask =  _databaseContainer.StartAsync();
+        var messagingTask = _messagingContainer.StartAsync();
+
+        await Task.WhenAll(databaseTask, messagingTask);
+
+        var connectionString = _databaseContainer.GetConnectionString();
 
         _connection = new NpgsqlConnection(connectionString);
         await _connection.OpenAsync();
@@ -51,15 +61,18 @@ public class CategoryManagementFixture : IAsyncLifetime
 
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
-            builder.UseSetting("ConnectionStrings:Database", _container!.GetConnectionString());
+            builder.UseSetting("ConnectionStrings:Database", _databaseContainer!.GetConnectionString());
             builder.UseSetting("DataAccess:Provider", "Postgres");
-            builder.UseSetting("Messaging:Provider", "Postgres");
+            builder.UseSetting("Messaging:Provider", "RabbitMQ");
             builder.UseSetting("Modules:CategoryManagement:Enabled", "true");
             builder.UseSetting("Authentication:Type", "Bearer");
             builder.UseSetting("Authentication:Audience", AuthAudience);
             builder.UseSetting("Authentication:Issuer", AuthIssuer);
             builder.UseSetting("Authentication:SigningKey", AuthSigningKey);
             builder.UseSetting("Logging:LogLevel:Default", "Debug");
+            builder.UseSetting("Messaging:RabbitMQ:Host", _messagingContainer.Hostname);
+            builder.UseSetting("Messaging:RabbitMQ:Username", "guest");
+            builder.UseSetting("Messaging:RabbitMQ:Password", "guest");
         });
 
         _testServer = _factory.Server;
@@ -111,10 +124,16 @@ public class CategoryManagementFixture : IAsyncLifetime
             await _connection.DisposeAsync();
         }
 
-        if (_container is not null)
+        if (_databaseContainer is not null)
         {
-            await _container.StopAsync();
-            await _container.DisposeAsync();
+            await _databaseContainer.StopAsync();
+            await _databaseContainer.DisposeAsync();
+        }
+
+        if (_messagingContainer is not null)
+        {
+            await _messagingContainer.StartAsync();
+            await _messagingContainer.DisposeAsync();
         }
 
         await _dbContext.DisposeAsync();

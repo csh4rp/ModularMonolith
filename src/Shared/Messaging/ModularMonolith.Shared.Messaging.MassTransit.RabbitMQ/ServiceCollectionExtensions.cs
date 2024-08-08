@@ -11,14 +11,27 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddRabbitMQMessaging<TDbContext>(this IServiceCollection serviceCollection,
         IConfiguration configuration,
+        OutboxStorageType outboxStorageType,
         Assembly[] assemblies)
         where TDbContext : DbContext
     {
+        var options = configuration.GetSection("RabbitMQ")
+                          .Get<RabbitMQOptions>()
+                      ?? throw new NullReferenceException("RabbitMQ section is missing");
+
         serviceCollection.AddMassTransit(c =>
         {
             c.AddEntityFrameworkOutbox<TDbContext>(o =>
             {
-                o.UsePostgres();
+                switch (outboxStorageType)
+                {
+                    case OutboxStorageType.Postgres:
+                        o.UsePostgres();
+                        break;
+                    case OutboxStorageType.SqlServer:
+                        o.UseSqlServer();
+                        break;
+                }
 
                 o.UseBusOutbox(a =>
                 {
@@ -33,13 +46,12 @@ public static class ServiceCollectionExtensions
                 cfg.UseEntityFrameworkOutbox<TDbContext>(context);
             });
 
-
             c.UsingRabbitMq((context, cfg) =>
             {
-                cfg.Host("localhost", "/", h =>
+                cfg.Host(options.Host, "/", host =>
                 {
-                    h.Username("guest");
-                    h.Password("guest");
+                    host.Username(options.Username);
+                    host.Password(options.Password);
                 });
 
                 var consumerMessages = assemblies

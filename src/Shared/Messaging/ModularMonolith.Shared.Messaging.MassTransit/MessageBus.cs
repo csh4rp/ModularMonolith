@@ -117,14 +117,13 @@ internal sealed class MessageBus : IMessageBus
         }
     }
 
-
     public async Task SendAsync(ICommand command, CancellationToken cancellationToken)
     {
         var operationContext = _operationContextAccessor.OperationContext;
         Debug.Assert(operationContext is not null);
 
         var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri(""));
-        
+
         await sendEndpoint.Send(command, command.GetType(), p =>
         {
             p.Headers.Set("timestamp", _timeProvider.GetUtcNow());
