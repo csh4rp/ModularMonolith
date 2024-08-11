@@ -16,11 +16,13 @@ public static class MessagingExtensions
         IConfiguration configuration,
         Assembly[] assemblies)
     {
-        var messagingSection = configuration.GetSection("Messaging");
-        var messagingProvider = messagingSection.GetSection("Provider").Get<string>();
+        var messagingProvider = configuration.GetSection("Messaging")
+            .GetSection("Provider")
+            .Get<string>();
 
-        var databaseSection = configuration.GetSection("Database");
-        var databaseProvider = databaseSection.GetSection("Provider").Get<OutboxStorageType>();
+        var databaseProvider = configuration.GetSection("Database")
+            .GetSection("Provider")
+            .Get<OutboxStorageType>();
 
         serviceCollection.AddMessageBus();
 

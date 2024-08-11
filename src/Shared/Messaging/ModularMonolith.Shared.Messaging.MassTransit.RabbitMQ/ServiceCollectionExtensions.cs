@@ -15,9 +15,10 @@ public static class ServiceCollectionExtensions
         Assembly[] assemblies)
         where TDbContext : DbContext
     {
-        var options = configuration.GetSection("RabbitMQ")
-                          .Get<RabbitMQOptions>()
-                      ?? throw new NullReferenceException("RabbitMQ section is missing");
+        var connectionString = configuration.GetConnectionString("RabbitMQ");
+
+        var setupConsumers = configuration.GetSection("Messaging:CustomersEnabled")
+            .Get<bool>();
 
         serviceCollection.AddMassTransit(c =>
         {
@@ -33,69 +34,24 @@ public static class ServiceCollectionExtensions
                         break;
                 }
 
-                o.UseBusOutbox(a =>
+                o.UseBusOutbox(cfg =>
                 {
-                    a.MessageDeliveryLimit = 10;
+                    cfg.MessageDeliveryLimit = 10;
                 });
             });
 
-            c.AddConsumers(assemblies);
-
-            c.AddConfigureEndpointsCallback((context, _, cfg) =>
+            if (setupConsumers)
             {
-                cfg.UseEntityFrameworkOutbox<TDbContext>(context);
-            });
+                c.AddConsumers(assemblies);
+            }
 
             c.UsingRabbitMq((context, cfg) =>
             {
-                cfg.Host(options.Host, "/", host =>
+                cfg.Host(connectionString);
+
+                if (setupConsumers)
                 {
-                    host.Username(options.Username);
-                    host.Password(options.Password);
-                });
-
-                var consumerMessages = assemblies
-                    .SelectMany(a => a.GetTypes())
-                    .Where(t => t.IsAssignableTo(typeof(IConsumer)))
-                    .GroupBy(t =>
-                    {
-                        var @interface = t.GetInterfaces()
-                            .Single(i => i.IsGenericType && i.IsAssignableTo(typeof(IConsumer)));
-
-                        return @interface.GenericTypeArguments[0];
-                    })
-                    .ToDictionary(t => t.Key, t => t.ToList());
-
-                foreach (var messageType in consumerMessages.Keys)
-                {
-                    cfg.Publish(messageType, msg =>
-                    {
-
-                    });
-                }
-
-                foreach (var (messageType, _) in consumerMessages)
-                {
-                    var eventAttribute = messageType.GetCustomAttribute<EventAttribute>()!;
-                    var topic = eventAttribute.Topic ?? messageType.Name;
-
-                    var groupedConsumers = consumerMessages.Values.SelectMany(s => s)
-                        .GroupBy(t => t.GetCustomAttribute<EventConsumerAttribute>()?.ConsumerName ?? topic)
-                        .ToDictionary(t => t.Key, t => t.ToList());
-
-                    foreach (var (queue, consumerTypes) in groupedConsumers)
-                    {
-                        cfg.ReceiveEndpoint(queue, cf =>
-                        {
-                            foreach (var consumerType in consumerTypes)
-                            {
-                                cf.ConfigureConsumer(context, consumerType);
-                            }
-
-                            cf.Bind(topic);
-                            cf.UseEntityFrameworkOutbox<TDbContext>(context);
-                        });
-                    }
+                    SetupConsumers<TDbContext>(context, cfg, assemblies);
                 }
 
                 cfg.ConfigureEndpoints(context);
@@ -103,5 +59,46 @@ public static class ServiceCollectionExtensions
         });
 
         return serviceCollection;
+    }
+
+    private static void SetupConsumers<TDbContext>(IBusRegistrationContext context,
+        IRabbitMqBusFactoryConfigurator cfg,
+        Assembly[] assemblies)
+        where TDbContext : DbContext
+    {
+        var consumerMessages = assemblies
+            .SelectMany(a => a.GetTypes())
+            .Where(t => t.IsAssignableTo(typeof(IConsumer)))
+            .GroupBy(t =>
+            {
+                var @interface = t.GetInterfaces()
+                    .Single(i => i.IsGenericType && i.IsAssignableTo(typeof(IConsumer)));
+
+                return @interface.GenericTypeArguments[0];
+            })
+            .ToDictionary(t => t.Key, t => t.ToList());
+
+        foreach (var (messageType, _) in consumerMessages)
+        {
+            var eventAttribute = messageType.GetCustomAttribute<EventAttribute>()!;
+            var topic = eventAttribute.Topic ?? messageType.Name;
+
+            var groupedConsumers = consumerMessages.Values.SelectMany(s => s)
+                .GroupBy(t => t.GetCustomAttribute<EventConsumerAttribute>()?.ConsumerName ?? topic)
+                .ToDictionary(t => t.Key, t => t.ToList());
+
+            foreach (var (queue, consumerTypes) in groupedConsumers)
+            {
+                cfg.ReceiveEndpoint(queue, cf =>
+                {
+                    foreach (var consumerType in consumerTypes)
+                    {
+                        cf.ConfigureConsumer(context, consumerType);
+                    }
+
+                    cf.Bind(topic);
+                });
+            }
+        }
     }
 }

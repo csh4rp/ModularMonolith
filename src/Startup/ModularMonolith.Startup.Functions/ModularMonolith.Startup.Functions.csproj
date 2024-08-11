@@ -19,4 +19,9 @@
   <ItemGroup>
     <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext"/>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\Common\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Common\ModularMonolith.Infrastrucutre.Messaging\ModularMonolith.Infrastrucutre.Messaging.csproj" />
+    <ProjectReference Include="..\..\Shared\Api\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj" />
+  </ItemGroup>
 </Project>

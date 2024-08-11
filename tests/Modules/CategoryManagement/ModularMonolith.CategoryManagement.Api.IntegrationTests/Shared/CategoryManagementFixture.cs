@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.CategoryManagement.RestApi;
 using ModularMonolith.Infrastructure.Migrations.Postgres;
+using ModularMonolith.Shared.TestUtils.Messaging;
 using Npgsql;
 using Respawn;
 using Testcontainers.PostgreSql;
@@ -30,6 +31,7 @@ public class CategoryManagementFixture : IAsyncLifetime
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
     private DbContext _dbContext = default!;
+    private TestBus? _testBus;
 
     public async Task InitializeAsync()
     {
@@ -48,6 +50,9 @@ public class CategoryManagementFixture : IAsyncLifetime
         var messagingTask = _messagingContainer.StartAsync();
 
         await Task.WhenAll(databaseTask, messagingTask);
+
+        _testBus = new TestBus();
+        await _testBus.StartAsync(_messagingContainer.GetConnectionString());
 
         var connectionString = _databaseContainer.GetConnectionString();
 
@@ -73,9 +78,11 @@ public class CategoryManagementFixture : IAsyncLifetime
             builder.UseSetting("Messaging:RabbitMQ:Host", _messagingContainer.Hostname);
             builder.UseSetting("Messaging:RabbitMQ:Username", "guest");
             builder.UseSetting("Messaging:RabbitMQ:Password", "guest");
+            builder.UseSetting("Messaging:CustomersEnabled", "false");
         });
 
         _testServer = _factory.Server;
+        _testBus.ConnectReceiveEndpoint<TestConsumer<CategoryCreatedEvent>>("");
     }
 
     private HttpClient CreateClient()
