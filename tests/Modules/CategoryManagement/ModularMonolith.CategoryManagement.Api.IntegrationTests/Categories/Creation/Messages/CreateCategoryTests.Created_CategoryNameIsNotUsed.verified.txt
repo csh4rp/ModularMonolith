@@ -1,0 +1,8 @@
+﻿{
+  CategoryId: {
+    Value: Guid_1
+  },
+  Name: Created-Category,
+  EventId: Guid_2,
+  Timestamp: DateTimeOffset_1
+}

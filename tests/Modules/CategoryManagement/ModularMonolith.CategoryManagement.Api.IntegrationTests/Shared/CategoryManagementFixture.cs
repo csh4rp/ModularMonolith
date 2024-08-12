@@ -33,6 +33,8 @@ public class CategoryManagementFixture : IAsyncLifetime
     private DbContext _dbContext = default!;
     private TestBus? _testBus;
 
+    private readonly TestConsumer<CategoryCreatedEvent> _testConsumer = new();
+
     public async Task InitializeAsync()
     {
         _databaseContainer = new PostgreSqlBuilder()
@@ -75,14 +77,12 @@ public class CategoryManagementFixture : IAsyncLifetime
             builder.UseSetting("Authentication:Issuer", AuthIssuer);
             builder.UseSetting("Authentication:SigningKey", AuthSigningKey);
             builder.UseSetting("Logging:LogLevel:Default", "Debug");
-            builder.UseSetting("Messaging:RabbitMQ:Host", _messagingContainer.Hostname);
-            builder.UseSetting("Messaging:RabbitMQ:Username", "guest");
-            builder.UseSetting("Messaging:RabbitMQ:Password", "guest");
+            builder.UseSetting("ConnectionStrings:RabbitMQ", _messagingContainer.GetConnectionString());
             builder.UseSetting("Messaging:CustomersEnabled", "false");
         });
 
         _testServer = _factory.Server;
-        _testBus.ConnectReceiveEndpoint<TestConsumer<CategoryCreatedEvent>>("");
+        _testBus.ConnectReceiveEndpoint("CategoryCreatedTestQueue", _testConsumer);
     }
 
     private HttpClient CreateClient()
@@ -120,6 +120,24 @@ public class CategoryManagementFixture : IAsyncLifetime
     {
         _dbContext.AddRange(categories);
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<CategoryCreatedEvent?> VerifyEventReceived()
+    {
+        var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var token = cancellationTokenSource.Token;
+
+        while (!token.IsCancellationRequested)
+        {
+            if (_testConsumer.Message is not null)
+            {
+                break;
+            }
+
+            await Task.Delay(100, token);
+        }
+
+        return _testConsumer.Message;
     }
 
 

@@ -34,7 +34,7 @@ public static class MessagingExtensions
             case "Kafka":
                 serviceCollection.AddKafkaMessaging<DbContext>(configuration, databaseProvider, assemblies);
                 break;
-            case "RabbitMq":
+            case "RabbitMQ":
                 serviceCollection.AddRabbitMQMessaging<DbContext>(configuration, databaseProvider, assemblies);
                 break;
             default:

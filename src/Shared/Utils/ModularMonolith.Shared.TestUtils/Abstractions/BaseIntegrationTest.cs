@@ -38,7 +38,6 @@ public abstract class BaseIntegrationTest<TClass> : IAsyncLifetime
         }
 
         var directory = Path.Join(Path.GetDirectoryName(filePath), "Responses");
-
         var settings = new VerifySettings();
 
         if (!string.IsNullOrEmpty(fileName))
@@ -54,6 +53,38 @@ public abstract class BaseIntegrationTest<TClass> : IAsyncLifetime
         }
 
         await VerifyJson(httpResponseMessage.Content.ReadAsStreamAsync(), settings);
+    }
+
+    protected async Task VerifyMessage(object message,
+        object?[]? parameters = null,
+        [CallerMemberName] string method = default!,
+        [CallerFilePath] string filePath = default!)
+    {
+        var type = GetType();
+        var attribute = type.GetMethod(method)?.GetCustomAttribute<TestFileNameAttribute>();
+
+        string? fileName = null;
+        if (attribute is not null)
+        {
+            fileName = $"{attribute.Name}";
+        }
+
+        var directory = Path.Join(Path.GetDirectoryName(filePath), "Messages");
+        var settings = new VerifySettings();
+
+        if (!string.IsNullOrEmpty(fileName))
+        {
+            settings.UseMethodName(fileName);
+        }
+
+        settings.UseDirectory(directory);
+
+        if (parameters is not null)
+        {
+            settings.UseParameters(parameters);
+        }
+
+        await Verify(message, settings);
     }
 
     public virtual Task InitializeAsync() => Task.CompletedTask;
