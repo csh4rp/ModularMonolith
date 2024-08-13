@@ -25,9 +25,13 @@ internal sealed class EventLogFactory
                 Uri = entity.MetaData.Uri is null ? null : new Uri(entity.MetaData.Uri),
                 IpAddress = entity.MetaData.IpAddress is null ? null : IPAddress.Parse(entity.MetaData.IpAddress),
                 OperationName = entity.MetaData.OperationName,
-                TraceId = entity.MetaData.TraceId is null ? null : ActivityTraceId.CreateFromString(entity.MetaData.TraceId),
-                SpanId = entity.MetaData.SpanId is null ? null : ActivitySpanId.CreateFromString(entity.MetaData.SpanId),
-                ParentSpanId = entity.MetaData.ParentSpanId is null ? null :  ActivitySpanId.CreateFromString(entity.MetaData.ParentSpanId),
+                TraceId =
+                    entity.MetaData.TraceId is null ? null : ActivityTraceId.CreateFromString(entity.MetaData.TraceId),
+                SpanId =
+                    entity.MetaData.SpanId is null ? null : ActivitySpanId.CreateFromString(entity.MetaData.SpanId),
+                ParentSpanId = entity.MetaData.ParentSpanId is null
+                    ? null
+                    : ActivitySpanId.CreateFromString(entity.MetaData.ParentSpanId),
             }
         };
     }

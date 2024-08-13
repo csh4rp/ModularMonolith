@@ -44,5 +44,6 @@ internal sealed class RegisterCommandHandlerTestsFixture
     public Task AssertThatUserRegisteredEventWasPublished() => _messageBus.Received(1)
         .PublishAsync(Arg.Any<UserRegisteredEvent>(), Arg.Any<CancellationToken>());
 
-    public Task AssertThatNoEventWasPublished() => _messageBus.DidNotReceiveWithAnyArgs().PublishAsync(Arg.Any<IEvent>(), default);
+    public Task AssertThatNoEventWasPublished() =>
+        _messageBus.DidNotReceiveWithAnyArgs().PublishAsync(Arg.Any<IEvent>(), default);
 }

@@ -8,7 +8,7 @@ using ModularMonolith.Shared.Messaging.MassTransit.Kafka;
 using ModularMonolith.Shared.Messaging.MassTransit.Postgres;
 using ModularMonolith.Shared.Messaging.MassTransit.RabbitMQ;
 
-namespace ModularMonolith.Infrastrucutre.Messaging;
+namespace ModularMonolith.Infrastructure.Messaging;
 
 public static class MessagingExtensions
 {
@@ -22,14 +22,14 @@ public static class MessagingExtensions
 
         var databaseProvider = configuration.GetSection("Database")
             .GetSection("Provider")
-            .Get<OutboxStorageType>();
+            .Get<DatabaseProvider>();
 
         serviceCollection.AddMessageBus();
 
         switch (messagingProvider)
         {
             case "Postgres":
-                serviceCollection.AddPostgresMessaging<DbContext>(configuration, databaseProvider , assemblies);
+                serviceCollection.AddPostgresMessaging<DbContext>(configuration, assemblies);
                 break;
             case "Kafka":
                 serviceCollection.AddKafkaMessaging<DbContext>(configuration, databaseProvider, assemblies);

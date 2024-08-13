@@ -49,5 +49,6 @@ internal sealed class SignInCommandHandlerTestsFixture
     public Task AssertThatSignInFailedEventWasPublished() => _messageBus.Received(1)
         .PublishAsync(Arg.Is<SignInFailedEvent>(u => u.UserId == _user!.Id), Arg.Any<CancellationToken>());
 
-    public Task AssertThatNoEventWasPublished() => _messageBus.DidNotReceiveWithAnyArgs().PublishAsync(Arg.Any<IEvent>(), default);
+    public Task AssertThatNoEventWasPublished() =>
+        _messageBus.DidNotReceiveWithAnyArgs().PublishAsync(Arg.Any<IEvent>(), default);
 }

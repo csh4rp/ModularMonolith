@@ -15,7 +15,7 @@ public static class AuditLogExtensions
 
         return entityTypeBuilder;
     }
-    
+
     public static IMutableEntityType AuditIgnore(this IMutableEntityType entityType)
     {
         entityType.AddAnnotation(AuditIgnoreAnnotation, true);

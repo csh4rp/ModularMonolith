@@ -4,10 +4,10 @@
     <PackageReference Include="MassTransit.Abstractions"/>
   </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj" />
-      <ProjectReference Include="..\..\DataAccess\ModularMonolith.Shared.DataAccess\ModularMonolith.Shared.DataAccess.csproj" />
-      <ProjectReference Include="..\..\Tracing\ModularMonolith.Shared.Tracing\ModularMonolith.Shared.Tracing.csproj" />
-      <ProjectReference Include="..\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj"/>
+    <ProjectReference Include="..\..\DataAccess\ModularMonolith.Shared.DataAccess\ModularMonolith.Shared.DataAccess.csproj"/>
+    <ProjectReference Include="..\..\Tracing\ModularMonolith.Shared.Tracing\ModularMonolith.Shared.Tracing.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj"/>
+  </ItemGroup>
 </Project>

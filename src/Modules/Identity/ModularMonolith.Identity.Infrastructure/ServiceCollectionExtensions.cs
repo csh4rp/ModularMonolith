@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Identity.Domain.Roles;
 using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Identity.Infrastructure.Account.Stores;
+
 namespace ModularMonolith.Identity.Infrastructure;
 
 public static class ServiceCollectionExtensions

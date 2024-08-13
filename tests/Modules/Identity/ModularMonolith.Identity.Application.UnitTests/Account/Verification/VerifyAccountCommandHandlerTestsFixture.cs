@@ -44,5 +44,6 @@ internal sealed class VerifyAccountCommandHandlerTestsFixture
         _eventBus.Received(1).PublishAsync(Arg.Is<AccountVerifiedEvent>(a => a.UserId == _user!.Id),
             Arg.Any<CancellationToken>());
 
-    public Task AssertThatNoEventWasPublished() => _eventBus.DidNotReceiveWithAnyArgs().PublishAsync(Arg.Any<IEvent>(), default);
+    public Task AssertThatNoEventWasPublished() =>
+        _eventBus.DidNotReceiveWithAnyArgs().PublishAsync(Arg.Any<IEvent>(), default);
 }

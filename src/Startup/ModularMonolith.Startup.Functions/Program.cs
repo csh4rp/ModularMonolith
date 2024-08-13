@@ -2,7 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ModularMonolith.Infrastructure.DataAccess;
-using ModularMonolith.Infrastrucutre.Messaging;
+using ModularMonolith.Infrastructure.Messaging;
 using ModularMonolith.Shared.Application;
 using ModularMonolith.Shared.Identity;
 using ModularMonolith.Shared.RestApi;
@@ -33,7 +33,6 @@ builder.ConfigureServices((context, serviceCollection) =>
         .AddExceptionHandlers()
         .AddSingleton(TimeProvider.System)
         .AddTracingServices();
-
 });
 
 var host = builder.Build();

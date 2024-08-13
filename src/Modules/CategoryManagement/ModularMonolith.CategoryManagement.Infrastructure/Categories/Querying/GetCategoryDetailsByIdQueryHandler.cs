@@ -18,9 +18,7 @@ internal sealed class GetCategoryDetailsByIdQueryHandler
         await _database.Set<Category>().Where(c => c.Id == CategoryId.From(request.Id))
             .Select(c => new CategoryDetailsResponse
             {
-                Id = c.Id.Value,
-                ParentId = c.ParentId.HasValue ? c.ParentId.Value.Value : null,
-                Name = c.Name
+                Id = c.Id.Value, ParentId = c.ParentId.HasValue ? c.ParentId.Value.Value : null, Name = c.Name
             })
             .FirstOrDefaultAsync(cancellationToken)
         ?? throw new EntityNotFoundException(typeof(Category), request.Id);

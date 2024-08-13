@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using MassTransit;
+using MassTransit.SqlTransport.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,11 +12,12 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddPostgresMessaging<TDbContext>(this IServiceCollection serviceCollection,
         IConfiguration configuration,
-        OutboxStorageType outboxStorageType,
         Assembly[] assemblies)
         where TDbContext : DbContext
     {
         var connectionString = configuration.GetConnectionString("Database");
+        var setupConsumers = configuration.GetSection("Messaging:CustomersEnabled")
+            .Get<bool>();
 
         if (string.IsNullOrEmpty(connectionString))
         {
@@ -33,68 +35,69 @@ public static class ServiceCollectionExtensions
         {
             c.AddEntityFrameworkOutbox<TDbContext>(o =>
             {
-                switch (outboxStorageType)
-                {
-                    case OutboxStorageType.Postgres:
-                        o.UsePostgres();
-                        break;
-                    case OutboxStorageType.SqlServer:
-                        o.UseSqlServer();
-                        break;
-                }
-
+                o.UsePostgres();
                 o.UseBusOutbox(a =>
                 {
                     a.MessageDeliveryLimit = 10;
                 });
             });
 
-            c.AddConsumers(assemblies);
-
-            c.AddConfigureEndpointsCallback((context, _, cfg) =>
+            if (setupConsumers)
             {
-                cfg.UseEntityFrameworkOutbox<TDbContext>(context);
-            });
+                c.AddConsumers(assemblies);
+            }
 
             c.UsingPostgres(connectionString, (context, configurator) =>
             {
-                var consumerMessages = assemblies
-                    .SelectMany(a => a.GetTypes())
-                    .Where(t => t.IsAssignableTo(typeof(IConsumer)))
-                    .GroupBy(t =>
-                    {
-                        var @interface = t.GetInterfaces()
-                            .Single(i => i.IsGenericType && i.IsAssignableTo(typeof(IConsumer)));
+                configurator.Host(new PostgresSqlHostSettings(connectionString));
 
-                        return @interface.GenericTypeArguments[0];
-                    })
-                    .ToDictionary(t => t.Key, t => t.ToList());
-
-                foreach (var (messageType, _) in consumerMessages)
+                if (setupConsumers)
                 {
-                    var eventAttribute = messageType.GetCustomAttribute<EventAttribute>()!;
-                    var topic = eventAttribute.Topic ?? messageType.Name;
-
-                    var groupedConsumers = consumerMessages.Values.SelectMany(s => s)
-                        .GroupBy(t => t.GetCustomAttribute<EventConsumerAttribute>()?.ConsumerName ?? topic)
-                        .ToDictionary(t => t.Key, t => t.ToList());
-
-                    foreach (var (consumerGroupName, consumerTypes) in groupedConsumers)
-                    {
-                        configurator.ReceiveEndpoint(consumerGroupName, cf =>
-                        {
-                            cf.UseEntityFrameworkOutbox<TDbContext>(context);
-
-                            foreach (var consumerType in consumerTypes)
-                            {
-                                cf.ConfigureConsumer(context, consumerType);
-                            }
-                        });
-                    }
+                    SetupConsumers(context, configurator, assemblies);
                 }
             });
         });
 
         return serviceCollection;
+    }
+
+    private static void SetupConsumers(IBusRegistrationContext context,
+        ISqlBusFactoryConfigurator cfg,
+        Assembly[] assemblies)
+    {
+        var consumerMessages = assemblies
+            .SelectMany(a => a.GetTypes())
+            .Where(t => t.IsAssignableTo(typeof(IConsumer)))
+            .GroupBy(t =>
+            {
+                var @interface = t.GetInterfaces()
+                    .Single(i => i.IsGenericType && i.IsAssignableTo(typeof(IConsumer)));
+
+                return @interface.GenericTypeArguments[0];
+            })
+            .ToDictionary(t => t.Key, t => t.ToList());
+
+        foreach (var (messageType, _) in consumerMessages)
+        {
+            var eventAttribute = messageType.GetCustomAttribute<EventAttribute>()!;
+            var topic = eventAttribute.Topic ?? messageType.Name;
+
+            var groupedConsumers = consumerMessages.Values.SelectMany(s => s)
+                .GroupBy(t => t.GetCustomAttribute<EventConsumerAttribute>()?.ConsumerName ?? topic)
+                .ToDictionary(t => t.Key, t => t.ToList());
+
+            foreach (var (queue, consumerTypes) in groupedConsumers)
+            {
+                cfg.ReceiveEndpoint(queue, cf =>
+                {
+                    foreach (var consumerType in consumerTypes)
+                    {
+                        cf.ConfigureConsumer(context, consumerType);
+                    }
+
+                    cf.Subscribe(topic);
+                });
+            }
+        }
     }
 }

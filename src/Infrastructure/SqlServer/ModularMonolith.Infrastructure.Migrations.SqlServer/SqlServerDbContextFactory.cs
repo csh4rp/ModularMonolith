@@ -8,6 +8,12 @@ namespace ModularMonolith.Infrastructure.Migrations.SqlServer;
 
 public class SqlServerDbContextFactory : IDesignTimeDbContextFactory<SqlServerDbContext>
 {
+    private readonly Assembly[] _configurationAssemblies =
+    [
+        Assembly.Load("ModularMonolith.CategoryManagement.Infrastructure"),
+        Assembly.Load("ModularMonolith.Identity.Infrastructure")
+    ];
+
     public SqlServerDbContext CreateDbContext(string[] args)
     {
         if (args.Length == 0)
@@ -19,26 +25,12 @@ public class SqlServerDbContextFactory : IDesignTimeDbContextFactory<SqlServerDb
         var optionsBuilder = new DbContextOptionsBuilder<SqlServerDbContext>();
 
         optionsBuilder.UseSqlServer(args[0], b =>
-            {
-                b.MigrationsAssembly(GetType().Assembly.FullName);
-                b.MigrationsHistoryTable("migration_history", "shared");
-            });
-
-        var options = optionsBuilder.Options;
-
-        if (args.Length > 1)
         {
-            var assemblyNames = args[1..];
+            b.MigrationsAssembly(GetType().Assembly.FullName);
+            b.MigrationsHistoryTable("migration_history", "shared");
+        });
 
-            var assemblies = new List<Assembly>(assemblyNames.Length);
-            foreach (var assemblyName in assemblyNames)
-            {
-                assemblies.Add(Assembly.Load(assemblyName));
-            }
-
-            return new SqlServerDbContext(options, ConfigurationAssemblyCollection.FromAssemblies(assemblies));
-        }
-
-        return new SqlServerDbContext(options, ConfigurationAssemblyCollection.Empty);
+        return new SqlServerDbContext(optionsBuilder.Options,
+            ConfigurationAssemblyCollection.FromAssemblies(_configurationAssemblies));
     }
 }

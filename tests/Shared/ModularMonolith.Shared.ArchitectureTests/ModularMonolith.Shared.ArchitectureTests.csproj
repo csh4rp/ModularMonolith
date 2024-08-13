@@ -9,18 +9,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.RestApi\ModularMonolith.CategoryManagement.RestApi.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.RestApi\ModularMonolith.CategoryManagement.RestApi.csproj"/>
     <ProjectReference Include="..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Application\ModularMonolith.CategoryManagement.Application.csproj"/>
     <ProjectReference Include="..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Contracts\ModularMonolith.CategoryManagement.Contracts.csproj"/>
     <ProjectReference Include="..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Domain\ModularMonolith.CategoryManagement.Domain.csproj"/>
     <ProjectReference Include="..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Infrastructure\ModularMonolith.CategoryManagement.Infrastructure.csproj"/>
-    <ProjectReference Include="..\..\..\src\Modules\Identity\ModularMonolith.Identity.RestApi\ModularMonolith.Identity.RestApi.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Identity\ModularMonolith.Identity.RestApi\ModularMonolith.Identity.RestApi.csproj"/>
     <ProjectReference Include="..\..\..\src\Modules\Identity\ModularMonolith.Identity.Application\ModularMonolith.Identity.Application.csproj"/>
     <ProjectReference Include="..\..\..\src\Modules\Identity\ModularMonolith.Identity.Contracts\ModularMonolith.Identity.Contracts.csproj"/>
     <ProjectReference Include="..\..\..\src\Modules\Identity\ModularMonolith.Identity.Core\ModularMonolith.Identity.Core.csproj"/>
     <ProjectReference Include="..\..\..\src\Modules\Identity\ModularMonolith.Identity.Domain\ModularMonolith.Identity.Domain.csproj"/>
     <ProjectReference Include="..\..\..\src\Modules\Identity\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj"/>
-    <ProjectReference Include="..\..\..\src\Shared\Api\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj" />
+    <ProjectReference Include="..\..\..\src\Shared\Api\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj"/>
     <ProjectReference Include="..\..\..\src\Shared\Common\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
     <ProjectReference Include="..\..\..\src\Shared\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
     <ProjectReference Include="..\..\..\src\Shared\Common\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>

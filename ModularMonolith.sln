@@ -141,7 +141,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Data
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.IntegrationTests", "tests\Shared\DataAccess\ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.IntegrationTests\ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.IntegrationTests.csproj", "{6BCB3691-D364-4D1B-8EAD-F1203E4C2191}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Infrastrucutre.Messaging", "src\Infrastructure\Common\ModularMonolith.Infrastrucutre.Messaging\ModularMonolith.Infrastrucutre.Messaging.csproj", "{79C3FBC7-C3CD-40DC-8432-1C705310767A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Infrastructure.Messaging", "src\Infrastructure\Common\ModularMonolith.Infrastructure.Messaging\ModularMonolith.Infrastructure.Messaging.csproj", "{79C3FBC7-C3CD-40DC-8432-1C705310767A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

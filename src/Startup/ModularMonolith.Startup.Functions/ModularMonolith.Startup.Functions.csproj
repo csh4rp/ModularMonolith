@@ -4,8 +4,8 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Functions.Worker" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker"/>
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk"/>
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -20,8 +20,8 @@
     <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Infrastructure\Common\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\Common\ModularMonolith.Infrastrucutre.Messaging\ModularMonolith.Infrastrucutre.Messaging.csproj" />
-    <ProjectReference Include="..\..\Shared\Api\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Common\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj"/>
+    <ProjectReference Include="..\..\Infrastructure\Common\ModularMonolith.Infrastructure.Messaging\ModularMonolith.Infrastructure.Messaging.csproj"/>
+    <ProjectReference Include="..\..\Shared\Api\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj"/>
   </ItemGroup>
 </Project>

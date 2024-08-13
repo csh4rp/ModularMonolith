@@ -28,7 +28,9 @@ internal sealed class ChangePasswordCommandHandlerTestsFixture
         _user = new User(userName) { Id = id };
         _password = password;
 
-        _userManager.FindByNameAsync(Arg.Is<string>(arg => _user.UserName.Equals(arg, StringComparison.InvariantCultureIgnoreCase)))
+        _userManager
+            .FindByNameAsync(Arg.Is<string>(arg =>
+                _user.UserName.Equals(arg, StringComparison.InvariantCultureIgnoreCase)))
             .Returns(_user);
 
         _userManager.ChangePasswordAsync(Arg.Any<User>(), Arg.Is<string>(arg => arg != _password), Arg.Any<string>())

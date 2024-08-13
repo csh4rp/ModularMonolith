@@ -48,13 +48,10 @@ public class IdentityFixture : IAsyncLifetime
         _connection = new NpgsqlConnection(connectionString);
         await _connection.OpenAsync();
 
-        const string assemblyName = "ModularMonolith.Identity.Infrastructure";
-
-        _dbContext = new PostgresDbContextFactory().CreateDbContext([connectionString, assemblyName]);
+        _dbContext = new PostgresDbContextFactory().CreateDbContext([connectionString]);
         await _dbContext.Database.MigrateAsync();
 
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
-
 
 
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
@@ -76,7 +73,8 @@ public class IdentityFixture : IAsyncLifetime
 
             builder.ConfigureServices(s =>
             {
-                s.Replace(new ServiceDescriptor(typeof(TimeProvider), typeof(FakeTimeProvider), ServiceLifetime.Singleton));
+                s.Replace(new ServiceDescriptor(typeof(TimeProvider), typeof(FakeTimeProvider),
+                    ServiceLifetime.Singleton));
             });
         });
 

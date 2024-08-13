@@ -60,10 +60,7 @@ public class CategoryManagementFixture : IAsyncLifetime
 
         _connection = new NpgsqlConnection(connectionString);
         _dbContext =
-            new PostgresDbContextFactory().CreateDbContext([
-                connectionString,
-                "ModularMonolith.CategoryManagement.Infrastructure"
-            ]);
+            new PostgresDbContextFactory().CreateDbContext([connectionString]);
 
         await _testBus.StartAsync(_messagingContainer.GetConnectionString());
         await _connection.OpenAsync();

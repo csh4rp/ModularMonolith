@@ -59,7 +59,8 @@ public abstract class CrudRepository<TAggregate, TId> where TAggregate : Aggrega
     public virtual Task<TAggregate?> FindByIdAsync(TId id, CancellationToken cancellationToken) =>
         Context.Set<TAggregate>().FindAsync([id], cancellationToken: cancellationToken).AsTask();
 
-    public virtual Task<List<TAggregate>> FindAllByIdsAsync(IEnumerable<TId> ids, CancellationToken cancellationToken) =>
+    public virtual Task<List<TAggregate>>
+        FindAllByIdsAsync(IEnumerable<TId> ids, CancellationToken cancellationToken) =>
         Context.Set<TAggregate>().Where(a => ids.Contains(a.Id)).ToListAsync(cancellationToken);
 
     public virtual Task<bool> ExistsByIdAsync(TId id, CancellationToken cancellationToken) =>

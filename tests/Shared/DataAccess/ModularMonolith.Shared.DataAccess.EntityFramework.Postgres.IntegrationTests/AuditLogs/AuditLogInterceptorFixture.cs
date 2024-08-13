@@ -49,77 +49,80 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
 
     public HttpContext GetHttpContext() => _httpContextAccessor.HttpContext!;
 
-     public AuditLogDbContext CreateDbContext()
-     {
-         var serviceCollection = new ServiceCollection();
-         serviceCollection.AddTransient<IHttpContextAccessor>(_ => _httpContextAccessor);
-         serviceCollection.AddTransient<AuditLogFactory>();
-         serviceCollection.AddTransient<Postgres.AuditLogs.Factories.AuditLogFactory>();
-         serviceCollection.AddTransient<IAuditMetaDataProvider, AuditMetaDataProvider>();
-         serviceCollection.AddTransient<IIdentityContextAccessor>(_ => _identityContextAccessor);
-         serviceCollection.AddTransient<IAuditLogStore, AuditLogStore>();
-         serviceCollection.AddTransient<IHttpContextAccessor>(_ =>
-             new HttpContextAccessor { HttpContext = new DefaultHttpContext()
-             {
-                 Request =
-                 {
-                     Scheme = "https",
-                     Method = "GET",
-                     Path = new PathString("/api/test"),
-                     Host = new HostString("localhost"),
-                     Protocol = "HTTP (1.1)",
-                     Query = new QueryCollection()
-                 }
-             } });
-         serviceCollection.AddTransient<TimeProvider>(_ => _dateTimeProvider);
-         serviceCollection.AddTransient<DbContext>(_ => _dbContext!);
+    public AuditLogDbContext CreateDbContext()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddTransient<IHttpContextAccessor>(_ => _httpContextAccessor);
+        serviceCollection.AddTransient<AuditLogFactory>();
+        serviceCollection.AddTransient<Postgres.AuditLogs.Factories.AuditLogFactory>();
+        serviceCollection.AddTransient<IAuditMetaDataProvider, AuditMetaDataProvider>();
+        serviceCollection.AddTransient<IIdentityContextAccessor>(_ => _identityContextAccessor);
+        serviceCollection.AddTransient<IAuditLogStore, AuditLogStore>();
+        serviceCollection.AddTransient<IHttpContextAccessor>(_ =>
+            new HttpContextAccessor
+            {
+                HttpContext = new DefaultHttpContext()
+                {
+                    Request =
+                    {
+                        Scheme = "https",
+                        Method = "GET",
+                        Path = new PathString("/api/test"),
+                        Host = new HostString("localhost"),
+                        Protocol = "HTTP (1.1)",
+                        Query = new QueryCollection()
+                    }
+                }
+            });
+        serviceCollection.AddTransient<TimeProvider>(_ => _dateTimeProvider);
+        serviceCollection.AddTransient<DbContext>(_ => _dbContext!);
 
-         var builder = new DbContextOptionsBuilder<AuditLogDbContext>();
-         builder.UseApplicationServiceProvider(serviceCollection.BuildServiceProvider());
-         builder.AddInterceptors(new AuditLogInterceptor());
-         builder.UseNpgsql(_connectionString)
-             .UseSnakeCaseNamingConvention();
+        var builder = new DbContextOptionsBuilder<AuditLogDbContext>();
+        builder.UseApplicationServiceProvider(serviceCollection.BuildServiceProvider());
+        builder.AddInterceptors(new AuditLogInterceptor());
+        builder.UseNpgsql(_connectionString)
+            .UseSnakeCaseNamingConvention();
 
-         _dbContext = new AuditLogDbContext(builder.Options);
-         return _dbContext;
-     }
+        _dbContext = new AuditLogDbContext(builder.Options);
+        return _dbContext;
+    }
 
-     public async Task InitializeAsync()
-     {
-         await using var connection = new NpgsqlConnection(_connectionString);
-         await connection.OpenAsync();
+    public async Task InitializeAsync()
+    {
+        await using var connection = new NpgsqlConnection(_connectionString);
+        await connection.OpenAsync();
 
-         await using var cmd = connection.CreateCommand();
-         cmd.CommandText =
-             """
-             CREATE TABLE IF NOT EXISTS "FirstTestEntity"
-             (
-                 "id" UUID NOT NULL PRIMARY KEY,
-                 "timestamp" TIMESTAMP NOT NULL,
-                 "name" VARCHAR(128) NOT NULL,
-                 "first_owned_entity" JSONB,
-                 "second_owned_entity" JSONB
-             );
+        await using var cmd = connection.CreateCommand();
+        cmd.CommandText =
+            """
+            CREATE TABLE IF NOT EXISTS "FirstTestEntity"
+            (
+                "id" UUID NOT NULL PRIMARY KEY,
+                "timestamp" TIMESTAMP NOT NULL,
+                "name" VARCHAR(128) NOT NULL,
+                "first_owned_entity" JSONB,
+                "second_owned_entity" JSONB
+            );
 
-             CREATE TABLE IF NOT EXISTS "SecondTestEntity"
-             (
-                 "id" UUID NOT NULL PRIMARY KEY,
-                 "name" VARCHAR(128) NOT NULL
-             );
+            CREATE TABLE IF NOT EXISTS "SecondTestEntity"
+            (
+                "id" UUID NOT NULL PRIMARY KEY,
+                "name" VARCHAR(128) NOT NULL
+            );
 
-             CREATE TABLE IF NOT EXISTS "FirstSecondTestEntity"
-             (
-                 "first_test_entity_id" UUID NOT NULL,
-                 "second_test_entity_id" UUID NOT NULL,
-                 PRIMARY KEY ("first_test_entity_id", "second_test_entity_id")
-             );
-             """;
+            CREATE TABLE IF NOT EXISTS "FirstSecondTestEntity"
+            (
+                "first_test_entity_id" UUID NOT NULL,
+                "second_test_entity_id" UUID NOT NULL,
+                PRIMARY KEY ("first_test_entity_id", "second_test_entity_id")
+            );
+            """;
 
-         await cmd.ExecuteNonQueryAsync();
-     }
+        await cmd.ExecuteNonQueryAsync();
+    }
 
-     public Task DisposeAsync()
-     {
-         return Task.CompletedTask;
-     }
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
 }

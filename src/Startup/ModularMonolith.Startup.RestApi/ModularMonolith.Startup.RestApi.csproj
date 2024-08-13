@@ -5,8 +5,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Modules\CategoryManagement\ModularMonolith.CategoryManagement.RestApi\ModularMonolith.CategoryManagement.RestApi.csproj" />
-    <ProjectReference Include="..\..\Modules\Identity\ModularMonolith.Identity.RestApi\ModularMonolith.Identity.RestApi.csproj" />
-    <ProjectReference Include="..\..\Shared\Api\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj" />
+    <ProjectReference Include="..\..\Modules\CategoryManagement\ModularMonolith.CategoryManagement.RestApi\ModularMonolith.CategoryManagement.RestApi.csproj"/>
+    <ProjectReference Include="..\..\Modules\Identity\ModularMonolith.Identity.RestApi\ModularMonolith.Identity.RestApi.csproj"/>
+    <ProjectReference Include="..\..\Shared\Api\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj"/>
   </ItemGroup>
 </Project>

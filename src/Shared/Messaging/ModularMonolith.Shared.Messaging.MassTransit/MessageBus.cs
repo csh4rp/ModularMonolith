@@ -133,5 +133,4 @@ internal sealed class MessageBus : IMessageBus
             p.Headers.Set("parent_span_id", operationContext.ParentSpanId.ToString());
         }, cancellationToken);
     }
-
 }

@@ -2,5 +2,5 @@
 
 public interface IUnitOfWork
 {
-   Task<IUnitOfWorkScope> BeginScopeAsync(CancellationToken cancellationToken);
+    Task<IUnitOfWorkScope> BeginScopeAsync(CancellationToken cancellationToken);
 }

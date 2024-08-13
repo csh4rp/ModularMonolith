@@ -7,7 +7,7 @@ namespace ModularMonolith.Shared.Tracing;
 internal sealed class OperationContextAccessor : IOperationContextAccessor
 {
     private const string DefaultSubject = "SYSTEM";
-    
+
     private readonly IIdentityContextAccessor _identityContextAccessor;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -27,7 +27,7 @@ internal sealed class OperationContextAccessor : IOperationContextAccessor
             {
                 return null;
             }
-            
+
             var httpContext = _httpContextAccessor?.HttpContext;
 
             return new OperationContext

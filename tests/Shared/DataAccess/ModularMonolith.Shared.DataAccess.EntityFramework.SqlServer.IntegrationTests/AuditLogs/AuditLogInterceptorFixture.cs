@@ -48,80 +48,83 @@ public class AuditLogInterceptorFixture : IAsyncLifetime
 
     public HttpContext GetHttpContext() => _httpContextAccessor.HttpContext!;
 
-     public AuditLogDbContext CreateDbContext()
-     {
-         var serviceCollection = new ServiceCollection();
-         serviceCollection.AddTransient<IHttpContextAccessor>(_ => _httpContextAccessor);
-         serviceCollection.AddTransient<AuditLogFactory>();
-         serviceCollection.AddTransient<SqlServer.AuditLogs.Factories.AuditLogFactory>();
-         serviceCollection.AddTransient<IAuditMetaDataProvider, AuditMetaDataProvider>();
-         serviceCollection.AddTransient<IIdentityContextAccessor>(_ => _identityContextAccessor);
-         serviceCollection.AddTransient<IAuditLogStore, AuditLogStore>();
-         serviceCollection.AddTransient<TimeProvider>(_ => _dateTimeProvider);
-         serviceCollection.AddTransient<DbContext>(_ => _dbContext!);
-         serviceCollection.AddTransient<IHttpContextAccessor>(_ =>
-             new HttpContextAccessor { HttpContext = new DefaultHttpContext()
-             {
-                 Request =
-                 {
-                     Scheme = "https",
-                     Method = "GET",
-                     Path = new PathString("/api/test"),
-                     Host = new HostString("localhost"),
-                     Protocol = "HTTP (1.1)",
-                     Query = new QueryCollection()
-                 }
-             } });
+    public AuditLogDbContext CreateDbContext()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddTransient<IHttpContextAccessor>(_ => _httpContextAccessor);
+        serviceCollection.AddTransient<AuditLogFactory>();
+        serviceCollection.AddTransient<SqlServer.AuditLogs.Factories.AuditLogFactory>();
+        serviceCollection.AddTransient<IAuditMetaDataProvider, AuditMetaDataProvider>();
+        serviceCollection.AddTransient<IIdentityContextAccessor>(_ => _identityContextAccessor);
+        serviceCollection.AddTransient<IAuditLogStore, AuditLogStore>();
+        serviceCollection.AddTransient<TimeProvider>(_ => _dateTimeProvider);
+        serviceCollection.AddTransient<DbContext>(_ => _dbContext!);
+        serviceCollection.AddTransient<IHttpContextAccessor>(_ =>
+            new HttpContextAccessor
+            {
+                HttpContext = new DefaultHttpContext()
+                {
+                    Request =
+                    {
+                        Scheme = "https",
+                        Method = "GET",
+                        Path = new PathString("/api/test"),
+                        Host = new HostString("localhost"),
+                        Protocol = "HTTP (1.1)",
+                        Query = new QueryCollection()
+                    }
+                }
+            });
 
-         var builder = new DbContextOptionsBuilder<AuditLogDbContext>();
-         builder.UseApplicationServiceProvider(serviceCollection.BuildServiceProvider());
-         builder.AddInterceptors(new AuditLogInterceptor());
-         builder.UseSqlServer(_connectionString);
+        var builder = new DbContextOptionsBuilder<AuditLogDbContext>();
+        builder.UseApplicationServiceProvider(serviceCollection.BuildServiceProvider());
+        builder.AddInterceptors(new AuditLogInterceptor());
+        builder.UseSqlServer(_connectionString);
 
-         _dbContext = new AuditLogDbContext(builder.Options);
-         return _dbContext;
-     }
+        _dbContext = new AuditLogDbContext(builder.Options);
+        return _dbContext;
+    }
 
-     public async Task InitializeAsync()
-     {
-         await using var connection = new SqlConnection(_connectionString);
-         await connection.OpenAsync();
+    public async Task InitializeAsync()
+    {
+        await using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
 
-         await using var cmd = connection.CreateCommand();
-         cmd.CommandText =
-             """
-             IF NOT EXISTS (SELECT 1 FROM SYSOBJECTS WHERE NAME = 'FirstTestEntity' AND XTYPE = 'U')
-                 CREATE TABLE FirstTestEntity
-                 (
-                     Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
-                     Timestamp DATETIMEOFFSET  NOT NULL,
-                     Name NVARCHAR(128) NOT NULL,
-                     FirstOwnedEntity NVARCHAR(MAX) NULL,
-                     SecondOwnedEntity NVARCHAR(MAX) NULL
-                 );
-
-             IF NOT EXISTS (SELECT 1 FROM SYSOBJECTS WHERE NAME = 'SecondTestEntity' AND XTYPE = 'U')
-                CREATE TABLE SecondTestEntity
+        await using var cmd = connection.CreateCommand();
+        cmd.CommandText =
+            """
+            IF NOT EXISTS (SELECT 1 FROM SYSOBJECTS WHERE NAME = 'FirstTestEntity' AND XTYPE = 'U')
+                CREATE TABLE FirstTestEntity
                 (
                     Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
-                    Name NVARCHAR(128) NOT NULL
+                    Timestamp DATETIMEOFFSET  NOT NULL,
+                    Name NVARCHAR(128) NOT NULL,
+                    FirstOwnedEntity NVARCHAR(MAX) NULL,
+                    SecondOwnedEntity NVARCHAR(MAX) NULL
                 );
 
+            IF NOT EXISTS (SELECT 1 FROM SYSOBJECTS WHERE NAME = 'SecondTestEntity' AND XTYPE = 'U')
+               CREATE TABLE SecondTestEntity
+               (
+                   Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+                   Name NVARCHAR(128) NOT NULL
+               );
 
-             IF NOT EXISTS (SELECT 1 FROM SYSOBJECTS WHERE NAME = 'FirstSecondTestEntity' AND XTYPE = 'U')
-                CREATE TABLE  FirstSecondTestEntity
-                (
-                    FirstTestEntityId UNIQUEIDENTIFIER NOT NULL,
-                    SecondTestEntityId UNIQUEIDENTIFIER NOT NULL,
-                    PRIMARY KEY (FirstTestEntityId, SecondTestEntityId)
-                );
-             """;
 
-         await cmd.ExecuteNonQueryAsync();
-     }
+            IF NOT EXISTS (SELECT 1 FROM SYSOBJECTS WHERE NAME = 'FirstSecondTestEntity' AND XTYPE = 'U')
+               CREATE TABLE  FirstSecondTestEntity
+               (
+                   FirstTestEntityId UNIQUEIDENTIFIER NOT NULL,
+                   SecondTestEntityId UNIQUEIDENTIFIER NOT NULL,
+                   PRIMARY KEY (FirstTestEntityId, SecondTestEntityId)
+               );
+            """;
 
-     public Task DisposeAsync()
-     {
-         return Task.CompletedTask;
-     }
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
 }

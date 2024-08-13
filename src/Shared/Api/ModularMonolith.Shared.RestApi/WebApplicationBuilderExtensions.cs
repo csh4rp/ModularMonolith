@@ -1,7 +1,7 @@
 ﻿using Asp.Versioning;
 using FluentValidation;
 using ModularMonolith.Infrastructure.DataAccess;
-using ModularMonolith.Infrastrucutre.Messaging;
+using ModularMonolith.Infrastructure.Messaging;
 using ModularMonolith.Shared.Application;
 using ModularMonolith.Shared.Identity;
 using ModularMonolith.Shared.RestApi.Authorization;

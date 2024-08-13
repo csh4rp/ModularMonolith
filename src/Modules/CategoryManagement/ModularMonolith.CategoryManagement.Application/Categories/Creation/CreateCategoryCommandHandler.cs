@@ -12,7 +12,8 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
 {
     private readonly ICategoryRepository _categoryRepository;
 
-    public CreateCategoryCommandHandler(ICategoryRepository categoryRepository) => _categoryRepository = categoryRepository;
+    public CreateCategoryCommandHandler(ICategoryRepository categoryRepository) =>
+        _categoryRepository = categoryRepository;
 
     public async Task<CreatedResponse> Handle(CreateCategoryCommand request,
         CancellationToken cancellationToken)
@@ -25,7 +26,8 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
 
         if (request.ParentId.HasValue)
         {
-            var parentExists = await _categoryRepository.ExistsByIdAsync(CategoryId.From(request.ParentId.Value), cancellationToken);
+            var parentExists =
+                await _categoryRepository.ExistsByIdAsync(CategoryId.From(request.ParentId.Value), cancellationToken);
             if (!parentExists)
             {
                 throw new ValidationException(MemberError.InvalidValue(nameof(CreateCategoryCommand.ParentId)));

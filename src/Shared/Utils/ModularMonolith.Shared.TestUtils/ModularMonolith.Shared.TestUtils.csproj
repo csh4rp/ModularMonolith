@@ -4,9 +4,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FluentAssertions"/>
-    <PackageReference Include="MassTransit.RabbitMQ" />
+    <PackageReference Include="MassTransit.RabbitMQ"/>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
-    <PackageReference Include="Polly" />
+    <PackageReference Include="Polly"/>
     <PackageReference Include="Verify"/>
     <PackageReference Include="Verify.Http"/>
     <PackageReference Include="Verify.Xunit"/>
@@ -15,6 +15,6 @@
     <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Resiliency\" />
+    <Folder Include="Resiliency\"/>
   </ItemGroup>
 </Project>

@@ -6,11 +6,7 @@ public sealed record SignInResponse
 
     public bool IsSuccessful { get; private set; }
 
-    public static SignInResponse Succeeded(string token) => new()
-    {
-        Token = token,
-        IsSuccessful = true
-    };
+    public static SignInResponse Succeeded(string token) => new() { Token = token, IsSuccessful = true };
 
     public static SignInResponse InvalidCredentials() => new();
 }

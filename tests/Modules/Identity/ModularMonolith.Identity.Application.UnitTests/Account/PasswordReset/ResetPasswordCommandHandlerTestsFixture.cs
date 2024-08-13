@@ -41,5 +41,6 @@ internal sealed class ResetPasswordCommandHandlerTestsFixture
     public Task AssertThatPasswordResetEventWasPublished() => _messageBus.Received(1)
         .PublishAsync(Arg.Is<PasswordResetEvent>(u => u.UserId == _user!.Id), Arg.Any<CancellationToken>());
 
-    public Task AssertThatNoEventWasPublished() => _messageBus.DidNotReceiveWithAnyArgs().PublishAsync(Arg.Any<IEvent>(), default);
+    public Task AssertThatNoEventWasPublished() =>
+        _messageBus.DidNotReceiveWithAnyArgs().PublishAsync(Arg.Any<IEvent>(), default);
 }

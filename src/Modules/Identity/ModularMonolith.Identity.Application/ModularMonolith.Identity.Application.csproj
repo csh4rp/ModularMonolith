@@ -6,11 +6,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\Common\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
-    <ProjectReference Include="..\..\..\Shared\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Common\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Common\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Identity\ModularMonolith.Shared.Identity\ModularMonolith.Shared.Identity.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Messaging\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
+    <ProjectReference Include="..\..\..\Shared\Common\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
+    <ProjectReference Include="..\..\..\Shared\Common\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj"/>
+    <ProjectReference Include="..\..\..\Shared\Identity\ModularMonolith.Shared.Identity\ModularMonolith.Shared.Identity.csproj"/>
+    <ProjectReference Include="..\..\..\Shared\Messaging\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj"/>
     <ProjectReference Include="..\ModularMonolith.Identity.Contracts\ModularMonolith.Identity.Contracts.csproj"/>
     <ProjectReference Include="..\ModularMonolith.Identity.Core\ModularMonolith.Identity.Core.csproj"/>
     <ProjectReference Include="..\ModularMonolith.Identity.Domain\ModularMonolith.Identity.Domain.csproj"/>

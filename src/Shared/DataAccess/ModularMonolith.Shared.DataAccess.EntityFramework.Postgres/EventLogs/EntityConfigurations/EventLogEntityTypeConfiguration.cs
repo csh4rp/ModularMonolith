@@ -27,7 +27,8 @@ public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<E
 
         builder.Property(b => b.EventTypeName)
             .HasMaxLength(512)
-            .IsRequired();;
+            .IsRequired();
+        ;
 
         builder.OwnsOne(b => b.MetaData, b =>
         {

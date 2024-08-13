@@ -1,6 +1,6 @@
 ﻿namespace ModularMonolith.Shared.Messaging;
 
-public enum OutboxStorageType
+public enum DatabaseProvider
 {
     Postgres,
     SqlServer,

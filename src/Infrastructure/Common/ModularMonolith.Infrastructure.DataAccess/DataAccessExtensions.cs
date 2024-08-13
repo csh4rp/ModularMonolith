@@ -16,7 +16,8 @@ public static class DataAccessExtensions
         IReadOnlyCollection<Assembly> assemblies)
     {
         var collection = ConfigurationAssemblyCollection.FromAssemblies(assemblies);
-        serviceCollection.Add(new ServiceDescriptor(typeof(ConfigurationAssemblyCollection), _ => collection, ServiceLifetime.Singleton));
+        serviceCollection.Add(new ServiceDescriptor(typeof(ConfigurationAssemblyCollection), _ => collection,
+            ServiceLifetime.Singleton));
 
         var dataAccessSection = configuration.GetSection("DataAccess");
         var provider = dataAccessSection.GetSection("Provider").Value;

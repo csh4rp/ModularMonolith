@@ -9,6 +9,12 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres;
 
 public class PostgresDbContextFactory : IDesignTimeDbContextFactory<PostgresDbContext>
 {
+    private readonly Assembly[] _configurationAssemblies =
+    [
+        Assembly.Load("ModularMonolith.CategoryManagement.Infrastructure"),
+        Assembly.Load("ModularMonolith.Identity.Infrastructure")
+    ];
+
     public PostgresDbContext CreateDbContext(string[] args)
     {
         if (args.Length == 0)
@@ -26,21 +32,7 @@ public class PostgresDbContextFactory : IDesignTimeDbContextFactory<PostgresDbCo
             })
             .UseSnakeCaseNamingConvention();
 
-        var options = optionsBuilder.Options;
-
-        if (args.Length > 1)
-        {
-            var assemblyNames = args[1..];
-
-            var assemblies = new List<Assembly>(assemblyNames.Length);
-            foreach (var assemblyName in assemblyNames)
-            {
-                assemblies.Add(Assembly.Load(assemblyName));
-            }
-
-            return new PostgresDbContext(options, ConfigurationAssemblyCollection.FromAssemblies(assemblies));
-        }
-
-        return new PostgresDbContext(options, ConfigurationAssemblyCollection.Empty);
+        return new PostgresDbContext(optionsBuilder.Options,
+            ConfigurationAssemblyCollection.FromAssemblies(_configurationAssemblies));
     }
 }

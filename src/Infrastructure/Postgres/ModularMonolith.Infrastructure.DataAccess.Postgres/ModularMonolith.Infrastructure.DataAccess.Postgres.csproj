@@ -5,6 +5,6 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\DataAccess\ModularMonolith.Shared.DataAccess.EntityFramework.Postgres\ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.csproj" />
+    <ProjectReference Include="..\..\..\Shared\DataAccess\ModularMonolith.Shared.DataAccess.EntityFramework.Postgres\ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.csproj"/>
   </ItemGroup>
 </Project>

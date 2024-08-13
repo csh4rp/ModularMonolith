@@ -1,5 +1,4 @@
-﻿
-using ModularMonolith.CategoryManagement.Api.IntegrationTests.Shared;
+﻿using ModularMonolith.CategoryManagement.Api.IntegrationTests.Shared;
 
 namespace ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories.Shared;
 

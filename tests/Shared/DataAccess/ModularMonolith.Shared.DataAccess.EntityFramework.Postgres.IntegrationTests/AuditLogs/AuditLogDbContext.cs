@@ -11,7 +11,7 @@ public class AuditLogDbContext : DbContext
     public AuditLogDbContext(DbContextOptions options) : base(options)
     {
     }
-    
+
     public DbSet<AuditLogEntity> AuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,16 +30,17 @@ public class AuditLogDbContext : DbContext
             b.ToJson();
             b.WithOwner();
         });
-        
+
         firstEntityBuilder.HasMany(b => b.SecondTestEntities)
             .WithMany(b => b.FirstTestEntities)
             .UsingEntity<Dictionary<string, object>>("FirstSecondTestEntity",
-                    l => l.HasOne<SecondTestEntity>().WithMany().HasForeignKey("SecondTestEntityId"),
+                l => l.HasOne<SecondTestEntity>().WithMany().HasForeignKey("SecondTestEntityId"),
                 r => r.HasOne<FirstTestEntity>().WithMany().HasForeignKey("FirstTestEntityId"));
-        
+
         var secondEntityBuilder = modelBuilder.Entity<SecondTestEntity>();
         secondEntityBuilder.ToTable("SecondTestEntity");
-        secondEntityBuilder.HasKey(x => x.Id);;
+        secondEntityBuilder.HasKey(x => x.Id);
+        ;
         secondEntityBuilder.AuditIgnore();
 
         modelBuilder.ApplyConfiguration(new AuditLogEntityTypeConfiguration());

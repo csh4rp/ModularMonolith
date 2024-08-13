@@ -45,7 +45,8 @@ public class GetCategoryTests : BaseIntegrationTest<GetCategoryTests>
     public async Task ShouldReturnNotFound_WhenCategoryDoesNotExist()
     {
         // Arrange & Act
-        using var response = await _client.GetAsync($"api/category-management/categories/00000000-0000-0000-0000-000000000001");
+        using var response =
+            await _client.GetAsync($"api/category-management/categories/00000000-0000-0000-0000-000000000001");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);

@@ -9,5 +9,5 @@ public class PostgresConnectionFactory
 
     public PostgresConnectionFactory(DbContext dbContext) => _dbContext = dbContext;
 
-    public NpgsqlConnection Create() => (NpgsqlConnection) _dbContext.Database.GetDbConnection();
+    public NpgsqlConnection Create() => (NpgsqlConnection)_dbContext.Database.GetDbConnection();
 }

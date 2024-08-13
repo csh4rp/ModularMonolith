@@ -47,11 +47,12 @@ public sealed class AuditLogFactory
             }
             else
             {
-                var change = new EntityFieldChange(propertyEntry.Metadata.Name, null, propertyEntry.CurrentValue?.ToString());
+                var change = new EntityFieldChange(propertyEntry.Metadata.Name, null,
+                    propertyEntry.CurrentValue?.ToString());
                 changes.Add(change);
             }
         }
-        
+
         foreach (var primaryKeyProperty in primaryKey.Properties)
         {
             var propertyEntry = auditableProperties.Single(p => p.Metadata.Name == primaryKeyProperty.Name);
@@ -60,7 +61,7 @@ public sealed class AuditLogFactory
 
             keyFields.Add(new EntityField(propertyEntry.Metadata.Name, propertyEntry.CurrentValue?.ToString()));
         }
-        
+
         return new AuditLogEntry
         {
             Id = Guid.NewGuid(),

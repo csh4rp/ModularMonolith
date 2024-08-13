@@ -29,10 +29,8 @@ public class TestBus
 
         _bus.ConnectReceiveEndpoint(queueName, x =>
         {
-
             x.Consumer(() => (T)Activator.CreateInstance(typeof(T))!, a =>
             {
-
             });
         });
     }
@@ -48,7 +46,6 @@ public class TestBus
         {
             x.Consumer(() => consumer, a =>
             {
-
             });
         });
     }

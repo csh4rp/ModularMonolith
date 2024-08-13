@@ -12,25 +12,25 @@
     <PackageReference Include="Respawn"/>
     <PackageReference Include="Respawn.Postgres"/>
     <PackageReference Include="Testcontainers.PostgreSql"/>
-    <PackageReference Include="Testcontainers.RabbitMq" />
+    <PackageReference Include="Testcontainers.RabbitMq"/>
     <PackageReference Include="Verify"/>
     <PackageReference Include="Verify.Http"/>
     <PackageReference Include="Verify.Xunit"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\Infrastructure\Postgres\ModularMonolith.Infrastructure.Migrations.Postgres\ModularMonolith.Infrastructure.Migrations.Postgres.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.RestApi\ModularMonolith.CategoryManagement.RestApi.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Shared\Utils\ModularMonolith.Shared.TestUtils\ModularMonolith.Shared.TestUtils.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Infrastructure\Postgres\ModularMonolith.Infrastructure.Migrations.Postgres\ModularMonolith.Infrastructure.Migrations.Postgres.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.RestApi\ModularMonolith.CategoryManagement.RestApi.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Shared\Utils\ModularMonolith.Shared.TestUtils\ModularMonolith.Shared.TestUtils.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Categories\Creation\Requests\CreateCategory.DuplicateName.json" />
-    <EmbeddedResource Include="Categories\Creation\Requests\CreateCategory.EmptyName.json" />
-    <EmbeddedResource Include="Categories\Creation\Requests\CreateCategory.Valid.json" />
-    <EmbeddedResource Include="Categories\Modification\Requests\UpdateCategory.DuplicateName.json" />
-    <EmbeddedResource Include="Categories\Modification\Requests\UpdateCategory.EmptyName.json" />
-    <EmbeddedResource Include="Categories\Modification\Requests\UpdateCategory.Valid.json" />
+    <EmbeddedResource Include="Categories\Creation\Requests\CreateCategory.DuplicateName.json"/>
+    <EmbeddedResource Include="Categories\Creation\Requests\CreateCategory.EmptyName.json"/>
+    <EmbeddedResource Include="Categories\Creation\Requests\CreateCategory.Valid.json"/>
+    <EmbeddedResource Include="Categories\Modification\Requests\UpdateCategory.DuplicateName.json"/>
+    <EmbeddedResource Include="Categories\Modification\Requests\UpdateCategory.EmptyName.json"/>
+    <EmbeddedResource Include="Categories\Modification\Requests\UpdateCategory.Valid.json"/>
   </ItemGroup>
 
   <ItemGroup>

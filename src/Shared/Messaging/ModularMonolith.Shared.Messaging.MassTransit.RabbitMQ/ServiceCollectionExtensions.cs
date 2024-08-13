@@ -11,7 +11,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddRabbitMQMessaging<TDbContext>(this IServiceCollection serviceCollection,
         IConfiguration configuration,
-        OutboxStorageType outboxStorageType,
+        DatabaseProvider databaseProvider,
         Assembly[] assemblies)
         where TDbContext : DbContext
     {
@@ -24,12 +24,12 @@ public static class ServiceCollectionExtensions
         {
             c.AddEntityFrameworkOutbox<TDbContext>(o =>
             {
-                switch (outboxStorageType)
+                switch (databaseProvider)
                 {
-                    case OutboxStorageType.Postgres:
+                    case DatabaseProvider.Postgres:
                         o.UsePostgres();
                         break;
-                    case OutboxStorageType.SqlServer:
+                    case DatabaseProvider.SqlServer:
                         o.UseSqlServer();
                         break;
                 }
@@ -45,26 +45,25 @@ public static class ServiceCollectionExtensions
                 c.AddConsumers(assemblies);
             }
 
-            c.UsingRabbitMq((context, cfg) =>
+            c.UsingRabbitMq((context, configurator) =>
             {
-                cfg.Host(connectionString);
+                configurator.Host(connectionString);
 
                 if (setupConsumers)
                 {
-                    SetupConsumers<TDbContext>(context, cfg, assemblies);
+                    SetupConsumers(context, configurator, assemblies);
                 }
 
-                cfg.ConfigureEndpoints(context);
+                configurator.ConfigureEndpoints(context);
             });
         });
 
         return serviceCollection;
     }
 
-    private static void SetupConsumers<TDbContext>(IBusRegistrationContext context,
+    private static void SetupConsumers(IBusRegistrationContext context,
         IRabbitMqBusFactoryConfigurator cfg,
         Assembly[] assemblies)
-        where TDbContext : DbContext
     {
         var consumerMessages = assemblies
             .SelectMany(a => a.GetTypes())

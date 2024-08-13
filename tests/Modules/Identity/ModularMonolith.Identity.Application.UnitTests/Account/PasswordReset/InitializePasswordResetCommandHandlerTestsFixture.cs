@@ -34,5 +34,6 @@ internal sealed class InitializePasswordResetCommandHandlerTestsFixture
         _messageBus.Received(1)
             .PublishAsync(Arg.Is<PasswordResetInitializedEvent>(e => e.UserId == _user!.Id), default);
 
-    public Task AssertThatNoEventWasPublished() => _messageBus.DidNotReceiveWithAnyArgs().PublishAsync(Arg.Any<IEvent>(), default);
+    public Task AssertThatNoEventWasPublished() =>
+        _messageBus.DidNotReceiveWithAnyArgs().PublishAsync(Arg.Any<IEvent>(), default);
 }

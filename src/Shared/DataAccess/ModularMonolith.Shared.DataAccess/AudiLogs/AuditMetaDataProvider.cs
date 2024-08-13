@@ -43,7 +43,7 @@ public class AuditMetaDataProvider : IAuditMetaDataProvider
     {
         var httpContext = _httpContextAccessor.HttpContext;
         var extraData = new Dictionary<string, string?>();
-        
+
         if (httpContext is not null)
         {
             extraData["user-agent"] = httpContext.Request.Headers.UserAgent.ToString();

@@ -21,7 +21,7 @@ public sealed class SqlServerDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new EventLogEntityTypeConfiguration(schemaName: SharedSchemaName))
-        .ApplyConfiguration(new AuditLogEntityTypeConfiguration(schemaName: SharedSchemaName));
+            .ApplyConfiguration(new AuditLogEntityTypeConfiguration(schemaName: SharedSchemaName));
 
         modelBuilder.AddInboxStateEntity(c =>
         {

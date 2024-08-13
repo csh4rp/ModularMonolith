@@ -10,13 +10,13 @@ public class AuditLogInterceptorTests : IAsyncLifetime
 {
     private readonly SqlServerFixture _sqlServerFixture;
     private readonly AuditLogInterceptorFixture _fixture;
-    
+
     public AuditLogInterceptorTests(SqlServerFixture sqlServerFixture)
     {
         _sqlServerFixture = sqlServerFixture;
         _fixture = new AuditLogInterceptorFixture(_sqlServerFixture.ConnectionString);
     }
-    
+
     [Fact]
     public async Task ShouldNotGenerateLog_WhenEntityIsIgnored()
     {
@@ -49,7 +49,7 @@ public class AuditLogInterceptorTests : IAsyncLifetime
             Timestamp = DateTimeOffset.UtcNow,
             Name = "Name_1",
             FirstOwnedEntity = new FirstOwnedEntity { Value = 1.1 },
-            SecondOwnedEntity = new SecondOwnedEntity{Value = "1"}
+            SecondOwnedEntity = new SecondOwnedEntity { Value = "1" }
         };
 
         context.Add(auditedEntity);
@@ -64,10 +64,10 @@ public class AuditLogInterceptorTests : IAsyncLifetime
 
         log.Should().NotBeNull();
         log!.EntityTypeName.Should().Be(typeof(FirstTestEntity).FullName);
-        
+
         log.EntityKey.Should().HaveCount(1);
         log.EntityKey[0].Name.Should().Be(nameof(FirstTestEntity.Id));
-        
+
         log.EntityChanges.Should().HaveCount(1);
         log.EntityChanges[0].Name.Should().Be(nameof(FirstTestEntity.Name));
         log.EntityChanges[0].CurrentValue.Should().Be(auditedEntity.Name);
@@ -93,7 +93,7 @@ public class AuditLogInterceptorTests : IAsyncLifetime
             Timestamp = DateTimeOffset.UtcNow,
             Name = "Name_1",
             FirstOwnedEntity = new FirstOwnedEntity { Value = 1.1 },
-            SecondOwnedEntity = new SecondOwnedEntity{Value = "1"}
+            SecondOwnedEntity = new SecondOwnedEntity { Value = "1" }
         };
 
         context.Add(auditedEntity);
@@ -107,17 +107,16 @@ public class AuditLogInterceptorTests : IAsyncLifetime
             .FirstOrDefaultAsync();
 
         log.Should().NotBeNull();
-        
+
         log!.EntityKey.Should().HaveCount(1);
         log.EntityKey[0].Value.Should().Be(auditedEntity.Id.ToString());
-        
+
         log.EntityChanges.Should().HaveCount(1);
         log.EntityChanges[0].Name.Should().Be(nameof(SecondOwnedEntity.Value));
         log.EntityChanges[0].CurrentValue.Should().Be(auditedEntity.SecondOwnedEntity.Value);
         log.EntityChanges[0].OriginalValue.Should().BeNull();
     }
-    
-    
+
 
     public Task InitializeAsync() => _fixture.InitializeAsync();
 

@@ -28,6 +28,7 @@ public class EventLogInterceptor : SaveChangesInterceptor
         return result;
     }
 
-    public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result) =>
+    public override InterceptionResult<int>
+        SavingChanges(DbContextEventData eventData, InterceptionResult<int> result) =>
         SavingChangesAsync(eventData, result).GetAwaiter().GetResult();
 }

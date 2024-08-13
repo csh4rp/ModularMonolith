@@ -18,9 +18,9 @@ internal sealed class EventLogEntryFactory
     public EventLogEntry Create(IEvent @event)
     {
         var operationContext = _operationContextAccessor.OperationContext;
-        
+
         Debug.Assert(operationContext is not null);
-        
+
         return new()
         {
             Id = @event.EventId,
@@ -36,7 +36,6 @@ internal sealed class EventLogEntryFactory
                 SpanId = operationContext.SpanId,
                 ParentSpanId = operationContext.ParentSpanId
             }
-        };   
+        };
     }
-
 }

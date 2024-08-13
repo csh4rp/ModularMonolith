@@ -8,6 +8,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
     <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
-    <ProjectReference Include="..\..\Identity\ModularMonolith.Shared.Identity\ModularMonolith.Shared.Identity.csproj" />
+    <ProjectReference Include="..\..\Identity\ModularMonolith.Shared.Identity\ModularMonolith.Shared.Identity.csproj"/>
   </ItemGroup>
 </Project>

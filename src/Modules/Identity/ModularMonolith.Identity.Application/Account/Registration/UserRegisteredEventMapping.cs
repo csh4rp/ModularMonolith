@@ -10,7 +10,6 @@ internal sealed class UserRegisteredEventMapping : IEventMapping<UserRegisteredE
     public IntegrationEvent Map(UserRegisteredEvent @event) =>
         new UserRegisteredIntegrationEvent(@event.UserId, @event.Email)
         {
-            EventId = @event.EventId,
-            Timestamp = @event.Timestamp
+            EventId = @event.EventId, Timestamp = @event.Timestamp
         };
 }

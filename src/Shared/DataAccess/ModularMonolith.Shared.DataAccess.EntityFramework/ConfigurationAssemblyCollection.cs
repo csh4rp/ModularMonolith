@@ -18,13 +18,13 @@ public class ConfigurationAssemblyCollection : IEnumerable<Assembly>
 
         _collection = collection;
     }
-    
+
     public IEnumerator<Assembly> GetEnumerator() => _collection.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    
+
     public static ConfigurationAssemblyCollection Empty { get; } = new();
-    
-    public static ConfigurationAssemblyCollection FromAssemblies(IReadOnlyCollection<Assembly> collection) => 
+
+    public static ConfigurationAssemblyCollection FromAssemblies(IReadOnlyCollection<Assembly> collection) =>
         new(collection);
 }

@@ -3,7 +3,7 @@
 public record AuditLogEntityMetaData
 {
     public required string? Subject { get; init; }
-    
+
     public required string? OperationName { get; init; }
 
     public required string? TraceId { get; init; }

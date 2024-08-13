@@ -42,9 +42,18 @@ public sealed class AuditLogFactory
             {
                 Subject = entity.MetaData.Subject,
                 OperationName = entity.MetaData.OperationName,
-                TraceId = entity.MetaData.TraceId is null ? null : ActivityTraceId.CreateFromString(entity.MetaData.TraceId),
-                SpanId = entity.MetaData.SpanId is null ? null : ActivitySpanId.CreateFromString(entity.MetaData.SpanId),
-                ParentSpanId = entity.MetaData.ParentSpanId is null ? null : ActivitySpanId.CreateFromString(entity.MetaData.ParentSpanId),
+                TraceId =
+                    entity.MetaData.TraceId is null
+                        ? null
+                        : ActivityTraceId.CreateFromString(entity.MetaData.TraceId),
+                SpanId =
+                    entity.MetaData.SpanId is null
+                        ? null
+                        : ActivitySpanId.CreateFromString(entity.MetaData.SpanId),
+                ParentSpanId =
+                    entity.MetaData.ParentSpanId is null
+                        ? null
+                        : ActivitySpanId.CreateFromString(entity.MetaData.ParentSpanId),
                 ExtraData = entity.MetaData.ExtraData.ToDictionary(k => k.Key, k => k.Value)
             }
         };
