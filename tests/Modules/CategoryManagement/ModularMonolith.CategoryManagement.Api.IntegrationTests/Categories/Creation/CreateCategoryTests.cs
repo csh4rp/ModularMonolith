@@ -35,9 +35,8 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         await VerifyResponse(response);
 
-        var message = await _categoryManagementFixture.VerifyEventReceived();
-        message.Should().NotBeNull();
-        await VerifyMessage(message!);
+        var message = await _categoryManagementFixture.VerifyCategoryCreatedEventReceived();
+        await VerifyMessage(message);
     }
 
     [Fact]

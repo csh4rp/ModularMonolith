@@ -24,18 +24,18 @@ public class CategoryManagementFixture : IAsyncLifetime
     private const string AuthIssuer = "localhost";
     private const string AuthSigningKey = "12345678123456781234567812345678";
 
-    private NpgsqlConnection? _connection;
-    private PostgreSqlContainer? _databaseContainer;
-    private RabbitMqContainer? _messagingContainer;
-    private Respawner? _respawner;
+    private readonly PostgreSqlContainer _databaseContainer;
+    private readonly RabbitMqContainer _messagingContainer;
+    private readonly TestBus _testBus = new();
+    private readonly TestConsumer<CategoryCreatedEvent> _categoryCreatedConsumer = new();
+
+    private DbContext _dbContext = default!;
+    private NpgsqlConnection _connection = default!;
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
-    private DbContext _dbContext = default!;
-    private TestBus? _testBus;
+    private Respawner _respawner = default!;
 
-    private readonly TestConsumer<CategoryCreatedEvent> _testConsumer = new();
-
-    public async Task InitializeAsync()
+    public CategoryManagementFixture()
     {
         _databaseContainer = new PostgreSqlBuilder()
             .WithImage("postgres:16.1")
@@ -47,21 +47,26 @@ public class CategoryManagementFixture : IAsyncLifetime
             .WithUsername("guest")
             .WithPassword("guest")
             .Build();
+    }
 
-        var databaseTask =  _databaseContainer.StartAsync();
+    public async Task InitializeAsync()
+    {
+        var databaseTask = _databaseContainer.StartAsync();
         var messagingTask = _messagingContainer.StartAsync();
 
         await Task.WhenAll(databaseTask, messagingTask);
 
-        _testBus = new TestBus();
-        await _testBus.StartAsync(_messagingContainer.GetConnectionString());
-
         var connectionString = _databaseContainer.GetConnectionString();
 
         _connection = new NpgsqlConnection(connectionString);
-        await _connection.OpenAsync();
+        _dbContext =
+            new PostgresDbContextFactory().CreateDbContext([
+                connectionString,
+                "ModularMonolith.CategoryManagement.Infrastructure"
+            ]);
 
-        _dbContext = new PostgresDbContextFactory().CreateDbContext([connectionString, "ModularMonolith.CategoryManagement.Infrastructure"]);
+        await _testBus.StartAsync(_messagingContainer.GetConnectionString());
+        await _connection.OpenAsync();
         await _dbContext.Database.MigrateAsync();
 
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
@@ -82,7 +87,7 @@ public class CategoryManagementFixture : IAsyncLifetime
         });
 
         _testServer = _factory.Server;
-        _testBus.ConnectReceiveEndpoint("CategoryCreatedTestQueue", _testConsumer);
+        _testBus.ConnectReceiveEndpoint("CategoryCreatedTestQueue", _categoryCreatedConsumer);
     }
 
     private HttpClient CreateClient()
@@ -122,44 +127,19 @@ public class CategoryManagementFixture : IAsyncLifetime
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<CategoryCreatedEvent?> VerifyEventReceived()
-    {
-        var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        var token = cancellationTokenSource.Token;
-
-        while (!token.IsCancellationRequested)
-        {
-            if (_testConsumer.Message is not null)
-            {
-                break;
-            }
-
-            await Task.Delay(100, token);
-        }
-
-        return _testConsumer.Message;
-    }
-
+    public Task<CategoryCreatedEvent> VerifyCategoryCreatedEventReceived() =>
+        new MessagePublicationVerifier<CategoryCreatedEvent>(_categoryCreatedConsumer).VerifyAsync();
 
     public async Task DisposeAsync()
     {
-        if (_respawner is not null && _connection is not null)
-        {
-            await _respawner.ResetAsync(_connection);
-            await _connection.DisposeAsync();
-        }
+        await _respawner.ResetAsync(_connection);
+        await _connection.DisposeAsync();
 
-        if (_databaseContainer is not null)
-        {
-            await _databaseContainer.StopAsync();
-            await _databaseContainer.DisposeAsync();
-        }
+        await _databaseContainer.StopAsync();
+        await _databaseContainer.DisposeAsync();
 
-        if (_messagingContainer is not null)
-        {
-            await _messagingContainer.StartAsync();
-            await _messagingContainer.DisposeAsync();
-        }
+        await _messagingContainer.StartAsync();
+        await _messagingContainer.DisposeAsync();
 
         await _dbContext.DisposeAsync();
         await _factory.DisposeAsync();

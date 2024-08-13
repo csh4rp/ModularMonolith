@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using ModularMonolith.Shared.Events;
 using ModularMonolith.Shared.IntegrationTests.Common;
 
 [assembly: ExcludeFromCodeCoverage]
@@ -55,19 +56,14 @@ public abstract class BaseIntegrationTest<TClass> : IAsyncLifetime
         await VerifyJson(httpResponseMessage.Content.ReadAsStreamAsync(), settings);
     }
 
-    protected async Task VerifyMessage(object message,
+    protected async Task VerifyMessage<T>(T message,
         object?[]? parameters = null,
         [CallerMemberName] string method = default!,
         [CallerFilePath] string filePath = default!)
     {
-        var type = GetType();
-        var attribute = type.GetMethod(method)?.GetCustomAttribute<TestFileNameAttribute>();
-
-        string? fileName = null;
-        if (attribute is not null)
-        {
-            fileName = $"{attribute.Name}";
-        }
+        var messageType = typeof(T);
+        var fileName = messageType.GetCustomAttribute<EventAttribute>()?.Name
+                       ?? messageType.Name;
 
         var directory = Path.Join(Path.GetDirectoryName(filePath), "Messages");
         var settings = new VerifySettings();
