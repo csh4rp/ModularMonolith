@@ -30,7 +30,9 @@ public sealed class Category : AggregateRoot<CategoryId>
 
     public static Category From(CategoryId id, string name, CategoryId? parentId) => new()
     {
-        Id = id, Name = name, ParentId = parentId
+        Id = id,
+        Name = name,
+        ParentId = parentId
     };
 
     public static Category Create(CategoryId? parentId, string name)
