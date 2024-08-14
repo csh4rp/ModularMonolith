@@ -37,5 +37,4 @@ builder.ConfigureServices((context, serviceCollection) =>
 
 var host = builder.Build();
 
-
-host.Run();
+await host.RunAsync();

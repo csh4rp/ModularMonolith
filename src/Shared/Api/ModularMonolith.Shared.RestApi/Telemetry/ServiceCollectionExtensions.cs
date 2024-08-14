@@ -10,9 +10,9 @@ public static class ServiceCollectionExtensions
         IHostEnvironment environment)
     {
         serviceCollection.AddOpenTelemetry()
-            .WithTracing(b =>
+            .WithTracing(builder =>
             {
-                b.AddSource("ModularMonolith")
+                builder.AddSource("ModularMonolith")
                     .ConfigureResource(resource =>
                         resource.AddService(
                             serviceName: "ModularMonolith",
@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
 
                 if (environment.IsDevelopment())
                 {
-                    b.AddConsoleExporter();
+                    builder.AddConsoleExporter();
                 }
             });
 
