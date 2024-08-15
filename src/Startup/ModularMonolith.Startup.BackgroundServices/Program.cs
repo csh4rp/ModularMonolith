@@ -1,4 +1,4 @@
-using ModularMonolith.Startup.BackgroundServices;
+﻿using ModularMonolith.Startup.BackgroundServices;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddHostedService<Worker>();

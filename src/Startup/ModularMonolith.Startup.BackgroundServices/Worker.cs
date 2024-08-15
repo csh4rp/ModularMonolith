@@ -1,4 +1,4 @@
-namespace ModularMonolith.Startup.BackgroundServices;
+﻿namespace ModularMonolith.Startup.BackgroundServices;
 
 public class Worker : BackgroundService
 {
