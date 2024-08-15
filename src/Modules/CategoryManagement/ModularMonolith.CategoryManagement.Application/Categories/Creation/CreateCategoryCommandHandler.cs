@@ -1,5 +1,4 @@
 ﻿using ModularMonolith.CategoryManagement.Application.Categories.Shared;
-
 using ModularMonolith.CategoryManagement.Contracts.Categories.Creation;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.Application.Commands;
@@ -13,7 +12,8 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
 {
     private readonly ICategoryRepository _categoryRepository;
 
-    public CreateCategoryCommandHandler(ICategoryRepository categoryRepository) => _categoryRepository = categoryRepository;
+    public CreateCategoryCommandHandler(ICategoryRepository categoryRepository) =>
+        _categoryRepository = categoryRepository;
 
     public async Task<CreatedResponse> Handle(CreateCategoryCommand request,
         CancellationToken cancellationToken)
@@ -26,15 +26,15 @@ internal sealed class CreateCategoryCommandHandler : ICommandHandler<CreateCateg
 
         if (request.ParentId.HasValue)
         {
-            var parentExists = await _categoryRepository.ExistsByIdAsync(CategoryId.From(request.ParentId.Value), cancellationToken);
+            var parentExists =
+                await _categoryRepository.ExistsByIdAsync(CategoryId.From(request.ParentId.Value), cancellationToken);
             if (!parentExists)
             {
                 throw new ValidationException(MemberError.InvalidValue(nameof(CreateCategoryCommand.ParentId)));
             }
         }
 
-        var category = new Category(request.ParentId.HasValue ? CategoryId.From(request.ParentId.Value) : null,
-            request.Name);
+        var category = request.ToCategory();
 
         await _categoryRepository.AddAsync(category, cancellationToken);
 

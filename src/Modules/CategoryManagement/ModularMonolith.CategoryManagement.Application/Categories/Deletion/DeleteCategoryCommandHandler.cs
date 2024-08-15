@@ -9,7 +9,8 @@ internal sealed class DeleteCategoryCommandHandler : ICommandHandler<DeleteCateg
 {
     private readonly ICategoryRepository _categoryRepository;
 
-    public DeleteCategoryCommandHandler(ICategoryRepository categoryRepository) => _categoryRepository = categoryRepository;
+    public DeleteCategoryCommandHandler(ICategoryRepository categoryRepository) =>
+        _categoryRepository = categoryRepository;
 
     public async Task Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
     {

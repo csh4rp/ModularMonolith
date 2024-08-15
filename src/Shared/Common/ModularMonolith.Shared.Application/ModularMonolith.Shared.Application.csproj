@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="MediatR"/>
+    <PackageReference Include="Microsoft.Extensions.Logging"/>
+    <PackageReference Include="Microsoft.IdentityModel.Tokens"/>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
+  </ItemGroup>
+</Project>

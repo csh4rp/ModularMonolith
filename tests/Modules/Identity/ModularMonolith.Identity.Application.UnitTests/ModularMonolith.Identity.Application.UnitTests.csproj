@@ -9,17 +9,13 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory"/>
     <PackageReference Include="MockQueryable.NSubstitute"/>
     <PackageReference Include="NSubstitute"/>
-    <PackageReference Include="NSubstitute.Analyzers.CSharp">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Application\ModularMonolith.Identity.Application.csproj"/>
     <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Contracts\ModularMonolith.Identity.Contracts.csproj"/>
     <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj"/>
-    <ProjectReference Include="..\..\..\..\src\Shared\ModularMonolith.Shared.TestUtils\ModularMonolith.Shared.TestUtils.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Shared\Utils\ModularMonolith.Shared.TestUtils\ModularMonolith.Shared.TestUtils.csproj"/>
     <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj"/>
   </ItemGroup>
 

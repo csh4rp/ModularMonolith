@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions"/>
+    <PackageReference Include="NSubstitute"/>
+    <PackageReference Include="Respawn"/>
+    <PackageReference Include="Testcontainers.MsSql"/>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.EntityFrameworkCore"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Infrastructure\SqlServer\ModularMonolith.Infrastructure.Migrations.SqlServer\ModularMonolith.Infrastructure.Migrations.SqlServer.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Shared\DataAccess\ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer\ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.csproj"/>
+  </ItemGroup>
+
+</Project>

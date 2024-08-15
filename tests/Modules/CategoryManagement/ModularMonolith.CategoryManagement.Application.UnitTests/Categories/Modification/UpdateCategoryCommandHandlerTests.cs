@@ -3,6 +3,7 @@ using ModularMonolith.CategoryManagement.Application.Categories.Shared;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Modification;
 using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts.Errors;
+using Xunit;
 
 namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.Modification;
 
@@ -77,6 +78,7 @@ public class UpdateCategoryCommandHandlerTests
         exception.Should().NotBeNull();
         exception.Errors.Should().HaveCount(1);
         exception.Errors[0].Code.Should().Be(ErrorCodes.InvalidValue);
-        exception.Errors[0].Reference.Should().Match(e => e.Equals(nameof(command.ParentId), StringComparison.OrdinalIgnoreCase));
+        exception.Errors[0].Reference.Should()
+            .Match(e => e.Equals(nameof(command.ParentId), StringComparison.OrdinalIgnoreCase));
     }
 }

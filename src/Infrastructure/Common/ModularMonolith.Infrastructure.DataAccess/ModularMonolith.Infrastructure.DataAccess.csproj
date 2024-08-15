@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\DataAccess\ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer\ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.csproj"/>
+    <ProjectReference Include="..\..\Postgres\ModularMonolith.Infrastructure.DataAccess.Postgres\ModularMonolith.Infrastructure.DataAccess.Postgres.csproj"/>
+    <ProjectReference Include="..\..\SqlServer\ModularMonolith.Infrasructure.DataAccess.SqlServer\ModularMonolith.Infrastructure.DataAccess.SqlServer.csproj"/>
+  </ItemGroup>
+</Project>

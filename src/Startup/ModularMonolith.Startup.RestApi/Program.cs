@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using ModularMonolith.Shared.Api;
+using ModularMonolith.Shared.RestApi;
 
 [assembly: ExcludeFromCodeCoverage]
 

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="MediatR.Contracts"/>
+    <PackageReference Include="FluentValidation"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj"/>
+  </ItemGroup>
+</Project>

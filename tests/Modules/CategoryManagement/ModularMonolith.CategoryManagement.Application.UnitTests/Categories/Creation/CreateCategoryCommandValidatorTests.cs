@@ -2,6 +2,7 @@
 using FluentValidation.TestHelper;
 using ModularMonolith.CategoryManagement.Application.Categories.Creation;
 using ModularMonolith.CategoryManagement.Contracts.Categories.Creation;
+using Xunit;
 
 namespace ModularMonolith.CategoryManagement.Application.UnitTests.Categories.Creation;
 

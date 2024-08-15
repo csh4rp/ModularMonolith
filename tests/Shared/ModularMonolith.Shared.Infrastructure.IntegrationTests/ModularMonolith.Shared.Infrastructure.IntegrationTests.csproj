@@ -1,25 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="Bogus" />
+    <PackageReference Include="Bogus"/>
     <PackageReference Include="FluentAssertions"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore"/>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
     <PackageReference Include="NSubstitute"/>
-    <PackageReference Include="NSubstitute.Analyzers.CSharp"/>
     <PackageReference Include="Respawn"/>
     <PackageReference Include="Respawn.Postgres"/>
     <PackageReference Include="Testcontainers.PostgreSql"/>
-    <PackageReference Update="NSubstitute.Analyzers.CSharp">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Infrastructure\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj" />
-    <ProjectReference Include="..\..\..\src\Infrastructure\ModularMonolith.Infrastructure.Migrations\ModularMonolith.Infrastructure.Migrations.csproj" />
-    <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj"/>
-    <ProjectReference Include="..\..\..\src\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj"/>
+    <ProjectReference Include="..\..\..\src\Infrastructure\Postgres\ModularMonolith.Infrastructure.Migrations.Postgres\ModularMonolith.Infrastructure.Migrations.Postgres.csproj"/>
   </ItemGroup>
 </Project>

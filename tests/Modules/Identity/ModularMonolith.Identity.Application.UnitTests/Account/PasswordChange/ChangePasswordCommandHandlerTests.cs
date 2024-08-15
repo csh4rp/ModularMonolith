@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using ModularMonolith.Identity.Contracts.Account.ChangePassword;
+using ModularMonolith.Identity.Contracts.Account.PasswordChange;
 using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts.Errors;
 

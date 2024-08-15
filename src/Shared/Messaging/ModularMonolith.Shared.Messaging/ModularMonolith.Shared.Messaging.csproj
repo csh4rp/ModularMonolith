@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="MassTransit.Abstractions"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
+    <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Domain\ModularMonolith.Shared.Domain.csproj"/>
+  </ItemGroup>
+</Project>

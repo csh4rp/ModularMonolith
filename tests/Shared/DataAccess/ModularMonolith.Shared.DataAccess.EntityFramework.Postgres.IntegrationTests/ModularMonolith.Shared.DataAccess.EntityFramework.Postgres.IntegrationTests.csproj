@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Infrastructure\Postgres\ModularMonolith.Infrastructure.DataAccess.Postgres\ModularMonolith.Infrastructure.DataAccess.Postgres.csproj"/>
+    <ProjectReference Include="..\..\..\..\src\Infrastructure\Postgres\ModularMonolith.Infrastructure.Migrations.Postgres\ModularMonolith.Infrastructure.Migrations.Postgres.csproj"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions"/>
+    <PackageReference Include="NSubstitute"/>
+    <PackageReference Include="Respawn"/>
+    <PackageReference Include="Testcontainers.PostgreSql"/>
+  </ItemGroup>
+</Project>

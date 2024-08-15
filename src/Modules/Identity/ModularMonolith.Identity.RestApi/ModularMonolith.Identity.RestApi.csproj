@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OutputType>exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions"/>
+    <PackageReference Include="MediatR"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Api\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Identity.Application\ModularMonolith.Identity.Application.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Identity.Contracts\ModularMonolith.Identity.Contracts.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Identity.Core\ModularMonolith.Identity.Core.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj"/>
+  </ItemGroup>
+</Project>

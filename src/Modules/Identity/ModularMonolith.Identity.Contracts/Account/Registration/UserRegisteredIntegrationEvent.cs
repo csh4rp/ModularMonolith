@@ -2,4 +2,5 @@
 
 namespace ModularMonolith.Identity.Contracts.Account.Registration;
 
-public record UserRegisteredIntegrationEvent(Guid UserId, string Email) : IIntegrationEvent;
+public sealed record UserRegisteredIntegrationEvent(Guid UserId, string Email)
+    : IntegrationEvent;

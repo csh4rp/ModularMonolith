@@ -2,7 +2,7 @@
 using ModularMonolith.CategoryManagement.Contracts.Categories.Querying;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.Shared.Application.Exceptions;
-using ModularMonolith.Shared.Infrastructure.Queries;
+using ModularMonolith.Shared.DataAccess.Queries;
 
 namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.Querying;
 

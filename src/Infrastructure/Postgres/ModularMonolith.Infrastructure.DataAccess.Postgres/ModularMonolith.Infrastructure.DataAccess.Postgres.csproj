@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="MassTransit"/>
+    <PackageReference Include="MassTransit.EntityFrameworkCore"/>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\DataAccess\ModularMonolith.Shared.DataAccess.EntityFramework.Postgres\ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.csproj"/>
+  </ItemGroup>
+</Project>

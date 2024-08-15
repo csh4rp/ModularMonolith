@@ -9,8 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
-using ModularMonolith.Bootstrapper.Infrastructure;
-using ModularMonolith.Infrastructure.Migrations;
+using ModularMonolith.Identity.Domain.Users;
+using ModularMonolith.Identity.RestApi;
+using ModularMonolith.Infrastructure.Migrations.Postgres;
 using ModularMonolith.Shared.TestUtils.Fakes;
 using Npgsql;
 using Respawn;
@@ -29,8 +30,7 @@ public class IdentityFixture : IAsyncLifetime
     private Respawner? _respawner;
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
-
-    public ApplicationDbContext DbContext { get; private set; } = default!;
+    private DbContext _dbContext = default!;
 
     public async Task InitializeAsync()
     {
@@ -38,6 +38,7 @@ public class IdentityFixture : IAsyncLifetime
             .WithImage("postgres:16.1")
             .WithName("identity_automated_tests")
             .WithDatabase("tests_database")
+            .WithPortBinding("32860")
             .Build();
 
         await _container.StartAsync();
@@ -47,14 +48,17 @@ public class IdentityFixture : IAsyncLifetime
         _connection = new NpgsqlConnection(connectionString);
         await _connection.OpenAsync();
 
-        DbContext = new ApplicationDbContextFactory().CreateDbContext([connectionString]);
-        await DbContext.Database.MigrateAsync();
+        _dbContext = new PostgresDbContextFactory().CreateDbContext([connectionString]);
+        await _dbContext.Database.MigrateAsync();
 
         _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
+
 
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseSetting("ConnectionStrings:Database", connectionString);
+            builder.UseSetting("DataAccess:Provider", "Postgres");
+            builder.UseSetting("Messaging:Provider", "Postgres");
             builder.UseSetting("Modules:Identity:Enabled", "true");
             builder.UseSetting("Modules:Identity:Auth:Audience", AuthAudience);
             builder.UseSetting("Modules:Identity:Auth:Issuer", AuthIssuer);
@@ -112,6 +116,12 @@ public class IdentityFixture : IAsyncLifetime
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    public Task AddUsersAsync(params User[] users)
+    {
+        _dbContext.AddRange(users);
+        return _dbContext.SaveChangesAsync();
+    }
+
     public AsyncServiceScope CreateServiceScope() => _testServer.Services.CreateAsyncScope();
 
     public async Task DisposeAsync()
@@ -128,7 +138,7 @@ public class IdentityFixture : IAsyncLifetime
             await _container.DisposeAsync();
         }
 
-        await DbContext.DisposeAsync();
+        await _dbContext.DisposeAsync();
         await _factory.DisposeAsync();
     }
 
@@ -137,7 +147,7 @@ public class IdentityFixture : IAsyncLifetime
         Debug.Assert(_connection is not null);
         Debug.Assert(_respawner is not null);
 
-        DbContext.ChangeTracker.Clear();
+        _dbContext.ChangeTracker.Clear();
         return _respawner.ResetAsync(_connection);
     }
 }

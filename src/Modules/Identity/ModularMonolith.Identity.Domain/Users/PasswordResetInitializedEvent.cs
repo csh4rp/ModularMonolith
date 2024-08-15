@@ -2,4 +2,4 @@
 
 namespace ModularMonolith.Identity.Domain.Users;
 
-public sealed record PasswordResetInitializedEvent(Guid UserId) : IEvent;
+public sealed record PasswordResetInitializedEvent(Guid UserId) : DomainEvent;

@@ -2,8 +2,9 @@
 using ModularMonolith.Identity.Application.Account.PasswordChange;
 using ModularMonolith.Identity.Application.UnitTests.Account.Shared;
 using ModularMonolith.Identity.Domain.Users;
-using ModularMonolith.Shared.Application.Events;
-using ModularMonolith.Shared.Application.Identity;
+using ModularMonolith.Shared.Events;
+using ModularMonolith.Shared.Identity;
+using ModularMonolith.Shared.Messaging;
 using NSubstitute;
 
 namespace ModularMonolith.Identity.Application.UnitTests.Account.PasswordChange;
@@ -12,7 +13,7 @@ internal sealed class ChangePasswordCommandHandlerTestsFixture
 {
     private readonly FakeUserManager _userManager = Substitute.For<FakeUserManager>();
     private readonly IIdentityContextAccessor _identityContextAccessor = Substitute.For<IIdentityContextAccessor>();
-    private readonly IEventBus _eventBus = Substitute.For<IEventBus>();
+    private readonly IMessageBus _eventBus = Substitute.For<IMessageBus>();
 
     private User? _user;
     private string? _password;
@@ -27,21 +28,24 @@ internal sealed class ChangePasswordCommandHandlerTestsFixture
         _user = new User(userName) { Id = id };
         _password = password;
 
-        _userManager.FindByIdAsync(_user.Id.ToString())
+        _userManager
+            .FindByNameAsync(Arg.Is<string>(arg =>
+                _user.UserName.Equals(arg, StringComparison.InvariantCultureIgnoreCase)))
             .Returns(_user);
 
-        _userManager.ChangePasswordAsync(Arg.Any<User>(), Arg.Any<string>(), Arg.Any<string>())
+        _userManager.ChangePasswordAsync(Arg.Any<User>(), Arg.Is<string>(arg => arg != _password), Arg.Any<string>())
             .Returns(IdentityResult.Failed(new IdentityError { Code = "PasswordMismatch" }));
 
-        _userManager.ChangePasswordAsync(_user, _password, Arg.Any<string>())
+        _userManager.ChangePasswordAsync(_user, Arg.Is<string>(a => a == _password), Arg.Any<string>())
             .Returns(IdentityResult.Success);
 
-        _identityContextAccessor.Context.Returns(new IdentityContext(id, userName));
+        _identityContextAccessor.IdentityContext.Returns(new IdentityContext(userName));
     }
+
 
     public Task AssertThatPasswordChangedEventWasPublished() => _eventBus.Received(1)
         .PublishAsync(Arg.Is<PasswordChangedEvent>(c => c.UserId == _user!.Id), Arg.Any<CancellationToken>());
 
     public Task AssertThatNoEventWasPublished() => _eventBus.DidNotReceiveWithAnyArgs()
-        .PublishAsync(default!, default);
+        .PublishAsync(Arg.Any<IEvent>(), default);
 }

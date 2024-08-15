@@ -3,23 +3,23 @@ using Microsoft.Extensions.Logging;
 using ModularMonolith.Identity.Contracts.Account.Verification;
 using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Shared.Application.Commands;
-using ModularMonolith.Shared.Application.Events;
 using ModularMonolith.Shared.Application.Exceptions;
 using ModularMonolith.Shared.Contracts.Errors;
+using ModularMonolith.Shared.Messaging;
 
 namespace ModularMonolith.Identity.Application.Account.Verification;
 
 internal sealed class VerifyAccountCommandHandler : ICommandHandler<VerifyAccountCommand>
 {
     private readonly UserManager<User> _userManager;
-    private readonly IEventBus _eventBus;
+    private readonly IMessageBus _messageBus;
     private readonly ILogger<VerifyAccountCommandHandler> _logger;
 
-    public VerifyAccountCommandHandler(UserManager<User> userManager, IEventBus eventBus,
+    public VerifyAccountCommandHandler(UserManager<User> userManager, IMessageBus messageBus,
         ILogger<VerifyAccountCommandHandler> logger)
     {
         _userManager = userManager;
-        _eventBus = eventBus;
+        _messageBus = messageBus;
         _logger = logger;
     }
 
@@ -43,6 +43,6 @@ internal sealed class VerifyAccountCommandHandler : ICommandHandler<VerifyAccoun
             throw new ValidationException(MemberError.InvalidValue(nameof(request.VerificationToken)));
         }
 
-        await _eventBus.PublishAsync(new AccountVerifiedEvent(user.Id), cancellationToken);
+        await _messageBus.PublishAsync(new AccountVerifiedEvent(user.Id), cancellationToken);
     }
 }

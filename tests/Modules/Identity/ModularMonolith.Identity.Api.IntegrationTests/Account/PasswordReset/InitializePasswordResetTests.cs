@@ -2,7 +2,6 @@
 using FluentAssertions;
 using ModularMonolith.Identity.Api.IntegrationTests.Account.Fixtures;
 using ModularMonolith.Identity.Api.IntegrationTests.Shared;
-using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Shared.TestUtils.Abstractions;
 
 namespace ModularMonolith.Identity.Api.IntegrationTests.Account.PasswordReset;
@@ -26,8 +25,8 @@ public class InitializePasswordResetTests : BaseIntegrationTest<InitializePasswo
     {
         // Arrange
         var user = _accountFixture.AActiveUser();
-        _identityFixture.DbContext.Set<User>().Add(user);
-        await _identityFixture.DbContext.SaveChangesAsync(default);
+
+        await _identityFixture.AddUsersAsync(user);
 
         using var request = GetResource("InitializePasswordReset.Valid.json");
 

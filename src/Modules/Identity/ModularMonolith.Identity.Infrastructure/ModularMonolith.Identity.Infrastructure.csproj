@@ -1,17 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore"/>
+    <PackageReference Include="Z.EntityFramework.Plus.EFCore"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\DataAccess\ModularMonolith.Shared.DataAccess.EntityFramework\ModularMonolith.Shared.DataAccess.EntityFramework.csproj"/>
     <ProjectReference Include="..\ModularMonolith.Identity.Core\ModularMonolith.Identity.Core.csproj"/>
     <ProjectReference Include="..\ModularMonolith.Identity.Domain\ModularMonolith.Identity.Domain.csproj"/>
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Microsoft.EntityFrameworkCore"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore"/>
-  </ItemGroup>
-
 </Project>

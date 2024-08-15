@@ -1,18 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <ItemGroup>
-    <Reference Include="Microsoft.EntityFrameworkCore"/>
+    <PackageReference Include="MassTransit.Abstractions"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore"/>
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
+    <ProjectReference Include="..\..\..\Shared\Common\ModularMonolith.Shared.Application\ModularMonolith.Shared.Application.csproj"/>
     <ProjectReference Include="..\ModularMonolith.CategoryManagement.Contracts\ModularMonolith.CategoryManagement.Contracts.csproj"/>
     <ProjectReference Include="..\ModularMonolith.CategoryManagement.Domain\ModularMonolith.CategoryManagement.Domain.csproj"/>
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MassTransit.Abstractions" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore"/>
-  </ItemGroup>
-
 </Project>

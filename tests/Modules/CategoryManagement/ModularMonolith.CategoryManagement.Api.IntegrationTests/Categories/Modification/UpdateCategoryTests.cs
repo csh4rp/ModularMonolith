@@ -28,8 +28,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
         // Arrange
         var category = _categoryFixture.Generate();
 
-        _categoryManagementFixture.DbContext.Set<Category>().Add(category);
-        await _categoryManagementFixture.DbContext.SaveChangesAsync();
+        await _categoryManagementFixture.AddCategoriesAsync(category);
 
         using var request = GetResource("UpdateCategory.Valid.json");
 
@@ -85,9 +84,7 @@ public class UpdateCategoryTests : BaseIntegrationTest<UpdateCategoryTests>
             .RuleFor(x => x.Name, "Updated-Category-Duplicate")
             .Generate();
 
-        await _categoryManagementFixture.DbContext.Set<Category>().AddRangeAsync(currentCategory,
-            otherCategory);
-        await _categoryManagementFixture.DbContext.SaveChangesAsync();
+        await _categoryManagementFixture.AddCategoriesAsync(currentCategory, otherCategory);
 
         using var request = GetResource("UpdateCategory.DuplicateName.json");
 
