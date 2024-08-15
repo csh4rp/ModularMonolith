@@ -26,12 +26,9 @@ public class TestBus
             throw new InvalidOperationException("Bus has to be stared before it can connect receive endpoint");
         }
 
-
         _bus.ConnectReceiveEndpoint(queueName, x =>
         {
-            x.Consumer(() => (T)Activator.CreateInstance(typeof(T))!, a =>
-            {
-            });
+            x.Consumer(() => (T)Activator.CreateInstance(typeof(T))!);
         });
     }
 
@@ -44,9 +41,7 @@ public class TestBus
 
         _bus.ConnectReceiveEndpoint(queueName, x =>
         {
-            x.Consumer(() => consumer, a =>
-            {
-            });
+            x.Consumer(() => consumer);
         });
     }
 }
