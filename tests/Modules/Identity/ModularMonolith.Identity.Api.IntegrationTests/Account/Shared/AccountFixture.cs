@@ -1,7 +1,7 @@
 ﻿using Bogus;
 using ModularMonolith.Identity.Domain.Users;
 
-namespace ModularMonolith.Identity.Api.IntegrationTests.Account.Fixtures;
+namespace ModularMonolith.Identity.Api.IntegrationTests.Account.Shared;
 
 public sealed class AccountFixture : Faker<User>, IClassFixture<AccountFixture>
 {

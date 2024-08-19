@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="MassTransit.RabbitMQ"/>
+    <PackageReference Include="MassTransit.EntityFrameworkCore"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Modules\Identity\ModularMonolith.Identity.Domain\ModularMonolith.Identity.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\DataAccess\ModularMonolith.Shared.DataAccess\ModularMonolith.Shared.DataAccess.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Messaging\ModularMonolith.Shared.Messaging.MassTransit\ModularMonolith.Shared.Messaging.MassTransit.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Messaging\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Tracing\ModularMonolith.Shared.Tracing\ModularMonolith.Shared.Tracing.csproj" />
+  </ItemGroup>
+
+</Project>

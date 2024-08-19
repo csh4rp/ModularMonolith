@@ -26,8 +26,8 @@ public class CategoryManagementFixture : IAsyncLifetime
 
     private readonly PostgreSqlContainer _databaseContainer;
     private readonly RabbitMqContainer _messagingContainer;
-    private readonly TestBus _testBus = new();
-    private readonly TestConsumer<CategoryCreatedEvent> _categoryCreatedConsumer = new();
+    private readonly RabbitMqTestBus _rabbitMqTestBus;
+    private readonly TestConsumer<CategoryCreatedEvent> _categoryCreatedConsumer;
 
     private DbContext _dbContext = default!;
     private NpgsqlConnection _connection = default!;
@@ -47,6 +47,9 @@ public class CategoryManagementFixture : IAsyncLifetime
             .WithUsername("guest")
             .WithPassword("guest")
             .Build();
+
+        _rabbitMqTestBus = new RabbitMqTestBus();
+        _categoryCreatedConsumer = new TestConsumer<CategoryCreatedEvent>();
     }
 
     public async Task InitializeAsync()
@@ -59,10 +62,9 @@ public class CategoryManagementFixture : IAsyncLifetime
         var connectionString = _databaseContainer.GetConnectionString();
 
         _connection = new NpgsqlConnection(connectionString);
-        _dbContext =
-            new PostgresDbContextFactory().CreateDbContext([connectionString]);
+        _dbContext = new PostgresDbContextFactory().CreateDbContext([connectionString]);
 
-        await _testBus.StartAsync(_messagingContainer.GetConnectionString());
+        await _rabbitMqTestBus.StartAsync(_messagingContainer.GetConnectionString());
         await _connection.OpenAsync();
         await _dbContext.Database.MigrateAsync();
 
@@ -84,7 +86,8 @@ public class CategoryManagementFixture : IAsyncLifetime
         });
 
         _testServer = _factory.Server;
-        _testBus.ConnectReceiveEndpoint("CategoryCreatedTestQueue", _categoryCreatedConsumer);
+
+        _rabbitMqTestBus.ConnectReceiveEndpoint("CategoryCreatedTestQueue", _categoryCreatedConsumer);
     }
 
     private HttpClient CreateClient()

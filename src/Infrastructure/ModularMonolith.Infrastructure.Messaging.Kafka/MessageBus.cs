@@ -3,34 +3,29 @@ using System.Reflection;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using ModularMonolith.Shared.Contracts;
+using ModularMonolith.Shared.Contracts.Attributes;
 using ModularMonolith.Shared.DataAccess.EventLogs;
 using ModularMonolith.Shared.Events;
+using ModularMonolith.Shared.Messaging;
+using ModularMonolith.Shared.Messaging.MassTransit;
 using ModularMonolith.Shared.Messaging.MassTransit.Factories;
 using ModularMonolith.Shared.Tracing;
 using EventLogEntry = ModularMonolith.Shared.DataAccess.EventLogs.EventLogEntry;
 
-namespace ModularMonolith.Shared.Messaging.MassTransit;
+namespace ModularMonolith.Infrastructure.Messaging.Kafka;
 
 internal sealed class MessageBus : IMessageBus
 {
-    private readonly IPublishEndpoint _publishEndpoint;
-    private readonly ISendEndpointProvider _sendEndpointProvider;
+    private readonly ITopicProducerProvider _topicProducerProvider;
     private readonly IOperationContextAccessor _operationContextAccessor;
     private readonly IEventLogStore _eventLogStore;
     private readonly EventLogEntryFactory _eventLogEntryFactory;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<MessageBus> _logger;
 
-    public MessageBus(IPublishEndpoint publishEndpoint,
-        ISendEndpointProvider sendEndpointProvider,
-        IOperationContextAccessor operationContextAccessor,
-        IEventLogStore eventLogStore,
-        EventLogEntryFactory eventLogEntryFactory,
-        TimeProvider timeProvider,
-        ILogger<MessageBus> logger)
+    public MessageBus(ITopicProducerProvider topicProducerProvider, IOperationContextAccessor operationContextAccessor, IEventLogStore eventLogStore, EventLogEntryFactory eventLogEntryFactory, TimeProvider timeProvider, ILogger<MessageBus> logger)
     {
-        _publishEndpoint = publishEndpoint;
-        _sendEndpointProvider = sendEndpointProvider;
+        _topicProducerProvider = topicProducerProvider;
         _operationContextAccessor = operationContextAccessor;
         _eventLogStore = eventLogStore;
         _eventLogEntryFactory = eventLogEntryFactory;
@@ -58,15 +53,8 @@ internal sealed class MessageBus : IMessageBus
             _logger.EventPersistenceSkipped(eventType.FullName!, @event.EventId);
         }
 
-        await _publishEndpoint.Publish(@event, eventType, p =>
-        {
-            p.MessageId = @event.EventId;
-            p.Headers.Set("timestamp", @event.Timestamp);
-            p.Headers.Set("subject", operationContext.Subject);
-            p.Headers.Set("trace_id", operationContext.TraceId.ToString());
-            p.Headers.Set("span_id", operationContext.SpanId.ToString());
-            p.Headers.Set("parent_span_id", operationContext.ParentSpanId.ToString());
-        }, cancellationToken);
+        var publisher = GetEventPublisher(@event);
+        await publisher.Invoke(@event, cancellationToken);
 
         _logger.EventPublished(eventType.FullName!, @event.EventId);
     }
@@ -102,16 +90,8 @@ internal sealed class MessageBus : IMessageBus
         foreach (var @event in eventsList)
         {
             var eventType = @event.GetType();
-
-            await _publishEndpoint.Publish(@event, eventType, p =>
-            {
-                p.MessageId = @event.EventId;
-                p.Headers.Set("timestamp", @event.Timestamp);
-                p.Headers.Set("subject", operationContext.Subject);
-                p.Headers.Set("trace_id", operationContext.TraceId.ToString());
-                p.Headers.Set("span_id", operationContext.SpanId.ToString());
-                p.Headers.Set("parent_span_id", operationContext.ParentSpanId.ToString());
-            }, cancellationToken);
+            var publisher = GetEventPublisher(@event);
+            await publisher.Invoke(@event, cancellationToken);
 
             _logger.EventPublished(eventType.FullName!, @event.EventId);
         }
@@ -122,15 +102,64 @@ internal sealed class MessageBus : IMessageBus
         var operationContext = _operationContextAccessor.OperationContext;
         Debug.Assert(operationContext is not null);
 
-        var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri(""));
+        var publisher = GetCommandSender(command);
+        await publisher.Invoke(command, cancellationToken);
+    }
 
-        await sendEndpoint.Send(command, command.GetType(), p =>
-        {
-            p.Headers.Set("timestamp", _timeProvider.GetUtcNow());
-            p.Headers.Set("subject", operationContext.Subject);
-            p.Headers.Set("trace_id", operationContext.TraceId.ToString());
-            p.Headers.Set("span_id", operationContext.SpanId.ToString());
-            p.Headers.Set("parent_span_id", operationContext.ParentSpanId.ToString());
-        }, cancellationToken);
+    private Func<IEvent, CancellationToken, Task> GetEventPublisher(IEvent @event)
+    {
+        var eventType = @event.GetType();
+        var topic = eventType.Name;
+
+        var createProducerMethod = _topicProducerProvider.GetType()
+            .GetMethod(nameof(ITopicProducerProvider.GetProducer))!
+            .MakeGenericMethod(typeof(string), eventType);
+
+        var producer = createProducerMethod.Invoke(_topicProducerProvider, [new Uri($"topic:{topic}")])!;
+        var producerType = producer.GetType();
+
+        var method = producerType.GetMethods()
+            .Where(m =>
+            {
+                if (m.Name != nameof(ITopicProducer<string, object>.Produce))
+                {
+                    return false;
+                }
+
+                var parameters = m.GetParameters();
+
+                if (parameters.Length != 3)
+                {
+                    return false;
+                }
+
+                if (parameters[1].ParameterType != eventType)
+                {
+                    return false;
+                }
+
+                return true;
+            })
+            .First();
+
+        return ((ev, cts) => (Task)method.Invoke(producer, [ev.EventId.ToString(), ev, cts])!);
+    }
+
+    private Func<object, CancellationToken, Task> GetCommandSender(ICommand command)
+    {
+        var commandType = command.GetType();
+        var commandAttribute = commandType.GetCustomAttribute<CommandAttribute>();
+        var topic = commandAttribute?.Target ?? commandType.Name;
+
+        var createProducerMethod = _topicProducerProvider.GetType()
+            .GetMethod(nameof(ITopicProducerProvider.GetProducer))!
+            .MakeGenericMethod(typeof(string), commandType);
+
+        var producer = createProducerMethod.Invoke(_topicProducerProvider, [new Uri($"topic: {topic}")])!;
+        var producerType = producer.GetType();
+
+        var method = producerType.GetMethod(nameof(ITopicProducer<string, object>.Produce))!;
+
+        return ((ev, cts) => (Task)method.Invoke(producer, [Guid.NewGuid().ToString(), ev, cts])!);
     }
 }

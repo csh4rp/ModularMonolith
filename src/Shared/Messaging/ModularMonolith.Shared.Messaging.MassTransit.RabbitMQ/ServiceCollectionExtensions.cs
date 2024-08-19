@@ -20,7 +20,10 @@ public static class ServiceCollectionExtensions
         var setupConsumers = configuration.GetSection("Messaging:CustomersEnabled")
             .Get<bool>();
 
-        serviceCollection.AddMassTransit(c =>
+
+        serviceCollection
+            .AddScoped<IMessageBus, MessageBus>()
+            .AddMassTransit(c =>
         {
             c.AddEntityFrameworkOutbox<TDbContext>(o =>
             {

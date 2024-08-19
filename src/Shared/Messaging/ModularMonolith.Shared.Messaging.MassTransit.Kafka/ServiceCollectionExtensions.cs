@@ -22,7 +22,9 @@ public static class ServiceCollectionExtensions
         var setupConsumers = configuration.GetSection("Messaging:CustomersEnabled")
             .Get<bool>();
 
-        serviceCollection.AddMassTransit(c =>
+        serviceCollection
+            .AddScoped<IMessageBus, MessageBus>()
+            .AddMassTransit(c =>
         {
             c.AddEntityFrameworkOutbox<TDbContext>(o =>
             {
@@ -47,6 +49,8 @@ public static class ServiceCollectionExtensions
                 c.AddConsumers(assemblies);
             }
 
+            c.UsingInMemory();
+
             c.AddRider(cfg =>
             {
                 cfg.SetDefaultEndpointNameFormatter();
@@ -55,21 +59,24 @@ public static class ServiceCollectionExtensions
                 {
                     configurator.Host(options.Host, host =>
                     {
-                        host.UseSasl(saslConfigurator =>
+                        if (!string.IsNullOrEmpty(options.Username) && !string.IsNullOrEmpty(options.Password))
                         {
-                            saslConfigurator.Username = options.Username;
-                            saslConfigurator.Password = options.Password;
-                            saslConfigurator.Mechanism = SaslMechanism.Plain;
-                        });
+                            host.UseSasl(saslConfigurator =>
+                            {
+                                saslConfigurator.Username = options.Username;
+                                saslConfigurator.Password = options.Password;
+                                saslConfigurator.Mechanism = SaslMechanism.Plain;
+                            });
 
-                        host.UseSsl(s => s.EndpointIdentificationAlgorithm = SslEndpointIdentificationAlgorithm.Https);
+                            host.UseSsl(s =>
+                                s.EndpointIdentificationAlgorithm = SslEndpointIdentificationAlgorithm.Https);
+                        }
                     });
 
                     if (setupConsumers)
                     {
                         SetupConsumers(context, configurator, assemblies);
                     }
-
                 });
             });
         });
@@ -104,8 +111,10 @@ public static class ServiceCollectionExtensions
 
             foreach (var (consumerGroupName, consumerTypes) in groupedConsumers)
             {
-                cfg.TopicEndpoint<object>(topic, consumerGroupName, cf =>
+                cfg.topicen
+                cfg.TopicEndpoint<string, object>(topic, consumerGroupName, cf =>
                 {
+                    cf.SetValueDeserializer(new Avro);
                     foreach (var consumerType in consumerTypes)
                     {
                         cf.ConfigureConsumer(context, consumerType);

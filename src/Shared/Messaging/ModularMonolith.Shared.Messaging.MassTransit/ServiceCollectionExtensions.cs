@@ -7,6 +7,5 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddMessageBus(this IServiceCollection serviceCollection) =>
         serviceCollection
-            .AddScoped<EventLogEntryFactory>()
-            .AddScoped<IMessageBus, MessageBus>();
+            .AddScoped<EventLogEntryFactory>();
 }

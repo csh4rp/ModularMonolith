@@ -1,7 +1,8 @@
 ﻿using System.Net;
 using FluentAssertions;
-using ModularMonolith.Identity.Api.IntegrationTests.Account.Fixtures;
+using ModularMonolith.Identity.Api.IntegrationTests.Account.Shared;
 using ModularMonolith.Identity.Api.IntegrationTests.Shared;
+using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Shared.IntegrationTests.Common;
 using ModularMonolith.Shared.TestUtils.Abstractions;
 
@@ -14,12 +15,18 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
 
     private readonly IdentityFixture _identityFixture;
     private readonly AccountFixture _accountFixture;
+    private readonly MessagingFixture<PasswordChangedEvent> _passwordChangedMessagingFixture;
 
     public ChangePasswordTests(IdentityFixture identityFixture, AccountFixture accountFixture)
     {
         _identityFixture = identityFixture;
         _accountFixture = accountFixture;
+        _passwordChangedMessagingFixture =
+            new MessagingFixture<PasswordChangedEvent>(
+                _identityFixture.GetMessagingConnectionString(), "Account");
     }
+
+    public override Task InitializeAsync() => _passwordChangedMessagingFixture.StartAsync();
 
     [Fact]
     public async Task ShouldReturnNoContent_WhenPasswordIsValid()
@@ -37,6 +44,9 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        var passwordChangedEvent = await _passwordChangedMessagingFixture.VerifyMessageReceivedAsync();
+        await VerifyMessage(passwordChangedEvent);
     }
 
     [Fact]
@@ -56,7 +66,7 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
         using var response = await client.PostAsync("/api/identity/account/change-password", request);
 
         // Assert
-        // response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         await VerifyResponse(response);
     }
 
@@ -94,5 +104,9 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
-    public override async Task DisposeAsync() => await _identityFixture.ResetAsync();
+    public override async Task DisposeAsync()
+    {
+        await _identityFixture.ResetAsync();
+        await _passwordChangedMessagingFixture.DisposeAsync();
+    }
 }

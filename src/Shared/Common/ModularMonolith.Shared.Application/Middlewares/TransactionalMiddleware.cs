@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Reflection;
+﻿using System.Reflection;
 using MediatR;
 using ModularMonolith.Shared.Application.Abstract;
 using ModularMonolith.Shared.Contracts;
@@ -9,8 +8,6 @@ namespace ModularMonolith.Shared.Application.Middlewares;
 internal sealed class TransactionalMiddleware<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
 {
-    private static readonly ConcurrentDictionary<Type, bool> TransactionBehaviourLookup = new();
-
     private readonly IUnitOfWork _unitOfWork;
 
     public TransactionalMiddleware(IUnitOfWork unitOfWork) =>
@@ -31,22 +28,20 @@ internal sealed class TransactionalMiddleware<TRequest, TResponse>
             ? typeof(IRequestHandler<,>).MakeGenericType(typeof(TRequest), typeof(TResponse))
             : typeof(IRequestHandler<>).MakeGenericType(typeof(TRequest));
 
-        if (!TransactionBehaviourLookup.TryGetValue(type, out var shouldUseTransaction))
-        {
-            var handlerType = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .FirstOrDefault(t => t.IsAssignableTo(type));
-
-            var hasTransactionalAttribute = handlerType?.GetCustomAttribute<TransactionalAttribute>();
-
-            shouldUseTransaction = hasTransactionalAttribute is not null;
-            TransactionBehaviourLookup.TryAdd(type, shouldUseTransaction);
-        }
-
-        if (!shouldUseTransaction)
+        if (TransactionalTypesDictionary.ShouldUseTransaction(type))
         {
             return await next();
         }
+
+        var handlerType = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(a => a.FullName!.StartsWith("ModularMonolith"))
+            .SelectMany(a => a.GetTypes())
+            .FirstOrDefault(t => t.IsAssignableTo(type));
+
+        var hasTransactionalAttribute = handlerType?.GetCustomAttribute<TransactionalAttribute>();
+
+        var shouldUseTransaction = hasTransactionalAttribute is not null;
+        TransactionalTypesDictionary.Add(type, shouldUseTransaction);
 
         await using var scope = await _unitOfWork.BeginScopeAsync(cancellationToken);
 

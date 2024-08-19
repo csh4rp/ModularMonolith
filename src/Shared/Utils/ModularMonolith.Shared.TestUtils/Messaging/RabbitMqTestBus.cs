@@ -2,7 +2,7 @@
 
 namespace ModularMonolith.Shared.TestUtils.Messaging;
 
-public class TestBus
+public class RabbitMqTestBus
 {
     private IBus? _bus;
 

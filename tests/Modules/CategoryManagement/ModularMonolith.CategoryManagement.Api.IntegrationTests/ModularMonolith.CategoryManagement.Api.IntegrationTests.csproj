@@ -116,4 +116,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageVersion Update="Testcontainers.PostgreSql" Version="3.9.0" />
+  </ItemGroup>
+
 </Project>

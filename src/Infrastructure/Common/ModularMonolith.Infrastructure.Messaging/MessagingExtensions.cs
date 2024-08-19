@@ -2,11 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ModularMonolith.Shared.Messaging;
-using ModularMonolith.Shared.Messaging.MassTransit;
-using ModularMonolith.Shared.Messaging.MassTransit.Kafka;
-using ModularMonolith.Shared.Messaging.MassTransit.Postgres;
-using ModularMonolith.Shared.Messaging.MassTransit.RabbitMQ;
+using ModularMonolith.Infrastructure.Messaging.Kafka;
+using ModularMonolith.Infrastructure.Messaging.Postgres;
+using ModularMonolith.Infrastructure.Messaging.RabbitMQ;
 
 namespace ModularMonolith.Infrastructure.Messaging;
 
@@ -18,13 +16,7 @@ public static class MessagingExtensions
     {
         var messagingProvider = configuration.GetSection("Messaging")
             .GetSection("Provider")
-            .Get<string>();
-
-        var databaseProvider = configuration.GetSection("Database")
-            .GetSection("Provider")
-            .Get<DatabaseProvider>();
-
-        serviceCollection.AddMessageBus();
+            .Value;
 
         switch (messagingProvider)
         {
@@ -32,10 +24,10 @@ public static class MessagingExtensions
                 serviceCollection.AddPostgresMessaging<DbContext>(configuration, assemblies);
                 break;
             case "Kafka":
-                serviceCollection.AddKafkaMessaging<DbContext>(configuration, databaseProvider, assemblies);
+                serviceCollection.AddKafkaMessaging<DbContext>(configuration, assemblies);
                 break;
             case "RabbitMQ":
-                serviceCollection.AddRabbitMQMessaging<DbContext>(configuration, databaseProvider, assemblies);
+                serviceCollection.AddRabbitMQMessaging<DbContext>(configuration, assemblies);
                 break;
             default:
                 throw new ArgumentException("Messaging:Provider is required");

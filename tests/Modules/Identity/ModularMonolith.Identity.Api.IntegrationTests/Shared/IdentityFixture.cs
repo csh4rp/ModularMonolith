@@ -3,19 +3,22 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
+using DotNet.Testcontainers.Builders;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Identity.RestApi;
-using ModularMonolith.Infrastructure.Migrations.Postgres;
+using ModularMonolith.Infrastructure.Migrations.SqlServer;
 using ModularMonolith.Shared.TestUtils.Fakes;
-using Npgsql;
+using ModularMonolith.Shared.TestUtils.Messaging;
 using Respawn;
-using Testcontainers.PostgreSql;
+using Testcontainers.Kafka;
+using Testcontainers.MsSql;
 
 namespace ModularMonolith.Identity.Api.IntegrationTests.Shared;
 
@@ -25,40 +28,53 @@ public class IdentityFixture : IAsyncLifetime
     private const string AuthIssuer = "localhost";
     private const string AuthSigningKey = "12345678123456781234567812345678";
 
-    private NpgsqlConnection? _connection;
-    private PostgreSqlContainer? _container;
-    private Respawner? _respawner;
+    private readonly MsSqlContainer _databaseContainer;
+    private readonly KafkaContainer _messagingContainer;
+    private readonly TestConsumer<PasswordChangedEvent> _passwordChangedConsumer;
+
+    private SqlConnection _connection = default!;
+    private Respawner _respawner = default!;
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
     private DbContext _dbContext = default!;
 
-    public async Task InitializeAsync()
+    public IdentityFixture()
     {
-        _container = new PostgreSqlBuilder()
-            .WithImage("postgres:16.1")
-            .WithName("identity_automated_tests")
-            .WithDatabase("tests_database")
-            .WithPortBinding("32860")
+        _databaseContainer = new MsSqlBuilder()
+            .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+            .WithWaitStrategy(Wait.ForUnixContainer().AddCustomWaitStrategy(new SqlServerReadinessCheck()))
             .Build();
 
-        await _container.StartAsync();
+        _messagingContainer = new KafkaBuilder()
+            .Build();
 
-        var connectionString = _container.GetConnectionString();
+        _passwordChangedConsumer = new TestConsumer<PasswordChangedEvent>();
+    }
 
-        _connection = new NpgsqlConnection(connectionString);
+    public async Task InitializeAsync()
+    {
+        var databaseTask = _databaseContainer.StartAsync();
+        var messagingTask = _messagingContainer.StartAsync();
+
+        await Task.WhenAll(databaseTask, messagingTask);
+
+        var connectionString = _databaseContainer.GetConnectionString();
+
+        await CreateTopics("Account");
+
+        _connection = new SqlConnection(connectionString);
         await _connection.OpenAsync();
 
-        _dbContext = new PostgresDbContextFactory().CreateDbContext([connectionString]);
+        _dbContext = new SqlServerDbContextFactory().CreateDbContext([connectionString]);
         await _dbContext.Database.MigrateAsync();
 
-        _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
-
+        _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.SqlServer });
 
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseSetting("ConnectionStrings:Database", connectionString);
-            builder.UseSetting("DataAccess:Provider", "Postgres");
-            builder.UseSetting("Messaging:Provider", "Postgres");
+            builder.UseSetting("DataAccess:Provider", "SqlServer");
+            builder.UseSetting("Messaging:Provider", "Kafka");
             builder.UseSetting("Modules:Identity:Enabled", "true");
             builder.UseSetting("Modules:Identity:Auth:Audience", AuthAudience);
             builder.UseSetting("Modules:Identity:Auth:Issuer", AuthIssuer);
@@ -70,16 +86,41 @@ public class IdentityFixture : IAsyncLifetime
             builder.UseSetting("Authentication:SigningKey", AuthSigningKey);
             builder.UseSetting("Logging:LogLevel:Default", "Warning");
             builder.UseSetting("Events:RunBackgroundWorkers", "false");
+            builder.UseSetting("Kafka:Host", _messagingContainer.GetBootstrapAddress());
 
             builder.ConfigureServices(s =>
             {
-                s.Replace(new ServiceDescriptor(typeof(TimeProvider), typeof(FakeTimeProvider),
-                    ServiceLifetime.Singleton));
+                s.Replace(
+                    new ServiceDescriptor(typeof(TimeProvider), typeof(FakeTimeProvider), ServiceLifetime.Singleton));
             });
         });
 
         _testServer = _factory.Server;
     }
+
+    private async Task CreateTopics(params string[] topics)
+    {
+        foreach (var topic in topics)
+        {
+            var result = await _messagingContainer.ExecAsync(new List<string>
+            {
+                "/bin/kafka-topics",
+                "--zookeeper",
+                "localhost:2181",
+                "--create",
+                "--topic",
+                topic,
+                "--partitions",
+                "2",
+                "--replication-factor",
+                "1"
+            });
+
+            Debug.Assert(result.ExitCode == 0);
+        }
+    }
+
+    public string GetMessagingConnectionString() => _messagingContainer.GetBootstrapAddress();
 
     public HttpClient CreateClient()
     {
@@ -122,21 +163,21 @@ public class IdentityFixture : IAsyncLifetime
         return _dbContext.SaveChangesAsync();
     }
 
+    public Task<PasswordChangedEvent> VerifyPasswordChangedEventReceived() =>
+        new MessagePublicationVerifier<PasswordChangedEvent>(_passwordChangedConsumer).VerifyAsync();
+
     public AsyncServiceScope CreateServiceScope() => _testServer.Services.CreateAsyncScope();
 
     public async Task DisposeAsync()
     {
-        if (_respawner is not null && _connection is not null)
-        {
-            await _respawner.ResetAsync(_connection);
-            await _connection.DisposeAsync();
-        }
+        await _respawner.ResetAsync(_connection);
+        await _connection.DisposeAsync();
 
-        if (_container is not null)
-        {
-            await _container.StopAsync();
-            await _container.DisposeAsync();
-        }
+        await _databaseContainer.StopAsync();
+        await _databaseContainer.DisposeAsync();
+
+        await _messagingContainer.StartAsync();
+        await _messagingContainer.DisposeAsync();
 
         await _dbContext.DisposeAsync();
         await _factory.DisposeAsync();

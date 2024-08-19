@@ -13,6 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Infrastructure\ModularMonolith.CategoryManagement.Infrastructure.csproj"/>
     <ProjectReference Include="..\..\..\Modules\Identity\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj"/>
-    <ProjectReference Include="..\ModularMonolith.Infrasructure.DataAccess.SqlServer\ModularMonolith.Infrastructure.DataAccess.SqlServer.csproj"/>
+    <ProjectReference Include="..\ModularMonolith.Infrastructure.DataAccess.SqlServer\ModularMonolith.Infrastructure.DataAccess.SqlServer.csproj"/>
   </ItemGroup>
 </Project>

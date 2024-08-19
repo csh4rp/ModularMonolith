@@ -68,7 +68,6 @@ public class SqlServerFixture : IAsyncLifetime
     {
         private readonly string[] _command = ["/opt/mssql-tools18/bin/sqlcmd", "-Q", "SELECT 1;", "-C"];
 
-        /// <inheritdoc />
         public async Task<bool> UntilAsync(IContainer container)
         {
             var execResult = await container.ExecAsync(_command)

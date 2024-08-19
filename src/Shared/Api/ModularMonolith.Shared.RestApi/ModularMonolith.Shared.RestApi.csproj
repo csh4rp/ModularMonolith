@@ -19,5 +19,6 @@
     <ProjectReference Include="..\..\..\Infrastructure\Common\ModularMonolith.Infrastructure.Messaging\ModularMonolith.Infrastructure.Messaging.csproj"/>
     <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
     <ProjectReference Include="..\..\DataAccess\ModularMonolith.Shared.DataAccess.EntityFramework\ModularMonolith.Shared.DataAccess.EntityFramework.csproj"/>
+    <ProjectReference Include="..\..\Tracing\ModularMonolith.Shared.Tracing\ModularMonolith.Shared.Tracing.csproj" />
   </ItemGroup>
 </Project>

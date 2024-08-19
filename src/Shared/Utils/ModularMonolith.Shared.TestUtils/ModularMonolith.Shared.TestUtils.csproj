@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FluentAssertions"/>
+    <PackageReference Include="MassTransit.Kafka" />
     <PackageReference Include="MassTransit.RabbitMQ"/>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
     <PackageReference Include="Polly"/>

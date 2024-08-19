@@ -32,6 +32,7 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.7" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.7" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
@@ -60,9 +61,10 @@
     <PackageVersion Include="Serilog.Extensions.Logging" Version="8.0.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.7.0" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
-    <PackageVersion Include="Testcontainers.PostgreSql" Version="3.9.0" />
+    <PackageVersion Include="Testcontainers.Kafka" Version="3.9.0" />
     <PackageVersion Include="Testcontainers.MsSql" Version="3.9.0" />
     <PackageVersion Include="Testcontainers.RabbitMq" Version="3.9.0" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="3.9.0" />
     <PackageVersion Include="TngTech.ArchUnitNET.xUnit" Version="0.10.6" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Compilers" Version="4.9.2" />
     <PackageVersion Include="Microsoft.Net.Compilers" Version="4.2.0" />
