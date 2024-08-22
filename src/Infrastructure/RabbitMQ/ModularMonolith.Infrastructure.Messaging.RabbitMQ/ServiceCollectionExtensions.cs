@@ -44,6 +44,7 @@ public static class ServiceCollectionExtensions
                 {
                     configurator.Host(connectionString);
                     configurator.ConfigureEndpoints(context);
+
                 });
             });
 

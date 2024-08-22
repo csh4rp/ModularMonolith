@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
+    <PackageReference Include="MassTransit.RabbitMQ" />
     <PackageReference Include="Z.EntityFramework.Plus.EFCore"/>
   </ItemGroup>
   <ItemGroup>

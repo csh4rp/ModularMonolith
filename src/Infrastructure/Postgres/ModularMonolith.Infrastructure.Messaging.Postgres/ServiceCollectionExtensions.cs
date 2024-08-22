@@ -45,6 +45,12 @@ public static class ServiceCollectionExtensions
                 {
                     configurator.Host(new PostgresSqlHostSettings(connectionString));
                     configurator.ConfigureEndpoints(context);
+
+                    configurator.ReceiveEndpoint("", e =>
+                    {
+
+
+                    });
                 });
             });
 
