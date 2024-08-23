@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Reference Include="FluentAssertions">
+        <HintPath>..\..\..\..\..\..\.nuget\packages\fluentassertions\6.12.0\lib\net6.0\FluentAssertions.dll</HintPath>
+      </Reference>
+      <Reference Include="MassTransit">
+        <HintPath>..\..\..\..\..\..\.nuget\packages\masstransit\8.2.3\lib\net8.0\MassTransit.dll</HintPath>
+      </Reference>
+      <Reference Include="MassTransit.Abstractions">
+        <HintPath>..\..\..\..\..\..\.nuget\packages\masstransit.abstractions\8.2.3\lib\net8.0\MassTransit.Abstractions.dll</HintPath>
+      </Reference>
+      <Reference Include="Verify">
+        <HintPath>..\..\..\..\..\..\.nuget\packages\verify\26.1.6\lib\net8.0\Verify.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\src\Shared\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,6 +1,6 @@
 ﻿using MassTransit;
 
-namespace ModularMonolith.Shared.TestUtils.Messaging;
+namespace ModularMonolith.Tests.Utils.Messaging;
 
 public class RabbitMqTestBus
 {

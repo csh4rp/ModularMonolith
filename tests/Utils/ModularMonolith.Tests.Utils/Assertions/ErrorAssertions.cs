@@ -3,7 +3,7 @@ using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 using ModularMonolith.Shared.Contracts.Errors;
 
-namespace ModularMonolith.Shared.TestUtils.Assertions;
+namespace ModularMonolith.Tests.Utils.Assertions;
 
 public class ErrorAssertions : ReferenceTypeAssertions<Error?, ErrorAssertions>
 {

@@ -1,6 +1,6 @@
 ﻿using ModularMonolith.Shared.Contracts.Errors;
 
-namespace ModularMonolith.Shared.TestUtils.Assertions;
+namespace ModularMonolith.Tests.Utils.Assertions;
 
 public static class ErrorAssertionsExtensions
 {

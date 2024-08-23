@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.CategoryManagement.Domain.Categories;
+using ModularMonolith.CategoryManagement.Infrastructure.Categories.MessageConfigurations;
 using ModularMonolith.CategoryManagement.Infrastructure.Categories.Repositories;
 
 namespace ModularMonolith.CategoryManagement.Infrastructure;
@@ -14,12 +15,11 @@ public static class ServiceCollectionExtensions
         return serviceCollection;
     }
 
-    public static IRabbitMqBusFactoryConfigurator AddConsumerConfigurations(this IRabbitMqBusFactoryConfigurator bus)
+    public static IRabbitMqBusFactoryConfigurator AddCategoryManagementConsumerConfigurations(this IRabbitMqBusFactoryConfigurator bus)
     {
-        bus.ReceiveEndpoint("", e =>
-        {
+        var config = new CategoryMessagingConfiguration();
 
-        });
+        config.Apply(bus);
 
         return bus;
     }

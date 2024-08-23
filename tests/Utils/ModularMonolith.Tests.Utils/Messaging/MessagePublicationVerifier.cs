@@ -1,4 +1,6 @@
-﻿namespace ModularMonolith.Shared.TestUtils.Messaging;
+﻿using ModularMonolith.Shared.TestUtils.Messaging;
+
+namespace ModularMonolith.Tests.Utils.Messaging;
 
 public class MessagePublicationVerifier<T> where T : class
 {

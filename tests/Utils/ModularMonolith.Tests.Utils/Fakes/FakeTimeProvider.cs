@@ -1,4 +1,4 @@
-﻿namespace ModularMonolith.Shared.TestUtils.Fakes;
+﻿namespace ModularMonolith.Tests.Utils.Fakes;
 
 public class FakeTimeProvider : TimeProvider
 {

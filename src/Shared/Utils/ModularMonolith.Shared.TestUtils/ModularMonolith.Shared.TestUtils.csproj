@@ -15,7 +15,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj"/>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resiliency\"/>
-  </ItemGroup>
 </Project>
