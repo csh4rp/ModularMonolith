@@ -3,7 +3,7 @@ using FluentAssertions;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories.Shared;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Shared;
 using ModularMonolith.Shared.IntegrationTests.Common;
-using ModularMonolith.Shared.TestUtils.Abstractions;
+using ModularMonolith.Tests.Utils.Abstractions;
 
 namespace ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories.Deletion;
 

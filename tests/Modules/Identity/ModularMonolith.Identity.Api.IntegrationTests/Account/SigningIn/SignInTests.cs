@@ -3,7 +3,7 @@ using FluentAssertions;
 using ModularMonolith.Identity.Api.IntegrationTests.Account.Shared;
 using ModularMonolith.Identity.Api.IntegrationTests.Shared;
 using ModularMonolith.Shared.IntegrationTests.Common;
-using ModularMonolith.Shared.TestUtils.Abstractions;
+using ModularMonolith.Tests.Utils.Abstractions;
 
 namespace ModularMonolith.Identity.Api.IntegrationTests.Account.SigningIn;
 

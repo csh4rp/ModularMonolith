@@ -62,6 +62,7 @@
     <ProjectReference Include="..\..\..\..\src\Infrastructure\SqlServer\ModularMonolith.Infrastructure.Migrations.SqlServer\ModularMonolith.Infrastructure.Migrations.SqlServer.csproj" />
     <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.RestApi\ModularMonolith.Identity.RestApi.csproj"/>
     <ProjectReference Include="..\..\..\..\src\Modules\Identity\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj"/>
+    <ProjectReference Include="..\..\..\Utils\ModularMonolith.Tests.Utils\ModularMonolith.Tests.Utils.csproj" />
   </ItemGroup>
 
 </Project>
