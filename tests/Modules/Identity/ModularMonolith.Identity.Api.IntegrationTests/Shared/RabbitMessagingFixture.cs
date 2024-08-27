@@ -3,39 +3,37 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ModularMonolith.Identity.Api.IntegrationTests.Shared;
 
-public class MessagingFixture<T> : IAsyncDisposable where T : class
+public class RabbitMessagingFixture<T> : IAsyncDisposable where T : class
 {
     private readonly IServiceProvider _serviceProvider;
 
     private T? _message;
     private IBusControl? _busControl;
 
-    public MessagingFixture(string connectionString, string topic)
+    public RabbitMessagingFixture(string connectionString, string queue)
     {
         var services = new ServiceCollection();
 
-        services.AddMassTransit(x =>
+        services.AddMassTransit(c =>
         {
-            x.UsingInMemory();
-
-            x.AddRider(cfg =>
+            c.UsingRabbitMq((context, configurator) =>
             {
-                cfg.SetDefaultEndpointNameFormatter();
+                configurator.Host(connectionString);
+                configurator.ConfigureEndpoints(context);
 
-                cfg.UsingKafka((context, configurator) =>
+                configurator.ReceiveEndpoint(queue, e =>
                 {
-                    configurator.Host(connectionString);
-
-                    configurator.TopicEndpoint<string, T>(topic, Guid.NewGuid().ToString(), e =>
+                    e.Handler<T>(consumeContext =>
                     {
-                        e.Handler<T>(cnx =>
-                        {
-                            _message = cnx.Message;
-                            return Task.CompletedTask;
-                        }, a => {});
+                        _message = consumeContext.Message;
+                        return Task.CompletedTask;
                     });
+
+                    e.Bind<T>();
                 });
             });
+
+
         });
 
         _serviceProvider = services.BuildServiceProvider();

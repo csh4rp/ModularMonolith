@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using ModularMonolith.Shared.Events;
-using ModularMonolith.Shared.IntegrationTests.Common;
 
 [assembly: ExcludeFromCodeCoverage]
 

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Messaging;
+using ModularMonolith.Shared.Messaging.MassTransit.Factories;
 
 namespace ModularMonolith.Infrastructure.Messaging.Postgres;
 
@@ -19,6 +20,7 @@ public static class ServiceCollectionExtensions
 
         serviceCollection
             .AddScoped<IMessageBus, MessageBus>()
+            .AddScoped<EventLogEntryFactory>()
             .AddMassTransit(c =>
             {
                 c.AddEntityFrameworkOutbox<TDbContext>(o =>

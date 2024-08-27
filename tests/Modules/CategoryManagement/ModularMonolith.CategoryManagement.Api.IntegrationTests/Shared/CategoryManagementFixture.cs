@@ -10,7 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.CategoryManagement.RestApi;
 using ModularMonolith.Infrastructure.Migrations.Postgres;
-using ModularMonolith.Shared.TestUtils.Messaging;
 using Npgsql;
 using Respawn;
 using Testcontainers.PostgreSql;
@@ -26,8 +25,6 @@ public class CategoryManagementFixture : IAsyncLifetime
 
     private readonly PostgreSqlContainer _databaseContainer;
     private readonly RabbitMqContainer _messagingContainer;
-    private readonly RabbitMqTestBus _rabbitMqTestBus;
-    private readonly TestConsumer<CategoryCreatedEvent> _categoryCreatedConsumer;
 
     private DbContext _dbContext = default!;
     private NpgsqlConnection _connection = default!;
@@ -46,10 +43,8 @@ public class CategoryManagementFixture : IAsyncLifetime
         _messagingContainer = new RabbitMqBuilder()
             .WithUsername("guest")
             .WithPassword("guest")
+            .WithPortBinding(15672, 15672)
             .Build();
-
-        _rabbitMqTestBus = new RabbitMqTestBus();
-        _categoryCreatedConsumer = new TestConsumer<CategoryCreatedEvent>();
     }
 
     public async Task InitializeAsync()
@@ -64,7 +59,6 @@ public class CategoryManagementFixture : IAsyncLifetime
         _connection = new NpgsqlConnection(connectionString);
         _dbContext = new PostgresDbContextFactory().CreateDbContext([connectionString]);
 
-        await _rabbitMqTestBus.StartAsync(_messagingContainer.GetConnectionString());
         await _connection.OpenAsync();
         await _dbContext.Database.MigrateAsync();
 
@@ -86,8 +80,6 @@ public class CategoryManagementFixture : IAsyncLifetime
         });
 
         _testServer = _factory.Server;
-
-        _rabbitMqTestBus.ConnectReceiveEndpoint("CategoryCreatedTestQueue", _categoryCreatedConsumer);
     }
 
     private HttpClient CreateClient()
@@ -105,6 +97,8 @@ public class CategoryManagementFixture : IAsyncLifetime
 
         return client;
     }
+
+    public string GetMessagingConnectionString() => _messagingContainer.GetConnectionString();
 
     private static string GenerateToken()
     {
@@ -126,9 +120,6 @@ public class CategoryManagementFixture : IAsyncLifetime
         _dbContext.AddRange(categories);
         await _dbContext.SaveChangesAsync();
     }
-
-    public Task<CategoryCreatedEvent> VerifyCategoryCreatedEventReceived() =>
-        new MessagePublicationVerifier<CategoryCreatedEvent>(_categoryCreatedConsumer).VerifyAsync();
 
     public async Task DisposeAsync()
     {

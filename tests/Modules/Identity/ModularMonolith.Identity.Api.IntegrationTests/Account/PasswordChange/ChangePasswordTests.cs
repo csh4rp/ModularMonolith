@@ -3,7 +3,6 @@ using FluentAssertions;
 using ModularMonolith.Identity.Api.IntegrationTests.Account.Shared;
 using ModularMonolith.Identity.Api.IntegrationTests.Shared;
 using ModularMonolith.Identity.Domain.Users;
-using ModularMonolith.Shared.IntegrationTests.Common;
 using ModularMonolith.Tests.Utils.Abstractions;
 
 namespace ModularMonolith.Identity.Api.IntegrationTests.Account.PasswordChange;
@@ -21,9 +20,10 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
     {
         _identityFixture = identityFixture;
         _accountFixture = accountFixture;
+
         _passwordChangedMessagingFixture =
             new MessagingFixture<PasswordChangedEvent>(
-                _identityFixture.GetMessagingConnectionString(), "Account");
+                _identityFixture.GetMessagingConnectionString(), "PasswordChangedEvent");
     }
 
     public override Task InitializeAsync() => _passwordChangedMessagingFixture.StartAsync();

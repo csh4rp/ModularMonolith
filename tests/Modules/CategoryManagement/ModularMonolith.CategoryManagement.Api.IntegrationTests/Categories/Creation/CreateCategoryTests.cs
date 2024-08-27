@@ -2,7 +2,8 @@
 using FluentAssertions;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories.Shared;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Shared;
-using ModularMonolith.Shared.IntegrationTests.Common;
+using ModularMonolith.CategoryManagement.Domain.Categories;
+using ModularMonolith.Identity.Api.IntegrationTests.Shared;
 using ModularMonolith.Tests.Utils.Abstractions;
 
 namespace ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories.Creation;
@@ -13,12 +14,21 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
     private readonly CategoryManagementFixture _categoryManagementFixture;
     private readonly CategoryFixture _categoryFixture;
     private readonly HttpClient _client;
+    private readonly RabbitMessagingFixture<CategoryCreatedEvent> _rabbitMessagingFixture;
 
     public CreateCategoryTests(CategoryManagementFixture categoryManagementFixture, CategoryFixture categoryFixture)
     {
         _categoryManagementFixture = categoryManagementFixture;
         _categoryFixture = categoryFixture;
         _client = categoryManagementFixture.CreateClientWithAuthToken();
+        _rabbitMessagingFixture =
+            new RabbitMessagingFixture<CategoryCreatedEvent>(_categoryManagementFixture.GetMessagingConnectionString(),
+                "CategoryCreatedEvent");
+    }
+
+    public override async Task InitializeAsync()
+    {
+        await _rabbitMessagingFixture.StartAsync();
     }
 
     [Fact]
@@ -35,7 +45,7 @@ public class CreateCategoryTests : BaseIntegrationTest<CreateCategoryTests>
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         await VerifyResponse(response);
 
-        var message = await _categoryManagementFixture.VerifyCategoryCreatedEventReceived();
+        var message = await _rabbitMessagingFixture.VerifyMessageReceivedAsync();
         await VerifyMessage(message);
     }
 

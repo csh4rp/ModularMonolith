@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Identity.Api.IntegrationTests.Account.Shared;
 using ModularMonolith.Identity.Api.IntegrationTests.Shared;
 using ModularMonolith.Identity.Domain.Users;
-using ModularMonolith.Shared.IntegrationTests.Common;
 using ModularMonolith.Tests.Utils.Abstractions;
 
 namespace ModularMonolith.Identity.Api.IntegrationTests.Account.Verification;

@@ -14,9 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Identity.RestApi;
 using ModularMonolith.Infrastructure.Migrations.SqlServer;
-using ModularMonolith.Shared.TestUtils.Messaging;
 using ModularMonolith.Tests.Utils.Fakes;
-using ModularMonolith.Tests.Utils.Messaging;
 using Respawn;
 using Testcontainers.Kafka;
 using Testcontainers.MsSql;
@@ -31,7 +29,6 @@ public class IdentityFixture : IAsyncLifetime
 
     private readonly MsSqlContainer _databaseContainer;
     private readonly KafkaContainer _messagingContainer;
-    private readonly TestConsumer<PasswordChangedEvent> _passwordChangedConsumer;
 
     private SqlConnection _connection = default!;
     private Respawner _respawner = default!;
@@ -48,8 +45,6 @@ public class IdentityFixture : IAsyncLifetime
 
         _messagingContainer = new KafkaBuilder()
             .Build();
-
-        _passwordChangedConsumer = new TestConsumer<PasswordChangedEvent>();
     }
 
     public async Task InitializeAsync()
@@ -163,9 +158,6 @@ public class IdentityFixture : IAsyncLifetime
         _dbContext.AddRange(users);
         return _dbContext.SaveChangesAsync();
     }
-
-    public Task<PasswordChangedEvent> VerifyPasswordChangedEventReceived() =>
-        new MessagePublicationVerifier<PasswordChangedEvent>(_passwordChangedConsumer).VerifyAsync();
 
     public AsyncServiceScope CreateServiceScope() => _testServer.Services.CreateAsyncScope();
 

@@ -5,6 +5,7 @@
   <ItemGroup>
     <PackageReference Include="Bogus"/>
     <PackageReference Include="EFCore.NamingConventions"/>
+    <PackageReference Include="MassTransit.RabbitMQ" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
     <PackageReference Include="Respawn"/>
     <PackageReference Include="FluentAssertions"/>

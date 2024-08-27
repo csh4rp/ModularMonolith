@@ -1,4 +1,4 @@
-﻿namespace ModularMonolith.Shared.IntegrationTests.Common;
+﻿namespace ModularMonolith.Tests.Utils.Abstractions;
 
 public class TestFileNameAttribute : Attribute
 {

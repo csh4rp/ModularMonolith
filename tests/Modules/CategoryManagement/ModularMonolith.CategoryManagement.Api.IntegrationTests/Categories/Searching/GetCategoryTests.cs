@@ -2,7 +2,6 @@
 using FluentAssertions;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories.Shared;
 using ModularMonolith.CategoryManagement.Api.IntegrationTests.Shared;
-using ModularMonolith.Shared.IntegrationTests.Common;
 using ModularMonolith.Tests.Utils.Abstractions;
 
 namespace ModularMonolith.CategoryManagement.Api.IntegrationTests.Categories.Searching;

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.CategoryManagement.Infrastructure;
 using ModularMonolith.Shared.Messaging;
+using ModularMonolith.Shared.Messaging.MassTransit.Factories;
 
 namespace ModularMonolith.Infrastructure.Messaging.RabbitMQ;
 
@@ -19,6 +20,7 @@ public static class ServiceCollectionExtensions
 
         serviceCollection
             .AddScoped<IMessageBus, MessageBus>()
+            .AddScoped<EventLogEntryFactory>()
             .AddMassTransit(c =>
             {
                 c.AddEntityFrameworkOutbox<TDbContext>(o =>
