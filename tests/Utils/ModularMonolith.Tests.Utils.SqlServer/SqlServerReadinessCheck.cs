@@ -1,7 +1,7 @@
 ﻿using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
 
-namespace ModularMonolith.Identity.Api.IntegrationTests.Shared;
+namespace ModularMonolith.Tests.Utils.SqlServer;
 
 public class SqlServerReadinessCheck : IWaitUntil
 {

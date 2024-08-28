@@ -3,7 +3,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
-using DotNet.Testcontainers.Builders;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.SqlClient;
@@ -15,6 +14,8 @@ using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Identity.RestApi;
 using ModularMonolith.Infrastructure.Migrations.SqlServer;
 using ModularMonolith.Tests.Utils.Fakes;
+using ModularMonolith.Tests.Utils.Kafka;
+using ModularMonolith.Tests.Utils.SqlServer;
 using Respawn;
 using Testcontainers.Kafka;
 using Testcontainers.MsSql;
@@ -38,13 +39,8 @@ public class IdentityFixture : IAsyncLifetime
 
     public IdentityFixture()
     {
-        _databaseContainer = new MsSqlBuilder()
-            .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-            .WithWaitStrategy(Wait.ForUnixContainer().AddCustomWaitStrategy(new SqlServerReadinessCheck()))
-            .Build();
-
-        _messagingContainer = new KafkaBuilder()
-            .Build();
+        _databaseContainer = new SqlServerContainerBuilder().Build();
+        _messagingContainer = new KafkaBuilder().Build();
     }
 
     public async Task InitializeAsync()
@@ -56,7 +52,7 @@ public class IdentityFixture : IAsyncLifetime
 
         var connectionString = _databaseContainer.GetConnectionString();
 
-        await CreateTopics("Account");
+        await _messagingContainer.CreateTopics("PasswordChangedEvent");
 
         _connection = new SqlConnection(connectionString);
         await _connection.OpenAsync();
@@ -92,28 +88,6 @@ public class IdentityFixture : IAsyncLifetime
         });
 
         _testServer = _factory.Server;
-    }
-
-    private async Task CreateTopics(params string[] topics)
-    {
-        foreach (var topic in topics)
-        {
-            var result = await _messagingContainer.ExecAsync(new List<string>
-            {
-                "/bin/kafka-topics",
-                "--zookeeper",
-                "localhost:2181",
-                "--create",
-                "--topic",
-                topic,
-                "--partitions",
-                "2",
-                "--replication-factor",
-                "1"
-            });
-
-            Debug.Assert(result.ExitCode == 0);
-        }
     }
 
     public string GetMessagingConnectionString() => _messagingContainer.GetBootstrapAddress();

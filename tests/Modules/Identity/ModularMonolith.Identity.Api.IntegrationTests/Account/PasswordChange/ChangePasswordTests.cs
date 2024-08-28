@@ -4,6 +4,7 @@ using ModularMonolith.Identity.Api.IntegrationTests.Account.Shared;
 using ModularMonolith.Identity.Api.IntegrationTests.Shared;
 using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Tests.Utils.Abstractions;
+using ModularMonolith.Tests.Utils.Kafka;
 
 namespace ModularMonolith.Identity.Api.IntegrationTests.Account.PasswordChange;
 
@@ -14,7 +15,7 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
 
     private readonly IdentityFixture _identityFixture;
     private readonly AccountFixture _accountFixture;
-    private readonly MessagingFixture<PasswordChangedEvent> _passwordChangedMessagingFixture;
+    private readonly KafkaMessagingFixture<PasswordChangedEvent> _passwordChangedMessagingFixture;
 
     public ChangePasswordTests(IdentityFixture identityFixture, AccountFixture accountFixture)
     {
@@ -22,7 +23,7 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
         _accountFixture = accountFixture;
 
         _passwordChangedMessagingFixture =
-            new MessagingFixture<PasswordChangedEvent>(
+            new KafkaMessagingFixture<PasswordChangedEvent>(
                 _identityFixture.GetMessagingConnectionString(), "PasswordChangedEvent");
     }
 

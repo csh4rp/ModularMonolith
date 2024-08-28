@@ -13,11 +13,6 @@ public sealed class CategoryCreatedConsumer : IConsumer<CategoryCreatedEvent>
         _logger = logger;
     }
 
-    public CategoryCreatedConsumer()
-    {
-        throw new NotImplementedException();
-    }
-
     public Task Consume(ConsumeContext<CategoryCreatedEvent> context)
     {
         _logger.LogInformation("Category with id: '{CategoryId}' was created", context.Message.CategoryId);

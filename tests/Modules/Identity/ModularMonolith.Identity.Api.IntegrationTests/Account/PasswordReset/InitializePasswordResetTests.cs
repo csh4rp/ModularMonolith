@@ -4,6 +4,7 @@ using ModularMonolith.Identity.Api.IntegrationTests.Account.Shared;
 using ModularMonolith.Identity.Api.IntegrationTests.Shared;
 using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Tests.Utils.Abstractions;
+using ModularMonolith.Tests.Utils.Kafka;
 
 namespace ModularMonolith.Identity.Api.IntegrationTests.Account.PasswordReset;
 
@@ -12,14 +13,14 @@ public class InitializePasswordResetTests : BaseIntegrationTest<InitializePasswo
 {
     private readonly IdentityFixture _identityFixture;
     private readonly AccountFixture _accountFixture;
-    private readonly MessagingFixture<PasswordResetInitializedEvent> _passwordResetInitializedMessagingFixture;
+    private readonly KafkaMessagingFixture<PasswordResetInitializedEvent> _passwordResetInitializedMessagingFixture;
 
     public InitializePasswordResetTests(IdentityFixture identityFixture, AccountFixture accountFixture)
     {
         _identityFixture = identityFixture;
         _accountFixture = accountFixture;
         _passwordResetInitializedMessagingFixture =
-            new MessagingFixture<PasswordResetInitializedEvent>(_identityFixture.GetMessagingConnectionString(), "Account");
+            new KafkaMessagingFixture<PasswordResetInitializedEvent>(_identityFixture.GetMessagingConnectionString(), "PasswordChangedEvent");
     }
 
     public override Task InitializeAsync() => _passwordResetInitializedMessagingFixture.StartAsync();

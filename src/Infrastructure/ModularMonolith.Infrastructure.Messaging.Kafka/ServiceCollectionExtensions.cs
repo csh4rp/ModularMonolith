@@ -13,7 +13,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddKafkaMessaging<TDbContext>(this IServiceCollection serviceCollection,
         IConfiguration configuration,
-        Assembly[] consumerAssemblies) where TDbContext : DbContext
+        Assembly[] consumerAssemblies,
+        bool runConsumers) where TDbContext : DbContext
     {
         var options = configuration.GetSection("Kafka")
                           .Get<KafkaOptions>()
@@ -44,7 +45,10 @@ public static class ServiceCollectionExtensions
                     });
                 });
 
-                c.AddConsumers(consumerAssemblies);
+                if (runConsumers)
+                {
+                    c.AddConsumers(consumerAssemblies);
+                }
 
                 c.UsingInMemory();
 
@@ -69,12 +73,6 @@ public static class ServiceCollectionExtensions
                                     s.EndpointIdentificationAlgorithm = SslEndpointIdentificationAlgorithm.Https);
                             }
                         });
-
-                        configurator.TopicEndpoint<string, object>("", "", e =>
-                        {
-
-                        });
-
                     });
                 });
             });

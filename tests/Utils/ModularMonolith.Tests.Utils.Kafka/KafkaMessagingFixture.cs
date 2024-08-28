@@ -1,39 +1,41 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ModularMonolith.Identity.Api.IntegrationTests.Shared;
+namespace ModularMonolith.Tests.Utils.Kafka;
 
-public class RabbitMessagingFixture<T> : IAsyncDisposable where T : class
+public class KafkaMessagingFixture<T> : IAsyncDisposable where T : class
 {
     private readonly IServiceProvider _serviceProvider;
 
     private T? _message;
     private IBusControl? _busControl;
 
-    public RabbitMessagingFixture(string connectionString, string queue)
+    public KafkaMessagingFixture(string connectionString, string topic)
     {
         var services = new ServiceCollection();
 
-        services.AddMassTransit(c =>
+        services.AddMassTransit(x =>
         {
-            c.UsingRabbitMq((context, configurator) =>
+            x.UsingInMemory();
+
+            x.AddRider(cfg =>
             {
-                configurator.Host(connectionString);
-                configurator.ConfigureEndpoints(context);
+                cfg.SetDefaultEndpointNameFormatter();
 
-                configurator.ReceiveEndpoint(queue, e =>
+                cfg.UsingKafka((context, configurator) =>
                 {
-                    e.Handler<T>(consumeContext =>
-                    {
-                        _message = consumeContext.Message;
-                        return Task.CompletedTask;
-                    });
+                    configurator.Host(connectionString);
 
-                    e.Bind<T>();
+                    configurator.TopicEndpoint<string, T>(topic, Guid.NewGuid().ToString(), e =>
+                    {
+                        e.Handler<T>(cnx =>
+                        {
+                            _message = cnx.Message;
+                            return Task.CompletedTask;
+                        }, a => {});
+                    });
                 });
             });
-
-
         });
 
         _serviceProvider = services.BuildServiceProvider();

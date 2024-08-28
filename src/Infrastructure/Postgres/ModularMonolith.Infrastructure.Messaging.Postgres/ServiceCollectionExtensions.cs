@@ -13,10 +13,11 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddPostgresMessaging<TDbContext>(this IServiceCollection serviceCollection,
         IConfiguration configuration,
-        Assembly[] consumerAssemblies) where TDbContext : DbContext
+        Assembly[] consumerAssemblies,
+        bool runConsumers) where TDbContext : DbContext
     {
         var connectionString = configuration.GetConnectionString("Messaging")!;
-        var provider = configuration.GetSection("DataAccess:Provider").Value;
+        var provider = configuration.GetSection("DataAccess").GetValue<string>("Provider");
 
         serviceCollection
             .AddScoped<IMessageBus, MessageBus>()
@@ -41,18 +42,15 @@ public static class ServiceCollectionExtensions
                     });
                 });
 
-                c.AddConsumers(consumerAssemblies);
+                if (runConsumers)
+                {
+                    c.AddConsumers(consumerAssemblies);
+                }
 
                 c.UsingPostgres((context, configurator) =>
                 {
                     configurator.Host(new PostgresSqlHostSettings(connectionString));
                     configurator.ConfigureEndpoints(context);
-
-                    configurator.ReceiveEndpoint("", e =>
-                    {
-
-
-                    });
                 });
             });
 

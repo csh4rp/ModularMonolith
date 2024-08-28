@@ -15,19 +15,21 @@ public static class MessagingExtensions
         Assembly[] assemblies)
     {
         var messagingProvider = configuration.GetSection("Messaging")
-            .GetSection("Provider")
-            .Value;
+            .GetValue<string>("Provider");
+
+        var runConsumers = configuration.GetSection("Messaging")
+            .GetValue<bool>("RunConsumers");
 
         switch (messagingProvider)
         {
             case "Postgres":
-                serviceCollection.AddPostgresMessaging<DbContext>(configuration, assemblies);
+                serviceCollection.AddPostgresMessaging<DbContext>(configuration, assemblies, runConsumers);
                 break;
             case "Kafka":
-                serviceCollection.AddKafkaMessaging<DbContext>(configuration, assemblies);
+                serviceCollection.AddKafkaMessaging<DbContext>(configuration, assemblies, runConsumers);
                 break;
             case "RabbitMQ":
-                serviceCollection.AddRabbitMQMessaging<DbContext>(configuration, assemblies);
+                serviceCollection.AddRabbitMQMessaging<DbContext>(configuration, assemblies, runConsumers);
                 break;
             default:
                 throw new ArgumentException("Messaging:Provider is required");
