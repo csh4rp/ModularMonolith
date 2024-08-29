@@ -10,7 +10,7 @@ public class KafkaMessagingFixture<T> : IAsyncDisposable where T : class
     private T? _message;
     private IBusControl? _busControl;
 
-    public KafkaMessagingFixture(string connectionString, string topic)
+    public KafkaMessagingFixture(string connectionString)
     {
         var services = new ServiceCollection();
 
@@ -26,7 +26,9 @@ public class KafkaMessagingFixture<T> : IAsyncDisposable where T : class
                 {
                     configurator.Host(connectionString);
 
-                    configurator.TopicEndpoint<string, T>(topic, Guid.NewGuid().ToString(), e =>
+                    var topicName = DefaultEndpointNameFormatter.Instance.Message<T>();
+
+                    configurator.TopicEndpoint<string, T>(topicName, Guid.NewGuid().ToString(), e =>
                     {
                         e.Handler<T>(cnx =>
                         {

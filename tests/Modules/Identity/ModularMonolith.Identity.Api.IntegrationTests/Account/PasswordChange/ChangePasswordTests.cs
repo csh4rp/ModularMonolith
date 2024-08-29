@@ -21,10 +21,7 @@ public class ChangePasswordTests : BaseIntegrationTest<ChangePasswordTests>
     {
         _identityFixture = identityFixture;
         _accountFixture = accountFixture;
-
-        _passwordChangedMessagingFixture =
-            new KafkaMessagingFixture<PasswordChangedEvent>(
-                _identityFixture.GetMessagingConnectionString(), "PasswordChangedEvent");
+        _passwordChangedMessagingFixture = new KafkaMessagingFixture<PasswordChangedEvent>(_identityFixture.GetMessagingConnectionString());
     }
 
     public override Task InitializeAsync() => _passwordChangedMessagingFixture.StartAsync();

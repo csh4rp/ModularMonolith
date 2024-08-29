@@ -52,7 +52,8 @@ public class IdentityFixture : IAsyncLifetime
 
         var connectionString = _databaseContainer.GetConnectionString();
 
-        await _messagingContainer.CreateTopics("PasswordChangedEvent");
+        await _messagingContainer.CreateTopic<PasswordChangedEvent>();
+        await _messagingContainer.CreateTopic<PasswordResetInitializedEvent>();
 
         _connection = new SqlConnection(connectionString);
         await _connection.OpenAsync();

@@ -20,7 +20,7 @@ public class InitializePasswordResetTests : BaseIntegrationTest<InitializePasswo
         _identityFixture = identityFixture;
         _accountFixture = accountFixture;
         _passwordResetInitializedMessagingFixture =
-            new KafkaMessagingFixture<PasswordResetInitializedEvent>(_identityFixture.GetMessagingConnectionString(), "PasswordChangedEvent");
+            new KafkaMessagingFixture<PasswordResetInitializedEvent>(_identityFixture.GetMessagingConnectionString());
     }
 
     public override Task InitializeAsync() => _passwordResetInitializedMessagingFixture.StartAsync();

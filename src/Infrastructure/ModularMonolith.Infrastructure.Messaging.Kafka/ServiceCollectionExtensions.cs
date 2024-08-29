@@ -20,7 +20,7 @@ public static class ServiceCollectionExtensions
                           .Get<KafkaOptions>()
                       ?? throw new NullReferenceException("Kafka section is missing");
 
-        var provider = configuration.GetSection("DataAccessProvider").Value;
+        var provider = configuration.GetSection("DataAccess:Provider").Value;
 
         serviceCollection
             .AddScoped<IMessageBus, MessageBus>()
