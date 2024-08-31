@@ -16,7 +16,8 @@ public static class ServiceCollectionExtensions
         Assembly[] consumerAssemblies,
         bool runConsumers) where TDbContext : DbContext
     {
-        var connectionString = configuration.GetConnectionString("RabbitMQ");
+        var connectionString = configuration.GetConnectionString("RabbitMQ")
+                               ?? throw new NullReferenceException("RabbitMQ ConnectionString is required");
         var provider = configuration.GetSection("DataAccess").GetValue<string>("Provider");
 
         serviceCollection
@@ -51,10 +52,12 @@ public static class ServiceCollectionExtensions
                 {
                     configurator.Host(connectionString);
                     configurator.ConfigureEndpoints(context);
-
                     configurator.AddCategoryManagementConsumerConfigurations();
                 });
             });
+
+        serviceCollection.AddHealthChecks()
+            .AddRabbitMQ(new Uri(connectionString), tags: ["live", "ready"]);
 
         return serviceCollection;
     }

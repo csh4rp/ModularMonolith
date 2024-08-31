@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
     <PackageReference Include="MassTransit.SqlTransport.PostgreSQL"/>
     <PackageReference Include="MassTransit.EntityFrameworkCore"/>
     <PackageReference Include="Microsoft.Extensions.Configuration" />

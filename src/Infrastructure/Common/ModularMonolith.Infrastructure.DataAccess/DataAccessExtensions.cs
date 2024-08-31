@@ -35,7 +35,9 @@ public static class DataAccessExtensions
                     options.UseAuditLogInterceptor = true;
                     options.UseEventLogInterceptor = true;
                     options.ConnectionStringName = "Database";
-                });
+                })
+                .AddHealthChecks()
+                .AddDbContextCheck<SqlServerDbContext>(tags: ["live", "ready"]);
                 break;
             case "Postgres":
                 serviceCollection.AddPostgresDataAccess<PostgresDbContext>(options =>
@@ -44,7 +46,9 @@ public static class DataAccessExtensions
                     options.UseEventLogInterceptor = true;
                     options.UseSnakeCaseNamingConvention = true;
                     options.ConnectionStringName = "Database";
-                });
+                })
+                .AddHealthChecks()
+                .AddDbContextCheck<PostgresDbContext>(tags: ["live", "ready"]);
                 break;
         }
 

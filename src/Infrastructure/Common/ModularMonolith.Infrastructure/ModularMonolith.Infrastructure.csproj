@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj" />
+    <ProjectReference Include="..\ModularMonolith.Infrastructure.Messaging\ModularMonolith.Infrastructure.Messaging.csproj" />
+  </ItemGroup>
+
+</Project>

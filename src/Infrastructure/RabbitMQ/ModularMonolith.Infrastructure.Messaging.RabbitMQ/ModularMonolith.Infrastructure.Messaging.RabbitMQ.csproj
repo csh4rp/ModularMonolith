@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" />
     <PackageReference Include="MassTransit.RabbitMQ"/>
     <PackageReference Include="MassTransit.EntityFrameworkCore"/>
     <PackageReference Include="Microsoft.Extensions.Configuration" />

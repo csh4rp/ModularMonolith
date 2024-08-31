@@ -54,6 +54,9 @@ public static class ServiceCollectionExtensions
                 });
             });
 
+        serviceCollection.AddHealthChecks()
+            .AddNpgSql(connectionString, tags: ["live", "ready"]);
+
         return serviceCollection;
     }
 }
