@@ -153,6 +153,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Tests.Utils
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Tests.Utils.SqlServer", "tests\Utils\ModularMonolith.Tests.Utils.SqlServer\ModularMonolith.Tests.Utils.SqlServer.csproj", "{AB977078-66A0-4176-9DF1-9E6E9B5C0D35}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{7971C098-E5B0-4AD0-8C7C-A260CAC7F280}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Identity.UnitTests", "tests\Shared\ModularMonolith.Shared.Identity.UnitTests\ModularMonolith.Shared.Identity.UnitTests.csproj", "{72BA31D8-3BD5-43B3-BEB9-42C913891010}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -231,6 +235,8 @@ Global
 		{7FB0D5A2-E12C-4D12-893B-7F1778661E3E} = {3482BBFA-D462-4DDB-B1F2-88FC61E84E3E}
 		{B12F594B-C14A-41FA-95E5-45F99051D1D2} = {3482BBFA-D462-4DDB-B1F2-88FC61E84E3E}
 		{AB977078-66A0-4176-9DF1-9E6E9B5C0D35} = {3482BBFA-D462-4DDB-B1F2-88FC61E84E3E}
+		{7971C098-E5B0-4AD0-8C7C-A260CAC7F280} = {282304E4-D50F-4AB3-8699-7CD18964EBF0}
+		{72BA31D8-3BD5-43B3-BEB9-42C913891010} = {7971C098-E5B0-4AD0-8C7C-A260CAC7F280}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BBAF6E32-FA5F-4916-9F22-AD58F95D2992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -425,5 +431,9 @@ Global
 		{AB977078-66A0-4176-9DF1-9E6E9B5C0D35}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB977078-66A0-4176-9DF1-9E6E9B5C0D35}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB977078-66A0-4176-9DF1-9E6E9B5C0D35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72BA31D8-3BD5-43B3-BEB9-42C913891010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72BA31D8-3BD5-43B3-BEB9-42C913891010}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72BA31D8-3BD5-43B3-BEB9-42C913891010}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72BA31D8-3BD5-43B3-BEB9-42C913891010}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

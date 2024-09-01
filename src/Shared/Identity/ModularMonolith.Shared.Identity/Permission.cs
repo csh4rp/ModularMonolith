@@ -14,16 +14,45 @@ public record Permission
         var permissionParts = permission.Split(Separator);
         var valueParts = _value.Split(Separator);
 
-        var currentValue = valueParts[0];
+        var valuesIndex = 0;
+        var permissionsIndex = 0;
 
-        foreach (var permissionPart in permissionParts)
+        while (permissionsIndex < permissionParts.Length)
         {
-            if (currentValue == Wildcard || currentValue == permissionPart)
+            var currentPermission = permissionParts[permissionsIndex];
+            var currentValue = valueParts[valuesIndex];
+
+            if (currentPermission.Equals(currentValue))
             {
+                valuesIndex++;
+                permissionsIndex++;
                 continue;
             }
 
+            if (currentValue.Equals(Wildcard))
+            {
+                if (valuesIndex == valueParts.Length - 1)
+                {
+                    break;
+                }
 
+                valuesIndex++;
+                currentValue = valueParts[valuesIndex];
+                while (permissionsIndex < permissionParts.Length)
+                {
+                    currentPermission = permissionParts[permissionsIndex];
+                    if (currentValue.Equals(currentPermission))
+                    {
+                        break;
+                    }
+
+                    permissionsIndex++;
+                }
+
+                continue;
+            }
+
+            return false;
         }
 
         return true;
