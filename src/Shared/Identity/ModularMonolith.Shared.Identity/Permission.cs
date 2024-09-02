@@ -22,6 +22,7 @@ public record Permission
             var currentPermission = permissionParts[permissionsIndex];
             var currentValue = valueParts[valuesIndex];
 
+             // Current parts match
             if (currentPermission.Equals(currentValue))
             {
                 valuesIndex++;
@@ -31,19 +32,30 @@ public record Permission
 
             if (currentValue.Equals(Wildcard))
             {
+                // If wildcard is last part - it's a march
                 if (valuesIndex == valueParts.Length - 1)
                 {
-                    break;
+                    return true;
                 }
 
                 valuesIndex++;
                 currentValue = valueParts[valuesIndex];
+
+                // Try to find next matching part
                 while (permissionsIndex < permissionParts.Length)
                 {
                     currentPermission = permissionParts[permissionsIndex];
+
+                    // Next matching part found
                     if (currentValue.Equals(currentPermission))
                     {
                         break;
+                    }
+
+                    // No matching part found
+                    if (permissionsIndex == permissionParts.Length - 1)
+                    {
+                        return false;
                     }
 
                     permissionsIndex++;
