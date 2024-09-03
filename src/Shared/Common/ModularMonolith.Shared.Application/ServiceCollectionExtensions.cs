@@ -14,7 +14,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddMediatR(c =>
         {
             c.AddOpenBehavior(typeof(TracingMiddleware<,>));
-            c.AddOpenBehavior(typeof(TransactionalMiddleware<,>));
             c.RegisterServicesFromAssemblies(assemblies);
         });
 

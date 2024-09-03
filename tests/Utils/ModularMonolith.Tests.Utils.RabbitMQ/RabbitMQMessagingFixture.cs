@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
+using ModularMonolith.Shared.Messaging.MassTransit.Filters;
 
 namespace ModularMonolith.Tests.Utils.RabbitMQ;
 
@@ -23,6 +24,7 @@ public class RabbitMQMessagingFixture<T> : IAsyncDisposable where T : class
 
                 configurator.ReceiveEndpoint(e =>
                 {
+                    e.UseConsumeFilter<IdentityFilter<T>>(context);
                     e.Handler<T>(consumeContext =>
                     {
                         _message = consumeContext.Message;
@@ -32,8 +34,6 @@ public class RabbitMQMessagingFixture<T> : IAsyncDisposable where T : class
                     e.Bind<T>();
                 });
             });
-
-
         });
 
         _serviceProvider = services.BuildServiceProvider();

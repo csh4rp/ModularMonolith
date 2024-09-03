@@ -10,10 +10,7 @@ public sealed class EventLogEntryFactory
 {
     private readonly IOperationContextAccessor _operationContextAccessor;
 
-    public EventLogEntryFactory(IOperationContextAccessor operationContextAccessor)
-    {
-        _operationContextAccessor = operationContextAccessor;
-    }
+    public EventLogEntryFactory(IOperationContextAccessor operationContextAccessor) => _operationContextAccessor = operationContextAccessor;
 
     public EventLogEntry Create(IEvent @event)
     {

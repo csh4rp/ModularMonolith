@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.CategoryManagement.Infrastructure;
 using ModularMonolith.Shared.Messaging;
 using ModularMonolith.Shared.Messaging.MassTransit.Factories;
+using ModularMonolith.Shared.Messaging.MassTransit.Filters;
 
 namespace ModularMonolith.Infrastructure.Messaging.RabbitMQ;
 
@@ -50,6 +51,7 @@ public static class ServiceCollectionExtensions
 
                 c.UsingRabbitMq((context, configurator) =>
                 {
+                    configurator.UseConsumeFilter(typeof(IdentityFilter<>), context);
                     configurator.Host(connectionString);
                     configurator.ConfigureEndpoints(context);
                     configurator.AddCategoryManagementConsumerConfigurations();

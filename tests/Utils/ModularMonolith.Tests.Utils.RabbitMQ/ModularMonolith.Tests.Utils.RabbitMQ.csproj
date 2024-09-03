@@ -12,4 +12,8 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\src\Shared\Messaging\ModularMonolith.Shared.Messaging.MassTransit\ModularMonolith.Shared.Messaging.MassTransit.csproj" />
+    </ItemGroup>
+
 </Project>

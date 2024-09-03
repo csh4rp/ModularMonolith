@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Messaging;
 using ModularMonolith.Shared.Messaging.MassTransit.Factories;
+using ModularMonolith.Shared.Messaging.MassTransit.Filters;
 
 namespace ModularMonolith.Infrastructure.Messaging.Postgres;
 
@@ -49,6 +50,7 @@ public static class ServiceCollectionExtensions
 
                 c.UsingPostgres((context, configurator) =>
                 {
+                    configurator.UseConsumeFilter(typeof(IdentityFilter<>), context);
                     configurator.Host(new PostgresSqlHostSettings(connectionString));
                     configurator.ConfigureEndpoints(context);
                 });

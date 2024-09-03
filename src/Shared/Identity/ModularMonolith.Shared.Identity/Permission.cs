@@ -1,13 +1,17 @@
-﻿namespace ModularMonolith.Shared.Identity;
+﻿using System.Text.RegularExpressions;
+
+namespace ModularMonolith.Shared.Identity;
 
 public record Permission
 {
+    private static readonly Regex ValidationRegex = new(@"^(([a-zA-Z]+)|\*)(\/(([a-zA-Z]+)|\*))*$", RegexOptions.Compiled);
+
     private const string Wildcard = "*";
     private const string Separator = "/";
 
     private readonly string _value;
 
-    public Permission(string value) => _value = value;
+    private Permission(string value) => _value = value;
 
     public bool GrantsAccessTo(string permission)
     {
@@ -68,5 +72,15 @@ public record Permission
         }
 
         return true;
+    }
+
+    public static Permission Parse(string value)
+    {
+        if (!ValidationRegex.IsMatch(value))
+        {
+            throw new ArgumentException("Value does not match permission format");
+        }
+
+        return new Permission(value);
     }
 }
