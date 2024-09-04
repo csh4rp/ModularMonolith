@@ -108,6 +108,9 @@ internal sealed class MessageBus : IMessageBus
 
     private Func<IEvent, CancellationToken, Task> GetEventPublisher(IEvent @event)
     {
+        var operationContext = _operationContextAccessor.OperationContext;
+        Debug.Assert(operationContext is not null);
+
         var eventType = @event.GetType();
         var topic = eventType.Name;
 
@@ -117,6 +120,18 @@ internal sealed class MessageBus : IMessageBus
 
         var producer = createProducerMethod.Invoke(_topicProducerProvider, [new Uri($"topic:{topic}")])!;
         var producerType = producer.GetType();
+
+        var pipe = Pipe.Execute<KafkaSendContext<string, object>>(
+            p =>
+            {
+                p.MessageId = @event.EventId;
+                p.Headers.Set("timestamp", @event.Timestamp);
+                p.Headers.Set("subject", operationContext.Subject);
+                p.Headers.Set("trace_id", operationContext.TraceId.ToString());
+                p.Headers.Set("span_id", operationContext.SpanId.ToString());
+                p.Headers.Set("parent_span_id", operationContext.ParentSpanId.ToString());
+            });
+
 
         var method = producerType.GetMethods()
             .Where(m =>
@@ -128,7 +143,7 @@ internal sealed class MessageBus : IMessageBus
 
                 var parameters = m.GetParameters();
 
-                if (parameters.Length != 3)
+                if (parameters.Length != 4)
                 {
                     return false;
                 }
@@ -142,7 +157,7 @@ internal sealed class MessageBus : IMessageBus
             })
             .First();
 
-        return ((ev, cts) => (Task)method.Invoke(producer, [ev.EventId.ToString(), ev, cts])!);
+        return ((ev, cts) => (Task)method.Invoke(producer, [ev.EventId.ToString(), ev, pipe, cts])!);
     }
 
     private Func<object, CancellationToken, Task> GetCommandSender(ICommand command)

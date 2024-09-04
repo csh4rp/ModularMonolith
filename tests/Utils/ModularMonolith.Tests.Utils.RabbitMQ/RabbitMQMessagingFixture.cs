@@ -20,7 +20,7 @@ public class RabbitMQMessagingFixture<T> : IAsyncDisposable where T : class
             c.UsingRabbitMq((context, configurator) =>
             {
                 configurator.Host(connectionString);
-                configurator.ConfigureEndpoints(context);
+                configurator.UseConsumeFilter<IdentityFilter<T>>(context);
 
                 configurator.ReceiveEndpoint(e =>
                 {
@@ -31,8 +31,9 @@ public class RabbitMQMessagingFixture<T> : IAsyncDisposable where T : class
                         return Task.CompletedTask;
                     });
 
-                    e.Bind<T>();
                 });
+
+                configurator.ConfigureEndpoints(context);
             });
         });
 

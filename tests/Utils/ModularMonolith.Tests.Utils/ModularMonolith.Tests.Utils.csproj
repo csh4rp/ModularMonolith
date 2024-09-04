@@ -7,26 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Reference Include="FluentAssertions">
-        <HintPath>..\..\..\..\..\..\.nuget\packages\fluentassertions\6.12.0\lib\net6.0\FluentAssertions.dll</HintPath>
-      </Reference>
-      <Reference Include="MassTransit">
-        <HintPath>..\..\..\..\..\..\.nuget\packages\masstransit\8.2.3\lib\net8.0\MassTransit.dll</HintPath>
-      </Reference>
-      <Reference Include="MassTransit.Abstractions">
-        <HintPath>..\..\..\..\..\..\.nuget\packages\masstransit.abstractions\8.2.3\lib\net8.0\MassTransit.Abstractions.dll</HintPath>
-      </Reference>
-      <Reference Include="Verify">
-        <HintPath>..\..\..\..\..\..\.nuget\packages\verify\26.1.6\lib\net8.0\Verify.dll</HintPath>
-      </Reference>
+      <PackageReference Include="FluentAssertions"/>
+      <PackageReference Include="MassTransit"/>
+      <PackageReference Include="MassTransit.Abstractions"/>
+      <PackageReference Include="Verify"/>
+      <PackageReference Include="Verify.Xunit" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\src\Shared\Common\ModularMonolith.Shared.Contracts\ModularMonolith.Shared.Contracts.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Verify.Xunit" />
-    </ItemGroup>
-
 </Project>

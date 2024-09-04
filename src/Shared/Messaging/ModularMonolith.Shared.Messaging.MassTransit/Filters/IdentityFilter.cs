@@ -16,7 +16,7 @@ public class IdentityFilter<T> : IFilter<ConsumeContext<T>> where T : class
     {
         if (context.TryGetHeader<string>("subject", out var subject))
         {
-            _identityContextSetter.Set(new IdentityContext(subject, [Permission.Parse("*")]));
+            // _identityContextSetter.Set(new IdentityContext(subject, [Permission.Parse("*")]));
         }
 
         return next.Send(context);
