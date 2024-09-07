@@ -9,7 +9,6 @@ using ModularMonolith.Shared.Messaging;
 using ModularMonolith.Shared.Messaging.MassTransit;
 using ModularMonolith.Shared.Messaging.MassTransit.Factories;
 using ModularMonolith.Shared.Tracing;
-using EventLogEntry = ModularMonolith.Shared.DataAccess.EventLogs.EventLogEntry;
 
 namespace ModularMonolith.Infrastructure.Messaging.Postgres;
 
@@ -73,66 +72,73 @@ internal sealed class MessageBus : IMessageBus
         _logger.EventPublished(eventType.FullName!, @event.EventId);
     }
 
-    public async Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken)
+    public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : class, IEvent
     {
-        var eventsList = events as IReadOnlyCollection<IEvent> ?? events.ToList();
-
         var operationContext = _operationContextAccessor.OperationContext;
         Debug.Assert(operationContext is not null);
 
-        var eventsToPersist = new List<EventLogEntry>();
+        var eventType = @event.GetType();
+        var eventAttribute = eventType.GetCustomAttribute<EventAttribute>();
 
-        foreach (var @event in eventsList)
+        if (eventAttribute?.IsPersisted is true)
         {
-            var eventType = @event.GetType();
-            var eventAttribute = eventType.GetCustomAttribute<EventAttribute>();
-
-            if (eventAttribute?.IsPersisted is not true)
-            {
-                _logger.EventPersistenceSkipped(eventType.FullName!, @event.EventId);
-                continue;
-            }
-
             var entry = _eventLogEntryFactory.Create(@event);
-            eventsToPersist.Add(entry);
+            await _eventLogStore.AddAsync(entry, cancellationToken);
+
+            _logger.EventPersisted(eventType.FullName!, @event.EventId);
+        }
+        else
+        {
+            _logger.EventPersistenceSkipped(eventType.FullName!, @event.EventId);
         }
 
-        await _eventLogStore.AddRangeAsync(eventsToPersist, cancellationToken);
+        await _publishEndpoint.Publish(@event, sendContext =>
+        {
+            sendContext.MessageId = @event.EventId;
+            sendContext.Headers.Set("timestamp", @event.Timestamp);
+            sendContext.Headers.Set("subject", operationContext.Subject);
+            sendContext.Headers.Set("trace_id", operationContext.TraceId.ToString());
+            sendContext.Headers.Set("span_id", operationContext.SpanId.ToString());
+            sendContext.Headers.Set("parent_span_id", operationContext.ParentSpanId.ToString());
+        }, cancellationToken);
 
-        _logger.EventsPersisted(eventsToPersist.Select(e => e.Id));
+        _logger.EventPublished(eventType.FullName!, @event.EventId);
+    }
 
-        foreach (var @event in eventsList)
+    public async Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken)
+    {
+        foreach (var @event in events)
         {
             var eventType = @event.GetType();
+            var method = GetType().GetMethods()
+                .First(m => m is
+                {
+                    Name: nameof(this.PublishAsync),
+                    IsGenericMethod: true
+                });
 
-            await _publishEndpoint.Publish(@event, eventType, p =>
-            {
-                p.MessageId = @event.EventId;
-                p.Headers.Set("timestamp", @event.Timestamp);
-                p.Headers.Set("subject", operationContext.Subject);
-                p.Headers.Set("trace_id", operationContext.TraceId.ToString());
-                p.Headers.Set("span_id", operationContext.SpanId.ToString());
-                p.Headers.Set("parent_span_id", operationContext.ParentSpanId.ToString());
-            }, cancellationToken);
-
-            _logger.EventPublished(eventType.FullName!, @event.EventId);
+            var genericMethod = method.MakeGenericMethod(eventType);
+            await (Task)genericMethod.Invoke(this, [@event, cancellationToken])!;
         }
     }
 
-    public async Task SendAsync(ICommand command, CancellationToken cancellationToken)
+    public async Task SendAsync<TCommand>(ICommand command, CancellationToken cancellationToken)
+        where TCommand : class, ICommand
     {
         var operationContext = _operationContextAccessor.OperationContext;
         Debug.Assert(operationContext is not null);
 
-        var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri(""));
+        var type = typeof(TCommand);
+        var uri = new Uri($"topic: {type.Name}");
+        var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(uri);
 
-        await sendEndpoint.Send(command, command.GetType(), p =>
+        await sendEndpoint.Send<TCommand>(command, sendContext =>
         {
-            p.Headers.Set("timestamp", _timeProvider.GetUtcNow());
-            p.Headers.Set("subject", operationContext.Subject);
-            p.Headers.Set("trace_id", operationContext.TraceId.ToString());
-            p.Headers.Set("span_id", operationContext.SpanId.ToString());
-            p.Headers.Set("parent_span_id", operationContext.ParentSpanId.ToString());
+            sendContext.Headers.Set("timestamp", _timeProvider.GetUtcNow());
+            sendContext.Headers.Set("subject", operationContext.Subject);
+            sendContext.Headers.Set("trace_id", operationContext.TraceId.ToString());
+            sendContext.Headers.Set("span_id", operationContext.SpanId.ToString());
+            sendContext.Headers.Set("parent_span_id", operationContext.ParentSpanId.ToString());
         }, cancellationToken);
     }
 }

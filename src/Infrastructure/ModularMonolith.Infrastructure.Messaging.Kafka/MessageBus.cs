@@ -3,14 +3,12 @@ using System.Reflection;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using ModularMonolith.Shared.Contracts;
-using ModularMonolith.Shared.Contracts.Attributes;
 using ModularMonolith.Shared.DataAccess.EventLogs;
 using ModularMonolith.Shared.Events;
 using ModularMonolith.Shared.Messaging;
 using ModularMonolith.Shared.Messaging.MassTransit;
 using ModularMonolith.Shared.Messaging.MassTransit.Factories;
 using ModularMonolith.Shared.Tracing;
-using EventLogEntry = ModularMonolith.Shared.DataAccess.EventLogs.EventLogEntry;
 
 namespace ModularMonolith.Infrastructure.Messaging.Kafka;
 
@@ -23,7 +21,12 @@ internal sealed class MessageBus : IMessageBus
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<MessageBus> _logger;
 
-    public MessageBus(ITopicProducerProvider topicProducerProvider, IOperationContextAccessor operationContextAccessor, IEventLogStore eventLogStore, EventLogEntryFactory eventLogEntryFactory, TimeProvider timeProvider, ILogger<MessageBus> logger)
+    public MessageBus(ITopicProducerProvider topicProducerProvider,
+        IOperationContextAccessor operationContextAccessor,
+        IEventLogStore eventLogStore,
+        EventLogEntryFactory eventLogEntryFactory,
+        TimeProvider timeProvider,
+        ILogger<MessageBus> logger)
     {
         _topicProducerProvider = topicProducerProvider;
         _operationContextAccessor = operationContextAccessor;
@@ -33,148 +36,74 @@ internal sealed class MessageBus : IMessageBus
         _logger = logger;
     }
 
-    public async Task PublishAsync(IEvent @event, CancellationToken cancellationToken)
+    public async Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken)
+    {
+        foreach (var @event in events)
+        {
+            var eventType = @event.GetType();
+            var method = GetType().GetMethods()
+                .First(m => m is
+                {
+                    Name: nameof(this.PublishAsync),
+                    IsGenericMethod: true
+                });
+
+            var genericMethod = method.MakeGenericMethod(eventType);
+            await (Task)genericMethod.Invoke(this, [@event, cancellationToken])!;
+        }
+    }
+
+    public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : class, IEvent
     {
         var operationContext = _operationContextAccessor.OperationContext;
         Debug.Assert(operationContext is not null);
 
-        var eventType = @event.GetType();
-        var eventAttribute = eventType.GetCustomAttribute<EventAttribute>();
+        var topic =  DefaultEndpointNameFormatter.Instance.Message<TEvent>();
+        var type = typeof(TEvent);
+        var uri = new Uri($"topic:{topic}");
+        var producer = _topicProducerProvider.GetProducer<Guid, TEvent>(uri);
+        var eventAttribute = type.GetCustomAttribute<EventAttribute>();
 
         if (eventAttribute?.IsPersisted is true)
         {
             var entry = _eventLogEntryFactory.Create(@event);
             await _eventLogStore.AddAsync(entry, cancellationToken);
 
-            _logger.EventPersisted(eventType.FullName!, @event.EventId);
+            _logger.EventPersisted(type.FullName!, @event.EventId);
         }
         else
         {
-            _logger.EventPersistenceSkipped(eventType.FullName!, @event.EventId);
+            _logger.EventPersistenceSkipped(type.FullName!, @event.EventId);
         }
 
-        var publisher = GetEventPublisher(@event);
-        await publisher.Invoke(@event, cancellationToken);
-
-        _logger.EventPublished(eventType.FullName!, @event.EventId);
-    }
-
-    public async Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken)
-    {
-        var eventsList = events as IReadOnlyCollection<IEvent> ?? events.ToList();
-
-        var operationContext = _operationContextAccessor.OperationContext;
-        Debug.Assert(operationContext is not null);
-
-        var eventsToPersist = new List<EventLogEntry>();
-
-        foreach (var @event in eventsList)
+        await producer.Produce(@event.EventId, @event, Pipe.Execute<KafkaSendContext<Guid, TEvent>>(kafkaCnx =>
         {
-            var eventType = @event.GetType();
-            var eventAttribute = eventType.GetCustomAttribute<EventAttribute>();
+            kafkaCnx.MessageId = @event.EventId;
+            kafkaCnx.Headers.Set("timestamp", @event.Timestamp);
+            kafkaCnx.Headers.Set("subject", operationContext.Subject);
+            kafkaCnx.Headers.Set("trace_id", operationContext.TraceId.ToString());
+            kafkaCnx.Headers.Set("span_id", operationContext.SpanId.ToString());
+            kafkaCnx.Headers.Set("parent_span_id", operationContext.ParentSpanId.ToString());
+        }), cancellationToken);
+    }
 
-            if (eventAttribute?.IsPersisted is not true)
-            {
-                _logger.EventPersistenceSkipped(eventType.FullName!, @event.EventId);
-                continue;
-            }
+    public Task SendAsync<TCommand>(ICommand command, CancellationToken cancellationToken)
+        where TCommand : class, ICommand
+    {
+        var operationContext = _operationContextAccessor.OperationContext;
+        Debug.Assert(operationContext is not null);
 
-            var entry = _eventLogEntryFactory.Create(@event);
-            eventsToPersist.Add(entry);
-        }
+        var topic =  DefaultEndpointNameFormatter.Instance.Message<TCommand>();
+        var uri = new Uri($"topic:{topic}");;
+        var producer = _topicProducerProvider.GetProducer<Guid, TCommand>(uri);
 
-        await _eventLogStore.AddRangeAsync(eventsToPersist, cancellationToken);
-
-        _logger.EventsPersisted(eventsToPersist.Select(e => e.Id));
-
-        foreach (var @event in eventsList)
+        return producer.Produce(Guid.NewGuid(), command, Pipe.Execute<KafkaSendContext<Guid, TCommand>>(kafkaCnx =>
         {
-            var eventType = @event.GetType();
-            var publisher = GetEventPublisher(@event);
-            await publisher.Invoke(@event, cancellationToken);
-
-            _logger.EventPublished(eventType.FullName!, @event.EventId);
-        }
-    }
-
-    public async Task SendAsync(ICommand command, CancellationToken cancellationToken)
-    {
-        var operationContext = _operationContextAccessor.OperationContext;
-        Debug.Assert(operationContext is not null);
-
-        var publisher = GetCommandSender(command);
-        await publisher.Invoke(command, cancellationToken);
-    }
-
-    private Func<IEvent, CancellationToken, Task> GetEventPublisher(IEvent @event)
-    {
-        var operationContext = _operationContextAccessor.OperationContext;
-        Debug.Assert(operationContext is not null);
-
-        var eventType = @event.GetType();
-        var topic = eventType.Name;
-
-        var createProducerMethod = _topicProducerProvider.GetType()
-            .GetMethod(nameof(ITopicProducerProvider.GetProducer))!
-            .MakeGenericMethod(typeof(string), eventType);
-
-        var producer = createProducerMethod.Invoke(_topicProducerProvider, [new Uri($"topic:{topic}")])!;
-        var producerType = producer.GetType();
-
-        var pipe = Pipe.Execute<KafkaSendContext<string, object>>(
-            p =>
-            {
-                p.MessageId = @event.EventId;
-                p.Headers.Set("timestamp", @event.Timestamp);
-                p.Headers.Set("subject", operationContext.Subject);
-                p.Headers.Set("trace_id", operationContext.TraceId.ToString());
-                p.Headers.Set("span_id", operationContext.SpanId.ToString());
-                p.Headers.Set("parent_span_id", operationContext.ParentSpanId.ToString());
-            });
-
-
-        var method = producerType.GetMethods()
-            .Where(m =>
-            {
-                if (m.Name != nameof(ITopicProducer<string, object>.Produce))
-                {
-                    return false;
-                }
-
-                var parameters = m.GetParameters();
-
-                if (parameters.Length != 4)
-                {
-                    return false;
-                }
-
-                if (parameters[1].ParameterType != eventType)
-                {
-                    return false;
-                }
-
-                return true;
-            })
-            .First();
-
-        return ((ev, cts) => (Task)method.Invoke(producer, [ev.EventId.ToString(), ev, pipe, cts])!);
-    }
-
-    private Func<object, CancellationToken, Task> GetCommandSender(ICommand command)
-    {
-        var commandType = command.GetType();
-        var commandAttribute = commandType.GetCustomAttribute<CommandAttribute>();
-        var topic = commandAttribute?.Target ?? commandType.Name;
-
-        var createProducerMethod = _topicProducerProvider.GetType()
-            .GetMethod(nameof(ITopicProducerProvider.GetProducer))!
-            .MakeGenericMethod(typeof(string), commandType);
-
-        var producer = createProducerMethod.Invoke(_topicProducerProvider, [new Uri($"topic: {topic}")])!;
-        var producerType = producer.GetType();
-
-        var method = producerType.GetMethod(nameof(ITopicProducer<string, object>.Produce))!;
-
-        return ((ev, cts) => (Task)method.Invoke(producer, [Guid.NewGuid().ToString(), ev, cts])!);
+            kafkaCnx.Headers.Set("timestamp", _timeProvider.GetUtcNow());
+            kafkaCnx.Headers.Set("subject", operationContext.Subject);
+            kafkaCnx.Headers.Set("trace_id", operationContext.TraceId.ToString());
+            kafkaCnx.Headers.Set("span_id", operationContext.SpanId.ToString());
+            kafkaCnx.Headers.Set("parent_span_id", operationContext.ParentSpanId.ToString());
+        }), cancellationToken);
     }
 }

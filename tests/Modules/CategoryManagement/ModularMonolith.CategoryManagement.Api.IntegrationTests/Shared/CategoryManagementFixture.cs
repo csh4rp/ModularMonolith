@@ -36,16 +36,10 @@ public class CategoryManagementFixture : IAsyncLifetime
     {
         _databaseContainer = new PostgreSqlBuilder()
             .WithImage("postgres:16.1")
-            .WithName("category_management_automated_tests")
-            .WithDatabase("tests_database")
             .Build();
 
         _messagingContainer = new RabbitMqBuilder()
-            .WithUsername("guest")
-            .WithPassword("guest")
             .WithImage("rabbitmq:3-management")
-            .WithPortBinding(15672, 15672)
-            .WithPortBinding(5672, 5672)
             .Build();
     }
 
@@ -68,7 +62,8 @@ public class CategoryManagementFixture : IAsyncLifetime
 
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
-            builder.UseSetting("ConnectionStrings:Database", _databaseContainer!.GetConnectionString());
+            builder.UseSetting("ConnectionStrings:Database", connectionString);
+            builder.UseSetting("ConnectionStrings:RabbitMQ", _messagingContainer.GetConnectionString());
             builder.UseSetting("DataAccess:Provider", "Postgres");
             builder.UseSetting("Messaging:Provider", "RabbitMQ");
             builder.UseSetting("Modules:CategoryManagement:Enabled", "true");
@@ -76,8 +71,7 @@ public class CategoryManagementFixture : IAsyncLifetime
             builder.UseSetting("Authentication:Audience", AuthAudience);
             builder.UseSetting("Authentication:Issuer", AuthIssuer);
             builder.UseSetting("Authentication:SigningKey", AuthSigningKey);
-            builder.UseSetting("Logging:LogLevel:Default", "Debug");
-            builder.UseSetting("ConnectionStrings:RabbitMQ", _messagingContainer.GetConnectionString());
+            builder.UseSetting("Logging:LogLevel:Default", "Warning");
             builder.UseSetting("Messaging:CustomersEnabled", "false");
         });
 
@@ -125,6 +119,7 @@ public class CategoryManagementFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        _testServer.Dispose();
         await _respawner.ResetAsync(_connection);
         await _connection.DisposeAsync();
 

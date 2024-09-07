@@ -2,7 +2,6 @@
 using MassTransit;
 using Testcontainers.Kafka;
 
-
 namespace ModularMonolith.Tests.Utils.Kafka;
 
 public static class ContainerExtensions

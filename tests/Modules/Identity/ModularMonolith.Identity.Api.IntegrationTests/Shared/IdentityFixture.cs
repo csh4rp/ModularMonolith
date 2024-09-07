@@ -66,6 +66,7 @@ public class IdentityFixture : IAsyncLifetime
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseSetting("ConnectionStrings:Database", connectionString);
+            builder.UseSetting("Kafka:Host", _messagingContainer.GetBootstrapAddress());
             builder.UseSetting("DataAccess:Provider", "SqlServer");
             builder.UseSetting("Messaging:Provider", "Kafka");
             builder.UseSetting("Modules:Identity:Enabled", "true");
@@ -79,7 +80,6 @@ public class IdentityFixture : IAsyncLifetime
             builder.UseSetting("Authentication:SigningKey", AuthSigningKey);
             builder.UseSetting("Logging:LogLevel:Default", "Warning");
             builder.UseSetting("Events:RunBackgroundWorkers", "false");
-            builder.UseSetting("Kafka:Host", _messagingContainer.GetBootstrapAddress());
 
             builder.ConfigureServices(s =>
             {
@@ -138,6 +138,7 @@ public class IdentityFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        _testServer.Dispose();
         await _respawner.ResetAsync(_connection);
         await _connection.DisposeAsync();
 

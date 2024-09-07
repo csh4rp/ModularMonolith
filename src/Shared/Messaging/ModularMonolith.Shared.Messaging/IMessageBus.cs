@@ -5,9 +5,9 @@ namespace ModularMonolith.Shared.Messaging;
 
 public interface IMessageBus
 {
-    Task PublishAsync(IEvent @event, CancellationToken cancellationToken);
+    Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : class, IEvent;
 
-    Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken);
+    Task PublishAsync(IEnumerable<IEvent> @event, CancellationToken cancellationToken);
 
-    Task SendAsync(ICommand command, CancellationToken cancellationToken);
+    Task SendAsync<TCommand>(ICommand command, CancellationToken cancellationToken) where TCommand : class, ICommand;
 }
