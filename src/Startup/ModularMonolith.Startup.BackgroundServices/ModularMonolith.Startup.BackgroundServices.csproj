@@ -5,4 +5,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting"/>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\Api\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj" />
+  </ItemGroup>
 </Project>

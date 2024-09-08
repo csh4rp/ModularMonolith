@@ -6,4 +6,9 @@
   <ItemGroup>
     <ProjectReference Include="..\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj"/>
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="MediatR">
+      <HintPath>..\..\..\..\..\..\..\.nuget\packages\mediatr\12.4.0\lib\net6.0\MediatR.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

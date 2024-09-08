@@ -1,5 +1,7 @@
-﻿namespace ModularMonolith.CategoryManagement.Contracts.Categories.Creation;
+﻿using ModularMonolith.Shared.Contracts;
 
-public class CategoryCreatedIntegrationEvent
+namespace ModularMonolith.CategoryManagement.Contracts.Categories.Creation;
+
+public record CategoryCreatedIntegrationEvent : IntegrationEvent
 {
 }

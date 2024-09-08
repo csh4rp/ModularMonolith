@@ -1,0 +1,6 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="MassTransit.Abstractions" />
+    <ProjectReference Include="..\ModularMonolith.CategoryManagement.Domain\ModularMonolith.CategoryManagement.Domain.csproj" />
+  </ItemGroup>
+</Project>

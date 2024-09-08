@@ -1,6 +1,8 @@
-﻿namespace ModularMonolith.Shared.Events;
+﻿using MediatR;
 
-public interface IEvent
+namespace ModularMonolith.Shared.Events;
+
+public interface IEvent : INotification
 {
     Guid EventId { get; }
 
