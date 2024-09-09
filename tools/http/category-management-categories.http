@@ -1,0 +1,7 @@
+POST {{host}}/api/category-management/categories
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Category-3"
+}

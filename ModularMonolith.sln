@@ -67,8 +67,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Startup", "Startup", "{D1AD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Startup.RestApi", "src\Startup\ModularMonolith.Startup.RestApi\ModularMonolith.Startup.RestApi.csproj", "{39FB8A53-1FEA-4E3E-932D-B20470CB7C72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Startup.Functions", "src\Startup\ModularMonolith.Startup.Functions\ModularMonolith.Startup.Functions.csproj", "{EECE9AF0-E034-4BD9-9ABB-B680DE49AC70}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Startup.BackgroundServices", "src\Startup\ModularMonolith.Startup.BackgroundServices\ModularMonolith.Startup.BackgroundServices.csproj", "{B424D8C9-1CED-47B1-B9D0-8382F64ED47A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataAccess", "DataAccess", "{BE90A33A-C3AE-419D-810D-9E30314D1004}"
@@ -155,11 +153,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{79
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Identity.UnitTests", "tests\Shared\ModularMonolith.Shared.Identity.UnitTests\ModularMonolith.Shared.Identity.UnitTests.csproj", "{72BA31D8-3BD5-43B3-BEB9-42C913891010}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.CategoryManagement.Messaging", "src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Messaging\ModularMonolith.CategoryManagement.Messaging.csproj", "{C03283EA-C20E-48A2-95D4-9F0E3AFD4618}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Infrastructure.Messaging.Kafka", "src\Infrastructure\Kafka\ModularMonolith.Infrastructure.Messaging.Kafka\ModularMonolith.Infrastructure.Messaging.Kafka.csproj", "{DF60D8A1-FC70-4FF1-83B3-6EC31E4D1579}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Identity.Messaging", "src\Modules\Identity\ModularMonolith.Identity.Messaging\ModularMonolith.Identity.Messaging.csproj", "{D200BECE-3784-4479-87F3-CFE38E369EA0}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "http", "http", "{C9B9D367-679A-414F-8BFB-415815F03FBE}"
+	ProjectSection(SolutionItems) = preProject
+		tools\http\category-management-categories.http = tools\http\category-management-categories.http
+		tools\http\identity-account.http = tools\http\identity-account.http
+		tools\http\http-client.env.json = tools\http\http-client.env.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -196,7 +197,6 @@ Global
 		{CD85F9EC-F187-4859-A9DB-9832C46DB8F8} = {282304E4-D50F-4AB3-8699-7CD18964EBF0}
 		{D1ADAFDE-DA2C-4A16-8AC9-F4F9D61C68E4} = {4DB255EE-857F-4772-A427-B1FB7C5C73C7}
 		{39FB8A53-1FEA-4E3E-932D-B20470CB7C72} = {D1ADAFDE-DA2C-4A16-8AC9-F4F9D61C68E4}
-		{EECE9AF0-E034-4BD9-9ABB-B680DE49AC70} = {D1ADAFDE-DA2C-4A16-8AC9-F4F9D61C68E4}
 		{B424D8C9-1CED-47B1-B9D0-8382F64ED47A} = {D1ADAFDE-DA2C-4A16-8AC9-F4F9D61C68E4}
 		{BE90A33A-C3AE-419D-810D-9E30314D1004} = {23D97AF7-96F3-49EC-BFE2-CCE1B738FCEE}
 		{6FCA4809-9F62-4A15-8C76-F1472AC91749} = {23D97AF7-96F3-49EC-BFE2-CCE1B738FCEE}
@@ -240,9 +240,8 @@ Global
 		{AB977078-66A0-4176-9DF1-9E6E9B5C0D35} = {3482BBFA-D462-4DDB-B1F2-88FC61E84E3E}
 		{7971C098-E5B0-4AD0-8C7C-A260CAC7F280} = {282304E4-D50F-4AB3-8699-7CD18964EBF0}
 		{72BA31D8-3BD5-43B3-BEB9-42C913891010} = {7971C098-E5B0-4AD0-8C7C-A260CAC7F280}
-		{C03283EA-C20E-48A2-95D4-9F0E3AFD4618} = {2E2598B1-7339-4E03-B452-7B9AF9937631}
 		{DF60D8A1-FC70-4FF1-83B3-6EC31E4D1579} = {CC6B6865-C16F-4D1A-AA05-2386046C752C}
-		{D200BECE-3784-4479-87F3-CFE38E369EA0} = {FAC7DF74-47D5-4F61-8446-5940C54A2BBE}
+		{C9B9D367-679A-414F-8BFB-415815F03FBE} = {B93D64D5-80C4-48EB-B938-10E66BA5A7E0}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BBAF6E32-FA5F-4916-9F22-AD58F95D2992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -317,10 +316,6 @@ Global
 		{39FB8A53-1FEA-4E3E-932D-B20470CB7C72}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39FB8A53-1FEA-4E3E-932D-B20470CB7C72}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39FB8A53-1FEA-4E3E-932D-B20470CB7C72}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EECE9AF0-E034-4BD9-9ABB-B680DE49AC70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EECE9AF0-E034-4BD9-9ABB-B680DE49AC70}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EECE9AF0-E034-4BD9-9ABB-B680DE49AC70}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EECE9AF0-E034-4BD9-9ABB-B680DE49AC70}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B424D8C9-1CED-47B1-B9D0-8382F64ED47A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B424D8C9-1CED-47B1-B9D0-8382F64ED47A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B424D8C9-1CED-47B1-B9D0-8382F64ED47A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -437,17 +432,9 @@ Global
 		{72BA31D8-3BD5-43B3-BEB9-42C913891010}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72BA31D8-3BD5-43B3-BEB9-42C913891010}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72BA31D8-3BD5-43B3-BEB9-42C913891010}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C03283EA-C20E-48A2-95D4-9F0E3AFD4618}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C03283EA-C20E-48A2-95D4-9F0E3AFD4618}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C03283EA-C20E-48A2-95D4-9F0E3AFD4618}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C03283EA-C20E-48A2-95D4-9F0E3AFD4618}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DF60D8A1-FC70-4FF1-83B3-6EC31E4D1579}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DF60D8A1-FC70-4FF1-83B3-6EC31E4D1579}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF60D8A1-FC70-4FF1-83B3-6EC31E4D1579}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF60D8A1-FC70-4FF1-83B3-6EC31E4D1579}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D200BECE-3784-4479-87F3-CFE38E369EA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D200BECE-3784-4479-87F3-CFE38E369EA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D200BECE-3784-4479-87F3-CFE38E369EA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D200BECE-3784-4479-87F3-CFE38E369EA0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

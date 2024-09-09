@@ -1,6 +1,4 @@
-﻿
-
-using FluentValidation;
+﻿using FluentValidation;
 using ModularMonolith.Infrastructure.DataAccess;
 using ModularMonolith.Infrastructure.Messaging;
 using ModularMonolith.Shared.Application;

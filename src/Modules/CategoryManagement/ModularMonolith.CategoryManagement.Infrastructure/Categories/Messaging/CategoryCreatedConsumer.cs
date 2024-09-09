@@ -2,7 +2,7 @@
 using MassTransit.Mediator;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 
-namespace ModularMonolith.CategoryManagement.Messaging.Categories;
+namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.Messaging;
 
 public class CategoryCreatedConsumer : IConsumer<CategoryCreatedEvent>
 {

@@ -1,6 +1,6 @@
 ﻿using MassTransit;
 
-namespace ModularMonolith.CategoryManagement.Messaging.Categories;
+namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.Messaging;
 
 public class CategoryCreatedConsumerDefinition : ConsumerDefinition<CategoryCreatedConsumer>
 {

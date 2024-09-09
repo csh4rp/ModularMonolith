@@ -18,7 +18,6 @@ public sealed class IdentityModule : AppModule
     private static readonly Assembly ContractsAssembly = Assembly.Load($"{RootNamespace}.Contracts");
     private static readonly Assembly DomainAssembly = Assembly.Load($"{RootNamespace}.Domain");
     private static readonly Assembly InfrastructureAssembly = Assembly.Load($"{RootNamespace}.Infrastructure");
-    private static readonly Assembly MessagingAssembly = Assembly.Load($"{RootNamespace}.Messaging");
 
     public override IServiceCollection RegisterServices(IServiceCollection serviceCollection)
     {
@@ -40,7 +39,7 @@ public sealed class IdentityModule : AppModule
 
     public override FrozenSet<Assembly> Assemblies { get; } = new[]
     {
-        BusinessLogicAssembly, ContractsAssembly, DomainAssembly, InfrastructureAssembly, MessagingAssembly
+        BusinessLogicAssembly, ContractsAssembly, DomainAssembly, InfrastructureAssembly
     }.ToFrozenSet();
 
     public override void SwaggerGenAction(SwaggerGenOptions options) =>

@@ -15,6 +15,5 @@
     <ProjectReference Include="..\ModularMonolith.CategoryManagement.Application\ModularMonolith.CategoryManagement.Application.csproj"/>
     <ProjectReference Include="..\ModularMonolith.CategoryManagement.Domain\ModularMonolith.CategoryManagement.Domain.csproj"/>
     <ProjectReference Include="..\ModularMonolith.CategoryManagement.Infrastructure\ModularMonolith.CategoryManagement.Infrastructure.csproj"/>
-    <ProjectReference Include="..\ModularMonolith.CategoryManagement.Messaging\ModularMonolith.CategoryManagement.Messaging.csproj" />
   </ItemGroup>
 </Project>

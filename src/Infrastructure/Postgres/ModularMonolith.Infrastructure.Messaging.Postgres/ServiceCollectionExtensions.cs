@@ -1,6 +1,5 @@
 using System.Reflection;
 using MassTransit;
-using MassTransit.SqlTransport.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,11 +35,6 @@ public static class ServiceCollectionExtensions
                             o.UseSqlServer();
                             break;
                     }
-
-                    o.UseBusOutbox(cfg =>
-                    {
-                        cfg.MessageDeliveryLimit = 10;
-                    });
                 });
 
                 if (runConsumers)
@@ -50,14 +44,24 @@ public static class ServiceCollectionExtensions
 
                 c.UsingPostgres((context, configurator) =>
                 {
+                    configurator.UseSqlMessageScheduler();
+
                     configurator.UseConsumeFilter(typeof(IdentityFilter<>), context);
-                    configurator.Host(new PostgresSqlHostSettings(connectionString));
                     configurator.ConfigureEndpoints(context);
                 });
             });
 
         serviceCollection.AddHealthChecks()
             .AddNpgSql(connectionString, tags: ["live", "ready"]);
+
+        serviceCollection.AddOptions<SqlTransportOptions>()
+            .Configure(options =>
+            {
+                options.ConnectionString = connectionString;
+                options.Schema = "transport";
+            });
+
+        serviceCollection.AddPostgresMigrationHostedService();
 
         return serviceCollection;
     }
