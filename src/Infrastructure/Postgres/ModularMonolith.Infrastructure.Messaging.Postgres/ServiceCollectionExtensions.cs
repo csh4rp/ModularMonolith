@@ -45,7 +45,6 @@ public static class ServiceCollectionExtensions
                 c.UsingPostgres((context, configurator) =>
                 {
                     configurator.UseSqlMessageScheduler();
-
                     configurator.UseConsumeFilter(typeof(IdentityFilter<>), context);
                     configurator.ConfigureEndpoints(context);
                 });
@@ -60,8 +59,6 @@ public static class ServiceCollectionExtensions
                 options.ConnectionString = connectionString;
                 options.Schema = "transport";
             });
-
-        serviceCollection.AddPostgresMigrationHostedService();
 
         return serviceCollection;
     }

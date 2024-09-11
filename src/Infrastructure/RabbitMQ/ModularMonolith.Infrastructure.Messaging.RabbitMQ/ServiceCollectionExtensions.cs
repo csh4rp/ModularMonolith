@@ -3,7 +3,6 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ModularMonolith.CategoryManagement.Infrastructure;
 using ModularMonolith.Shared.Messaging;
 using ModularMonolith.Shared.Messaging.MassTransit.Factories;
 using ModularMonolith.Shared.Messaging.MassTransit.Filters;
@@ -54,7 +53,6 @@ public static class ServiceCollectionExtensions
                     configurator.UseConsumeFilter(typeof(IdentityFilter<>), context);
                     configurator.Host(connectionString);
                     configurator.ConfigureEndpoints(context);
-                    configurator.AddCategoryManagementConsumerConfigurations();
                 });
             });
 

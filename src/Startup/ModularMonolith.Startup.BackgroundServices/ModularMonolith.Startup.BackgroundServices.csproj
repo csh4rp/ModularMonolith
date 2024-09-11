@@ -4,8 +4,15 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting"/>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Shared\Api\ModularMonolith.Shared.RestApi\ModularMonolith.Shared.RestApi.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Common\ModularMonolith.Infrastructure.DataAccess\ModularMonolith.Infrastructure.DataAccess.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Common\ModularMonolith.Infrastructure.Messaging\ModularMonolith.Infrastructure.Messaging.csproj" />
+    <ProjectReference Include="..\..\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Application\ModularMonolith.CategoryManagement.Application.csproj" />
+    <ProjectReference Include="..\..\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Infrastructure\ModularMonolith.CategoryManagement.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Identity\ModularMonolith.Identity.Application\ModularMonolith.Identity.Application.csproj" />
+    <ProjectReference Include="..\..\Modules\Identity\ModularMonolith.Identity.Infrastructure\ModularMonolith.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Shared\Common\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
 ﻿using MassTransit;
-using MassTransit.Mediator;
+using MediatR;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 
 namespace ModularMonolith.CategoryManagement.Infrastructure.Categories.Messaging;

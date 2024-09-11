@@ -13,7 +13,7 @@ public static class WebApplicationException
             .ReportApiVersions()
             .Build();
 
-        var modules = app.Services.GetServices<AppModule>().ToList();
+        var modules = app.Services.GetServices<IWebAppModule>().ToList();
 
         if (app.Environment.IsDevelopment())
         {

@@ -1,10 +1,11 @@
 ﻿using System.Reflection;
+using Microsoft.Extensions.Configuration;
 
-namespace ModularMonolith.Shared.RestApi;
+namespace ModularMonolith.Shared.Infrastructure;
 
 public static class ConfigurationExtensions
 {
-    public static IEnumerable<IWebAppModule> GetEnabledWebModules(this IConfiguration configuration)
+    public static IEnumerable<IAppModule> GetEnabledModules(this IConfiguration configuration)
     {
         var executingAssembly = Assembly.GetExecutingAssembly();
         var location = executingAssembly.Location;
@@ -26,17 +27,12 @@ public static class ConfigurationExtensions
             var name = moduleSection.Key;
 
             var appModuleType = files
-                .Where(file => file.EndsWith($".{name}.RestApi.dll"))
+                .Where(file => file.EndsWith($".{name}.Infrastructure.dll"))
                 .Select(Assembly.LoadFile)
                 .SelectMany(assembly => assembly.GetExportedTypes())
-                .FirstOrDefault(t => t.IsAssignableTo(typeof(IWebAppModule)));
+                .First(t => t.IsAssignableTo(typeof(IAppModule)));
 
-            if (appModuleType is null)
-            {
-                continue;
-            }
-
-            yield return (IWebAppModule)Activator.CreateInstance(appModuleType)!;
+            yield return (IAppModule)Activator.CreateInstance(appModuleType)!;
         }
     }
 }

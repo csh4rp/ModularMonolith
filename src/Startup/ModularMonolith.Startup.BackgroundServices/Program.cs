@@ -3,11 +3,10 @@ using ModularMonolith.Infrastructure.DataAccess;
 using ModularMonolith.Infrastructure.Messaging;
 using ModularMonolith.Shared.Application;
 using ModularMonolith.Shared.Identity;
-using ModularMonolith.Shared.RestApi;
-using ModularMonolith.Shared.RestApi.Authorization;
-using ModularMonolith.Shared.RestApi.Exceptions;
-using ModularMonolith.Shared.RestApi.Telemetry;
+using ModularMonolith.Shared.Infrastructure;
 using ModularMonolith.Shared.Tracing;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -15,21 +14,33 @@ var modules = builder.Configuration.GetEnabledModules().ToList();
 
 foreach (var module in modules)
 {
-    builder.Services.AddSingleton<AppModule>(_ => (AppModule)Activator.CreateInstance(module.GetType())!);
+    builder.Services.AddSingleton<IAppModule>(_ => module);
 }
 
 var assemblies = modules.SelectMany(m => m.Assemblies).ToArray();
 
 builder.Services
     .AddDataAccess(builder.Configuration, assemblies)
-    .AddAuth(builder.Configuration)
-    .AddTelemetryWithTracing(builder.Configuration, builder.Environment)
-    .AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true)
+    .AddOpenTelemetry()
+    .WithTracing(b =>
+    {
+        b.AddSource("ModularMonolith")
+            .ConfigureResource(resource =>
+                resource.AddService(
+                    serviceName: "ModularMonolith",
+                    serviceVersion: "1.0.0"));
+
+        if (builder.Environment.IsDevelopment())
+        {
+            b.AddConsoleExporter();
+        }
+    });
+
+    builder.Services.AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true)
     .AddMediator(assemblies)
     .AddMessaging(builder.Configuration, assemblies)
     .AddIdentityContextAccessor()
     .AddHttpContextAccessor()
-    .AddExceptionHandlers()
     .AddSingleton(TimeProvider.System)
     .AddTracingServices();
 

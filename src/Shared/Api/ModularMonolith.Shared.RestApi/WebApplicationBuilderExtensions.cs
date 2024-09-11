@@ -8,8 +8,9 @@ using ModularMonolith.Shared.RestApi.Authorization;
 using ModularMonolith.Shared.RestApi.Exceptions;
 using ModularMonolith.Shared.RestApi.Middlewares;
 using ModularMonolith.Shared.RestApi.Swagger;
-using ModularMonolith.Shared.RestApi.Telemetry;
 using ModularMonolith.Shared.Tracing;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 namespace ModularMonolith.Shared.RestApi;
 
@@ -17,11 +18,11 @@ public static class WebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder RegisterModules(this WebApplicationBuilder builder)
     {
-        var modules = builder.Configuration.GetEnabledModules().ToList();
+        var modules = builder.Configuration.GetEnabledWebModules().ToList();
 
         foreach (var module in modules)
         {
-            builder.Services.AddSingleton<AppModule>(_ => (AppModule)Activator.CreateInstance(module.GetType())!);
+            builder.Services.AddSingleton<IWebAppModule>(_ => (IWebAppModule)Activator.CreateInstance(module.GetType())!);
         }
 
         var assemblies = modules.SelectMany(m => m.Assemblies).ToArray();
@@ -41,8 +42,22 @@ public static class WebApplicationBuilderExtensions
         builder.Services
             .AddDataAccess(builder.Configuration, assemblies)
             .AddAuth(builder.Configuration)
-            .AddTelemetryWithTracing(builder.Configuration, builder.Environment)
-            .AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true)
+            .AddOpenTelemetry()
+            .WithTracing(b =>
+            {
+                b.AddSource("ModularMonolith")
+                    .ConfigureResource(resource =>
+                        resource.AddService(
+                            serviceName: "ModularMonolith",
+                            serviceVersion: "1.0.0"));
+
+                if (builder.Environment.IsDevelopment())
+                {
+                    b.AddConsoleExporter();
+                }
+            });
+
+            builder.Services.AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true)
             .AddMediator(assemblies)
             .AddMessaging(builder.Configuration, assemblies)
             .AddIdentityContextAccessor()
