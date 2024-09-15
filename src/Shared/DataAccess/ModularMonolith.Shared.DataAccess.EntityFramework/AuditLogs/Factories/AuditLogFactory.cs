@@ -18,8 +18,6 @@ public sealed class AuditLogFactory
 
     public AuditLogEntry Create(EntityEntry entry)
     {
-        Debug.Assert(Activity.Current is not null);
-
         var entityType = entry.Entity.GetType();
 
         var auditableProperties = entry.Properties.Where(p => p.IsAuditable())

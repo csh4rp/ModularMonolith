@@ -5,9 +5,9 @@ start-infrastructure:
 	docker-compose -f docker-compose.yml up -d
 
 add-migration:
-	dotnet ef migrations add --context ApplicationDbContext \
-	--project src/Infrastructure/ModularMonolith.Infrastructure.Migrations \
-	--startup-project src/Infrastructure/ModularMonolith.Infrastructure.Migrations \
+	dotnet ef migrations add --context PostgresDbContext \
+	--project src/Infrastructure/Postgres/ModularMonolith.Infrastructure.Migrations.Postgres \
+	--startup-project src/Infrastructure/Postgres/ModularMonolith.Infrastructure.Migrations.Postgres \
 	$(migration-name) \
 	-- ${connection-string}
 

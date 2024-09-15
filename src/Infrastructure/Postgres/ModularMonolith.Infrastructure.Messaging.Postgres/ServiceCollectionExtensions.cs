@@ -1,5 +1,6 @@
 using System.Reflection;
 using MassTransit;
+using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,6 +38,47 @@ public static class ServiceCollectionExtensions
                     }
                 });
 
+                c.AddSagaRepository<JobSaga>()
+                    .EntityFrameworkRepository(r =>
+                    {
+                        r.ExistingDbContext<TDbContext>();
+                        r.LockStatementProvider = provider == "Postgres"
+                            ? new PostgresLockStatementProvider()
+                            : new SqlServerLockStatementProvider();
+                    });
+                c.AddSagaRepository<JobTypeSaga>()
+                    .EntityFrameworkRepository(r =>
+                    {
+                        r.ExistingDbContext<TDbContext>();
+                        r.LockStatementProvider = provider == "Postgres"
+                            ? new PostgresLockStatementProvider()
+                            : new SqlServerLockStatementProvider();
+                    });
+                c.AddSagaRepository<JobAttemptSaga>()
+                    .EntityFrameworkRepository(r =>
+                    {
+                        r.ExistingDbContext<TDbContext>();
+                        r.LockStatementProvider = provider == "Postgres"
+                            ? new PostgresLockStatementProvider()
+                            : new SqlServerLockStatementProvider();
+                    });
+
+                c.AddJobSagaStateMachines().EntityFrameworkRepository(cf =>
+                {
+                    cf.ExistingDbContext<TDbContext>();
+                    switch (provider)
+                    {
+                        case "Postgres":
+                            cf.UsePostgres();
+                            break;
+                        case "SqlServer":
+                            cf.UseSqlServer();
+                            break;
+                    }
+                });
+
+                c.AddMessageScheduler(new Uri("queue:scheduler"));
+
                 if (runConsumers)
                 {
                     c.AddConsumers(consumerAssemblies);
@@ -44,7 +86,7 @@ public static class ServiceCollectionExtensions
 
                 c.UsingPostgres((context, configurator) =>
                 {
-                    configurator.UseSqlMessageScheduler();
+                    configurator.UseMessageScheduler(new Uri("queue:scheduler"));
                     configurator.UseConsumeFilter(typeof(IdentityFilter<>), context);
                     configurator.ConfigureEndpoints(context);
                 });

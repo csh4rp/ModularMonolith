@@ -10,4 +10,10 @@
     <ProjectReference Include="..\..\Tracing\ModularMonolith.Shared.Tracing\ModularMonolith.Shared.Tracing.csproj"/>
     <ProjectReference Include="..\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj"/>
   </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="MassTransit">
+      <HintPath>..\..\..\..\..\..\..\.nuget\packages\masstransit\8.2.5\lib\net8.0\MassTransit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

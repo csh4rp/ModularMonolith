@@ -12,14 +12,14 @@ public class IdentityFilter<T> : IFilter<ConsumeContext<T>> where T : class
         _identityContextSetter = identityContextSetter;
     }
 
-    public Task Send(ConsumeContext<T> context, IPipe<ConsumeContext<T>> next)
+    public async Task Send(ConsumeContext<T> context, IPipe<ConsumeContext<T>> next)
     {
         if (context.TryGetHeader<string>("subject", out var subject))
         {
             // _identityContextSetter.Set(new IdentityContext(subject, [Permission.Parse("*")]));
         }
 
-        return next.Send(context);
+        await next.Send(context);
     }
 
     public void Probe(ProbeContext context)

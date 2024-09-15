@@ -18,10 +18,7 @@ public class AuditMetaDataProvider : IAuditMetaDataProvider
 
     public virtual AuditMetaData GetMetaData()
     {
-        Debug.Assert(Activity.Current is not null);
-
         var activity = Activity.Current;
-        var httpContext = _httpContextAccessor.HttpContext;
         var identityContext = _identityContextAccessor.IdentityContext;
 
         var extraData = GetExtraData();
@@ -29,10 +26,10 @@ public class AuditMetaDataProvider : IAuditMetaDataProvider
         return new AuditMetaData
         {
             Subject = identityContext?.Subject,
-            OperationName = Activity.Current.OperationName,
-            TraceId = activity.TraceId,
-            SpanId = activity.SpanId,
-            ParentSpanId = activity.Parent is null
+            OperationName = activity?.OperationName,
+            TraceId = activity?.TraceId,
+            SpanId = activity?.SpanId,
+            ParentSpanId = activity?.Parent is null
                 ? null
                 : activity.ParentSpanId,
             ExtraData = extraData

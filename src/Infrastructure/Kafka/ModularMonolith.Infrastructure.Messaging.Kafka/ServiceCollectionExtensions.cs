@@ -45,6 +45,9 @@ public static class ServiceCollectionExtensions
                     });
                 });
 
+                c.AddJobSagaStateMachines();
+                c.AddMessageScheduler(new Uri("queue:scheduler"));
+
                 if (runConsumers)
                 {
                     c.AddConsumers(consumerAssemblies);

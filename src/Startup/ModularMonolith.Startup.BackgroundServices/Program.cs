@@ -5,6 +5,7 @@ using ModularMonolith.Shared.Application;
 using ModularMonolith.Shared.Identity;
 using ModularMonolith.Shared.Infrastructure;
 using ModularMonolith.Shared.Tracing;
+using ModularMonolith.Startup.BackgroundServices;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -42,7 +43,8 @@ builder.Services
     .AddIdentityContextAccessor()
     .AddHttpContextAccessor()
     .AddSingleton(TimeProvider.System)
-    .AddTracingServices();
+    .AddTracingServices()
+    .AddHostedService<CronBackgroundService>();
 
 foreach (var module in modules)
 {

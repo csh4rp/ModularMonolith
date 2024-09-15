@@ -43,6 +43,9 @@ public static class ServiceCollectionExtensions
                     });
                 });
 
+                c.AddJobSagaStateMachines();
+                c.AddDelayedMessageScheduler();
+
                 if (runConsumers)
                 {
                     c.AddConsumers(consumerAssemblies);
@@ -53,6 +56,7 @@ public static class ServiceCollectionExtensions
                     configurator.UseConsumeFilter(typeof(IdentityFilter<>), context);
                     configurator.Host(connectionString);
                     configurator.ConfigureEndpoints(context);
+                    configurator.UseDelayedMessageScheduler();
                 });
             });
 
