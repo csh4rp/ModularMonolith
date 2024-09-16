@@ -4,11 +4,11 @@ using ModularMonolith.Identity.Contracts.Account.Anonymisation;
 
 namespace ModularMonolith.Identity.Infrastructure.Account.Messaging;
 
-public class AnonymiseAccountsJobWorker : IConsumer<AnonymiseAccountsJob>
+ public class AnonymiseAccountsJobConsumer : IJobConsumer<AnonymiseAccountsJob>
 {
-    private readonly ILogger<AnonymiseAccountsJobWorker> _logger;
+    private readonly ILogger<AnonymiseAccountsJobConsumer> _logger;
 
-    public AnonymiseAccountsJobWorker(ILogger<AnonymiseAccountsJobWorker> logger)
+    public AnonymiseAccountsJobConsumer(ILogger<AnonymiseAccountsJobConsumer> logger)
     {
         _logger = logger;
     }

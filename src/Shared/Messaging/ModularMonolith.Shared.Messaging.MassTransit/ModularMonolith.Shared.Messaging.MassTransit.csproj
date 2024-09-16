@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="MassTransit.Abstractions"/>
+    <PackageReference Include="MassTransit.Quartz" />
   </ItemGroup>
 
   <ItemGroup>

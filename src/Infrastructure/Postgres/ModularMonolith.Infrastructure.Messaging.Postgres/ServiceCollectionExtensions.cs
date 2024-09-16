@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Messaging;
 using ModularMonolith.Shared.Messaging.MassTransit.Factories;
 using ModularMonolith.Shared.Messaging.MassTransit.Filters;
+using Quartz;
 
 namespace ModularMonolith.Infrastructure.Messaging.Postgres;
 
@@ -19,6 +20,9 @@ public static class ServiceCollectionExtensions
     {
         var connectionString = configuration.GetConnectionString("Messaging")!;
         var provider = configuration.GetSection("DataAccess").GetValue<string>("Provider");
+
+        serviceCollection.AddQuartz()
+            .AddQuartzHostedService();
 
         serviceCollection
             .AddScoped<IMessageBus, MessageBus>()
@@ -38,33 +42,40 @@ public static class ServiceCollectionExtensions
                     }
                 });
 
-                c.AddSagaRepository<JobSaga>()
-                    .EntityFrameworkRepository(r =>
-                    {
-                        r.ExistingDbContext<TDbContext>();
-                        r.LockStatementProvider = provider == "Postgres"
-                            ? new PostgresLockStatementProvider()
-                            : new SqlServerLockStatementProvider();
-                    });
-                c.AddSagaRepository<JobTypeSaga>()
-                    .EntityFrameworkRepository(r =>
-                    {
-                        r.ExistingDbContext<TDbContext>();
-                        r.LockStatementProvider = provider == "Postgres"
-                            ? new PostgresLockStatementProvider()
-                            : new SqlServerLockStatementProvider();
-                    });
-                c.AddSagaRepository<JobAttemptSaga>()
-                    .EntityFrameworkRepository(r =>
-                    {
-                        r.ExistingDbContext<TDbContext>();
-                        r.LockStatementProvider = provider == "Postgres"
-                            ? new PostgresLockStatementProvider()
-                            : new SqlServerLockStatementProvider();
-                    });
+                c.AddQuartzConsumers();
+                c.AddMessageScheduler(new Uri("queue:quartz"));
 
+
+                // c.AddSagaRepository<JobSaga>()
+                //     .EntityFrameworkRepository(r =>
+                //     {
+                //         r.ExistingDbContext<TDbContext>();
+                //         r.LockStatementProvider = provider == "Postgres"
+                //             ? new PostgresLockStatementProvider()
+                //             : new SqlServerLockStatementProvider();
+                //     });
+                // c.AddSagaRepository<JobTypeSaga>()
+                //     .EntityFrameworkRepository(r =>
+                //     {
+                //         r.ExistingDbContext<TDbContext>();
+                //         r.LockStatementProvider = provider == "Postgres"
+                //             ? new PostgresLockStatementProvider()
+                //             : new SqlServerLockStatementProvider();
+                //     });
+                // c.AddSagaRepository<JobAttemptSaga>()
+                //     .EntityFrameworkRepository(r =>
+                //     {
+                //         r.ExistingDbContext<TDbContext>();
+                //         r.LockStatementProvider = provider == "Postgres"
+                //             ? new PostgresLockStatementProvider()
+                //             : new SqlServerLockStatementProvider();
+                //     });
+
+
+                c.SetJobConsumerOptions();
                 c.AddJobSagaStateMachines().EntityFrameworkRepository(cf =>
                 {
+                    cf.LockStatementProvider = new PostgresLockStatementProvider();
                     cf.ExistingDbContext<TDbContext>();
                     switch (provider)
                     {
@@ -77,8 +88,6 @@ public static class ServiceCollectionExtensions
                     }
                 });
 
-                c.AddMessageScheduler(new Uri("queue:scheduler"));
-
                 if (runConsumers)
                 {
                     c.AddConsumers(consumerAssemblies);
@@ -86,7 +95,7 @@ public static class ServiceCollectionExtensions
 
                 c.UsingPostgres((context, configurator) =>
                 {
-                    configurator.UseMessageScheduler(new Uri("queue:scheduler"));
+                    configurator.UseMessageScheduler(new Uri("queue:quartz"));
                     configurator.UseConsumeFilter(typeof(IdentityFilter<>), context);
                     configurator.ConfigureEndpoints(context);
                 });
