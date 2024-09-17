@@ -1,6 +1,5 @@
 using System.Reflection;
 using MassTransit;
-using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +18,6 @@ public static class ServiceCollectionExtensions
         bool runConsumers) where TDbContext : DbContext
     {
         var connectionString = configuration.GetConnectionString("Messaging")!;
-        var provider = configuration.GetSection("DataAccess").GetValue<string>("Provider");
 
         serviceCollection.AddQuartz()
             .AddQuartzHostedService();
@@ -31,61 +29,17 @@ public static class ServiceCollectionExtensions
             {
                 c.AddEntityFrameworkOutbox<TDbContext>(o =>
                 {
-                    switch (provider)
-                    {
-                        case "Postgres":
-                            o.UsePostgres();
-                            break;
-                        case "SqlServer":
-                            o.UseSqlServer();
-                            break;
-                    }
+                    o.UsePostgres();
                 });
 
                 c.AddQuartzConsumers();
                 c.AddMessageScheduler(new Uri("queue:quartz"));
 
-
-                // c.AddSagaRepository<JobSaga>()
-                //     .EntityFrameworkRepository(r =>
-                //     {
-                //         r.ExistingDbContext<TDbContext>();
-                //         r.LockStatementProvider = provider == "Postgres"
-                //             ? new PostgresLockStatementProvider()
-                //             : new SqlServerLockStatementProvider();
-                //     });
-                // c.AddSagaRepository<JobTypeSaga>()
-                //     .EntityFrameworkRepository(r =>
-                //     {
-                //         r.ExistingDbContext<TDbContext>();
-                //         r.LockStatementProvider = provider == "Postgres"
-                //             ? new PostgresLockStatementProvider()
-                //             : new SqlServerLockStatementProvider();
-                //     });
-                // c.AddSagaRepository<JobAttemptSaga>()
-                //     .EntityFrameworkRepository(r =>
-                //     {
-                //         r.ExistingDbContext<TDbContext>();
-                //         r.LockStatementProvider = provider == "Postgres"
-                //             ? new PostgresLockStatementProvider()
-                //             : new SqlServerLockStatementProvider();
-                //     });
-
-
                 c.SetJobConsumerOptions();
                 c.AddJobSagaStateMachines().EntityFrameworkRepository(cf =>
                 {
-                    cf.LockStatementProvider = new PostgresLockStatementProvider();
                     cf.ExistingDbContext<TDbContext>();
-                    switch (provider)
-                    {
-                        case "Postgres":
-                            cf.UsePostgres();
-                            break;
-                        case "SqlServer":
-                            cf.UseSqlServer();
-                            break;
-                    }
+                    cf.UsePostgres();
                 });
 
                 if (runConsumers)
