@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Messaging;
+using ModularMonolith.Shared.Messaging.MassTransit;
 using ModularMonolith.Shared.Messaging.MassTransit.Factories;
 using ModularMonolith.Shared.Messaging.MassTransit.Filters;
 using Quartz;
@@ -17,7 +18,9 @@ public static class ServiceCollectionExtensions
         Assembly[] consumerAssemblies,
         bool runConsumers) where TDbContext : DbContext
     {
-        var connectionString = configuration.GetConnectionString("Messaging")!;
+        var connectionString = configuration.GetConnectionString("Messaging")
+                               ?? configuration.GetConnectionString("Database")
+                               ?? throw new ArgumentNullException("ConnectionString:Messaging");
 
         serviceCollection.AddQuartz()
             .AddQuartzHostedService();
@@ -33,8 +36,7 @@ public static class ServiceCollectionExtensions
                 });
 
                 c.AddQuartzConsumers();
-                c.AddMessageScheduler(new Uri("queue:quartz"));
-
+                c.AddMessageScheduler(MessagingConstants.ScheduleQueueUri);
                 c.SetJobConsumerOptions();
                 c.AddJobSagaStateMachines().EntityFrameworkRepository(cf =>
                 {
@@ -49,7 +51,7 @@ public static class ServiceCollectionExtensions
 
                 c.UsingPostgres((context, configurator) =>
                 {
-                    configurator.UseMessageScheduler(new Uri("queue:quartz"));
+                    configurator.UseMessageScheduler(MessagingConstants.ScheduleQueueUri);
                     configurator.UseConsumeFilter(typeof(IdentityFilter<>), context);
                     configurator.ConfigureEndpoints(context);
                 });

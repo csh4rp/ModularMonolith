@@ -292,7 +292,9 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_job_attempt_saga_job_id_retry_attempt");
 
-                    b.ToTable("job_attempt_saga", (string)null);
+                    b.ToTable("job_attempt_saga", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
                 });
 
             modelBuilder.Entity("MassTransit.JobSaga", b =>
@@ -364,7 +366,9 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                     b.HasKey("CorrelationId")
                         .HasName("pk_job_saga");
 
-                    b.ToTable("job_saga", (string)null);
+                    b.ToTable("job_saga", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
                 });
 
             modelBuilder.Entity("MassTransit.JobTypeSaga", b =>
@@ -408,7 +412,9 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                     b.HasKey("CorrelationId")
                         .HasName("pk_job_type_saga");
 
-                    b.ToTable("job_type_saga", (string)null);
+                    b.ToTable("job_type_saga", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
                 });
 
             modelBuilder.Entity("ModularMonolith.CategoryManagement.Domain.Categories.Category", b =>

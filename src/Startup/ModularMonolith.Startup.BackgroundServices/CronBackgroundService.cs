@@ -12,8 +12,7 @@ public class CronBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var uri = new Uri("queue:quartz");
-        var endpoint = await _bus.GetSendEndpoint(uri);
+        var endpoint = await _bus.GetSendEndpoint(MessagingConstants.ScheduleQueueUri);
 
         _ = await endpoint.ScheduleRecurringSend<AnonymiseAccountsJob>(new Uri("queue:AnonymiseAccountsJobConsumer"),
             new CronSchedule("*/5 * * * * ?"),

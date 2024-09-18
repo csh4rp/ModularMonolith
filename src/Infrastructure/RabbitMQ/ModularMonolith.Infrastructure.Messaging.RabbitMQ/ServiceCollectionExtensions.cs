@@ -4,8 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Messaging;
+using ModularMonolith.Shared.Messaging.MassTransit;
 using ModularMonolith.Shared.Messaging.MassTransit.Factories;
 using ModularMonolith.Shared.Messaging.MassTransit.Filters;
+using Quartz;
 
 namespace ModularMonolith.Infrastructure.Messaging.RabbitMQ;
 
@@ -18,7 +20,11 @@ public static class ServiceCollectionExtensions
     {
         var connectionString = configuration.GetConnectionString("RabbitMQ")
                                ?? throw new NullReferenceException("RabbitMQ ConnectionString is required");
+
         var provider = configuration.GetSection("DataAccess").GetValue<string>("Provider");
+
+        serviceCollection.AddQuartz()
+            .AddQuartzHostedService();
 
         serviceCollection
             .AddScoped<IMessageBus, MessageBus>()
@@ -37,14 +43,25 @@ public static class ServiceCollectionExtensions
                             break;
                     }
 
-                    o.UseBusOutbox(cfg =>
-                    {
-                        cfg.MessageDeliveryLimit = 10;
-                    });
+                    o.UseBusOutbox();
                 });
 
-                c.AddJobSagaStateMachines();
-                c.AddDelayedMessageScheduler();
+                c.AddQuartzConsumers();
+                c.AddMessageScheduler(MessagingConstants.ScheduleQueueUri);
+                c.SetJobConsumerOptions();
+                c.AddJobSagaStateMachines().EntityFrameworkRepository(cf =>
+                {
+                    cf.ExistingDbContext<TDbContext>();
+                    switch (provider)
+                    {
+                        case "Postgres":
+                            cf.UsePostgres();
+                            break;
+                        case "SqlServer":
+                            cf.UseSqlServer();
+                            break;
+                    }
+                });
 
                 if (runConsumers)
                 {
@@ -53,10 +70,10 @@ public static class ServiceCollectionExtensions
 
                 c.UsingRabbitMq((context, configurator) =>
                 {
-                    configurator.UseConsumeFilter(typeof(IdentityFilter<>), context);
                     configurator.Host(connectionString);
+                    configurator.UseConsumeFilter(typeof(IdentityFilter<>), context);
                     configurator.ConfigureEndpoints(context);
-                    configurator.UseDelayedMessageScheduler();
+                    configurator.UseMessageScheduler(MessagingConstants.ScheduleQueueUri);
                 });
             });
 

@@ -1,20 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <ItemGroup>
+    <PackageReference Include="MassTransit" />
     <PackageReference Include="MassTransit.Abstractions"/>
     <PackageReference Include="MassTransit.Quartz" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj"/>
     <ProjectReference Include="..\..\DataAccess\ModularMonolith.Shared.DataAccess\ModularMonolith.Shared.DataAccess.csproj"/>
     <ProjectReference Include="..\..\Tracing\ModularMonolith.Shared.Tracing\ModularMonolith.Shared.Tracing.csproj"/>
     <ProjectReference Include="..\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="MassTransit">
-      <HintPath>..\..\..\..\..\..\..\.nuget\packages\masstransit\8.2.5\lib\net8.0\MassTransit.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>

@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
 {
     [DbContext(typeof(PostgresDbContext))]
-    [Migration("20240915145802_AddedSagaStorage")]
-    partial class AddedSagaStorage
+    [Migration("20240918185130_InitialCategories")]
+    partial class InitialCategories
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -295,7 +295,9 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_job_attempt_saga_job_id_retry_attempt");
 
-                    b.ToTable("job_attempt_saga", (string)null);
+                    b.ToTable("job_attempt_saga", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
                 });
 
             modelBuilder.Entity("MassTransit.JobSaga", b =>
@@ -367,7 +369,9 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                     b.HasKey("CorrelationId")
                         .HasName("pk_job_saga");
 
-                    b.ToTable("job_saga", (string)null);
+                    b.ToTable("job_saga", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
                 });
 
             modelBuilder.Entity("MassTransit.JobTypeSaga", b =>
@@ -411,7 +415,9 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                     b.HasKey("CorrelationId")
                         .HasName("pk_job_type_saga");
 
-                    b.ToTable("job_type_saga", (string)null);
+                    b.ToTable("job_type_saga", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
                 });
 
             modelBuilder.Entity("ModularMonolith.CategoryManagement.Domain.Categories.Category", b =>
@@ -445,277 +451,6 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                         .HasDatabaseName("ix_category_parent_id");
 
                     b.ToTable("category", "category_management");
-                });
-
-            modelBuilder.Entity("ModularMonolith.Identity.Domain.Common.Entities.UserToken", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("login_provider");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)")
-                        .HasColumnName("value");
-
-                    b.HasKey("UserId", "LoginProvider", "Name")
-                        .HasName("pk_user_token");
-
-                    b.ToTable("user_token", "identity");
-                });
-
-            modelBuilder.Entity("ModularMonolith.Identity.Domain.Roles.Role", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("concurrency_stamp")
-                        .HasAnnotation("AuditIgnoreAnnotation", true);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("NormalizedName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("normalized_name");
-
-                    b.HasKey("Id")
-                        .HasName("pk_role");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("ix_role_normalized_name");
-
-                    b.ToTable("role", "identity");
-                });
-
-            modelBuilder.Entity("ModularMonolith.Identity.Domain.Roles.RoleClaim", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("ClaimType")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("claim_type");
-
-                    b.Property<string>("ClaimValue")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("claim_value");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("role_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_role_claim");
-
-                    b.HasIndex("RoleId")
-                        .HasDatabaseName("ix_role_claim_role_id");
-
-                    b.ToTable("role_claim", "identity");
-                });
-
-            modelBuilder.Entity("ModularMonolith.Identity.Domain.Users.User", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("access_failed_count");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("concurrency_stamp")
-                        .HasAnnotation("AuditIgnoreAnnotation", true);
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("email");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean")
-                        .HasColumnName("email_confirmed");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("boolean")
-                        .HasColumnName("lockout_enabled");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("lockout_end");
-
-                    b.Property<string>("NormalizedEmail")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("normalized_email");
-
-                    b.Property<string>("NormalizedUserName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("normalized_user_name");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
-                        .HasColumnName("password_hash")
-                        .HasAnnotation("AuditIgnoreAnnotation", true);
-
-                    b.Property<string>("PhoneNumber")
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("phone_number");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("boolean")
-                        .HasColumnName("phone_number_confirmed");
-
-                    b.Property<string>("SecurityStamp")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("security_stamp")
-                        .HasAnnotation("AuditIgnoreAnnotation", true);
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("boolean")
-                        .HasColumnName("two_factor_enabled");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("user_name");
-
-                    b.HasKey("Id")
-                        .HasName("pk_user");
-
-                    b.HasIndex("NormalizedEmail")
-                        .IsUnique()
-                        .HasDatabaseName("ix_user_normalized_email");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("ix_user_normalized_user_name");
-
-                    b.ToTable("user", "identity");
-                });
-
-            modelBuilder.Entity("ModularMonolith.Identity.Domain.Users.UserClaim", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("ClaimType")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("claim_type");
-
-                    b.Property<string>("ClaimValue")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("claim_value");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_user_claim");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_user_claim_user_id");
-
-                    b.ToTable("user_claim", "identity");
-                });
-
-            modelBuilder.Entity("ModularMonolith.Identity.Domain.Users.UserLogin", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("login_provider");
-
-                    b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("provider_key");
-
-                    b.Property<string>("ProviderDisplayName")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("provider_display_name");
-
-                    b.HasKey("UserId", "LoginProvider", "ProviderKey")
-                        .HasName("pk_user_login");
-
-                    b.ToTable("user_login", "identity");
-                });
-
-            modelBuilder.Entity("ModularMonolith.Identity.Domain.Users.UserRole", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("role_id");
-
-                    b.HasKey("UserId", "RoleId")
-                        .HasName("pk_user_role");
-
-                    b.HasIndex("RoleId")
-                        .HasDatabaseName("ix_user_role_role_id");
-
-                    b.ToTable("user_role", "identity");
                 });
 
             modelBuilder.Entity("ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.Models.AuditLogEntity", b =>
@@ -795,69 +530,6 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                         .WithMany()
                         .HasForeignKey("ParentId")
                         .HasConstraintName("fk_category_category_parent_id");
-                });
-
-            modelBuilder.Entity("ModularMonolith.Identity.Domain.Common.Entities.UserToken", b =>
-                {
-                    b.HasOne("ModularMonolith.Identity.Domain.Users.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_token_user_user_id");
-                });
-
-            modelBuilder.Entity("ModularMonolith.Identity.Domain.Roles.RoleClaim", b =>
-                {
-                    b.HasOne("ModularMonolith.Identity.Domain.Roles.Role", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_role_claim_role_role_id");
-                });
-
-            modelBuilder.Entity("ModularMonolith.Identity.Domain.Users.UserClaim", b =>
-                {
-                    b.HasOne("ModularMonolith.Identity.Domain.Users.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_claim_user_user_id");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ModularMonolith.Identity.Domain.Users.UserLogin", b =>
-                {
-                    b.HasOne("ModularMonolith.Identity.Domain.Users.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_login_user_user_id");
-                });
-
-            modelBuilder.Entity("ModularMonolith.Identity.Domain.Users.UserRole", b =>
-                {
-                    b.HasOne("ModularMonolith.Identity.Domain.Roles.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_role_role_role_id");
-
-                    b.HasOne("ModularMonolith.Identity.Domain.Users.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_role_user_user_id");
-
-                    b.Navigation("Role");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.Models.AuditLogEntity", b =>

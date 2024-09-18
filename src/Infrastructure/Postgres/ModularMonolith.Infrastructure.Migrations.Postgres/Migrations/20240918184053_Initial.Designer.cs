@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
 {
     [DbContext(typeof(PostgresDbContext))]
-    [Migration("20240624174449_Initial")]
+    [Migration("20240918184053_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -21,7 +21,7 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.5")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -250,6 +250,176 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                     b.HasAnnotation("AuditIgnoreAnnotation", true);
                 });
 
+            modelBuilder.Entity("MassTransit.JobAttemptSaga", b =>
+                {
+                    b.Property<Guid>("CorrelationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("correlation_id");
+
+                    b.Property<int>("CurrentState")
+                        .HasColumnType("integer")
+                        .HasColumnName("current_state");
+
+                    b.Property<DateTime?>("Faulted")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("faulted");
+
+                    b.Property<string>("InstanceAddress")
+                        .HasColumnType("text")
+                        .HasColumnName("instance_address");
+
+                    b.Property<Guid>("JobId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_id");
+
+                    b.Property<int>("RetryAttempt")
+                        .HasColumnType("integer")
+                        .HasColumnName("retry_attempt");
+
+                    b.Property<string>("ServiceAddress")
+                        .HasColumnType("text")
+                        .HasColumnName("service_address");
+
+                    b.Property<DateTime?>("Started")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("started");
+
+                    b.Property<Guid?>("StatusCheckTokenId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("status_check_token_id");
+
+                    b.HasKey("CorrelationId")
+                        .HasName("pk_job_attempt_saga");
+
+                    b.HasIndex("JobId", "RetryAttempt")
+                        .IsUnique()
+                        .HasDatabaseName("ix_job_attempt_saga_job_id_retry_attempt");
+
+                    b.ToTable("job_attempt_saga", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
+                });
+
+            modelBuilder.Entity("MassTransit.JobSaga", b =>
+                {
+                    b.Property<Guid>("CorrelationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("correlation_id");
+
+                    b.Property<Guid>("AttemptId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("attempt_id");
+
+                    b.Property<DateTime?>("Completed")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("completed");
+
+                    b.Property<int>("CurrentState")
+                        .HasColumnType("integer")
+                        .HasColumnName("current_state");
+
+                    b.Property<TimeSpan?>("Duration")
+                        .HasColumnType("interval")
+                        .HasColumnName("duration");
+
+                    b.Property<DateTime?>("Faulted")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("faulted");
+
+                    b.Property<string>("Job")
+                        .HasColumnType("text")
+                        .HasColumnName("job");
+
+                    b.Property<Guid?>("JobRetryDelayToken")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_retry_delay_token");
+
+                    b.Property<Guid?>("JobSlotWaitToken")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_slot_wait_token");
+
+                    b.Property<TimeSpan?>("JobTimeout")
+                        .HasColumnType("interval")
+                        .HasColumnName("job_timeout");
+
+                    b.Property<Guid>("JobTypeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_type_id");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("text")
+                        .HasColumnName("reason");
+
+                    b.Property<int>("RetryAttempt")
+                        .HasColumnType("integer")
+                        .HasColumnName("retry_attempt");
+
+                    b.Property<string>("ServiceAddress")
+                        .HasColumnType("text")
+                        .HasColumnName("service_address");
+
+                    b.Property<DateTime?>("Started")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("started");
+
+                    b.Property<DateTime?>("Submitted")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("submitted");
+
+                    b.HasKey("CorrelationId")
+                        .HasName("pk_job_saga");
+
+                    b.ToTable("job_saga", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
+                });
+
+            modelBuilder.Entity("MassTransit.JobTypeSaga", b =>
+                {
+                    b.Property<Guid>("CorrelationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("correlation_id");
+
+                    b.Property<int>("ActiveJobCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("active_job_count");
+
+                    b.Property<string>("ActiveJobs")
+                        .HasColumnType("text")
+                        .HasColumnName("active_jobs");
+
+                    b.Property<int>("ConcurrentJobLimit")
+                        .HasColumnType("integer")
+                        .HasColumnName("concurrent_job_limit");
+
+                    b.Property<int>("CurrentState")
+                        .HasColumnType("integer")
+                        .HasColumnName("current_state");
+
+                    b.Property<string>("Instances")
+                        .HasColumnType("text")
+                        .HasColumnName("instances");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<int?>("OverrideJobLimit")
+                        .HasColumnType("integer")
+                        .HasColumnName("override_job_limit");
+
+                    b.Property<DateTime?>("OverrideLimitExpiration")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("override_limit_expiration");
+
+                    b.HasKey("CorrelationId")
+                        .HasName("pk_job_type_saga");
+
+                    b.ToTable("job_type_saga", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
+                });
+
             modelBuilder.Entity("ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.Models.AuditLogEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -281,6 +451,8 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                         .HasDatabaseName("ix_audit_log_entity_type_name_timestamp");
 
                     b.ToTable("audit_log", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
                 });
 
             modelBuilder.Entity("ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLogs.Models.EventLogEntity", b =>
@@ -315,6 +487,8 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                         .HasDatabaseName("ix_event_log_event_type_name_timestamp");
 
                     b.ToTable("event_log", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
                 });
 
             modelBuilder.Entity("ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.Models.AuditLogEntity", b =>
@@ -340,7 +514,9 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
 
                             b1.ToTable("audit_log", "shared");
 
-                            b1.ToJson("entity_key");
+                            b1
+                                .ToJson("entity_key")
+                                .HasAnnotation("AuditIgnoreAnnotation", true);
 
                             b1.WithOwner()
                                 .HasForeignKey("AuditLogEntityId")
@@ -371,7 +547,9 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
 
                             b1.ToTable("audit_log", "shared");
 
-                            b1.ToJson("entity_changes");
+                            b1
+                                .ToJson("entity_changes")
+                                .HasAnnotation("AuditIgnoreAnnotation", true);
 
                             b1.WithOwner()
                                 .HasForeignKey("AuditLogEntityId")
@@ -382,9 +560,6 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                         {
                             b1.Property<Guid>("AuditLogEntityId")
                                 .HasColumnType("uuid");
-
-                            b1.Property<string>("IpAddress")
-                                .HasColumnType("text");
 
                             b1.Property<string>("OperationName")
                                 .HasColumnType("text");
@@ -401,18 +576,46 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                             b1.Property<string>("TraceId")
                                 .HasColumnType("text");
 
-                            b1.Property<string>("Uri")
-                                .HasColumnType("text");
-
                             b1.HasKey("AuditLogEntityId");
 
                             b1.ToTable("audit_log", "shared");
 
-                            b1.ToJson("meta_data");
+                            b1
+                                .ToJson("meta_data")
+                                .HasAnnotation("AuditIgnoreAnnotation", true);
 
                             b1.WithOwner()
                                 .HasForeignKey("AuditLogEntityId")
                                 .HasConstraintName("fk_audit_log_audit_log_id");
+
+                            b1.OwnsMany("ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.AuditLogs.Models.ExtraData", "ExtraData", b2 =>
+                                {
+                                    b2.Property<Guid>("AuditLogEntityMetaDataAuditLogEntityId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<int>("Id")
+                                        .ValueGeneratedOnAdd()
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("Key")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Value")
+                                        .HasColumnType("text");
+
+                                    b2.HasKey("AuditLogEntityMetaDataAuditLogEntityId", "Id");
+
+                                    b2.ToTable("audit_log", "shared");
+
+                                    b2.ToJson("meta_data");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("AuditLogEntityMetaDataAuditLogEntityId")
+                                        .HasConstraintName("fk_audit_log_audit_log_audit_log_entity_meta_data_audit_log_entity_id");
+                                });
+
+                            b1.Navigation("ExtraData");
                         });
 
                     b.Navigation("EntityChanges");

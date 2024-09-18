@@ -1,4 +1,4 @@
-migration-name := 'initial'
+migration-name := 'Initial'
 connection-string := 'User ID=postgres;Password=Admin123!@\#;Host=localhost;Port=5432;Database=modular_monolith'
 
 start-infrastructure:

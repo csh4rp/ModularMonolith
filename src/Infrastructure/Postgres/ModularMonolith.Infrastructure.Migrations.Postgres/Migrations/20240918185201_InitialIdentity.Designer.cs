@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
 {
     [DbContext(typeof(PostgresDbContext))]
-    [Migration("20240728095658_InitialIdentity")]
+    [Migration("20240918185201_InitialIdentity")]
     partial class InitialIdentity
     {
         /// <inheritdoc />
@@ -21,7 +21,7 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.5")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -248,6 +248,209 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                     b.ToTable("outbox_state", "shared");
 
                     b.HasAnnotation("AuditIgnoreAnnotation", true);
+                });
+
+            modelBuilder.Entity("MassTransit.JobAttemptSaga", b =>
+                {
+                    b.Property<Guid>("CorrelationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("correlation_id");
+
+                    b.Property<int>("CurrentState")
+                        .HasColumnType("integer")
+                        .HasColumnName("current_state");
+
+                    b.Property<DateTime?>("Faulted")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("faulted");
+
+                    b.Property<string>("InstanceAddress")
+                        .HasColumnType("text")
+                        .HasColumnName("instance_address");
+
+                    b.Property<Guid>("JobId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_id");
+
+                    b.Property<int>("RetryAttempt")
+                        .HasColumnType("integer")
+                        .HasColumnName("retry_attempt");
+
+                    b.Property<string>("ServiceAddress")
+                        .HasColumnType("text")
+                        .HasColumnName("service_address");
+
+                    b.Property<DateTime?>("Started")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("started");
+
+                    b.Property<Guid?>("StatusCheckTokenId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("status_check_token_id");
+
+                    b.HasKey("CorrelationId")
+                        .HasName("pk_job_attempt_saga");
+
+                    b.HasIndex("JobId", "RetryAttempt")
+                        .IsUnique()
+                        .HasDatabaseName("ix_job_attempt_saga_job_id_retry_attempt");
+
+                    b.ToTable("job_attempt_saga", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
+                });
+
+            modelBuilder.Entity("MassTransit.JobSaga", b =>
+                {
+                    b.Property<Guid>("CorrelationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("correlation_id");
+
+                    b.Property<Guid>("AttemptId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("attempt_id");
+
+                    b.Property<DateTime?>("Completed")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("completed");
+
+                    b.Property<int>("CurrentState")
+                        .HasColumnType("integer")
+                        .HasColumnName("current_state");
+
+                    b.Property<TimeSpan?>("Duration")
+                        .HasColumnType("interval")
+                        .HasColumnName("duration");
+
+                    b.Property<DateTime?>("Faulted")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("faulted");
+
+                    b.Property<string>("Job")
+                        .HasColumnType("text")
+                        .HasColumnName("job");
+
+                    b.Property<Guid?>("JobRetryDelayToken")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_retry_delay_token");
+
+                    b.Property<Guid?>("JobSlotWaitToken")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_slot_wait_token");
+
+                    b.Property<TimeSpan?>("JobTimeout")
+                        .HasColumnType("interval")
+                        .HasColumnName("job_timeout");
+
+                    b.Property<Guid>("JobTypeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_type_id");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("text")
+                        .HasColumnName("reason");
+
+                    b.Property<int>("RetryAttempt")
+                        .HasColumnType("integer")
+                        .HasColumnName("retry_attempt");
+
+                    b.Property<string>("ServiceAddress")
+                        .HasColumnType("text")
+                        .HasColumnName("service_address");
+
+                    b.Property<DateTime?>("Started")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("started");
+
+                    b.Property<DateTime?>("Submitted")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("submitted");
+
+                    b.HasKey("CorrelationId")
+                        .HasName("pk_job_saga");
+
+                    b.ToTable("job_saga", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
+                });
+
+            modelBuilder.Entity("MassTransit.JobTypeSaga", b =>
+                {
+                    b.Property<Guid>("CorrelationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("correlation_id");
+
+                    b.Property<int>("ActiveJobCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("active_job_count");
+
+                    b.Property<string>("ActiveJobs")
+                        .HasColumnType("text")
+                        .HasColumnName("active_jobs");
+
+                    b.Property<int>("ConcurrentJobLimit")
+                        .HasColumnType("integer")
+                        .HasColumnName("concurrent_job_limit");
+
+                    b.Property<int>("CurrentState")
+                        .HasColumnType("integer")
+                        .HasColumnName("current_state");
+
+                    b.Property<string>("Instances")
+                        .HasColumnType("text")
+                        .HasColumnName("instances");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<int?>("OverrideJobLimit")
+                        .HasColumnType("integer")
+                        .HasColumnName("override_job_limit");
+
+                    b.Property<DateTime?>("OverrideLimitExpiration")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("override_limit_expiration");
+
+                    b.HasKey("CorrelationId")
+                        .HasName("pk_job_type_saga");
+
+                    b.ToTable("job_type_saga", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
+                });
+
+            modelBuilder.Entity("ModularMonolith.CategoryManagement.Domain.Categories.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("parent_id");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
+
+                    b.HasKey("Id")
+                        .HasName("pk_category");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_category_name");
+
+                    b.HasIndex("ParentId")
+                        .HasDatabaseName("ix_category_parent_id");
+
+                    b.ToTable("category", "category_management");
                 });
 
             modelBuilder.Entity("ModularMonolith.Identity.Domain.Common.Entities.UserToken", b =>
@@ -588,6 +791,16 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                         .HasDatabaseName("ix_event_log_event_type_name_timestamp");
 
                     b.ToTable("event_log", "shared");
+
+                    b.HasAnnotation("AuditIgnoreAnnotation", true);
+                });
+
+            modelBuilder.Entity("ModularMonolith.CategoryManagement.Domain.Categories.Category", b =>
+                {
+                    b.HasOne("ModularMonolith.CategoryManagement.Domain.Categories.Category", null)
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .HasConstraintName("fk_category_category_parent_id");
                 });
 
             modelBuilder.Entity("ModularMonolith.Identity.Domain.Common.Entities.UserToken", b =>

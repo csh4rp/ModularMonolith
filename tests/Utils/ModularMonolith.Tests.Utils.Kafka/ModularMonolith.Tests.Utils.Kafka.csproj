@@ -1,24 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
-
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MassTransit.Kafka" />
+    <PackageReference Include="Testcontainers" />
+    <PackageReference Include="Testcontainers.Kafka" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Testcontainers">
-      <HintPath>..\..\..\..\..\..\.nuget\packages\testcontainers\3.9.0\lib\net8.0\Testcontainers.dll</HintPath>
-    </Reference>
-    <Reference Include="Testcontainers.Kafka">
-      <HintPath>..\..\..\..\..\..\.nuget\packages\testcontainers.kafka\3.9.0\lib\net8.0\Testcontainers.Kafka.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>

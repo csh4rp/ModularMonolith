@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
     <PackageReference Include="MassTransit.SqlTransport.PostgreSQL"/>
@@ -7,7 +6,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\Modules\Identity\ModularMonolith.Identity.Domain\ModularMonolith.Identity.Domain.csproj" />
     <ProjectReference Include="..\..\..\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Domain\ModularMonolith.CategoryManagement.Domain.csproj" />
@@ -16,5 +14,4 @@
     <ProjectReference Include="..\..\..\Shared\Messaging\ModularMonolith.Shared.Messaging\ModularMonolith.Shared.Messaging.csproj" />
     <ProjectReference Include="..\..\..\Shared\Tracing\ModularMonolith.Shared.Tracing\ModularMonolith.Shared.Tracing.csproj" />
   </ItemGroup>
-
 </Project>

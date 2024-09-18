@@ -45,6 +45,9 @@ public sealed class PostgresDbContext : DbContext
         new JobSagaMap(false).Configure(modelBuilder);
         new JobTypeSagaMap(false).Configure(modelBuilder);
         new JobAttemptSagaMap(false).Configure(modelBuilder);
+        modelBuilder.Entity<JobSaga>().ToTable("job_saga", SharedSchemaName);
+        modelBuilder.Entity<JobTypeSaga>().ToTable("job_type_saga", SharedSchemaName);
+        modelBuilder.Entity<JobAttemptSaga>().ToTable("job_attempt_saga", SharedSchemaName);
 
         modelBuilder.Entity<JobSaga>(c =>
         {

@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Messaging;
+using ModularMonolith.Shared.Messaging.MassTransit;
 using ModularMonolith.Shared.Messaging.MassTransit.Factories;
+using Quartz;
 
 namespace ModularMonolith.Infrastructure.Messaging.Kafka;
 
@@ -21,6 +23,9 @@ public static class ServiceCollectionExtensions
                       ?? throw new NullReferenceException("Kafka section is missing");
 
         var provider = configuration.GetSection("DataAccess:Provider").Value;
+
+        serviceCollection.AddQuartz()
+            .AddQuartzHostedService();
 
         serviceCollection
             .AddScoped<IMessageBus, MessageBus>()
@@ -39,14 +44,25 @@ public static class ServiceCollectionExtensions
                             break;
                     }
 
-                    o.UseBusOutbox(cfg =>
-                    {
-                        cfg.MessageDeliveryLimit = 10;
-                    });
+                    o.UseBusOutbox();
                 });
 
-                c.AddJobSagaStateMachines();
-                c.AddMessageScheduler(new Uri("queue:scheduler"));
+                c.AddQuartzConsumers();
+                c.AddMessageScheduler(MessagingConstants.ScheduleQueueUri);
+                c.SetJobConsumerOptions();
+                c.AddJobSagaStateMachines().EntityFrameworkRepository(cf =>
+                {
+                    cf.ExistingDbContext<TDbContext>();
+                    switch (provider)
+                    {
+                        case "Postgres":
+                            cf.UsePostgres();
+                            break;
+                        case "SqlServer":
+                            cf.UseSqlServer();
+                            break;
+                    }
+                });
 
                 if (runConsumers)
                 {
