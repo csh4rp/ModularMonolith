@@ -2,11 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ModularMonolith.Shared.Messaging;
-using ModularMonolith.Shared.Messaging.MassTransit;
-using ModularMonolith.Shared.Messaging.MassTransit.Kafka;
-using ModularMonolith.Shared.Messaging.MassTransit.Postgres;
-using ModularMonolith.Shared.Messaging.MassTransit.RabbitMQ;
+using ModularMonolith.Infrastructure.Messaging.Kafka;
+using ModularMonolith.Infrastructure.Messaging.Postgres;
+using ModularMonolith.Infrastructure.Messaging.RabbitMQ;
+using ModularMonolith.Infrastructure.Messaging.SqlServer;
 
 namespace ModularMonolith.Infrastructure.Messaging;
 
@@ -17,25 +16,24 @@ public static class MessagingExtensions
         Assembly[] assemblies)
     {
         var messagingProvider = configuration.GetSection("Messaging")
-            .GetSection("Provider")
-            .Get<string>();
+            .GetValue<string>("Provider");
 
-        var databaseProvider = configuration.GetSection("Database")
-            .GetSection("Provider")
-            .Get<DatabaseProvider>();
-
-        serviceCollection.AddMessageBus();
+        var runConsumers = configuration.GetSection("Messaging")
+            .GetValue<bool>("RunConsumers");
 
         switch (messagingProvider)
         {
             case "Postgres":
-                serviceCollection.AddPostgresMessaging<DbContext>(configuration, assemblies);
+                serviceCollection.AddPostgresMessaging<DbContext>(configuration, assemblies, runConsumers);
+                break;
+            case "SqlServer":
+                serviceCollection.AddSqlServerMessaging<DbContext>(configuration, assemblies, runConsumers);
                 break;
             case "Kafka":
-                serviceCollection.AddKafkaMessaging<DbContext>(configuration, databaseProvider, assemblies);
+                serviceCollection.AddKafkaMessaging<DbContext>(configuration, assemblies, runConsumers);
                 break;
             case "RabbitMQ":
-                serviceCollection.AddRabbitMQMessaging<DbContext>(configuration, databaseProvider, assemblies);
+                serviceCollection.AddRabbitMQMessaging<DbContext>(configuration, assemblies, runConsumers);
                 break;
             default:
                 throw new ArgumentException("Messaging:Provider is required");

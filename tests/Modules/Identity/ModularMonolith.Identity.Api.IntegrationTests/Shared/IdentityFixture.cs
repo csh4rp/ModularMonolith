@@ -5,17 +5,20 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using ModularMonolith.Identity.Domain.Users;
 using ModularMonolith.Identity.RestApi;
-using ModularMonolith.Infrastructure.Migrations.Postgres;
-using ModularMonolith.Shared.TestUtils.Fakes;
-using Npgsql;
+using ModularMonolith.Infrastructure.Migrations.SqlServer;
+using ModularMonolith.Tests.Utils.Fakes;
+using ModularMonolith.Tests.Utils.Kafka;
+using ModularMonolith.Tests.Utils.SqlServer;
 using Respawn;
-using Testcontainers.PostgreSql;
+using Testcontainers.Kafka;
+using Testcontainers.MsSql;
 
 namespace ModularMonolith.Identity.Api.IntegrationTests.Shared;
 
@@ -25,40 +28,47 @@ public class IdentityFixture : IAsyncLifetime
     private const string AuthIssuer = "localhost";
     private const string AuthSigningKey = "12345678123456781234567812345678";
 
-    private NpgsqlConnection? _connection;
-    private PostgreSqlContainer? _container;
-    private Respawner? _respawner;
+    private readonly MsSqlContainer _databaseContainer;
+    private readonly KafkaContainer _messagingContainer;
+
+    private SqlConnection _connection = default!;
+    private Respawner _respawner = default!;
     private WebApplicationFactory<Program> _factory = default!;
     private TestServer _testServer = default!;
     private DbContext _dbContext = default!;
 
+    public IdentityFixture()
+    {
+        _databaseContainer = new SqlServerContainerBuilder().Build();
+        _messagingContainer = new KafkaBuilder().Build();
+    }
+
     public async Task InitializeAsync()
     {
-        _container = new PostgreSqlBuilder()
-            .WithImage("postgres:16.1")
-            .WithName("identity_automated_tests")
-            .WithDatabase("tests_database")
-            .WithPortBinding("32860")
-            .Build();
+        var databaseTask = _databaseContainer.StartAsync();
+        var messagingTask = _messagingContainer.StartAsync();
 
-        await _container.StartAsync();
+        await Task.WhenAll(databaseTask, messagingTask);
 
-        var connectionString = _container.GetConnectionString();
+        var connectionString = _databaseContainer.GetConnectionString();
 
-        _connection = new NpgsqlConnection(connectionString);
+        await _messagingContainer.CreateTopic<PasswordChangedEvent>();
+        await _messagingContainer.CreateTopic<PasswordResetInitializedEvent>();
+
+        _connection = new SqlConnection(connectionString);
         await _connection.OpenAsync();
 
-        _dbContext = new PostgresDbContextFactory().CreateDbContext([connectionString]);
+        _dbContext = new SqlServerDbContextFactory().CreateDbContext([connectionString]);
         await _dbContext.Database.MigrateAsync();
 
-        _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
-
+        _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions { DbAdapter = DbAdapter.SqlServer });
 
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseSetting("ConnectionStrings:Database", connectionString);
-            builder.UseSetting("DataAccess:Provider", "Postgres");
-            builder.UseSetting("Messaging:Provider", "Postgres");
+            builder.UseSetting("Kafka:Host", _messagingContainer.GetBootstrapAddress());
+            builder.UseSetting("DataAccess:Provider", "SqlServer");
+            builder.UseSetting("Messaging:Provider", "Kafka");
             builder.UseSetting("Modules:Identity:Enabled", "true");
             builder.UseSetting("Modules:Identity:Auth:Audience", AuthAudience);
             builder.UseSetting("Modules:Identity:Auth:Issuer", AuthIssuer);
@@ -73,13 +83,15 @@ public class IdentityFixture : IAsyncLifetime
 
             builder.ConfigureServices(s =>
             {
-                s.Replace(new ServiceDescriptor(typeof(TimeProvider), typeof(FakeTimeProvider),
-                    ServiceLifetime.Singleton));
+                s.Replace(
+                    new ServiceDescriptor(typeof(TimeProvider), typeof(FakeTimeProvider), ServiceLifetime.Singleton));
             });
         });
 
         _testServer = _factory.Server;
     }
+
+    public string GetMessagingConnectionString() => _messagingContainer.GetBootstrapAddress();
 
     public HttpClient CreateClient()
     {
@@ -126,17 +138,15 @@ public class IdentityFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        if (_respawner is not null && _connection is not null)
-        {
-            await _respawner.ResetAsync(_connection);
-            await _connection.DisposeAsync();
-        }
+        _testServer.Dispose();
+        await _respawner.ResetAsync(_connection);
+        await _connection.DisposeAsync();
 
-        if (_container is not null)
-        {
-            await _container.StopAsync();
-            await _container.DisposeAsync();
-        }
+        await _databaseContainer.StopAsync();
+        await _databaseContainer.DisposeAsync();
+
+        await _messagingContainer.StartAsync();
+        await _messagingContainer.DisposeAsync();
 
         await _dbContext.DisposeAsync();
         await _factory.DisposeAsync();

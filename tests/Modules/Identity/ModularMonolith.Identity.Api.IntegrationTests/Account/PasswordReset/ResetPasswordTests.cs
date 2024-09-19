@@ -4,11 +4,10 @@ using System.Text.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using ModularMonolith.Identity.Api.IntegrationTests.Account.Fixtures;
+using ModularMonolith.Identity.Api.IntegrationTests.Account.Shared;
 using ModularMonolith.Identity.Api.IntegrationTests.Shared;
 using ModularMonolith.Identity.Domain.Users;
-using ModularMonolith.Shared.IntegrationTests.Common;
-using ModularMonolith.Shared.TestUtils.Abstractions;
+using ModularMonolith.Tests.Utils.Abstractions;
 
 namespace ModularMonolith.Identity.Api.IntegrationTests.Account.PasswordReset;
 

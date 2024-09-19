@@ -5,7 +5,7 @@ namespace ModularMonolith.Shared.RestApi.Swagger;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddSwaggerWithBearerToken(this IServiceCollection serviceCollection,
-        List<AppModule> modules)
+        List<IWebAppModule> modules)
     {
         serviceCollection.AddEndpointsApiExplorer()
             .AddSwaggerGen(opt =>

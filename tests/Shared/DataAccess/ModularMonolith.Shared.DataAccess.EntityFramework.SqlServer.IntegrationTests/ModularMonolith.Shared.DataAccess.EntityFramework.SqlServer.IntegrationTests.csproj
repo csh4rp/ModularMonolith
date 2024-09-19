@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Infrastructure\SqlServer\ModularMonolith.Infrastructure.Migrations.SqlServer\ModularMonolith.Infrastructure.Migrations.SqlServer.csproj"/>
     <ProjectReference Include="..\..\..\..\src\Shared\DataAccess\ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer\ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.csproj"/>
+    <ProjectReference Include="..\..\..\Utils\ModularMonolith.Tests.Utils.SqlServer\ModularMonolith.Tests.Utils.SqlServer.csproj" />
   </ItemGroup>
 
 </Project>

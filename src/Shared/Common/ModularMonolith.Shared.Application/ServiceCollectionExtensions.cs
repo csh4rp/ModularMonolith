@@ -1,9 +1,6 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Shared.Application.Middlewares;
-
-[assembly: InternalsVisibleTo("ModularMonolith.CategoryManagement.Application.UnitTests")]
 
 namespace ModularMonolith.Shared.Application;
 

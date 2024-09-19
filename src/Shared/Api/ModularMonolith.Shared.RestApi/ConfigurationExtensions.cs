@@ -4,7 +4,7 @@ namespace ModularMonolith.Shared.RestApi;
 
 public static class ConfigurationExtensions
 {
-    public static IEnumerable<AppModule> GetEnabledModules(this IConfiguration configuration)
+    public static IEnumerable<IWebAppModule> GetEnabledWebModules(this IConfiguration configuration)
     {
         var executingAssembly = Assembly.GetExecutingAssembly();
         var location = executingAssembly.Location;
@@ -29,9 +29,14 @@ public static class ConfigurationExtensions
                 .Where(file => file.EndsWith($".{name}.RestApi.dll"))
                 .Select(Assembly.LoadFile)
                 .SelectMany(assembly => assembly.GetExportedTypes())
-                .First(t => t.IsAssignableTo(typeof(AppModule)));
+                .FirstOrDefault(t => t.IsAssignableTo(typeof(IWebAppModule)));
 
-            yield return (AppModule)Activator.CreateInstance(appModuleType)!;
+            if (appModuleType is null)
+            {
+                continue;
+            }
+
+            yield return (IWebAppModule)Activator.CreateInstance(appModuleType)!;
         }
     }
 }

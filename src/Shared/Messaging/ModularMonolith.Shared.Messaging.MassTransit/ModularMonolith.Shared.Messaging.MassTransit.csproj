@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <ItemGroup>
+    <PackageReference Include="MassTransit" />
     <PackageReference Include="MassTransit.Abstractions"/>
+    <PackageReference Include="MassTransit.Quartz" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Common\ModularMonolith.Shared.Events\ModularMonolith.Shared.Events.csproj"/>
     <ProjectReference Include="..\..\DataAccess\ModularMonolith.Shared.DataAccess\ModularMonolith.Shared.DataAccess.csproj"/>

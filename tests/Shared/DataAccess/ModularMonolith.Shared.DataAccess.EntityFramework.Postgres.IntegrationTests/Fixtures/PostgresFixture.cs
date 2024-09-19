@@ -21,8 +21,6 @@ public class PostgresFixture : IAsyncLifetime
     {
         _container = new PostgreSqlBuilder()
             .WithImage("postgres:16.1")
-            .WithName("shared_infrastructure_integration_tests")
-            .WithDatabase("shared_automated_tests")
             .Build();
 
         await _container.StartAsync();

@@ -1,14 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore"/>
     <PackageReference Include="Microsoft.Extensions.Configuration"/>
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Messaging\ModularMonolith.Shared.Messaging.MassTransit.Kafka\ModularMonolith.Shared.Messaging.MassTransit.Kafka.csproj"/>
-    <ProjectReference Include="..\..\..\Shared\Messaging\ModularMonolith.Shared.Messaging.MassTransit.Postgres\ModularMonolith.Shared.Messaging.MassTransit.Postgres.csproj"/>
-    <ProjectReference Include="..\..\..\Shared\Messaging\ModularMonolith.Shared.Messaging.MassTransit.RabbitMQ\ModularMonolith.Shared.Messaging.MassTransit.RabbitMQ.csproj"/>
+    <ProjectReference Include="..\..\Kafka\ModularMonolith.Infrastructure.Messaging.Kafka\ModularMonolith.Infrastructure.Messaging.Kafka.csproj" />
+    <ProjectReference Include="..\..\Postgres\ModularMonolith.Infrastructure.Messaging.Postgres\ModularMonolith.Infrastructure.Messaging.Postgres.csproj" />
+    <ProjectReference Include="..\..\RabbitMQ\ModularMonolith.Infrastructure.Messaging.RabbitMQ\ModularMonolith.Infrastructure.Messaging.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\SqlServer\ModularMonolith.Infrastructure.Messaging.SqlServer\ModularMonolith.Infrastructure.Messaging.SqlServer.csproj" />
   </ItemGroup>
-
 </Project>

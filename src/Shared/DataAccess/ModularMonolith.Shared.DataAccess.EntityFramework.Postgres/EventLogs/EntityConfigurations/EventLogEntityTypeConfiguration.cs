@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
+using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLogs.Models;
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLogs.EntityConfigurations;
@@ -28,12 +29,12 @@ public sealed class EventLogEntityTypeConfiguration : IEntityTypeConfiguration<E
         builder.Property(b => b.EventTypeName)
             .HasMaxLength(512)
             .IsRequired();
-        ;
 
         builder.OwnsOne(b => b.MetaData, b =>
         {
             b.ToJson("meta_data");
-        });
+        })
+        .AuditIgnore();
 
         builder.HasIndex(b => b.Timestamp);
 

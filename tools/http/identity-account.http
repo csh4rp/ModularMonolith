@@ -1,0 +1,23 @@
+POST {{host}}/api/identity/account/sign-in
+Content-Type: application/json
+
+{
+  "email": "mail@mail.com",
+  "password": "Pa$$word123!@#"
+}
+
+> {%
+    client.global.set("token", response.body.token);
+%}
+
+###
+
+POST {{host}}/api/identity/account/register
+Content-Type: application/json
+
+{
+  "email": "mail1@mail.com",
+  "password": "Pa$$word123!@#",
+  "passwordConfirmed": "Pa$$word123!@#"
+
+}

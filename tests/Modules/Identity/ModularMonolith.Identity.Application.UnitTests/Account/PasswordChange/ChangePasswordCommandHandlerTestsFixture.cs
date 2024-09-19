@@ -39,9 +39,8 @@ internal sealed class ChangePasswordCommandHandlerTestsFixture
         _userManager.ChangePasswordAsync(_user, Arg.Is<string>(a => a == _password), Arg.Any<string>())
             .Returns(IdentityResult.Success);
 
-        _identityContextAccessor.IdentityContext.Returns(new IdentityContext(userName));
+        _identityContextAccessor.IdentityContext.Returns(new IdentityContext(userName, []));
     }
-
 
     public Task AssertThatPasswordChangedEventWasPublished() => _eventBus.Received(1)
         .PublishAsync(Arg.Is<PasswordChangedEvent>(c => c.UserId == _user!.Id), Arg.Any<CancellationToken>());

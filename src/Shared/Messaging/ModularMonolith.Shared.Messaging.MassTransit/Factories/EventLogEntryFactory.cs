@@ -6,14 +6,11 @@ using EventLogEntry = ModularMonolith.Shared.DataAccess.EventLogs.EventLogEntry;
 
 namespace ModularMonolith.Shared.Messaging.MassTransit.Factories;
 
-internal sealed class EventLogEntryFactory
+public sealed class EventLogEntryFactory
 {
     private readonly IOperationContextAccessor _operationContextAccessor;
 
-    public EventLogEntryFactory(IOperationContextAccessor operationContextAccessor)
-    {
-        _operationContextAccessor = operationContextAccessor;
-    }
+    public EventLogEntryFactory(IOperationContextAccessor operationContextAccessor) => _operationContextAccessor = operationContextAccessor;
 
     public EventLogEntry Create(IEvent @event)
     {

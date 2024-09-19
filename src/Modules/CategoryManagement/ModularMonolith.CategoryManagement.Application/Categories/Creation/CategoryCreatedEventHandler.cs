@@ -1,14 +1,19 @@
-﻿using MassTransit;
+﻿using Microsoft.Extensions.Logging;
 using ModularMonolith.CategoryManagement.Domain.Categories;
-using ModularMonolith.Shared.Events;
+using ModularMonolith.Shared.Contracts;
 
 namespace ModularMonolith.CategoryManagement.Application.Categories.Creation;
 
-[EventConsumer("categories")]
-public class CategoryCreatedEventHandler : IConsumer<CategoryCreatedEvent>
+internal sealed class CategoryCreatedEventHandler : IEventHandler<CategoryCreatedEvent>
 {
-    public Task Consume(ConsumeContext<CategoryCreatedEvent> context)
+    private readonly ILogger<CategoryCreatedEventHandler> _logger;
+
+    public CategoryCreatedEventHandler(ILogger<CategoryCreatedEventHandler> logger) => _logger = logger;
+
+    public Task Handle(CategoryCreatedEvent notification, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("CategoryCreated event was handled");
+
         return Task.CompletedTask;
     }
 }

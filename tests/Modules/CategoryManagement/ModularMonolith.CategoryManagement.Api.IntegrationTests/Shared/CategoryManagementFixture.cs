@@ -10,7 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using ModularMonolith.CategoryManagement.Domain.Categories;
 using ModularMonolith.CategoryManagement.RestApi;
 using ModularMonolith.Infrastructure.Migrations.Postgres;
-using ModularMonolith.Shared.TestUtils.Messaging;
 using Npgsql;
 using Respawn;
 using Testcontainers.PostgreSql;
@@ -26,8 +25,6 @@ public class CategoryManagementFixture : IAsyncLifetime
 
     private readonly PostgreSqlContainer _databaseContainer;
     private readonly RabbitMqContainer _messagingContainer;
-    private readonly TestBus _testBus = new();
-    private readonly TestConsumer<CategoryCreatedEvent> _categoryCreatedConsumer = new();
 
     private DbContext _dbContext = default!;
     private NpgsqlConnection _connection = default!;
@@ -39,13 +36,10 @@ public class CategoryManagementFixture : IAsyncLifetime
     {
         _databaseContainer = new PostgreSqlBuilder()
             .WithImage("postgres:16.1")
-            .WithName("category_management_automated_tests")
-            .WithDatabase("tests_database")
             .Build();
 
         _messagingContainer = new RabbitMqBuilder()
-            .WithUsername("guest")
-            .WithPassword("guest")
+            .WithImage("rabbitmq:3-management")
             .Build();
     }
 
@@ -59,10 +53,8 @@ public class CategoryManagementFixture : IAsyncLifetime
         var connectionString = _databaseContainer.GetConnectionString();
 
         _connection = new NpgsqlConnection(connectionString);
-        _dbContext =
-            new PostgresDbContextFactory().CreateDbContext([connectionString]);
+        _dbContext = new PostgresDbContextFactory().CreateDbContext([connectionString]);
 
-        await _testBus.StartAsync(_messagingContainer.GetConnectionString());
         await _connection.OpenAsync();
         await _dbContext.Database.MigrateAsync();
 
@@ -70,7 +62,8 @@ public class CategoryManagementFixture : IAsyncLifetime
 
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
-            builder.UseSetting("ConnectionStrings:Database", _databaseContainer!.GetConnectionString());
+            builder.UseSetting("ConnectionStrings:Database", connectionString);
+            builder.UseSetting("ConnectionStrings:RabbitMQ", _messagingContainer.GetConnectionString());
             builder.UseSetting("DataAccess:Provider", "Postgres");
             builder.UseSetting("Messaging:Provider", "RabbitMQ");
             builder.UseSetting("Modules:CategoryManagement:Enabled", "true");
@@ -78,13 +71,11 @@ public class CategoryManagementFixture : IAsyncLifetime
             builder.UseSetting("Authentication:Audience", AuthAudience);
             builder.UseSetting("Authentication:Issuer", AuthIssuer);
             builder.UseSetting("Authentication:SigningKey", AuthSigningKey);
-            builder.UseSetting("Logging:LogLevel:Default", "Debug");
-            builder.UseSetting("ConnectionStrings:RabbitMQ", _messagingContainer.GetConnectionString());
+            builder.UseSetting("Logging:LogLevel:Default", "Warning");
             builder.UseSetting("Messaging:CustomersEnabled", "false");
         });
 
         _testServer = _factory.Server;
-        _testBus.ConnectReceiveEndpoint("CategoryCreatedTestQueue", _categoryCreatedConsumer);
     }
 
     private HttpClient CreateClient()
@@ -102,6 +93,8 @@ public class CategoryManagementFixture : IAsyncLifetime
 
         return client;
     }
+
+    public string GetMessagingConnectionString() => _messagingContainer.GetConnectionString();
 
     private static string GenerateToken()
     {
@@ -124,11 +117,9 @@ public class CategoryManagementFixture : IAsyncLifetime
         await _dbContext.SaveChangesAsync();
     }
 
-    public Task<CategoryCreatedEvent> VerifyCategoryCreatedEventReceived() =>
-        new MessagePublicationVerifier<CategoryCreatedEvent>(_categoryCreatedConsumer).VerifyAsync();
-
     public async Task DisposeAsync()
     {
+        _testServer.Dispose();
         await _respawner.ResetAsync(_connection);
         await _connection.DisposeAsync();
 

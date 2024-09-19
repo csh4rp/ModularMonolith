@@ -1,10 +1,8 @@
 ﻿using System.Diagnostics;
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Configurations;
-using DotNet.Testcontainers.Containers;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Infrastructure.Migrations.SqlServer;
+using ModularMonolith.Tests.Utils.SqlServer;
 using Respawn;
 using Testcontainers.MsSql;
 
@@ -22,10 +20,7 @@ public class SqlServerFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        _container = new MsSqlBuilder()
-            .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-            .WithWaitStrategy(Wait.ForUnixContainer().AddCustomWaitStrategy(new SqlServerReadinessCheck()))
-            .WithName("shared_infrastructure_integration_tests")
+        _container = new SqlServerContainerBuilder()
             .Build();
 
         await _container.StartAsync();
@@ -62,19 +57,5 @@ public class SqlServerFixture : IAsyncLifetime
         Debug.Assert(_respawner is not null);
 
         return _respawner.ResetAsync(_connection);
-    }
-
-    private class SqlServerReadinessCheck : IWaitUntil
-    {
-        private readonly string[] _command = ["/opt/mssql-tools18/bin/sqlcmd", "-Q", "SELECT 1;", "-C"];
-
-        /// <inheritdoc />
-        public async Task<bool> UntilAsync(IContainer container)
-        {
-            var execResult = await container.ExecAsync(_command)
-                .ConfigureAwait(false);
-
-            return 0L.Equals(execResult.ExitCode);
-        }
     }
 }

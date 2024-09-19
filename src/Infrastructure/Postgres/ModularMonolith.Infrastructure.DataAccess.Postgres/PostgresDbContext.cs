@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.DataAccess.EntityFramework;
 using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs;
@@ -38,6 +39,28 @@ public sealed class PostgresDbContext : DbContext
         modelBuilder.AddOutboxMessageEntity(c =>
         {
             c.ToTable("outbox_message", SharedSchemaName);
+            c.AuditIgnore();
+        });
+
+        new JobSagaMap(false).Configure(modelBuilder);
+        new JobTypeSagaMap(false).Configure(modelBuilder);
+        new JobAttemptSagaMap(false).Configure(modelBuilder);
+        modelBuilder.Entity<JobSaga>().ToTable("job_saga", SharedSchemaName);
+        modelBuilder.Entity<JobTypeSaga>().ToTable("job_type_saga", SharedSchemaName);
+        modelBuilder.Entity<JobAttemptSaga>().ToTable("job_attempt_saga", SharedSchemaName);
+
+        modelBuilder.Entity<JobSaga>(c =>
+        {
+            c.AuditIgnore();
+        });
+
+        modelBuilder.Entity<JobTypeSaga>(c =>
+        {
+            c.AuditIgnore();
+        });
+
+        modelBuilder.Entity<JobAttemptSaga>(c =>
+        {
             c.AuditIgnore();
         });
 

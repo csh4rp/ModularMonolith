@@ -21,7 +21,7 @@ public class ApiTests
     {
         var rule = Classes()
             .That()
-            .AreAssignableTo(typeof(AppModule))
+            .AreAssignableTo(typeof(IWebAppModule))
             .Should()
             .BePublic();
 

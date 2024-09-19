@@ -3,10 +3,16 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using ModularMonolith.Shared.DataAccess.AudiLogs;
+using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs.Factories;
 using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs.Interceptors;
 using ModularMonolith.Shared.DataAccess.EntityFramework.EventLogs.Interceptors;
 using ModularMonolith.Shared.DataAccess.EntityFramework.Options;
+using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.AuditLogs.Stores;
+using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.EventLogs.Factories;
+using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.EventLogs.Stores;
 using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.Factories;
+using ModularMonolith.Shared.DataAccess.EventLogs;
 
 namespace ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer;
 
@@ -22,6 +28,11 @@ public static class ServiceConnectionExtensions
         serviceCollection
             .AddScoped<SqlConnectionFactory>()
             .AddEntityFrameworkDataAccess()
+            .AddSingleton<EventLogFactory>()
+            .AddScoped<IEventLogStore, EventLogStore>()
+            .AddScoped<IAuditLogStore, AuditLogStore>()
+            .AddScoped<AuditLogFactory>()
+            .AddScoped<AuditLogs.Factories.AuditLogFactory>()
             .AddDbContextFactory<TDbContext>((serviceProvider, optionsBuilder) =>
             {
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();

@@ -42,8 +42,22 @@ public static class ServiceCollectionExtensions
                         ValidateIssuerSigningKey = true
                     };
 
-
                     options.MapInboundClaims = false;
+                });
+        }
+        else if (authType.Equals("OAuth"))
+        {
+            var clientId = configuration.GetSection("Authentication:ClientId").Get<string>()
+                           ?? throw new ArgumentException("Authentication:ClientId is not configured");
+
+            var clientSecret = configuration.GetSection("Authentication:ClientSecret").Get<string>()
+                           ?? throw new ArgumentException("Authentication:ClientSecret is not configured");
+
+            serviceCollection.AddAuthentication()
+                .AddOAuth("", authOptions =>
+                {
+                    authOptions.ClientId = clientId;
+                    authOptions.ClientSecret = clientSecret;
                 });
         }
         else

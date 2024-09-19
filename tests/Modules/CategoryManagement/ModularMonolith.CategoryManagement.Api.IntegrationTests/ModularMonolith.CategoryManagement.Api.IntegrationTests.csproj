@@ -21,7 +21,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Infrastructure\Postgres\ModularMonolith.Infrastructure.Migrations.Postgres\ModularMonolith.Infrastructure.Migrations.Postgres.csproj"/>
     <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.RestApi\ModularMonolith.CategoryManagement.RestApi.csproj"/>
-    <ProjectReference Include="..\..\..\..\src\Shared\Utils\ModularMonolith.Shared.TestUtils\ModularMonolith.Shared.TestUtils.csproj"/>
+    <ProjectReference Include="..\..\..\Utils\ModularMonolith.Tests.Utils.RabbitMQ\ModularMonolith.Tests.Utils.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\..\Utils\ModularMonolith.Tests.Utils\ModularMonolith.Tests.Utils.csproj" />
+    <ProjectReference Include="..\..\Identity\ModularMonolith.Identity.Api.IntegrationTests\ModularMonolith.Identity.Api.IntegrationTests.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -114,6 +116,10 @@
       <ParentFile>GetCategoryTests</ParentFile>
       <DependentUpon>GetCategoryTests.cs</DependentUpon>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageVersion Update="Testcontainers.PostgreSql" Version="3.9.0" />
   </ItemGroup>
 
 </Project>

@@ -3,8 +3,10 @@ $$
 
 DECLARE
 new_user_name CONSTANT VARCHAR(128) := 'mail@mail.com';
+
+-- Pa$$word123!@#
 DECLARE
-new_user_password_hash CONSTANT VARCHAR(255) := 'AQAAAAIAAYagAAAAEMbO4U0+72DTJTrynS9mX+9SokWZbBi9opL+zLvvgauBIWs6QRwDpUFPaHdEe6e+Mw==';
+new_user_password_hash CONSTANT VARCHAR(255) := 'AQAAAAIAAYagAAAAEExLl8UzbmjdreSVh9HhneMNcOVzEnKMCKFNyym/N1y8evJUbsENt3dBLFyxUqBO4A==';
 
 BEGIN
 

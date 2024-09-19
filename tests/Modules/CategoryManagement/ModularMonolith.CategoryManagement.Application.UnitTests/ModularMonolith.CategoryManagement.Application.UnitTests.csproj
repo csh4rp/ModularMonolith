@@ -1,19 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="FluentAssertions"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory"/>
     <PackageReference Include="NSubstitute"/>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Application\ModularMonolith.CategoryManagement.Application.csproj"/>
     <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Contracts\ModularMonolith.CategoryManagement.Contracts.csproj"/>
     <ProjectReference Include="..\..\..\..\src\Modules\CategoryManagement\ModularMonolith.CategoryManagement.Domain\ModularMonolith.CategoryManagement.Domain.csproj"/>
   </ItemGroup>
-
 </Project>

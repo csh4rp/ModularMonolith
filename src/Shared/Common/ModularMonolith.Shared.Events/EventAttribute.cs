@@ -7,7 +7,5 @@ public class EventAttribute : Attribute
 
     public string Name { get; }
 
-    public string? Topic { get; set; }
-
     public bool IsPersisted { get; set; }
 }
