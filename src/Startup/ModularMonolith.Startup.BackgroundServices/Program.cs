@@ -37,7 +37,7 @@ builder.Services
         }
     });
 
-    builder.Services.AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true)
+builder.Services.AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true)
     .AddMediator(assemblies)
     .AddMessaging(builder.Configuration, assemblies)
     .AddIdentityContextAccessor()

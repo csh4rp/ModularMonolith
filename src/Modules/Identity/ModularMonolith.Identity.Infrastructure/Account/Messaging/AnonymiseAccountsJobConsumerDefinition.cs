@@ -1,4 +1,4 @@
-using MassTransit;
+﻿using MassTransit;
 
 namespace ModularMonolith.Identity.Infrastructure.Account.Messaging;
 
