@@ -164,6 +164,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "http", "http", "{C9B9D367-6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Shared.Infrastructure", "src\Shared\Common\ModularMonolith.Shared.Infrastructure\ModularMonolith.Shared.Infrastructure.csproj", "{B9942716-BDAD-4097-8934-84FF64DA3AF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Infrastructure.Messaging.SqlServer", "src\Infrastructure\SqlServer\ModularMonolith.Infrastructure.Messaging.SqlServer\ModularMonolith.Infrastructure.Messaging.SqlServer.csproj", "{38086A76-174B-4810-AE60-EE01D69DA732}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -245,6 +247,7 @@ Global
 		{DF60D8A1-FC70-4FF1-83B3-6EC31E4D1579} = {CC6B6865-C16F-4D1A-AA05-2386046C752C}
 		{C9B9D367-679A-414F-8BFB-415815F03FBE} = {B93D64D5-80C4-48EB-B938-10E66BA5A7E0}
 		{B9942716-BDAD-4097-8934-84FF64DA3AF2} = {2F7379A1-80C3-484B-B052-CD1E27C8B3C3}
+		{38086A76-174B-4810-AE60-EE01D69DA732} = {2C1A8162-911B-430E-93BB-9975001E9996}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BBAF6E32-FA5F-4916-9F22-AD58F95D2992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -443,5 +446,9 @@ Global
 		{B9942716-BDAD-4097-8934-84FF64DA3AF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9942716-BDAD-4097-8934-84FF64DA3AF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9942716-BDAD-4097-8934-84FF64DA3AF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38086A76-174B-4810-AE60-EE01D69DA732}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38086A76-174B-4810-AE60-EE01D69DA732}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38086A76-174B-4810-AE60-EE01D69DA732}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38086A76-174B-4810-AE60-EE01D69DA732}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

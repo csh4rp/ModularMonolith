@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Infrastructure.Messaging.Kafka;
 using ModularMonolith.Infrastructure.Messaging.Postgres;
 using ModularMonolith.Infrastructure.Messaging.RabbitMQ;
+using ModularMonolith.Infrastructure.Messaging.SqlServer;
 
 namespace ModularMonolith.Infrastructure.Messaging;
 
@@ -24,6 +25,9 @@ public static class MessagingExtensions
         {
             case "Postgres":
                 serviceCollection.AddPostgresMessaging<DbContext>(configuration, assemblies, runConsumers);
+                break;
+            case "SqlServer":
+                serviceCollection.AddSqlServerMessaging<DbContext>(configuration, assemblies, runConsumers);
                 break;
             case "Kafka":
                 serviceCollection.AddKafkaMessaging<DbContext>(configuration, assemblies, runConsumers);

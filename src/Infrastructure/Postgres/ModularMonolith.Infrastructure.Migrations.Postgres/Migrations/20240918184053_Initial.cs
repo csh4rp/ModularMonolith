@@ -1020,7 +1020,8 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     timestamp = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    entity_type_name = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
+                    entity_type_name =
+                        table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                     operation_type = table.Column<int>(type: "integer", nullable: false),
                     entity_changes = table.Column<string>(type: "jsonb", nullable: true),
                     entity_key = table.Column<string>(type: "jsonb", nullable: true),
@@ -1038,7 +1039,8 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     timestamp = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    event_type_name = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
+                    event_type_name =
+                        table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                     event_payload = table.Column<JsonDocument>(type: "jsonb", nullable: false),
                     meta_data = table.Column<string>(type: "jsonb", nullable: false)
                 },
@@ -1053,7 +1055,8 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                        .Annotation("Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     message_id = table.Column<Guid>(type: "uuid", nullable: false),
                     consumer_id = table.Column<Guid>(type: "uuid", nullable: false),
                     lock_id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -1068,7 +1071,8 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_inbox_state", x => x.id);
-                    table.UniqueConstraint("ak_inbox_state_message_id_consumer_id", x => new { x.message_id, x.consumer_id });
+                    table.UniqueConstraint("ak_inbox_state_message_id_consumer_id",
+                        x => new { x.message_id, x.consumer_id });
                 });
 
             migrationBuilder.CreateTable(
@@ -1129,7 +1133,8 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                     concurrent_job_limit = table.Column<int>(type: "integer", nullable: false),
                     name = table.Column<string>(type: "text", nullable: true),
                     override_job_limit = table.Column<int>(type: "integer", nullable: true),
-                    override_limit_expiration = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    override_limit_expiration =
+                        table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     active_jobs = table.Column<string>(type: "text", nullable: true),
                     instances = table.Column<string>(type: "text", nullable: true)
                 },
@@ -1144,7 +1149,8 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                 columns: table => new
                 {
                     sequence_number = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                        .Annotation("Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     enqueue_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     sent_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     headers = table.Column<string>(type: "text", nullable: true),
@@ -1153,17 +1159,22 @@ namespace ModularMonolith.Infrastructure.Migrations.Postgres.Migrations
                     inbox_consumer_id = table.Column<Guid>(type: "uuid", nullable: true),
                     outbox_id = table.Column<Guid>(type: "uuid", nullable: true),
                     message_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    content_type = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    content_type =
+                        table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     message_type = table.Column<string>(type: "text", nullable: false),
                     body = table.Column<string>(type: "text", nullable: false),
                     conversation_id = table.Column<Guid>(type: "uuid", nullable: true),
                     correlation_id = table.Column<Guid>(type: "uuid", nullable: true),
                     initiator_id = table.Column<Guid>(type: "uuid", nullable: true),
                     request_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    source_address = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    destination_address = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    response_address = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    fault_address = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    source_address =
+                        table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    destination_address =
+                        table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    response_address =
+                        table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    fault_address =
+                        table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     expiration_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>

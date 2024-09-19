@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+      <PackageReference Include="AspNetCore.HealthChecks.SqlServer" />
+      <PackageReference Include="MassTransit.SqlTransport.SqlServer"/>
+      <PackageReference Include="MassTransit.EntityFrameworkCore"/>
+      <PackageReference Include="Microsoft.Extensions.Configuration" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Shared\Messaging\ModularMonolith.Shared.Messaging.MassTransit\ModularMonolith.Shared.Messaging.MassTransit.csproj" />
+    </ItemGroup>
+</Project>
