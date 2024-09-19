@@ -22,7 +22,8 @@ public static class WebApplicationBuilderExtensions
 
         foreach (var module in modules)
         {
-            builder.Services.AddSingleton<IWebAppModule>(_ => (IWebAppModule)Activator.CreateInstance(module.GetType())!);
+            builder.Services.AddSingleton<IWebAppModule>(
+                _ => (IWebAppModule)Activator.CreateInstance(module.GetType())!);
         }
 
         var assemblies = modules.SelectMany(m => m.Assemblies).ToArray();
@@ -57,7 +58,7 @@ public static class WebApplicationBuilderExtensions
                 }
             });
 
-            builder.Services.AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true)
+        builder.Services.AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true)
             .AddMediator(assemblies)
             .AddMessaging(builder.Configuration, assemblies)
             .AddIdentityContextAccessor()

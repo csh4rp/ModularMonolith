@@ -97,10 +97,13 @@ public static class ServiceCollectionExtensions
             });
 
         serviceCollection.AddHealthChecks()
-            .AddKafka(new ProducerConfig
-            {
-                SaslUsername = options.Username, SaslPassword = options.Password, BootstrapServers = options.Host
-            }, tags: ["live", "ready"]);
+            .AddKafka(
+                new ProducerConfig
+                {
+                    SaslUsername = options.Username,
+                    SaslPassword = options.Password,
+                    BootstrapServers = options.Host
+                }, tags: ["live", "ready"]);
 
         return serviceCollection;
     }

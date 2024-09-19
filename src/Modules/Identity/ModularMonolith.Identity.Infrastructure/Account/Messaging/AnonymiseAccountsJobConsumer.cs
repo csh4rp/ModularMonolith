@@ -4,7 +4,7 @@ using ModularMonolith.Identity.Contracts.Account.Anonymisation;
 
 namespace ModularMonolith.Identity.Infrastructure.Account.Messaging;
 
- public sealed class AnonymiseAccountsJobConsumer : IJobConsumer<AnonymiseAccountsJob>
+public sealed class AnonymiseAccountsJobConsumer : IJobConsumer<AnonymiseAccountsJob>
 {
     private readonly ILogger<AnonymiseAccountsJobConsumer> _logger;
 

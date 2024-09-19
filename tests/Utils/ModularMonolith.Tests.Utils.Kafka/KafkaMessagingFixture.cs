@@ -34,7 +34,7 @@ public class KafkaMessagingFixture<T> : IAsyncDisposable where T : class
                         {
                             _message = cnx.Message;
                             return Task.CompletedTask;
-                        }, a => {});
+                        }, a => { });
                     });
                 });
             });

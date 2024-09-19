@@ -53,12 +53,13 @@ internal sealed class MessageBus : IMessageBus
         }
     }
 
-    public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : class, IEvent
+    public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken)
+        where TEvent : class, IEvent
     {
         var operationContext = _operationContextAccessor.OperationContext;
         Debug.Assert(operationContext is not null);
 
-        var topic =  DefaultEndpointNameFormatter.Instance.Message<TEvent>();
+        var topic = DefaultEndpointNameFormatter.Instance.Message<TEvent>();
         var type = typeof(TEvent);
         var uri = new Uri($"topic:{topic}");
         var producer = _topicProducerProvider.GetProducer<Guid, TEvent>(uri);
@@ -93,8 +94,9 @@ internal sealed class MessageBus : IMessageBus
         var operationContext = _operationContextAccessor.OperationContext;
         Debug.Assert(operationContext is not null);
 
-        var topic =  DefaultEndpointNameFormatter.Instance.Message<TCommand>();
-        var uri = new Uri($"topic:{topic}");;
+        var topic = DefaultEndpointNameFormatter.Instance.Message<TCommand>();
+        var uri = new Uri($"topic:{topic}");
+        ;
         var producer = _topicProducerProvider.GetProducer<Guid, TCommand>(uri);
 
         return producer.Produce(Guid.NewGuid(), command, Pipe.Execute<KafkaSendContext<Guid, TCommand>>(kafkaCnx =>

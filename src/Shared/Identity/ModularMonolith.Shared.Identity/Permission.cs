@@ -4,7 +4,8 @@ namespace ModularMonolith.Shared.Identity;
 
 public record Permission
 {
-    private static readonly Regex ValidationRegex = new(@"^(([a-zA-Z]+)|\*)(\/(([a-zA-Z]+)|\*))*$", RegexOptions.Compiled);
+    private static readonly Regex ValidationRegex =
+        new(@"^(([a-zA-Z]+)|\*)(\/(([a-zA-Z]+)|\*))*$", RegexOptions.Compiled);
 
     private const string Wildcard = "*";
     private const string Separator = "/";
@@ -26,7 +27,7 @@ public record Permission
             var currentPermission = permissionParts[permissionsIndex];
             var currentValue = valueParts[valuesIndex];
 
-             // Current parts match
+            // Current parts match
             if (currentPermission.Equals(currentValue))
             {
                 valuesIndex++;
