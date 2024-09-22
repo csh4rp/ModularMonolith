@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModularMonolith.Infrastructure.DataAccess.Postgres;
@@ -31,24 +32,28 @@ public static class DataAccessExtensions
         {
             case "SqlServer":
                 serviceCollection.AddSqlServerDataAccess<SqlServerDbContext>(options =>
-                {
-                    options.UseAuditLogInterceptor = true;
-                    options.UseEventLogInterceptor = true;
-                    options.ConnectionStringName = "Database";
-                })
-                .AddHealthChecks()
-                .AddDbContextCheck<SqlServerDbContext>(tags: ["live", "ready"]);
+                    {
+                        options.UseAuditLogInterceptor = true;
+                        options.UseEventLogInterceptor = true;
+                        options.ConnectionStringName = "Database";
+                    }).AddDataProtection()
+                    .PersistKeysToDbContext<SqlServerDbContext>();
+
+                serviceCollection.AddHealthChecks()
+                    .AddDbContextCheck<SqlServerDbContext>(tags: ["live", "ready"]);
                 break;
             case "Postgres":
                 serviceCollection.AddPostgresDataAccess<PostgresDbContext>(options =>
-                {
-                    options.UseAuditLogInterceptor = true;
-                    options.UseEventLogInterceptor = true;
-                    options.UseSnakeCaseNamingConvention = true;
-                    options.ConnectionStringName = "Database";
-                })
-                .AddHealthChecks()
-                .AddDbContextCheck<PostgresDbContext>(tags: ["live", "ready"]);
+                    {
+                        options.UseAuditLogInterceptor = true;
+                        options.UseEventLogInterceptor = true;
+                        options.UseSnakeCaseNamingConvention = true;
+                        options.ConnectionStringName = "Database";
+                    }).AddDataProtection()
+                    .PersistKeysToDbContext<PostgresDbContext>();
+
+                serviceCollection.AddHealthChecks()
+                    .AddDbContextCheck<PostgresDbContext>(tags: ["live", "ready"]);
                 break;
         }
 
