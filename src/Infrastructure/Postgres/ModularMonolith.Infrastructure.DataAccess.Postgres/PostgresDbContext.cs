@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.DataAccess.EntityFramework;
 using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs;
@@ -8,7 +9,7 @@ using ModularMonolith.Shared.DataAccess.EntityFramework.Postgres.EventLogs.Entit
 
 namespace ModularMonolith.Infrastructure.DataAccess.Postgres;
 
-public sealed class PostgresDbContext : DbContext
+public sealed class PostgresDbContext : DbContext, IDataProtectionKeyContext
 {
     private const string SharedSchemaName = "shared";
 
@@ -18,6 +19,8 @@ public sealed class PostgresDbContext : DbContext
         ConfigurationAssemblyCollection configurationAssemblies)
         : base(options) =>
         _configurationAssemblies = configurationAssemblies;
+
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -69,4 +72,5 @@ public sealed class PostgresDbContext : DbContext
             modelBuilder.ApplyConfigurationsFromAssembly(configurationAssembly);
         }
     }
+
 }

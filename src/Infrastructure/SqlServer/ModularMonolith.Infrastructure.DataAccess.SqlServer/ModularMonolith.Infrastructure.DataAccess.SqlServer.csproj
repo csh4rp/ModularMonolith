@@ -2,6 +2,7 @@
   <ItemGroup>
     <PackageReference Include="MassTransit"/>
     <PackageReference Include="MassTransit.EntityFrameworkCore"/>
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer"/>
   </ItemGroup>
   <ItemGroup>

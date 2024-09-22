@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ModularMonolith.Shared.DataAccess.EntityFramework;
 using ModularMonolith.Shared.DataAccess.EntityFramework.AuditLogs;
@@ -7,7 +8,7 @@ using ModularMonolith.Shared.DataAccess.EntityFramework.SqlServer.EventLogs.Enti
 
 namespace ModularMonolith.Infrastructure.DataAccess.SqlServer;
 
-public sealed class SqlServerDbContext : DbContext
+public sealed class SqlServerDbContext : DbContext, IDataProtectionKeyContext
 {
     private const string SharedSchemaName = "Shared";
 
@@ -17,6 +18,8 @@ public sealed class SqlServerDbContext : DbContext
         ConfigurationAssemblyCollection configurationAssemblyCollection)
         : base(options) =>
         _configurationAssemblyCollection = configurationAssemblyCollection;
+
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -44,4 +47,5 @@ public sealed class SqlServerDbContext : DbContext
             modelBuilder.ApplyConfigurationsFromAssembly(configurationAssembly);
         }
     }
+
 }

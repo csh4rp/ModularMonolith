@@ -28,7 +28,7 @@ internal sealed class OperationContextAccessor : IOperationContextAccessor
                 return null;
             }
 
-            var httpContext = _httpContextAccessor?.HttpContext;
+            var httpContext = _httpContextAccessor.HttpContext;
 
             return new OperationContext
             {
